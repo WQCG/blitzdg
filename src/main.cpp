@@ -1,6 +1,6 @@
 #include <iostream>
 #include <blitz/array.h>
-#include <rectangle.hpp>
+#include <LUFactorizer.hpp>
 
 using namespace std;
 using namespace blitz;
@@ -11,7 +11,8 @@ int main(int argc, char **argv) {
 	int N = 8;
 
     // Create two-dimensional arrays of float
-    Array<float,2> A(N,N), B(N,N), C(N,N), D(N,N);
+    Array<double,2> A(N,N), B(N,N), C(N,N), D(N,N);
+	Array<double, 2> * const & ptr = &A;
 
 	firstIndex ii;
 	secondIndex jj;
@@ -25,10 +26,16 @@ int main(int argc, char **argv) {
 	cout << "C:" << C << endl ;
 	cout << "D:" << D << endl ;
 
-	Rectangle rect;
-  	rect.set_values (3,4);
-  	cout << "area: " << rect.area();
+	cout << "ptr:" << ptr << endl;
+	cout << "ptr (dereferenced):" << *ptr << endl;
 
+	LUFactorizer factorizer(ptr);
+
+	factorizer.factorize();
+
+	B = factorizer.get_A();
+
+	cout << B << endl;
 
     return 0;
 

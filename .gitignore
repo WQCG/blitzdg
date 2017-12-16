@@ -4,4 +4,5 @@ lib/
 build/
 include/igloo
 *.pdf
+.vscode/
 
