@@ -1,4 +1,6 @@
 #!/bin/bash
-g++  -lblitz -lumfpack ./foo.cpp -o foo -Wall
-./foo
+make tests
+./bin/test
+make
+./bin/blitzdg
 

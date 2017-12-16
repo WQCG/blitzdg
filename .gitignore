@@ -1,0 +1,7 @@
+*.tar.gz
+bin/
+lib/
+build/
+include/igloo
+*.pdf
+
