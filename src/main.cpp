@@ -23,6 +23,14 @@ int main(int argc, char **argv) {
 		0,4,2,0,1;
 	B = jj;
 
+	Array<double, 1> b(N), soln(N);
+
+    b =  8,
+        45,
+        -3,
+         3,
+        19;
+
     C = A*B;
 	D = A+B;
 
@@ -36,6 +44,9 @@ int main(int argc, char **argv) {
 
 	// B gets a reference to A (not a copy)
 	B = luSolver.get_A();
+
+	luSolver.solve(b, soln);
+	cout << soln << endl;
 
 	//B and A will output the same values
 	cout << B << endl;

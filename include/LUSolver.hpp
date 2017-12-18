@@ -14,8 +14,17 @@ class LUSolver {
     int N;
     Array<double, 2> * A;
 
+    // Umfpack-specific fields
+    int * Ap;
+    int * Ai;
+    double * Ax;
+    int * Map;
+    double * null = (double *) NULL ;
+
+    void * Symbolic;
+    void * Numeric;
+
     SparseTriplet Triplet;
-    void* Numeric;
 
     void toSparseTriplet();
 
@@ -26,7 +35,7 @@ class LUSolver {
 
     void factorize();
 
-    Array<double, 2> const & solve(Array<double, 2> * const &, Array<double, 2> * &);
+    void solve(Array<double, 1> const &, Array<double, 1> &);
 
     ~LUSolver();
 };
