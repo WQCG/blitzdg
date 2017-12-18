@@ -2,7 +2,7 @@
 
 using namespace blitz;
 
-struct sparseTriplet {
+struct SparseTriplet {
     int nz;
     int *row;
     int *col;
@@ -14,7 +14,7 @@ class LUSolver {
     int N;
     Array<double, 2> * A;
 
-    sparseTriplet triplet;
+    SparseTriplet triplet;
 
     void toSparseTriplet();
 
