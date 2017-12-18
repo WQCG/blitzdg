@@ -10,7 +10,7 @@ struct sparseTriplet {
 };
 
 
-class LUFactorizer {
+class LUSolver {
     int N;
     Array<double, 2> * A;
 
@@ -19,7 +19,7 @@ class LUFactorizer {
     void toSparseTriplet();
 
   public:
-    LUFactorizer(Array<double, 2> * const &);
+    LUSolver(Array<double, 2> * const &);
     
     Array<double, 2> & get_A();
 
@@ -27,6 +27,6 @@ class LUFactorizer {
 
     Array<double, 2> const & solve(Array<double, 2> * const &, Array<double, 2> * &);
 
-    ~LUFactorizer();
+    ~LUSolver();
 };
 

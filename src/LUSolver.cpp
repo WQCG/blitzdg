@@ -1,18 +1,18 @@
 #include <suitesparse/umfpack.h>
-#include <LUFactorizer.hpp>
+#include <LUSolver.hpp>
 #include <iostream>
 #include <math.h>
 
 using namespace std;
 
-LUFactorizer::LUFactorizer(Array<double, 2> * const & Ain) {
+LUSolver::LUSolver(Array<double, 2> * const & Ain) {
     A = Ain;
     triplet.row = nullptr;
     triplet.col = nullptr;
     triplet.val = nullptr;
 }
 
-void LUFactorizer::factorize() {
+void LUSolver::factorize() {
     const Array<double, 2> & Aref = *A;
     const int n_rows = Aref.rows();
     const int n_cols = Aref.cols();
@@ -57,7 +57,7 @@ void LUFactorizer::factorize() {
     cout << "x: " << xa << endl;
 }
 
-void LUFactorizer::toSparseTriplet() {
+void LUSolver::toSparseTriplet() {
     const Array<double, 2> & Aref = *A;
 
     const int n_rows = Aref.rows();
@@ -87,12 +87,12 @@ void LUFactorizer::toSparseTriplet() {
     triplet.nz = nz;
 }
 
-Array<double, 2> & LUFactorizer::get_A() {
+Array<double, 2> & LUSolver::get_A() {
     return *A;
 }
 
 
-LUFactorizer::~LUFactorizer() {
+LUSolver::~LUSolver() {
     if (triplet.row != nullptr) delete[] triplet.row;
     if (triplet.col != nullptr) delete[] triplet.col;
     if (triplet.val != nullptr) delete[] triplet.val;

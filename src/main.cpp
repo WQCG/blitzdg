@@ -1,6 +1,6 @@
 #include <iostream>
 #include <blitz/array.h>
-#include <LUFactorizer.hpp>
+#include <LUSolver.hpp>
 
 using namespace std;
 using namespace blitz;
@@ -29,12 +29,13 @@ int main(int argc, char **argv) {
 	cout << "C:" << C << endl ;
 	cout << "D:" << D << endl ;
 
-	LUFactorizer factorizer(&A);
+	LUSolver luSolver(&A);
 
-	factorizer.factorize();
+	// Compute LU factors.
+	luSolver.factorize();
 
 	// B gets a reference to A (not a copy)
-	B = factorizer.get_A();
+	B = luSolver.get_A();
 
 	//B and A will output the same values
 	cout << B << endl;
