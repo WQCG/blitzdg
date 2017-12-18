@@ -8,16 +8,19 @@ using namespace blitz;
 int main(int argc, char **argv) {
 	cout << "hello, world\n" ;
 
-	int N = 8;
+	int N = 5;
 
     // Create two-dimensional arrays of float
     Array<double,2> A(N,N), B(N,N), C(N,N), D(N,N);
-	Array<double, 2> * const & ptr = &A;
 
 	firstIndex ii;
 	secondIndex jj;
 
-	A = ii;
+	A = 2,3,0,0,0,
+		3,0,4,0,6,
+		0,-1,-3,2,0,
+		0,0,1,0,0,
+		0,4,2,0,1;
 	B = jj;
 
     C = A*B;
@@ -26,17 +29,19 @@ int main(int argc, char **argv) {
 	cout << "C:" << C << endl ;
 	cout << "D:" << D << endl ;
 
-	cout << "ptr:" << ptr << endl;
-	cout << "ptr (dereferenced):" << *ptr << endl;
-
-	LUFactorizer factorizer(ptr);
+	LUFactorizer factorizer(&A);
 
 	factorizer.factorize();
 
+	// B gets a reference to A (not a copy)
 	B = factorizer.get_A();
 
+	//B and A will output the same values
 	cout << B << endl;
+	cout << A << endl;
+
+	// But their memory addresses will be different.
+	cout << &B << endl << &A << endl;
 
     return 0;
-
 }
