@@ -14,7 +14,8 @@ class LUSolver {
     int N;
     Array<double, 2> * A;
 
-    SparseTriplet triplet;
+    SparseTriplet Triplet;
+    void* Numeric;
 
     void toSparseTriplet();
 

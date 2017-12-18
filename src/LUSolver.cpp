@@ -7,9 +7,10 @@ using namespace std;
 
 LUSolver::LUSolver(Array<double, 2> * const & Ain) {
     A = Ain;
-    triplet.row = nullptr;
-    triplet.col = nullptr;
-    triplet.val = nullptr;
+    Triplet.row = nullptr;
+    Triplet.col = nullptr;
+    Triplet.val = nullptr;
+    Numeric = nullptr;
 }
 
 void LUSolver::factorize() {
@@ -17,32 +18,32 @@ void LUSolver::factorize() {
     const int n_rows = Aref.rows();
     const int n_cols = Aref.cols();
 
-    // Convert full matrix A to sparse triplet.
+    // Convert full matrix A to sparse Triplet.
     toSparseTriplet();
 
-    const int nz = triplet.nz;
+    const int nz = Triplet.nz;
 
     int *Ap = new int[n_rows+1];
     int *Ai = new int[nz];
     double *Ax = new double[nz];
     int *map = new int[nz];
 
-    void *Symbolic, *Numeric;
+    void *symbolic;
     double *null = (double *) NULL ;
 
     double b[] = {8., 45., -3., 3., 19.};
     double x[5];
 
     cout << "Computing LU factorization!" << endl;
-    // convert sparse triplet to compressed column format
-    umfpack_di_triplet_to_col(n_rows, n_cols, triplet.nz, triplet.row, triplet.col,
-        triplet.val, Ap, Ai, Ax, map);
+    // convert sparse Triplet to compressed column format
+    umfpack_di_triplet_to_col(n_rows, n_cols, Triplet.nz, Triplet.row, Triplet.col,
+        Triplet.val, Ap, Ai, Ax, map);
 
-    umfpack_di_symbolic(n_rows, n_cols, Ap, Ai, Ax, &Symbolic, null, null);
-    umfpack_di_numeric (Ap, Ai, Ax, Symbolic, &Numeric, null, null) ;
+    umfpack_di_symbolic(n_rows, n_cols, Ap, Ai, Ax, &symbolic, null, null);
+    umfpack_di_numeric (Ap, Ai, Ax, symbolic, &Numeric, null, null) ;
     cout << "Done!" << endl;
 
-    umfpack_di_free_symbolic (&Symbolic) ;
+    umfpack_di_free_symbolic (&symbolic) ;
 
     umfpack_di_solve (UMFPACK_A, Ap, Ai, Ax, x, b, Numeric, null, null) ;
     umfpack_di_free_numeric (&Numeric) ;
@@ -63,10 +64,10 @@ void LUSolver::toSparseTriplet() {
     const int n_rows = Aref.rows();
     const int n_cols = Aref.cols();
 
-    triplet.nz = n_rows*n_cols;  // find a better bound, or don't.
-    triplet.col = new int[triplet.nz];
-    triplet.row = new int[triplet.nz];
-    triplet.val = new double[triplet.nz];
+    Triplet.nz = n_rows*n_cols;  // find a better bound, or don't.
+    Triplet.col = new int[Triplet.nz];
+    Triplet.row = new int[Triplet.nz];
+    Triplet.val = new double[Triplet.nz];
 
     int nz = 0;
 
@@ -76,15 +77,15 @@ void LUSolver::toSparseTriplet() {
                 continue;
             }
 
-            triplet.row[nz] = i;
-            triplet.col[nz] = j;
-            triplet.val[nz] = Aref(i,j);
+            Triplet.row[nz] = i;
+            Triplet.col[nz] = j;
+            Triplet.val[nz] = Aref(i,j);
 
             nz++;
         }
     }
 
-    triplet.nz = nz;
+    Triplet.nz = nz;
 }
 
 Array<double, 2> & LUSolver::get_A() {
@@ -93,7 +94,7 @@ Array<double, 2> & LUSolver::get_A() {
 
 
 LUSolver::~LUSolver() {
-    if (triplet.row != nullptr) delete[] triplet.row;
-    if (triplet.col != nullptr) delete[] triplet.col;
-    if (triplet.val != nullptr) delete[] triplet.val;
+    if (Triplet.row != nullptr) delete[] Triplet.row;
+    if (Triplet.col != nullptr) delete[] Triplet.col;
+    if (Triplet.val != nullptr) delete[] Triplet.val;
 }
