@@ -46,7 +46,6 @@ void LUSolver::factorize() {
     umfpack_di_free_symbolic (&symbolic) ;
 
     umfpack_di_solve (UMFPACK_A, Ap, Ai, Ax, x, b, Numeric, null, null) ;
-    umfpack_di_free_numeric (&Numeric) ;
 
     Array<double, 2> xa(5,1);
     xa(0) = x[0];
@@ -97,4 +96,5 @@ LUSolver::~LUSolver() {
     if (Triplet.row != nullptr) delete[] Triplet.row;
     if (Triplet.col != nullptr) delete[] Triplet.col;
     if (Triplet.val != nullptr) delete[] Triplet.val;
+    if (Numeric != nullptr) umfpack_di_free_numeric (&Numeric);
 }
