@@ -1,16 +1,57 @@
 #include <igloo/igloo_alt.h>
-using namespace igloo;
+#include <blitz/array.h>
 
-Describe(a_guitar_with_a_fuzzbox)
+using namespace igloo;
+using namespace blitz;
+
+const int N=5;
+
+Array<double,2> A(N,N), B(N,N), C(N,N), D(N,N);
+Array<double,1> b(N), soln(N), d(N), e(N);
+
+firstIndex ii;
+secondIndex jj;
+
+Describe(Simple_blitz_array_operations)
 {
   void SetUp()
   {
-    //load things
+
+    A = 2,3,0,0,0,
+		    3,0,4,0,6,
+		    0,-1,-3,2,0,
+		    0,0,1,0,0,
+		    0,4,2,0,1;
+
+	  B = jj;
+
+    b =  8,
+        45,
+        -3,
+         3,
+        19;
+
+    d = 1,2,3,4;
+    e = 2,3,4,5;
   }
 
-  It(starts_in_clean_mode)
+  It(Properly_Multiplies_Pointwise)
   {
-    Assert::That(15, Equals(15));
+    Array<double, 1> result(N);
+    result = d(ii)*e(ii);
+
+    Assert::That(2., Equals(result(0)));
+    Assert::That(6., Equals(result(1)));
+    Assert::That(12., Equals(result(2)));
+    Assert::That(20., Equals(result(3)));
+  }
+
+  It(Properly_Does_Dot_Product) 
+  {
+    double result;
+    result = sum(d * e);
+
+    Assert::That(40., Equals(result));
   }
 
   Describe(in_distorted_mode)
