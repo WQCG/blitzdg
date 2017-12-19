@@ -25,6 +25,6 @@ clean:
 	@echo " $(RM) -r $(BUILDDIR) $(TARGET)"; $(RM) -r $(BUILDDIR) $(TARGET)
 
 tests:
-	@echo " $(CC) $(CFLAGS) ${TESTDIR}/bdd_ex.cpp $(INC) $(LIB) -o bin/test"; $(CC) $(CFLAGS) ${TESTDIR}/bdd_ex.cpp $(INC) $(LIB) -o bin/test
+	@echo " $(CC) $(CFLAGS) ${TESTDIR}/tests.cpp $(INC) $(LIB) -o bin/test"; $(CC) $(CFLAGS) ${TESTDIR}/tests.cpp $(INC) $(LIB) -o bin/test
 
 .PHONY: clean
