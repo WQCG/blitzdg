@@ -24,7 +24,8 @@ clean:
 	@echo " Cleaning...";
 	@echo " $(RM) -r $(BUILDDIR) $(TARGET)"; $(RM) -r $(BUILDDIR) $(TARGET)
 
-tests:
-	@echo " $(CC) $(CFLAGS) ${TESTDIR}/tests.cpp $(INC) $(LIB) -o bin/test"; $(CC) $(CFLAGS) ${TESTDIR}/tests.cpp $(INC) $(LIB) -o bin/test
-
+tests: $(shell echo $(OBJECTS) | sed 's/build\/main.o//' )
+	@echo " $(CC) $(CFLAGS) ${TESTDIR}/tests.cpp $(INC) $(LIB) -c -o build/test.o"; $(CC) $(CFLAGS) ${TESTDIR}/tests.cpp $(INC) $(LIB) -c -o build/test.o
+	#@echo " $(CC) build/test.o build/LUSolver.o -o bin/test $(LIB)"; $(CC) build/test.o build/LUSolver.o -o bin/test $(LIB)
+	@echo " $(CC) build/test.o $^ -o bin/test $(LIB)"; $(CC) build/test.o $^ -o bin/test $(LIB)
 .PHONY: clean

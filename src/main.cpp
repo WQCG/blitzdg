@@ -6,12 +6,10 @@ using namespace std;
 using namespace blitz;
 
 int main(int argc, char **argv) {
-	cout << "hello, world\n" ;
-
 	int N = 5;
 
     // Create two-dimensional arrays of float
-    Array<double,2> A(N,N), B(N,N), C(N,N), D(N,N);
+    Array<double,2> A(N,N), B(N,N);
 
 	firstIndex ii;
 	secondIndex jj;
@@ -30,12 +28,6 @@ int main(int argc, char **argv) {
         -3,
          3,
         19;
-
-    C = A*B;
-	D = A+B;
-
-	cout << "C:" << C << endl ;
-	cout << "D:" << D << endl ;
 
 	LUSolver luSolver(&A);
 
