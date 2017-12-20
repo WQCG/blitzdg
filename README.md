@@ -17,7 +17,9 @@ So far:
 
 * `blitz++`
 * `SuiteSparse (umfpack)`
-* `igloo` for BDD-style testing. 
+* `metis`
+* `libgmsh`
+* `igloo` for BDD-style testing.
 
 Dependency installation is outlined in `pull-deps.sh` (tested on Ubuntu).
 

@@ -8,7 +8,7 @@ SRCEXT := cpp
 SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 CFLAGS := -g -Wall -std=c++0x #do we want this last one?
-LIB := -pthread -L lib -lblitz -lumfpack
+LIB := -pthread -L lib -lblitz -lumfpack -lmetis -lgmsh
 INC := -I include
 
 $(TARGET): $(OBJECTS)
