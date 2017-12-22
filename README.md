@@ -19,6 +19,7 @@ So far:
 * `SuiteSparse (umfpack)`
 * `metis`
 * `libgmsh`
+* `boost`
 * `igloo` for BDD-style testing.
 
 Dependency installation is outlined in `pull-deps.sh` (tested on Ubuntu).
