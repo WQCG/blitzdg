@@ -10,23 +10,23 @@ class MeshManager {
   public:
     MeshManager();
 
-    int GetIndex(int, int, int);
+    int get_Index(int row, int col, int numCols);
 
     // Read gmsh .msh file.
-    void ReadMesh(string gmshInputFile);
+    void readMesh(string gmshInputFile);
     
-    void ReadVertices(string vertFile);
+    void readVertices(string vertFile);
 
-    void ReadElementToVertex(string E2VFile);
+    void readElements(string E2VFile);
 
     // Split up with metis.
-    void PartitionMesh(int numPartitions);
+    void partitionMesh(int numPartitions);
 
-    double * & GetVertices();
+    double * & get_Vertices();
 
-    int GetDim();
+    int get_Dim();
 
-    int GetNumVerts();
+    int get_NumVerts();
     
     ~MeshManager();
 };

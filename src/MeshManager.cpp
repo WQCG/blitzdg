@@ -13,18 +13,16 @@ MeshManager::MeshManager() {
 }
 
 
-int MeshManager::GetIndex(int row, int col, int numCols) {
+int MeshManager::get_Index(int row, int col, int numCols) {
     return col + row*numCols;
 }
 
 
-void MeshManager::ReadMesh(string gmshInputFile) {
-    
+void MeshManager::readMesh(string gmshInputFile) {
+    throw("Not implemented!");
 }
 
-void MeshManager::ReadVertices(string vertFile) {
-    string str1("hello world");
-    to_upper(str1);
+void MeshManager::readVertices(string vertFile) {
     
     ifstream vertFileStream(vertFile);
 
@@ -64,15 +62,15 @@ void MeshManager::ReadVertices(string vertFile) {
     vertFileStream.close();
 }
 
-double * & MeshManager::GetVertices() {
+double * & MeshManager::get_Vertices() {
     return Vert;
 }
 
-int MeshManager::GetDim() {
+int MeshManager::get_Dim() {
     return Dim;
 }
 
-int MeshManager::GetNumVerts() {
+int MeshManager::get_NumVerts() {
     return NumVerts;
 }
 
