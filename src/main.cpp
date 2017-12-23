@@ -28,5 +28,21 @@ int main(int argc, char **argv) {
 		cout << endl;
 	}
 
+	mgr.readElements("/home/dsteinmo/blitzdg/input/2box.E2V");
+	int numElements = mgr.get_NumElements();
+	int elementType = mgr.get_ElementType();
+
+	cout << "numElements: " << numElements << endl;
+	cout << "elementType: " << elementType << endl;
+
+	int * & elements = mgr.get_Elements();
+
+	// can move this into a printElements function or something.
+	for(int i=0; i < numElements; i++) {
+		for (int j=0; j < elementType; j++) {
+			cout << elements[mgr.get_Index(i, j, elementType)] << " ";
+		}
+		cout << endl;
+	}
     return 0;
 }

@@ -10,8 +10,7 @@ using namespace boost;
 
 MeshManager::MeshManager() {
     Vert = nullptr;
-    string foo = " \t";
-    csvDelimeters = &foo;
+    CsvDelimeters = " \t";
     NumVerts = 0;
     NumElements = 0;
     Dim = 0;
@@ -73,13 +72,13 @@ vector<int> MeshManager::readCsvFile(string csvFile, string delimiters, T * & re
 
 void MeshManager::readVertices(string vertFile) {
     cout << vertFile << endl;
-    vector<int> dims = readCsvFile<double>(vertFile, " \t", Vert);
+    vector<int> dims = readCsvFile<double>(vertFile, CsvDelimeters, Vert);
     NumVerts = dims[0];
     Dim = dims[1];
 }
 
 void MeshManager::readElements(string E2VFile) {
-    vector<int> dims = readCsvFile<int>(E2VFile, " \t", EToV);
+    vector<int> dims = readCsvFile<int>(E2VFile, CsvDelimeters, EToV);
     NumElements = dims[0];
     ElementType = dims[1];
 }
@@ -94,6 +93,17 @@ int MeshManager::get_Dim() {
 
 int MeshManager::get_NumVerts() {
     return NumVerts;
+}
+
+int MeshManager::get_NumElements() {
+    return NumElements;
+}
+int MeshManager::get_ElementType() {
+    return ElementType;
+}
+
+int * & MeshManager::get_Elements() {
+    return EToV;
 }
 
 MeshManager::~MeshManager() {

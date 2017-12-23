@@ -11,7 +11,7 @@ class MeshManager {
     int NumVerts;
     int ElementType;
     int NumElements;
-    string * csvDelimeters;
+    string CsvDelimeters;
 
     template<typename T>
     vector<int> readCsvFile(string csvFile, string delimiters, T * & result);
@@ -36,6 +36,11 @@ class MeshManager {
     int get_Dim();
 
     int get_NumVerts();
+
+    int * & get_Elements();
+
+    int get_NumElements();
+	  int get_ElementType();
     
     ~MeshManager();
 };
