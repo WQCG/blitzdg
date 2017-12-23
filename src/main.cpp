@@ -17,6 +17,7 @@ int main(int argc, char **argv) {
 	cout << "dim: " << dim << endl;
 	cout << "numVerts: " << numVerts << endl;
 
+
 	double * & verts = mgr.get_Vertices();
 
 	// can move this into a printverts function or something.
@@ -26,7 +27,6 @@ int main(int argc, char **argv) {
 		}
 		cout << endl;
 	}
-
 
     return 0;
 }

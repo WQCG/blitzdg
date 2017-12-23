@@ -1,11 +1,20 @@
 #include <blitz/array.h>
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
+using namespace boost;
 
 class MeshManager {
     double * Vert;
+    int * EToV;
     int Dim;
     int NumVerts;
+    int ElementType;
+    int NumElements;
+    string * csvDelimeters;
+
+    template<typename T>
+    vector<int> readCsvFile(string csvFile, string delimiters, T * & result);
 
   public:
     MeshManager();
