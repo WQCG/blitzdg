@@ -126,7 +126,6 @@ void MeshManager::partitionMesh(int numPartitions) {
 }
 
 void MeshManager::readVertices(string vertFile) {
-    cout << vertFile << endl;
     vector<int> dims = readCsvFile<double>(vertFile, CsvDelimeters, Vert);
     NumVerts = dims[0];
     Dim = dims[1];
@@ -163,4 +162,5 @@ int * & MeshManager::get_Elements() {
 
 MeshManager::~MeshManager() {
     if (Vert != nullptr) delete[] Vert;
+    if (EToV != nullptr) delete[] EToV;
 }
