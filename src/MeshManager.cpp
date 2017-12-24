@@ -4,6 +4,7 @@
 #include <gmsh/Gmsh.h>
 #include <fstream>
 #include <boost/algorithm/string.hpp>
+#include <metis.h>
 
 using namespace std;
 using namespace boost;
@@ -67,6 +68,61 @@ vector<int> MeshManager::readCsvFile(string csvFile, string delimiters, T * & re
     fileStream.close();
 
     return dims;
+}
+
+void MeshManager::partitionMesh(int numPartitions) {
+    int * metisOptions =  NULL;
+    int objval =0 ;
+    int * epart = NULL;
+    int * npart = NULL;
+
+    // set up mesh partitioning options
+    metisOptions = new int[METIS_NOPTIONS];
+    metisOptions[METIS_OPTION_PTYPE] = METIS_PTYPE_KWAY; // default
+    metisOptions[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_VOL; // total communication volume minimization.
+    metisOptions[METIS_OPTION_CTYPE] = METIS_CTYPE_SHEM;
+    metisOptions[METIS_OPTION_IPTYPE] = METIS_IPTYPE_NODE;
+    metisOptions[METIS_OPTION_RTYPE] = METIS_RTYPE_GREEDY;
+    metisOptions[METIS_OPTION_NCUTS] = 1;
+    metisOptions[METIS_OPTION_NITER] = 10; // default
+    metisOptions[METIS_OPTION_SEED] = 123; // random number seed.
+    metisOptions[METIS_OPTION_UFACTOR] = 30; // max load imbalance of 1.03
+    metisOptions[METIS_OPTION_NUMBERING] = 1; // 1-based numbering.
+    metisOptions[METIS_OPTION_DBGLVL] = METIS_DBG_INFO; //debug level='info'. 0 for nothing.
+    metisOptions[METIS_OPTION_CONTIG] = 1; // enforce a contiguous partition.
+
+    int * eind = EToV;
+    int * eptr = new int[NumElements+1];
+
+    // output arrays
+    epart = new int[NumElements];
+    npart = new int[NumVerts];
+    // Assume mesh with homogenous element type, then eptr 
+    // dictates an equal stride of size ElementType across EToV array.
+    for (int i=0; i <= NumElements; i++)
+        eptr[i] = ElementType*i;
+
+    int result =  METIS_PartMeshNodal( &NumElements, &NumVerts, eptr, eind, NULL, NULL,
+                    &numPartitions, NULL, metisOptions, &objval, epart, npart);
+
+    if (result == METIS_OK)
+        cout << "METIS partitioning successful!" << endl;
+    else if (result == METIS_ERROR_INPUT)
+        cout << "METIS input error!" << endl;
+    else if (result == METIS_ERROR_MEMORY)
+        cout << "METIS could not allocate the required memory!" << endl;
+    else
+        cout << "Unknown METIS error: " << result << endl;
+
+    cout << "total communication volume of partition: " << objval << endl;
+
+    cout << "Element partitioning vector: " << endl;
+    for (int i=0; i<NumElements; i++)
+        cout << epart[i] << endl;
+
+    cout << "Vertex partitioning vector: " << endl;
+    for (int i=0; i<NumVerts; i++)
+        cout << npart[i] << endl;
 
 }
 

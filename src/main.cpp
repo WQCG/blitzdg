@@ -44,5 +44,7 @@ int main(int argc, char **argv) {
 		}
 		cout << endl;
 	}
+
+	mgr.partitionMesh(2);
     return 0;
 }
