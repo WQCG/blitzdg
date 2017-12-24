@@ -1,6 +1,7 @@
 #include <igloo/igloo_alt.h>
 #include <blitz/array.h>
 #include <LUSolver.hpp>
+#include <MeshManager.hpp>
 
 using namespace igloo;
 using namespace blitz;
@@ -112,6 +113,38 @@ Describe(LUSolver_Object)
     Assert::That(abs(soln(3)-x(3)), IsLessThan(eps));
     Assert::That(abs(soln(4)-x(4)), IsLessThan(eps));
   }
+};
+
+Describe(MeshManager_Object) {
+  It(Reads_Vertex_Files) {
+    MeshManager meshManager;
+
+    meshManager.readVertices("input/2box.V");
+
+    Assert::That(meshManager.get_NumVerts(), Equals(6));
+    Assert::That(meshManager.get_Dim(), Equals(2));
+
+    double * verts = meshManager.get_Vertices();
+
+    Assert::That(verts[0], Equals(0.0));
+    Assert::That(verts[1], Equals(0.0));
+
+    Assert::That(verts[2], Equals(0.5));
+    Assert::That(verts[3], Equals(0.0));
+
+    Assert::That(verts[4], Equals(1.0));
+    Assert::That(verts[5], Equals(0.0));
+
+    Assert::That(verts[6], Equals(1.0));
+    Assert::That(verts[7], Equals(1.0));
+
+    Assert::That(verts[8], Equals(0.5));
+    Assert::That(verts[9], Equals(1.0));
+
+    Assert::That(verts[10], Equals(0.0));
+    Assert::That(verts[11], Equals(1.0));
+  }
+
 };
 
 int main(const int argc, const char *argv[])
