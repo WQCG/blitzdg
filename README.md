@@ -11,6 +11,14 @@ Currently only supporting running/development on linux systems, primarily ubuntu
 3.  `make && ./bin/blitzdg` (The binary currently doesn't do much).
 4. Run unit tests with `make tests && ./bin/test`.
 
+### Running with Docker
+
+You can also run the build and tests inside a docker container.
+
+1. `git clone https://github.com/dsteinmo/blitzdg.git && cd blitzdg`
+2. `docker build -t blitzdg .`
+3. `docker run -t blitzdg`
+
 ## Dependencies
 
 So far: 
