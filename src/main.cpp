@@ -8,8 +8,7 @@ using namespace blitz;
 int main(int argc, char **argv) {
 	MeshManager mgr;
 
-	//mgr.ReadMesh("foo");
-	mgr.readVertices("/home/dsteinmo/blitzdg/input/2box.V");
+	mgr.readVertices("input/2box.V");
 
 	int dim = mgr.get_Dim();
 	int numVerts = mgr.get_NumVerts();
@@ -28,7 +27,7 @@ int main(int argc, char **argv) {
 		cout << endl;
 	}
 
-	mgr.readElements("/home/dsteinmo/blitzdg/input/2box.E2V");
+	mgr.readElements("input/2box.E2V");
 	int numElements = mgr.get_NumElements();
 	int elementType = mgr.get_ElementType();
 
