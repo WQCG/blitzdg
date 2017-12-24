@@ -18,7 +18,6 @@ So far:
 * `blitz++`
 * `SuiteSparse (umfpack)`
 * `metis`
-* `libgmsh`
 * `boost`
 * `igloo` for BDD-style testing.
 
