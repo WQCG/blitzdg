@@ -15,6 +15,9 @@ Array<double,1> b(N), soln(N), d(N), e(N), x(N);
 firstIndex ii;
 secondIndex jj;
 
+MeshManager * meshManager=nullptr;
+
+
 Describe(Simple_blitz_array_operations)
 {
   void SetUp() {
@@ -116,15 +119,19 @@ Describe(LUSolver_Object)
 };
 
 Describe(MeshManager_Object) {
+  void SetUp() {
+    meshManager = new MeshManager();
+  }
+
   It(Reads_Vertex_Files) {
-    MeshManager meshManager;
+    MeshManager & mgr = *meshManager;
 
-    meshManager.readVertices("input/2box.V");
+    mgr.readVertices("input/2box.V");
 
-    Assert::That(meshManager.get_NumVerts(), Equals(6));
-    Assert::That(meshManager.get_Dim(), Equals(2));
+    Assert::That(mgr.get_NumVerts(), Equals(6));
+    Assert::That(mgr.get_Dim(), Equals(2));
 
-    double * verts = meshManager.get_Vertices();
+    double * verts = mgr.get_Vertices();
 
     Assert::That(verts[0], Equals(0.0));
     Assert::That(verts[1], Equals(0.0));
@@ -146,14 +153,14 @@ Describe(MeshManager_Object) {
   }
 
   It(Reads_Element_Files) {
-    MeshManager meshManager;
+    MeshManager & mgr = *meshManager;
 
-    meshManager.readElements("input/2box.E2V");
+    mgr.readElements("input/2box.E2V");
 
-    Assert::That(meshManager.get_NumElements(), Equals(2));
-    Assert::That(meshManager.get_ElementType(), Equals(4));
+    Assert::That(mgr.get_NumElements(), Equals(2));
+    Assert::That(mgr.get_ElementType(), Equals(4));
 
-    int * elements = meshManager.get_Elements();
+    int * elements = mgr.get_Elements();
 
     Assert::That(elements[0], Equals(1));
     Assert::That(elements[1], Equals(2));
@@ -164,6 +171,10 @@ Describe(MeshManager_Object) {
     Assert::That(elements[5], Equals(3));
     Assert::That(elements[6], Equals(4));
     Assert::That(elements[7], Equals(5));
+  }
+
+  void TearDown() {
+    meshManager->~MeshManager();
   }
 };
 
