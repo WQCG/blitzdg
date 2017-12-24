@@ -145,6 +145,26 @@ Describe(MeshManager_Object) {
     Assert::That(verts[11], Equals(1.0));
   }
 
+  It(Reads_Element_Files) {
+    MeshManager meshManager;
+
+    meshManager.readElements("input/2box.E2V");
+
+    Assert::That(meshManager.get_NumElements(), Equals(2));
+    Assert::That(meshManager.get_ElementType(), Equals(4));
+
+    int * elements = meshManager.get_Elements();
+
+    Assert::That(elements[0], Equals(1));
+    Assert::That(elements[1], Equals(2));
+    Assert::That(elements[2], Equals(5));
+    Assert::That(elements[3], Equals(6));
+
+    Assert::That(elements[4], Equals(2));
+    Assert::That(elements[5], Equals(3));
+    Assert::That(elements[6], Equals(4));
+    Assert::That(elements[7], Equals(5));
+  }
 };
 
 int main(const int argc, const char *argv[])
