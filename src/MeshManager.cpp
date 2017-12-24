@@ -1,7 +1,6 @@
 #include <iostream>
 #include <math.h>
 #include <MeshManager.hpp>
-#include <gmsh/Gmsh.h>
 #include <fstream>
 #include <boost/algorithm/string.hpp>
 #include <metis.h>
