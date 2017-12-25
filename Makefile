@@ -12,7 +12,7 @@ TESTOBJECTS := $(shell echo $(OBJECTS) | sed 's/build\/main.o//')
 
 CFLAGS := -g -Wall -std=c++0x #do we want this last one?
 LIB := -pthread -L lib -lblitz -lumfpack -lmetis
-INC := -I include
+INC := -I include -I /usr/include
 
 $(TARGET): $(TESTTARGET)
 	@echo " Linking main binary..."
