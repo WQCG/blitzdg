@@ -119,10 +119,6 @@ Describe(LUSolver_Object)
     Assert::That(abs(soln(3)-x(3)), IsLessThan(eps));
     Assert::That(abs(soln(4)-x(4)), IsLessThan(eps));
   }
-
-  void TearDown() {
-    luSolver->~LUSolver();
-  }
 };
 
 Describe(MeshManager_Object) {
@@ -178,10 +174,6 @@ Describe(MeshManager_Object) {
     Assert::That(elements[5], Equals(3));
     Assert::That(elements[6], Equals(4));
     Assert::That(elements[7], Equals(5));
-  }
-
-  void TearDown() {
-    meshManager->~MeshManager();
   }
 };
 
