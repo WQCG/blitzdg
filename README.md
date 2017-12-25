@@ -11,7 +11,7 @@ Currently only supporting running/development on linux systems, primarily ubuntu
 1. `git clone https://github.com/dsteinmo/blitzdg.git`
 2. `cd blitzdg && ./pull-deps.sh`
 3.  `make && ./bin/blitzdg` (The binary currently doesn't do much).
-4. Run unit tests with `make tests && ./bin/test`.
+4. Run unit tests with `make test`.
 
 ### Running with Docker
 
