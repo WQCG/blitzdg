@@ -10,18 +10,19 @@ OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 BINOBJECTS := $(shell echo $(OBJECTS) | sed 's/build\/test\/tests.o//')
 TESTOBJECTS := $(shell echo $(OBJECTS) | sed 's/build\/main.o//')
 
-CFLAGS := -g -Wall -std=c++0x #do we want this last one?
+CFLAGS := -g -Wall -std=c++0x -fprofile-arcs -ftest-coverage 
+LINKERFLAGS := -fprofile-arcs
 LIB := -pthread -L lib -lblitz -lumfpack -lmetis
 INC := -I include -I /usr/include
 
 $(TARGET): $(TESTTARGET)
 	@echo " Linking main binary..."
-	@echo " $(CC) $(BINOBJECTS) -o $(TARGET) $(LIB)"; $(CC) $(BINOBJECTS) -o $(TARGET) $(LIB)
+	@echo " $(CC) $(LINKERFLAGS) $(BINOBJECTS) -o $(TARGET) $(LIB)"; $(CC) $(LINKERFLAGS) $(BINOBJECTS) -o $(TARGET) $(LIB)
 
 $(TESTTARGET): $(OBJECTS)
 	@mkdir -p bin
 	@echo " Linking tests..."
-	@echo " $(CC) $(TESTOBJECTS) -o $(TESTTARGET) $(LIB)"; $(CC) $(TESTOBJECTS) -o $(TESTTARGET) $(LIB)
+	@echo " $(CC) $(LINKERFLAGS) $(TESTOBJECTS) -o $(TESTTARGET) $(LIB)"; $(CC) $(LINKERFLAGS) $(TESTOBJECTS) -o $(TESTTARGET) $(LIB)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)
