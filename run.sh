@@ -1,6 +1,6 @@
 #!/bin/bash
 make
-make tests
+make test
 ./bin/test
 ./bin/blitzdg
 
