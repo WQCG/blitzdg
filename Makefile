@@ -36,6 +36,6 @@ test: bin/test
 	@bin/test
 
 get-deps:
-	@./pull-deps.sh
+	@sudo /bin/bash pull-deps.sh
 
 .PHONY: clean
