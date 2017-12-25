@@ -11,3 +11,7 @@ tar xzf ./igloo.1.1.1.tar.gz
 cp -r igloo-igloo.1.1.1/igloo include/.
 rm -rf igloo-igloo.1.1.1
 rm igloo.1.1.1.tar.gz
+
+if [ -z "$INSTALL_OPTIONAL" ]; then
+    pip install cpp-coveralls
+fi
