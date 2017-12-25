@@ -2,6 +2,8 @@
 
 blitzdg is an open-source project aiming to implement parallel discontinuous Galerkin (dg) solvers for common partial differential equations systems using blitz++ for array and tensor manipulations and MPI for distributed parallelism.
 
+[![Build Status](https://travis-ci.org/dsteinmo/blitzdg.svg?branch=master)](https://travis-ci.org/dsteinmo/blitzdg)
+
 ## Running
 
 Currently only supporting running/development on linux systems, primarily ubuntu. Tested with GNU g++ compiler and GNU make.
