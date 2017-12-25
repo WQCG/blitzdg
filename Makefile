@@ -19,7 +19,7 @@ $(TARGET): $(TESTTARGET)
 	@echo " $(CC) $(BINOBJECTS) -o $(TARGET) $(LIB)"; $(CC) $(BINOBJECTS) -o $(TARGET) $(LIB)
 
 $(TESTTARGET): $(OBJECTS)
-	@mkdir -p $(BUILDDIR)/bin
+	@mkdir -p bin
 	@echo " Linking tests..."
 	@echo " $(CC) $(TESTOBJECTS) -o $(TESTTARGET) $(LIB)"; $(CC) $(TESTOBJECTS) -o $(TESTTARGET) $(LIB)
 
