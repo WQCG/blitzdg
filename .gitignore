@@ -5,4 +5,4 @@ build/
 include/igloo
 *.pdf
 .vscode/
-
+.coveralls.yml
