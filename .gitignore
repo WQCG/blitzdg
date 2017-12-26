@@ -6,3 +6,4 @@ include/igloo
 *.pdf
 .vscode/
 .coveralls.yml
+doc/latex
