@@ -1,3 +1,12 @@
+/** \mainpage blitzdg documentation
+  *
+  * \section intro_sec Introduction
+  *
+  * This is the auto-generated API docs page for the blitzdg project.
+  *
+  * Click on 'Classes' to start familarizing yourself with the API
+  */
+
 #include <iostream>
 #include <blitz/array.h>
 #include <MeshManager.hpp>
