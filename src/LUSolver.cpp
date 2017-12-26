@@ -5,6 +5,9 @@
 
 using namespace std;
 
+/**
+ * Constructor. Takes a pointer reference to a blitz 2D array (The matrix A to be used by the solver in Ax=b).
+ */
 LUSolver::LUSolver(Array<double, 2> * const & Ain) {
     A = Ain;
     Triplet.row = nullptr;
@@ -14,6 +17,9 @@ LUSolver::LUSolver(Array<double, 2> * const & Ain) {
     Symbolic = nullptr;
 }
 
+/**
+ * Factorize the matrix A with UMFPACK. Computes L,U factors and permutation matrices P,Q such that P*A*Q=LU.
+ */
 void LUSolver::factorize() {
     const Array<double, 2> & Aref = *A;
     const int n_rows = Aref.rows();
@@ -39,6 +45,10 @@ void LUSolver::factorize() {
     cout << "Done!" << endl;
 }
 
+/**
+ * Solve Ax=b using UMFPACK. Requires LUSolver.factorize() to be called first. 'x' is returned in 'soln' reference.
+ * 'b' is speified by 'rhs' reference.
+ */
 void LUSolver::solve(Array<double, 1> const & rhs, Array<double,1> & soln) {
     int n = rhs.length(0);
     double * b = new double[n];
@@ -89,6 +99,9 @@ void LUSolver::toSparseTriplet() {
     Triplet.nz = nz;
 }
 
+/**
+ * Returns a reference to the matrix A.
+ */
 Array<double, 2> & LUSolver::get_A() {
     return *A;
 }

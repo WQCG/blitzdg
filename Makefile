@@ -40,4 +40,7 @@ test: bin/test
 get-deps:
 	@sudo /bin/bash pull-deps.sh
 
+docs:
+	doxygen doxygen.conf
+
 .PHONY: clean

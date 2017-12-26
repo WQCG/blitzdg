@@ -8,6 +8,9 @@
 using namespace std;
 using namespace boost;
 
+/**
+ * Constructor.
+ */
 MeshManager::MeshManager() {
     Vert = nullptr;
     CsvDelimeters = " \t";
@@ -19,12 +22,16 @@ MeshManager::MeshManager() {
     VertexPartitionMap = nullptr;
 }
 
-
+/**
+ * Convert (row,col) index to integer index into a contiguous block of memory.
+ */
 int MeshManager::get_Index(int row, int col, int numCols) {
     return col + row*numCols;
 }
 
-
+/**
+ * Read a .msh file that was generated with Gmsh.
+ */
 void MeshManager::readMesh(string gmshInputFile) {
     throw("Not implemented!");
 }
@@ -82,6 +89,10 @@ vector<int> MeshManager::readCsvFile(string csvFile, string delimiters, T * & re
     return dims;
 }
 
+/**
+ * Partition a mesh into numPartitions partitions using METIS. Results can be obtained by calling
+ * MeshManager.get_ElementPartitionMap() and MeshManager.get_VertexPartitionMap().
+ */
 void MeshManager::partitionMesh(int numPartitions) {
     int * metisOptions =  NULL;
     int objval =0 ;
@@ -141,53 +152,90 @@ void MeshManager::partitionMesh(int numPartitions) {
 
 }
 
+/**
+ * Read a list of vertices from a file. x-, y-, (and z-) are coordinates delimited by spaces, e.g., 0.5 1.0.
+ */
 void MeshManager::readVertices(string vertFile) {
     vector<int> dims = readCsvFile<double>(vertFile, CsvDelimeters, Vert);
     NumVerts = dims[0];
     Dim = dims[1];
 }
 
+/**
+ * Read a list of elments from a file. Vertex numbers are written in a row and delimited by spaces, e.g., 1 2 3 4
+ */
 void MeshManager::readElements(string E2VFile) {
     vector<int> dims = readCsvFile<int>(E2VFile, CsvDelimeters, EToV);
     NumElements = dims[0];
     ElementType = dims[1];
 }
 
+/**
+ * Print the list of vertices to stdout.
+ */
 void MeshManager::printVertices() {
     MeshManager::printArray<double>(Vert, NumVerts, Dim);
 }
 
+/**
+ * Print the list of elements to stdout.
+ */
 void MeshManager::printElements() {
     MeshManager::printArray<int>(EToV, NumElements, ElementType);
 }
 
+/**
+ * Returns a reference to the list of vertices, a contiguous block of type double.
+ */
 double * & MeshManager::get_Vertices() {
     return Vert;
 }
 
+/**
+ * Returns the dimension of the vertex data. Usuallly will be 2 or 3.
+ */
 int MeshManager::get_Dim() {
     return Dim;
 }
 
+/**
+ * Returns the number of vertices.
+ */
 int MeshManager::get_NumVerts() {
     return NumVerts;
 }
 
+/**
+ * Returns the number of elements.
+ */
 int MeshManager::get_NumElements() {
     return NumElements;
 }
+
+/**
+ * Returns the type of element. 3 => triangles, 4 => quadrilaterals, etc.
+ */
 int MeshManager::get_ElementType() {
     return ElementType;
 }
 
+/**
+ * Returns a reference to the list of elements, a contiguous block of type int.
+ */
 int * & MeshManager::get_Elements() {
     return EToV;
 }
 
+/**
+ * Returns a reference to the element partition map, an array of type int.
+ */
 int * & MeshManager::get_ElementPartitionMap() {
     return ElementPartitionMap;
 }
 
+/**
+ * Returns a reference to the vertex partition map, an array of type int.
+ */
 int * & MeshManager::get_VertexPartitionMap() {
     return VertexPartitionMap;
 }
