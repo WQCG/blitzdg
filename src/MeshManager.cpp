@@ -27,6 +27,16 @@ void MeshManager::readMesh(string gmshInputFile) {
 }
 
 template<typename T>
+void MeshManager::printArray(T * & arr, int numRows, int numCols) {
+    for(int i=0; i < numRows; i++) {
+		for (int j=0; j < numCols; j++) {
+			cout << arr[get_Index(i, j, numCols)] << " ";
+		}
+		cout << endl;
+	}
+}
+
+template<typename T>
 vector<int> MeshManager::readCsvFile(string csvFile, string delimiters, T * & result) {
 
     ifstream fileStream(csvFile);
@@ -135,6 +145,14 @@ void MeshManager::readElements(string E2VFile) {
     vector<int> dims = readCsvFile<int>(E2VFile, CsvDelimeters, EToV);
     NumElements = dims[0];
     ElementType = dims[1];
+}
+
+void MeshManager::printVertices() {
+    MeshManager::printArray<double>(Vert, NumVerts, Dim);
+}
+
+void MeshManager::printElements() {
+    MeshManager::printArray<int>(EToV, NumElements, ElementType);
 }
 
 double * & MeshManager::get_Vertices() {

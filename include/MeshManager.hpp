@@ -16,6 +16,9 @@ class MeshManager {
     template<typename T>
     vector<int> readCsvFile(string csvFile, string delimiters, T * & result);
 
+    template<typename T>
+    void printArray(T * & arr, int numRows, int numCols);
+
   public:
     MeshManager();
 
@@ -41,6 +44,9 @@ class MeshManager {
 
     int get_NumElements();
 	  int get_ElementType();
+
+    void printVertices();
+    void printElements();
     
     ~MeshManager();
 };
