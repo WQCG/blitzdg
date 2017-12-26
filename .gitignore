@@ -7,4 +7,4 @@ include/igloo
 .vscode/
 .coveralls.yml
 doc/latex
-dox/html
+doc/html
