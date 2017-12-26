@@ -14,6 +14,9 @@ MeshManager::MeshManager() {
     NumVerts = 0;
     NumElements = 0;
     Dim = 0;
+
+    ElementPartitionMap = nullptr;
+    VertexPartitionMap = nullptr;
 }
 
 
@@ -133,6 +136,9 @@ void MeshManager::partitionMesh(int numPartitions) {
     for (int i=0; i<NumVerts; i++)
         cout << npart[i] << endl;
 
+    ElementPartitionMap = epart;
+    VertexPartitionMap = npart;
+
 }
 
 void MeshManager::readVertices(string vertFile) {
@@ -178,7 +184,17 @@ int * & MeshManager::get_Elements() {
     return EToV;
 }
 
+int * & MeshManager::get_ElementPartitionMap() {
+    return ElementPartitionMap;
+}
+
+int * & MeshManager::get_VertexPartitionMap() {
+    return VertexPartitionMap;
+}
+
 MeshManager::~MeshManager() {
     if (Vert != nullptr) delete[] Vert;
     if (EToV != nullptr) delete[] EToV;
+    if (ElementPartitionMap != nullptr) delete[] ElementPartitionMap;
+    if (VertexPartitionMap != nullptr) delete[] VertexPartitionMap;
 }

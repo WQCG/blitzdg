@@ -110,6 +110,7 @@ Describe(LUSolver_Object)
     Array <double, 1> soln(N);
 
 	  // Compute LU factors.
+    cout << endl;
 	  solver.factorize();
     solver.solve(b, soln);
     
@@ -174,6 +175,40 @@ Describe(MeshManager_Object) {
     Assert::That(elements[5], Equals(3));
     Assert::That(elements[6], Equals(4));
     Assert::That(elements[7], Equals(5));
+  }
+
+  It(Can_Print_Vertices_And_DoesNotThrow) {
+    MeshManager & mgr = *meshManager;
+    mgr.readVertices("input/2box.V");
+    cout << endl << "Vertices:" << endl;
+    mgr.printVertices();
+  }
+
+  It(Can_Print_Elements_And_DoesNotThrow) {
+    MeshManager & mgr = *meshManager;
+    mgr.readElements("input/2box.E2V");
+    cout << endl << "Elements" << endl;
+    mgr.printElements();
+  }
+
+  It(Can_Partition_A_Mesh) {
+    MeshManager & mgr = *meshManager;
+    mgr.readVertices("input/2box.V");
+    mgr.readElements("input/2box.E2V");
+
+    mgr.partitionMesh(2);
+
+    int * & epMap = mgr.get_ElementPartitionMap();
+    Assert::That(epMap[0], Equals(1));
+    Assert::That(epMap[1], Equals(2));
+
+    int * & vpMap = mgr.get_VertexPartitionMap();
+    Assert::That(vpMap[0], Equals(1));
+    Assert::That(vpMap[1], Equals(1));
+    Assert::That(vpMap[2], Equals(2));
+    Assert::That(vpMap[3], Equals(2));
+    Assert::That(vpMap[4], Equals(1));
+    Assert::That(vpMap[5], Equals(2));
   }
 };
 

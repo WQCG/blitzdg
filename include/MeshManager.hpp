@@ -13,6 +13,9 @@ class MeshManager {
     int NumElements;
     string CsvDelimeters;
 
+    int * ElementPartitionMap;
+    int * VertexPartitionMap;
+
     template<typename T>
     vector<int> readCsvFile(string csvFile, string delimiters, T * & result);
 
@@ -44,6 +47,9 @@ class MeshManager {
 
     int get_NumElements();
 	  int get_ElementType();
+
+    int * & get_ElementPartitionMap();
+    int * & get_VertexPartitionMap();
 
     void printVertices();
     void printElements();
