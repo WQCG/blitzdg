@@ -41,6 +41,7 @@ get-deps:
 	@sudo /bin/bash pull-deps.sh
 
 docs:
-	doxygen doxygen.conf
+	@doxygen doxygen.conf
+	@cp -r doxygen/html/* docs/.
 
-.PHONY: clean
+.PHONY: clean docs
