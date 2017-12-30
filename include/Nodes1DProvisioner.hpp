@@ -1,8 +1,7 @@
 #include <blitz/array.h>
-#include <boost/algorithm/string.hpp>
 
 using namespace std;
-using namespace boost;
+using namespace blitz;
 
 class Nodes1DProvisioner {
     
@@ -23,9 +22,9 @@ class Nodes1DProvisioner {
 
     void buildDr();
 
-    Array<double, 1> & get_xGrid();
+    Array<double, 2> & get_xGrid();
     Array<double, 1> & get_rGrid();
     Array<double, 2> & get_Dr();
 
     ~Nodes1DProvisioner();
-}
+};
