@@ -15,6 +15,8 @@ class Nodes1DProvisioner {
 
     Array<double, 2> Dr;
 
+    void computeJacobiPolynomial(Array<double,1> const & x, double alpha, double beta, int N,  Array<double,1> & p);
+
   public:
     Nodes1DProvisioner(int NOrder, int NumElements, double xmin, double xmax);
 

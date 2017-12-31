@@ -10,32 +10,19 @@
 #include <iostream>
 #include <blitz/array.h>
 #include <MeshManager.hpp>
+#include <Nodes1DProvisioner.hpp>
 
 using namespace std;
 using namespace blitz;
 
 int main(int argc, char **argv) {
-	MeshManager mgr;
-
-	mgr.readVertices("input/2box.V");
-
-	int dim = mgr.get_Dim();
-	int numVerts = mgr.get_NumVerts();
-
-	cout << "dim: " << dim << endl;
-	cout << "numVerts: " << numVerts << endl;
-
-	mgr.printVertices();
-
-	mgr.readElements("input/2box.E2V");
-	int numElements = mgr.get_NumElements();
-	int elementType = mgr.get_ElementType();
-
-	cout << "numElements: " << numElements << endl;
-	cout << "elementType: " << elementType << endl;
-
-	mgr.printElements();
-
-	mgr.partitionMesh(2);
-    return 0;
+	int N = 4;
+	int K = 10;
+	double xmin =-1.0;
+	double xmax = 1.0;
+	Nodes1DProvisioner nodes1DProvisioner(N, K, xmin, xmax);
+	
+  nodes1DProvisioner.buildNodes();
+  
+  return 0;
 }
