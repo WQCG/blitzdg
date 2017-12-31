@@ -74,12 +74,12 @@ Array<double, 2> & Nodes1DProvisioner::get_Dr() {
 Nodes1DProvisioner::~Nodes1DProvisioner() {}
 
 
-void Nodes1DProvisioner::computeJacobiPolynomial(Array<double,1> const & x, double alpha, double beta, int N, Array<double,1> & p) {
+void Nodes1DProvisioner::computeJacobiPolynomial(Array<double,1> const & x,  const double alpha, const double beta, const int N, Array<double,1> & p) {
     Range all = Range::all();
     int Np = (x.length())(0);
 
     Array<double,2> pStorage(N+1, Np);
-    
+
     double gamma0 = pow(2,(alpha+beta+1))/(alpha+beta+1)*tgamma(alpha+1)*tgamma(beta+1)/tgamma(alpha+beta+1);
 
     p = 1/sqrt(gamma0);
