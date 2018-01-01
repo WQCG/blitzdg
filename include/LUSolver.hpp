@@ -1,5 +1,5 @@
 #include <blitz/array.h>
-#include <SparseTriplet.hpp>
+#include <SparseMatrixConverter.hpp>
 
 using namespace blitz;
 
@@ -19,10 +19,10 @@ class LUSolver {
 
     SparseTriplet Triplet;
 
-    void toSparseTriplet();
-
+    SparseMatrixConverter MatrixConverter;
+  
   public:
-    LUSolver(Array<double, 2> * const &);
+    LUSolver(Array<double, 2> * const &, SparseMatrixConverter const &);
     
     Array<double, 2> & get_A();
 

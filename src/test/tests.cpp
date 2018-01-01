@@ -5,9 +5,10 @@
 
 using namespace igloo;
 using namespace blitz;
+using namespace std;
 
 const int N=5;
-const double eps=2.e-15;
+const double eps=10*numeric_limits<double>::epsilon();
 
 Array<double,2> A(N,N), B(N,N), C(N,N), D(N,N);
 Array<double,1> b(N), soln(N), d(N), e(N), x(N);
@@ -17,6 +18,7 @@ secondIndex jj;
 
 LUSolver * luSolver = nullptr;
 MeshManager * meshManager=nullptr;
+SparseMatrixConverter *matrixConverter = nullptr;
 
 
 Describe(Simple_blitz_array_operations)
@@ -100,7 +102,8 @@ Describe(LUSolver_Object)
         4,
         5;
 
-    luSolver = new LUSolver(&A);
+    matrixConverter = new SparseMatrixConverter();
+    luSolver = new LUSolver(&A, *matrixConverter);
 
   }
   It(Solves_Ax_equals_b) 
