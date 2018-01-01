@@ -1,14 +1,7 @@
 #include <blitz/array.h>
+#include <SparseTriplet.hpp>
 
 using namespace blitz;
-
-struct SparseTriplet {
-    int nz;
-    int *row;
-    int *col;
-    double *val;
-};
-
 
 class LUSolver {
     int N;
