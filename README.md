@@ -28,6 +28,7 @@ So far:
 * `blitz++`
 * `SuiteSparse (umfpack)`
 * `metis`
+* `arpack++`
 * `boost`
 * `igloo` for BDD-style testing.
 
