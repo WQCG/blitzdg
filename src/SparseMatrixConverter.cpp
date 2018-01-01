@@ -1,9 +1,20 @@
 #include <SparseMatrixConverter.hpp>
+#include <suitesparse/umfpack.h>
 
 using namespace std;
 
 SparseMatrixConverter::SparseMatrixConverter() {
 
+}
+
+void SparseMatrixConverter::sparseTripletToCompressedColumn(const int numRows, const int numCols, const SparseTriplet & triplet,
+                                                        int * Aptr, int * Aind, double * Avalues) {
+
+    const int nz = triplet.nz;
+    int * map = new int[nz];
+
+    umfpack_di_triplet_to_col(numRows, numCols, nz, triplet.row, triplet.col,
+        triplet.val, Aptr, Aind, Avalues, map);
 }
 
 void SparseMatrixConverter::fullToSparseTriplet(const Array<double, 2> & A, SparseTriplet & triplet) {

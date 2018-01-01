@@ -37,9 +37,9 @@ void LUSolver::factorize() {
     Map = new int[nz];
 
     cout << "Computing LU factorization!" << endl;
+
     // convert sparse Triplet to compressed column format
-    umfpack_di_triplet_to_col(n_rows, n_cols, Triplet.nz, Triplet.row, Triplet.col,
-        Triplet.val, Ap, Ai, Ax, Map);
+    MatrixConverter.sparseTripletToCompressedColumn(n_rows, n_cols, Triplet, Ap, Ai, Ax);
 
     umfpack_di_symbolic(n_rows, n_cols, Ap, Ai, Ax, &Symbolic, null, null);
     umfpack_di_numeric (Ap, Ai, Ax, Symbolic, &Numeric, null, null) ;
