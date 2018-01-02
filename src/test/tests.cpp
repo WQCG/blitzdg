@@ -2,6 +2,7 @@
 #include <blitz/array.h>
 #include <LUSolver.hpp>
 #include <MeshManager.hpp>
+#include <Nodes1DProvisioner.hpp>
 
 using namespace igloo;
 using namespace blitz;
@@ -18,7 +19,8 @@ secondIndex jj;
 
 LUSolver * luSolver = nullptr;
 MeshManager * meshManager=nullptr;
-SparseMatrixConverter *matrixConverter = nullptr;
+SparseMatrixConverter * matrixConverter = nullptr;
+Nodes1DProvisioner * nodes1DProvisioner = nullptr;
 
 
 Describe(Simple_blitz_array_operations)
@@ -212,6 +214,31 @@ Describe(MeshManager_Object) {
     Assert::That(vpMap[3], Equals(2));
     Assert::That(vpMap[4], Equals(1));
     Assert::That(vpMap[5], Equals(2));
+  }
+};
+
+Describe(Nodes1DProvisioner_Object) {
+  void SetUp() {
+    const int NOrder = 3;
+    const int NumElements = 5;
+    const double xmin = -1.0;
+    const double xmax = 1.0;
+
+    nodes1DProvisioner = new Nodes1DProvisioner(NOrder, NumElements, xmin, xmax);
+  }
+
+  It(Should_Generate_0th_Order_Legendre_Polynomial) {
+    Array<double, 1> x(3);
+    x = -1.,0.,1.;
+    Array<double, 1>  p(3);
+
+    Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+
+    nodes1D.computeJacobiPolynomial(x, 0.0, 0.0, 0, p);
+
+    Assert::That(p(0), Equals(1/sqrt(2)));
+    Assert::That(p(1), Equals(1/sqrt(2)));
+    Assert::That(p(2), Equals(1/sqrt(2)));
   }
 };
 
