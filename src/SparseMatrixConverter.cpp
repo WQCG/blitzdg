@@ -7,6 +7,15 @@ SparseMatrixConverter::SparseMatrixConverter() {
 
 }
 
+void SparseMatrixConverter::fullToCompressedColumn(const Array<double, 2> & A,
+                                                int * Aptr, int * Aind, double * Avalues) {
+    SparseTriplet triplet;
+
+    fullToSparseTriplet(A, triplet);
+
+    sparseTripletToCompressedColumn(A.rows(), A.cols(), triplet, Aptr, Aind, Avalues);
+}
+
 void SparseMatrixConverter::sparseTripletToCompressedColumn(const int numRows, const int numCols, const SparseTriplet & triplet,
                                                         int * Aptr, int * Aind, double * Avalues) {
 
@@ -46,7 +55,27 @@ void SparseMatrixConverter::fullToSparseTriplet(const Array<double, 2> & A, Spar
     }
 
     triplet.nz = nz;
+}
 
+int SparseMatrixConverter::getNumNonZeros(const Array<double, 2> & A) {
+    const double eps = numeric_limits<double>::epsilon();
+    const int n_rows = A.rows();
+    const int n_cols = A.cols();
+
+    int nz = 0;
+
+    for( int i=0; i < n_rows; i++ ) {
+        for ( int j=0; j < n_cols; j++ ) {
+            double val = A(i,j);
+            if ( abs(val) < 2*eps ) {
+                continue;
+            }
+
+            nz++;
+        }
+    }
+
+    return nz;
 }
 
 SparseMatrixConverter::~SparseMatrixConverter() {

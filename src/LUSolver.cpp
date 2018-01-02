@@ -26,10 +26,7 @@ void LUSolver::factorize() {
     const int n_rows = Aref.rows();
     const int n_cols = Aref.cols();
 
-    // Convert full matrix A to sparse Triplet.
-    MatrixConverter.fullToSparseTriplet(Aref, Triplet);
-
-    const int nz = Triplet.nz;
+    const int nz = MatrixConverter.getNumNonZeros(*A);
 
     Ap = new int[n_rows+1];
     Ai = new int[nz];
@@ -39,7 +36,7 @@ void LUSolver::factorize() {
     cout << "Computing LU factorization!" << endl;
 
     // convert sparse Triplet to compressed column format
-    MatrixConverter.sparseTripletToCompressedColumn(n_rows, n_cols, Triplet, Ap, Ai, Ax);
+    MatrixConverter.fullToCompressedColumn(*A, Ap, Ai, Ax);
 
     umfpack_di_symbolic(n_rows, n_cols, Ap, Ai, Ax, &Symbolic, null, null);
     umfpack_di_numeric (Ap, Ai, Ax, Symbolic, &Numeric, null, null) ;

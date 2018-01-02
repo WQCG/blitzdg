@@ -13,5 +13,9 @@ class SparseMatrixConverter {
 
     void sparseTripletToCompressedColumn(const int numRows, const int numCols, const SparseTriplet & triplet, int * Aptr, int * Aind, double * Avalues);
 
+    void fullToCompressedColumn(const Array<double, 2> & A, int * Aptr, int * Aind, double * Avalues);
+
+    int getNumNonZeros(const Array<double, 2> & A);
+
     ~SparseMatrixConverter();
 };
