@@ -236,9 +236,38 @@ Describe(Nodes1DProvisioner_Object) {
 
     nodes1D.computeJacobiPolynomial(x, 0.0, 0.0, 0, p);
 
-    Assert::That(p(0), Equals(1/sqrt(2)));
-    Assert::That(p(1), Equals(1/sqrt(2)));
-    Assert::That(p(2), Equals(1/sqrt(2)));
+    Assert::That(p(0), Equals(1./sqrt(2.)));
+    Assert::That(p(1), Equals(1./sqrt(2.)));
+    Assert::That(p(2), Equals(1./sqrt(2.)));
+  }
+
+  It(Should_Generate_1st_Order_Legendre_Polynomial) {
+    Array<double, 1> x(3);
+    x = -1.,0.,1.;
+    Array<double, 1>  p(3);
+
+    Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+
+    nodes1D.computeJacobiPolynomial(x, 0.0, 0.0, 1, p);
+
+    Assert::That(p(0), Equals(-sqrt(3./2.)));
+    Assert::That(p(1), Equals(0.0));
+    Assert::That(p(2), Equals(sqrt(3./2.)));
+  }
+
+
+  It(Should_Generate_2nd_Order_Legendre_Polynomial) {
+    Array<double, 1> x(3);
+    x = -1.,0.,1.;
+    Array<double, 1>  p(3);
+
+    Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+
+    nodes1D.computeJacobiPolynomial(x, 0.0, 0.0, 2, p);
+
+    Assert::That(abs(p(0)-sqrt(5./2.)), IsLessThan(eps));
+    Assert::That(abs(p(1)-(-sqrt(5./8.))), IsLessThan(eps));
+    Assert::That(abs(p(2)-sqrt(5./2.)), IsLessThan(eps));
   }
 };
 

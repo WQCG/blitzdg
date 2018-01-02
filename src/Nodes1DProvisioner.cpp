@@ -25,17 +25,8 @@ void Nodes1DProvisioner::buildNodes() {
 
     double alpha = 0.0;
     double beta = 0.0;
-    int N = 0;
 
-    computeJacobiPolynomial(x, alpha, beta, N, p);
-    cout << p << endl;
-
-    N = 1;
-    computeJacobiPolynomial(x, alpha, beta, N, p);
-    cout << p << endl;
-
-    N = 2;
-    computeJacobiPolynomial(x, alpha, beta, N, p);
+    computeJacobiPolynomial(x, alpha, beta, NOrder, p);
     cout << p << endl;
 }
 
