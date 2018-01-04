@@ -8,11 +8,12 @@ using namespace std;
  * Constructor. Takes order of polynomials, number of elements, and dimensions of the domain.
  * Assumes equally-spaced elements.
  */
-Nodes1DProvisioner::Nodes1DProvisioner(int _NOrder, int _NumElements, double _xmin, double _xmax) {
+Nodes1DProvisioner::Nodes1DProvisioner(int _NOrder, int _NumElements, double _xmin, double _xmax, SparseMatrixConverter & converter) {
     NOrder = _NOrder;
     NumElements = _NumElements;
     Min_x = _xmin;
     Max_x = _xmax;
+    *MatrixConverter = converter;
 }
 
 /**
@@ -28,6 +29,12 @@ void Nodes1DProvisioner::buildNodes() {
 
     computeJacobiPolynomial(x, alpha, beta, NOrder, p);
     cout << p << endl;
+
+    int N = 4;
+    Array<double, 1> x1(N+1);
+    Array<double, 1> w(N+1);
+
+    computeJacobiQuadWeights(alpha, beta, N, x1, w);
 }
 
 /**
@@ -98,4 +105,39 @@ void Nodes1DProvisioner::computeJacobiPolynomial(Array<double,1> const & x,  con
         aold = anew;
     }
     p = pStorage(N, all);
+}
+
+/**  Compute the Nth order Gauss quadrature points, x,
+  *   and weights, w, associated with the Jacobi polynomial, of type (alpha,beta) > -1 ( != -0.5).
+  */
+void Nodes1DProvisioner::computeJacobiQuadWeights(double alpha, double beta, int N, Array<double,1> & x, Array<double,1> & w) {
+
+    if ( N == 0) {
+        x(0) = -(alpha-beta)/(alpha+beta+2);
+        w(0) = 2.0;
+        return;
+    }
+
+    const double eps = numeric_limits<double>::epsilon();
+
+    firstIndex ii;
+    secondIndex jj;
+
+    // Form symmetric matrix.
+    Array<double, 2> J(N+1,N+1);
+    for (int i=0; i < N+1; i++) {
+        double h1 = 2.*i+alpha+beta;
+        double h1ip1 = 2.*(i+1)+alpha+beta;
+        J(i,i)   = -0.5*(alpha*alpha-beta*beta)/(h1+2.)/h1;
+        if (i < N) {
+            J(i,i+1) = 2./(h1ip1+2)*sqrt((i+1)*((i+1)+alpha+beta)*((i+1)+alpha)*((i+1)+beta)/(h1ip1+1)/(h1ip1+3));
+        }
+    }
+
+    if ((alpha + beta) < 10*eps ) {
+        J(0,0) = 0.0;
+    }
+    J = J(ii,jj) + J(jj,ii);
+
+    cout << J << endl;
 }

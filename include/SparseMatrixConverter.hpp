@@ -1,3 +1,4 @@
+#pragma once
 #include <blitz/array.h>
 #include <SparseTriplet.hpp>
 #include <suitesparse/umfpack.h>

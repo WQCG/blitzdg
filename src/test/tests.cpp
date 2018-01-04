@@ -1,8 +1,9 @@
 #include <igloo/igloo_alt.h>
 #include <blitz/array.h>
-#include <LUSolver.hpp>
 #include <MeshManager.hpp>
 #include <Nodes1DProvisioner.hpp>
+#include <LUSolver.hpp>
+
 
 using namespace igloo;
 using namespace blitz;
@@ -224,7 +225,8 @@ Describe(Nodes1DProvisioner_Object) {
     const double xmin = -1.0;
     const double xmax = 1.0;
 
-    nodes1DProvisioner = new Nodes1DProvisioner(NOrder, NumElements, xmin, xmax);
+    matrixConverter = new SparseMatrixConverter();
+    nodes1DProvisioner = new Nodes1DProvisioner(NOrder, NumElements, xmin, xmax, *matrixConverter);
   }
 
   It(Should_Generate_0th_Order_Legendre_Polynomial) {
