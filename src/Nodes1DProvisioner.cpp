@@ -1,6 +1,8 @@
 #include <iostream>
 #include <math.h>
 #include <Nodes1DProvisioner.hpp>
+// #include <arpack++/arlssym.h>
+// #include <arpack++/arlsnsym.h>
 
 using namespace std;
 
@@ -13,7 +15,7 @@ Nodes1DProvisioner::Nodes1DProvisioner(int _NOrder, int _NumElements, double _xm
     NumElements = _NumElements;
     Min_x = _xmin;
     Max_x = _xmax;
-    *MatrixConverter = converter;
+    MatrixConverter = &converter;
 }
 
 /**
@@ -110,6 +112,12 @@ void Nodes1DProvisioner::computeJacobiPolynomial(Array<double,1> const & x,  con
 /**  Compute the Nth order Gauss quadrature points, x,
   *   and weights, w, associated with the Jacobi polynomial, of type (alpha,beta) > -1 ( != -0.5).
   */
+
+extern "C" {
+    void dsyevd_( char* jobz, char* uplo, int* n, double* a, int* lda,
+                double* w, double* work, int* lwork, int* iwork, int* liwork, int* info );
+}
+
 void Nodes1DProvisioner::computeJacobiQuadWeights(double alpha, double beta, int N, Array<double,1> & x, Array<double,1> & w) {
 
     if ( N == 0) {
@@ -139,4 +147,36 @@ void Nodes1DProvisioner::computeJacobiQuadWeights(double alpha, double beta, int
     J = J(ii,jj) + J(jj,ii);
 
     cout << J << endl;
+
+    SparseMatrixConverter & matConverter = *MatrixConverter;
+    int nz = matConverter.getNumNonZeros(J);
+    cout << nz << endl;
+
+    int * Ap = new int[N+1];
+    int * Ai = new int[nz];
+    double * Ax = new double[nz];
+    
+    cout << "Computing LU factorization!" << endl;
+
+    matConverter.fullToCompressedColumn(J, Ap, Ai, Ax);
+
+    int sz = 5;
+    int lda = sz;
+    int iwkopt;
+
+    double ww[sz];
+    double wkopt;
+    int lwork = -1;
+    int liwork = -1;
+    int info;
+
+    double * A = new double[50];
+    cout << "Calling dsyevd" << endl;
+    dsyevd_("V", "UP", &sz, A, &lda, ww, &wkopt, &lwork, &iwkopt, &liwork, &info);
+
+    cout << "Done Calling dsyevd" << endl;
+    for( int i =0; i < sz; i++) {
+        cout << ww[i] <<", " ;
+    }
+    cout << endl;
 }

@@ -12,7 +12,7 @@ TESTOBJECTS := $(shell echo $(OBJECTS) | sed 's/build\/main.o//')
 
 CFLAGS := -g -Wall -std=c++0x -fprofile-arcs -ftest-coverage 
 LINKERFLAGS := -fprofile-arcs
-LIB := -pthread -L lib -lblitz -lumfpack -lmetis -larpack++
+LIB := -pthread -L lib -lblitz -lumfpack -lmetis -larpack++ -lsuperlu -lblas -larpack -llapack
 INC := -I include -I /usr/include
 
 $(TARGET): $(TESTTARGET)
