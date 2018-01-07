@@ -13,7 +13,8 @@ apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 8B48AD6246925553
 
 echo "deb http://ftp.us.debian.org/debian jessie main" | sudo tee -a /etc/apt/sources.list
 apt-get -u update
-apt-get -y install libsuperlu4
+apt-get -y install libarpack2-dev
+apt-get -y install libarpack2
 
 curl -fSL https://github.com/joakimkarlsson/igloo/archive/igloo.1.1.1.tar.gz -o ./igloo.1.1.1.tar.gz
 tar xzf ./igloo.1.1.1.tar.gz
