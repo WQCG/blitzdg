@@ -6,6 +6,9 @@ ln -s /usr/lib/x86_64-linux-gnu/libumfpack.so.5.7.1 /usr/lib/x86_64-linux-gnu/li
 apt-get -y install libmetis-dev libmetis-doc
 apt-get -y install libboost-dbg libboost-dev libboost-doc
 apt-get -y install libarpack++2-dev
+
+echo "deb http://ftp.us.debian.org/debian jessie main" | sudo tee -a /etc/apt/sources.list
+apt-get -u update
 apt-get -y install libsuperlu4
 
 curl -fSL https://github.com/joakimkarlsson/igloo/archive/igloo.1.1.1.tar.gz -o ./igloo.1.1.1.tar.gz
