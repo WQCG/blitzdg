@@ -15,6 +15,8 @@ echo "deb http://ftp.us.debian.org/debian jessie main" | sudo tee -a /etc/apt/so
 apt-get -u update
 apt-get -y install libarpack2-dev
 apt-get -y install libarpack2
+apt-get -y install libsuperlu-dev
+apt-get -y install libsuperlu4
 
 curl -fSL https://github.com/joakimkarlsson/igloo/archive/igloo.1.1.1.tar.gz -o ./igloo.1.1.1.tar.gz
 tar xzf ./igloo.1.1.1.tar.gz
