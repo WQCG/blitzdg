@@ -170,13 +170,58 @@ void Nodes1DProvisioner::computeJacobiQuadWeights(double alpha, double beta, int
     int liwork = -1;
     int info;
 
-    double * A = new double[50];
+    char V = 'V';
+    char UPLO[] = "UP";
+
+    double * A = new double[sz*lda];
+    A[0] = 1.;
+    A[6] = 2.;
+    A[12] = 3.;
+    A[18] = 4.;
+    A[24] = 5.;
+
     cout << "Calling dsyevd" << endl;
-    dsyevd_("V", "UP", &sz, A, &lda, ww, &wkopt, &lwork, &iwkopt, &liwork, &info);
+    dsyevd_(&V, UPLO, &sz, A, &lda, ww, &wkopt, &lwork, &iwkopt, &liwork, &info);
 
     cout << "Done Calling dsyevd" << endl;
-    for( int i =0; i < sz; i++) {
-        cout << ww[i] <<", " ;
+
+    cout << "wkopt: " << wkopt << endl;
+    cout << "info: " << info << endl;
+
+    cout << "A:" << endl;
+    int ind = 0;
+    for (int i=0; i<sz; i++) {
+        for (int j=0; j<sz; j++) {
+            cout << A[ind] << " ";
+            ind++;
+        }
+        cout << endl;
     }
+    cout << endl;
+
+    lwork = (int)wkopt;
+    double * work = new double[lwork];
+    liwork = iwkopt;
+    int * iwork = new int[liwork];
+    /* Solve eigenproblem */
+    dsyevd_( &V, UPLO, &sz, A, &lda, ww, work, &lwork, iwork,
+                        &liwork, &info );
+
+    cout << "info: " << info << endl;
+
+    cout << "A:" << endl;
+    ind = 0;
+    for (int i=0; i<sz; i++) {
+        for (int j=0; j<sz; j++) {
+            cout << A[ind] << " ";
+            ind++;
+        }
+        cout << endl;
+    }
+    cout << endl;
+    cout << "w: ";
+    for (int i=0; i < sz; i++)
+        cout << ww[i] << " ";
+
     cout << endl;
 }
