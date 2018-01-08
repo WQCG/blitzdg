@@ -16,7 +16,7 @@ class SparseMatrixConverter {
 
     void fullToCompressedColumn(const Array<double, 2> & A, int * Aptr, int * Aind, double * Avalues);
 
-    void fullToPodArray(const Array<double, 2> & A, int * Apod);
+    void fullToPodArray(const Array<double, 2> & A, double * Apod);
 
     int getNumNonZeros(const Array<double, 2> & A);
 

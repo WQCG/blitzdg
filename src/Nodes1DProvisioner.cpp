@@ -149,16 +149,8 @@ void Nodes1DProvisioner::computeJacobiQuadWeights(double alpha, double beta, int
     cout << J << endl;
 
     SparseMatrixConverter & matConverter = *MatrixConverter;
-    int nz = matConverter.getNumNonZeros(J);
-    cout << nz << endl;
-
-    int * Ap = new int[N+1];
-    int * Ai = new int[nz];
-    double * Ax = new double[nz];
     
     cout << "Computing LU factorization!" << endl;
-
-    matConverter.fullToCompressedColumn(J, Ap, Ai, Ax);
 
     int sz = 5;
     int lda = sz;
@@ -170,47 +162,27 @@ void Nodes1DProvisioner::computeJacobiQuadWeights(double alpha, double beta, int
     int liwork = -1;
     int info;
 
-    char V = 'V';
+    char JOBZ = 'V';
     char UPLO[] = "UP";
 
     double * A = new double[sz*lda];
-    A[0] = 1.;
-    A[6] = 2.;
-    A[12] = 3.;
-    A[18] = 4.;
-    A[24] = 5.;
 
-    cout << "Calling dsyevd" << endl;
-    dsyevd_(&V, UPLO, &sz, A, &lda, ww, &wkopt, &lwork, &iwkopt, &liwork, &info);
+    matConverter.fullToPodArray(J, A);
 
-    cout << "Done Calling dsyevd" << endl;
-
-    cout << "wkopt: " << wkopt << endl;
-    cout << "info: " << info << endl;
-
-    cout << "A:" << endl;
-    int ind = 0;
-    for (int i=0; i<sz; i++) {
-        for (int j=0; j<sz; j++) {
-            cout << A[ind] << " ";
-            ind++;
-        }
-        cout << endl;
-    }
-    cout << endl;
+    cout << "Determining optimal workspace parameters." << endl;
+    dsyevd_(&JOBZ, UPLO, &sz, A, &lda, ww, &wkopt, &lwork, &iwkopt, &liwork, &info);
 
     lwork = (int)wkopt;
     double * work = new double[lwork];
     liwork = iwkopt;
     int * iwork = new int[liwork];
     /* Solve eigenproblem */
-    dsyevd_( &V, UPLO, &sz, A, &lda, ww, work, &lwork, iwork,
+
+    cout << "Solving eigenvalue problem." << endl;
+    dsyevd_( &JOBZ, UPLO, &sz, A, &lda, ww, work, &lwork, iwork,
                         &liwork, &info );
-
-    cout << "info: " << info << endl;
-
     cout << "A:" << endl;
-    ind = 0;
+    int ind = 0;
     for (int i=0; i<sz; i++) {
         for (int j=0; j<sz; j++) {
             cout << A[ind] << " ";
@@ -225,3 +197,4 @@ void Nodes1DProvisioner::computeJacobiQuadWeights(double alpha, double beta, int
 
     cout << endl;
 }
+
