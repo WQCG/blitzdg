@@ -7,6 +7,17 @@ SparseMatrixConverter::SparseMatrixConverter() {
 
 }
 
+void SparseMatrixConverter::fullToPodArray(const Array<double, 2> & A, int * Apod) {
+    int ind = 0;
+    for (int i =0; i< A.rows(); i++) {
+        for (int j=0; j< A.cols(); j++) {
+            Apod[ind] = A(i,j);
+            ind++;
+        }
+    }
+
+}
+
 void SparseMatrixConverter::fullToCompressedColumn(const Array<double, 2> & A,
                                                 int * Aptr, int * Aind, double * Avalues) {
     SparseTriplet triplet;
