@@ -150,8 +150,6 @@ void Nodes1DProvisioner::computeJacobiQuadWeights(double alpha, double beta, int
 
     SparseMatrixConverter & matConverter = *MatrixConverter;
     
-    cout << "Computing LU factorization!" << endl;
-
     int sz = 5;
     int lda = sz;
     int iwkopt;
@@ -181,17 +179,15 @@ void Nodes1DProvisioner::computeJacobiQuadWeights(double alpha, double beta, int
     cout << "Solving eigenvalue problem." << endl;
     dsyevd_( &JOBZ, UPLO, &sz, A, &lda, ww, work, &lwork, iwork,
                         &liwork, &info );
-    cout << "A:" << endl;
-    int ind = 0;
-    for (int i=0; i<sz; i++) {
-        for (int j=0; j<sz; j++) {
-            cout << A[ind] << " ";
-            ind++;
-        }
-        cout << endl;
-    }
+
+    Array<double, 2> eigenvectors(N+1,N+1);
+
+    matConverter.podArrayToFull(A, eigenvectors);
+    cout << "eigenvectors:" << endl;
+    cout << eigenvectors << endl;;
+
     cout << endl;
-    cout << "w: ";
+    cout << "eigenvalues: ";
     for (int i=0; i < sz; i++)
         cout << ww[i] << " ";
 

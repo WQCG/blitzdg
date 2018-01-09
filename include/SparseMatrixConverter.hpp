@@ -18,6 +18,8 @@ class SparseMatrixConverter {
 
     void fullToPodArray(const Array<double, 2> & A, double * Apod);
 
+    void podArrayToFull(const double * Apod, Array<double, 2> & A);
+
     int getNumNonZeros(const Array<double, 2> & A);
 
     ~SparseMatrixConverter();
