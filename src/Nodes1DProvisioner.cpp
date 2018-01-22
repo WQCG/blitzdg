@@ -109,15 +109,14 @@ void Nodes1DProvisioner::computeJacobiPolynomial(Array<double,1> const & x,  con
     p = pStorage(N, all);
 }
 
-/**  Compute the Nth order Gauss quadrature points, x,
-  *   and weights, w, associated with the Jacobi polynomial, of type (alpha,beta) > -1 ( != -0.5).
-  */
-
 extern "C" {
     void dsyevd_( char* jobz, char* uplo, int* n, double* a, int* lda,
                 double* w, double* work, int* lwork, int* iwork, int* liwork, int* info );
 }
 
+/**  Compute the Nth order Gauss quadrature points, x,
+  *   and weights, w, associated with the Jacobi polynomial, of type (alpha,beta) > -1 ( != -0.5).
+  */
 void Nodes1DProvisioner::computeJacobiQuadWeights(double alpha, double beta, int N, Array<double,1> & x, Array<double,1> & w) {
 
     if ( N == 0) {
@@ -193,4 +192,3 @@ void Nodes1DProvisioner::computeJacobiQuadWeights(double alpha, double beta, int
 
     cout << endl;
 }
-

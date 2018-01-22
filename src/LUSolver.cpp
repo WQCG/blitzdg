@@ -45,7 +45,7 @@ void LUSolver::factorize() {
 
 /**
  * Solve Ax=b using UMFPACK. Requires LUSolver.factorize() to be called first. 'x' is returned in 'soln' reference.
- * 'b' is speified by 'rhs' reference.
+ * 'b' is specified by 'rhs' reference.
  */
 void LUSolver::solve(Array<double, 1> const & rhs, Array<double,1> & soln) {
     int n = rhs.length(0);
