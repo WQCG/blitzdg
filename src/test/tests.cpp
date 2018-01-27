@@ -3,6 +3,7 @@
 #include <MeshManager.hpp>
 #include <Nodes1DProvisioner.hpp>
 #include <LUSolver.hpp>
+#include <EigenSolver.hpp>
 
 
 using namespace igloo;
@@ -22,6 +23,7 @@ LUSolver * luSolver = nullptr;
 MeshManager * meshManager=nullptr;
 SparseMatrixConverter * matrixConverter = nullptr;
 Nodes1DProvisioner * nodes1DProvisioner = nullptr;
+EigenSolver * eigenSolver = nullptr;
 
 
 Describe(Simple_blitz_array_operations)
@@ -215,6 +217,54 @@ Describe(MeshManager_Object) {
     Assert::That(vpMap[3], Equals(2));
     Assert::That(vpMap[4], Equals(1));
     Assert::That(vpMap[5], Equals(2));
+  }
+};
+
+Describe(EigenSolver_Object) {
+  void SetUp() {
+
+    A = 1,0,0,0,0,
+        0,2,0,0,0,
+        0,0,3,0,0,
+        0,0,0,4,0,
+        0,0,0,0,5;
+
+    matrixConverter = new SparseMatrixConverter();
+    eigenSolver = new EigenSolver(&A, *matrixConverter);
+  }
+
+  It(Should_Solve_Trivial_Eigenproblem) {
+    EigenSolver & solver = *eigenSolver;
+
+    Array<double, 1> eigenvalues(5);
+    eigenvalues = 0,0,0,0,0;
+    Array<double, 2> eigenvectors(5,5);
+    eigenvectors = 0,0,0,0,0,
+                   0,0,0,0,0,
+                   0,0,0,0,0,
+                   0,0,0,0,0,
+                   0,0,0,0,0;
+
+    cout << "Solving eigenproblem!";
+    solver.solve(eigenvalues, eigenvectors);
+    cout << "eigenvectors: " << eigenvectors << endl;
+
+    Array<double, 2> expectedEvecs(5,5);
+    expectedEvecs = 1,0,0,0,0,
+                    0,1,0,0,0,
+                    0,0,1,0,0,
+                    0,0,0,1,0,
+                    0,0,0,0,1;
+
+    Assert::That(eigenvalues(0), Equals(1.));
+    Assert::That(eigenvalues(1), Equals(2.));
+    Assert::That(eigenvalues(2), Equals(3.));
+    Assert::That(eigenvalues(3), Equals(4.));
+    Assert::That(eigenvalues(4), Equals(5.));
+
+    Array <double, 2> res(5,5);
+    res = eigenvectors - expectedEvecs;
+    Assert::That(sum(res(ii)*res(ii)), IsLessThan(eps));
   }
 };
 
