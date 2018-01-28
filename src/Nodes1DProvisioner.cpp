@@ -10,12 +10,13 @@ using namespace std;
  * Constructor. Takes order of polynomials, number of elements, and dimensions of the domain.
  * Assumes equally-spaced elements.
  */
-Nodes1DProvisioner::Nodes1DProvisioner(int _NOrder, int _NumElements, double _xmin, double _xmax, SparseMatrixConverter & converter) {
+Nodes1DProvisioner::Nodes1DProvisioner(int _NOrder, int _NumElements, double _xmin, double _xmax, SparseMatrixConverter & converter, EigenSolver & eigenSolver) {
     NOrder = _NOrder;
     NumElements = _NumElements;
     Min_x = _xmin;
     Max_x = _xmax;
     MatrixConverter = &converter;
+    EigSolver = &eigenSolver;
 }
 
 /**
@@ -109,11 +110,6 @@ void Nodes1DProvisioner::computeJacobiPolynomial(Array<double,1> const & x,  con
     p = pStorage(N, all);
 }
 
-extern "C" {
-    void dsyevd_( char* jobz, char* uplo, int* n, double* a, int* lda,
-                double* w, double* work, int* lwork, int* iwork, int* liwork, int* info );
-}
-
 /**  Compute the Nth order Gauss quadrature points, x,
   *   and weights, w, associated with the Jacobi polynomial, of type (alpha,beta) > -1 ( != -0.5).
   */
@@ -147,48 +143,14 @@ void Nodes1DProvisioner::computeJacobiQuadWeights(double alpha, double beta, int
 
     cout << J << endl;
 
-    SparseMatrixConverter & matConverter = *MatrixConverter;
+    //SparseMatrixConverter & matConverter = *MatrixConverter;
+    EigenSolver & eigSolver = *EigSolver;
     
-    int sz = 5;
-    int lda = sz;
-    int iwkopt;
+    Array<double, 1> eigenvalues(N+1);
+    Array<double, 2> eigenvectors(N+1);
 
-    double ww[sz];
-    double wkopt;
-    int lwork = -1;
-    int liwork = -1;
-    int info;
+    eigSolver.solve(J, eigenvalues, eigenvectors);
 
-    char JOBZ = 'V';
-    char UPLO[] = "UP";
-
-    double * A = new double[sz*lda];
-
-    matConverter.fullToPodArray(J, A);
-
-    cout << "Determining optimal workspace parameters." << endl;
-    dsyevd_(&JOBZ, UPLO, &sz, A, &lda, ww, &wkopt, &lwork, &iwkopt, &liwork, &info);
-
-    lwork = (int)wkopt;
-    double * work = new double[lwork];
-    liwork = iwkopt;
-    int * iwork = new int[liwork];
-    /* Solve eigenproblem */
-
-    cout << "Solving eigenvalue problem." << endl;
-    dsyevd_( &JOBZ, UPLO, &sz, A, &lda, ww, work, &lwork, iwork,
-                        &liwork, &info );
-
-    Array<double, 2> eigenvectors(N+1,N+1);
-
-    matConverter.podArrayToFull(A, eigenvectors);
-    cout << "eigenvectors:" << endl;
-    cout << eigenvectors << endl;;
-
-    cout << endl;
-    cout << "eigenvalues: ";
-    for (int i=0; i < sz; i++)
-        cout << ww[i] << " ";
-
-    cout << endl;
+    cout << eigenvalues << endl;
+    cout << eigenvectors << endl;
 }

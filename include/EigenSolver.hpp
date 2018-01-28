@@ -6,13 +6,12 @@ using namespace blitz;
 
 class EigenSolver {
     int N;
-    Array<double, 2> * A;
     SparseMatrixConverter MatrixConverter;
 
   public:
-    EigenSolver(Array<double, 2> * const &, SparseMatrixConverter const &);
+    EigenSolver(SparseMatrixConverter const &);
 
-    void solve(Array<double,1> & eigenvalues, Array<double, 2> & eigenvectors);
+    void solve(const Array<double,2> & A, Array<double,1> & eigenvalues, Array<double, 2> & eigenvectors);
     
     ~EigenSolver();
 };

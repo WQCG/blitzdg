@@ -3,8 +3,7 @@
 /**
  * Constructor. Takes a pointer reference to a blitz 2D array (The matrix A to be used by the solver in Ax=λx).
  */
-EigenSolver::EigenSolver(Array<double, 2> * const & Ain, SparseMatrixConverter const & _matrixConverter) {
-    A = Ain;
+EigenSolver::EigenSolver(SparseMatrixConverter const & _matrixConverter) {
     MatrixConverter = _matrixConverter;
 }
 
@@ -17,8 +16,7 @@ extern "C" {
  * Solve Ax=λx using LAPACK. Eigenvalues are stored in reference 'eigenvalues' and eigenvectors are stored column-wise
  * in reference 'eigenvectors.'
  */
-void EigenSolver::solve(Array<double,1> & eigenvalues, Array<double, 2> & eigenvectors) {
-    Array<double,2> Aref = *A;
+void EigenSolver::solve(const Array<double,2> & Aref, Array<double,1> & eigenvalues, Array<double, 2> & eigenvectors) {
 
     int sz = Aref.rows();
     int lda = sz;

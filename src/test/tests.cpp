@@ -239,7 +239,7 @@ Describe(EigenSolver_Object) {
   }
 
   It(Should_Solve_Trivial_Symmetric_Eigenproblem) {
-    eigenSolver = new EigenSolver(&Adiag, *matrixConverter);
+    eigenSolver = new EigenSolver(*matrixConverter);
     EigenSolver & solver = *eigenSolver;
 
     Array<double, 1> eigenvalues(5);
@@ -251,7 +251,7 @@ Describe(EigenSolver_Object) {
                    0,0,0,0,0,
                    0,0,0,0,0;
 
-    solver.solve(eigenvalues, eigenvectors);
+    solver.solve(Adiag, eigenvalues, eigenvectors);
     
     Array<double, 2> expectedEvecs(5,5);
     
@@ -273,7 +273,7 @@ Describe(EigenSolver_Object) {
   }
 
   It(Should_Solve_NonTrivial_Symmetric_Eigenproblem) {
-    eigenSolver = new EigenSolver(&Asymmetric, *matrixConverter);
+    eigenSolver = new EigenSolver(*matrixConverter);
     EigenSolver & solver = *eigenSolver;
 
     Array<double, 1> eigenvalues(5);
@@ -286,7 +286,7 @@ Describe(EigenSolver_Object) {
                    0,0,0,0,0;
 
     cout << "Solving eigenproblem!";
-    solver.solve(eigenvalues, eigenvectors);
+    solver.solve(Asymmetric, eigenvalues, eigenvectors);
     cout << "eigenvectors: " << eigenvectors << endl;
 
     Array<double, 2> expectedEvecs(5,5);
@@ -319,7 +319,9 @@ Describe(Nodes1DProvisioner_Object) {
     const double xmax = 1.0;
 
     matrixConverter = new SparseMatrixConverter();
-    nodes1DProvisioner = new Nodes1DProvisioner(NOrder, NumElements, xmin, xmax, *matrixConverter);
+    eigenSolver = new EigenSolver(*matrixConverter);
+
+    nodes1DProvisioner = new Nodes1DProvisioner(NOrder, NumElements, xmin, xmax, *matrixConverter, *eigenSolver);
   }
 
   It(Should_Generate_0th_Order_Legendre_Polynomial) {

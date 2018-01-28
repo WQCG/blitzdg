@@ -12,6 +12,7 @@
 #include <MeshManager.hpp>
 #include <Nodes1DProvisioner.hpp>
 #include <SparseMatrixConverter.hpp>
+#include <EigenSolver.hpp>
 
 using namespace std;
 using namespace blitz;
@@ -23,7 +24,9 @@ int main(int argc, char **argv) {
 	double xmax = 1.0;
 
   SparseMatrixConverter matrixConverter;
-	Nodes1DProvisioner nodes1DProvisioner(N, K, xmin, xmax, matrixConverter);
+  EigenSolver eigenSolver(matrixConverter);
+
+	Nodes1DProvisioner nodes1DProvisioner(N, K, xmin, xmax, matrixConverter, eigenSolver);
 	
   nodes1DProvisioner.buildNodes();
   

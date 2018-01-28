@@ -1,6 +1,7 @@
 #pragma once
 #include <blitz/array.h>
 #include <SparseMatrixConverter.hpp>
+#include <EigenSolver.hpp>
 
 using namespace std;
 using namespace blitz;
@@ -18,9 +19,10 @@ class Nodes1DProvisioner {
     Array<double, 2> Dr;
 
     SparseMatrixConverter * MatrixConverter;
+    EigenSolver * EigSolver;
 
   public:
-    Nodes1DProvisioner(int NOrder, int NumElements, double xmin, double xmax, SparseMatrixConverter & converter);
+    Nodes1DProvisioner(int NOrder, int NumElements, double xmin, double xmax, SparseMatrixConverter & converter, EigenSolver & eigenSolver);
 
     void buildNodes();
 
