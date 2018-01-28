@@ -1,14 +1,8 @@
+#pragma once
 #include <blitz/array.h>
+#include <SparseMatrixConverter.hpp>
 
 using namespace blitz;
-
-struct SparseTriplet {
-    int nz;
-    int *row;
-    int *col;
-    double *val;
-};
-
 
 class LUSolver {
     int N;
@@ -26,10 +20,10 @@ class LUSolver {
 
     SparseTriplet Triplet;
 
-    void toSparseTriplet();
-
+    SparseMatrixConverter MatrixConverter;
+  
   public:
-    LUSolver(Array<double, 2> * const &);
+    LUSolver(Array<double, 2> * const &, SparseMatrixConverter const &);
     
     Array<double, 2> & get_A();
 

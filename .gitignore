@@ -7,3 +7,4 @@ include/igloo
 .vscode/
 .coveralls.yml
 doxygen/
+*.ps.gz

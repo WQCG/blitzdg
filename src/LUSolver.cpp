@@ -8,8 +8,9 @@ using namespace std;
 /**
  * Constructor. Takes a pointer reference to a blitz 2D array (The matrix A to be used by the solver in Ax=b).
  */
-LUSolver::LUSolver(Array<double, 2> * const & Ain) {
+LUSolver::LUSolver(Array<double, 2> * const & Ain, SparseMatrixConverter const & _matrixConverter) {
     A = Ain;
+    MatrixConverter = _matrixConverter;
     Triplet.row = nullptr;
     Triplet.col = nullptr;
     Triplet.val = nullptr;
@@ -25,10 +26,7 @@ void LUSolver::factorize() {
     const int n_rows = Aref.rows();
     const int n_cols = Aref.cols();
 
-    // Convert full matrix A to sparse Triplet.
-    toSparseTriplet();
-
-    const int nz = Triplet.nz;
+    const int nz = MatrixConverter.getNumNonZeros(*A);
 
     Ap = new int[n_rows+1];
     Ai = new int[nz];
@@ -36,9 +34,9 @@ void LUSolver::factorize() {
     Map = new int[nz];
 
     cout << "Computing LU factorization!" << endl;
+
     // convert sparse Triplet to compressed column format
-    umfpack_di_triplet_to_col(n_rows, n_cols, Triplet.nz, Triplet.row, Triplet.col,
-        Triplet.val, Ap, Ai, Ax, Map);
+    MatrixConverter.fullToCompressedColumn(*A, Ap, Ai, Ax);
 
     umfpack_di_symbolic(n_rows, n_cols, Ap, Ai, Ax, &Symbolic, null, null);
     umfpack_di_numeric (Ap, Ai, Ax, Symbolic, &Numeric, null, null) ;
@@ -47,7 +45,7 @@ void LUSolver::factorize() {
 
 /**
  * Solve Ax=b using UMFPACK. Requires LUSolver.factorize() to be called first. 'x' is returned in 'soln' reference.
- * 'b' is speified by 'rhs' reference.
+ * 'b' is specified by 'rhs' reference.
  */
 void LUSolver::solve(Array<double, 1> const & rhs, Array<double,1> & soln) {
     int n = rhs.length(0);
@@ -68,44 +66,12 @@ void LUSolver::solve(Array<double, 1> const & rhs, Array<double,1> & soln) {
     }
 }
 
-void LUSolver::toSparseTriplet() {
-    const Array<double, 2> & Aref = *A;
-
-    const int n_rows = Aref.rows();
-    const int n_cols = Aref.cols();
-
-    Triplet.nz = n_rows*n_cols;  // find a better bound, or don't.
-    Triplet.col = new int[Triplet.nz];
-    Triplet.row = new int[Triplet.nz];
-    Triplet.val = new double[Triplet.nz];
-
-    int nz = 0;
-
-    for( int i=0; i < n_rows; i++ ) {
-        for ( int j=0; j < n_cols; j++ ) {
-            double val = Aref(i,j);
-            if ( abs(val) < 1.e-15 ) {
-                continue;
-            }
-
-            Triplet.row[nz] = i;
-            Triplet.col[nz] = j;
-            Triplet.val[nz] = val;
-
-            nz++;
-        }
-    }
-
-    Triplet.nz = nz;
-}
-
 /**
  * Returns a reference to the matrix A.
  */
 Array<double, 2> & LUSolver::get_A() {
     return *A;
 }
-
 
 LUSolver::~LUSolver() {
     if (Triplet.row != nullptr) delete[] Triplet.row;
