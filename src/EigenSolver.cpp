@@ -1,7 +1,7 @@
 #include <EigenSolver.hpp>
 
 /**
- * Constructor. Takes a pointer reference to a blitz 2D array (The matrix A to be used by the solver in Ax=λx).
+ * Constructor. Takes a reference to a SparseMatrixConverter.
  */
 EigenSolver::EigenSolver(SparseMatrixConverter const & _matrixConverter) {
     MatrixConverter = _matrixConverter;
@@ -16,9 +16,9 @@ extern "C" {
  * Solve Ax=λx using LAPACK. Eigenvalues are stored in reference 'eigenvalues' and eigenvectors are stored column-wise
  * in reference 'eigenvectors.'
  */
-void EigenSolver::solve(const Array<double,2> & Aref, Array<double,1> & eigenvalues, Array<double, 2> & eigenvectors) {
+void EigenSolver::solve(const Array<double,2> & A, Array<double,1> & eigenvalues, Array<double, 2> & eigenvectors) {
 
-    int sz = Aref.rows();
+    int sz = A.rows();
     int lda = sz;
     int iwkopt;
 
@@ -33,7 +33,7 @@ void EigenSolver::solve(const Array<double,2> & Aref, Array<double,1> & eigenval
 
     double * Apod = new double[sz*lda];
 
-    MatrixConverter.fullToPodArray(Aref, Apod);
+    MatrixConverter.fullToPodArray(A, Apod);
 
     /* Determining optimal workspace parameters */
     dsyevd_( &JOBZ, UPLO, &sz, Apod, &lda, ww, &wkopt, &lwork, &iwkopt, &liwork, &info );
