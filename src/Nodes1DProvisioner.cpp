@@ -146,11 +146,18 @@ void Nodes1DProvisioner::computeJacobiQuadWeights(double alpha, double beta, int
     //SparseMatrixConverter & matConverter = *MatrixConverter;
     EigenSolver & eigSolver = *EigSolver;
     
-    Array<double, 1> eigenvalues(N+1);
     Array<double, 2> eigenvectors(N+1);
 
-    eigSolver.solve(J, eigenvalues, eigenvectors);
+    eigSolver.solve(J, x, eigenvectors);
 
-    cout << eigenvalues << endl;
+    // The eigenvalues give the x points.
+    cout << x << endl;
     cout << eigenvectors << endl;
+
+    // The weights are given by:
+    Array<double, 1> v1(N+1);
+    v1 = eigenvectors(0, Range::all()); 
+
+    double gamma0 = pow(2,(alpha+beta+1))/(alpha+beta+1)*tgamma(alpha+1)*tgamma(beta+1)/tgamma(alpha+beta+1);
+    w = (v1*v1)*gamma0;
 }
