@@ -1,4 +1,7 @@
 #include <EigenSolver.hpp>
+#include <blitz/array.h>
+
+using namespace blitz;
 
 /**
  * Constructor. Takes a reference to a SparseMatrixConverter.
@@ -50,6 +53,12 @@ void EigenSolver::solve(const Array<double,2> & A, Array<double,1> & eigenvalues
 
     for (int i=0; i < sz; i++)
         eigenvalues(i) = ww[i];
+
+    firstIndex ii;
+    secondIndex jj;
+    eigenvectors = eigenvectors(jj,ii);
+
+    
 }
 
 EigenSolver::~EigenSolver() {

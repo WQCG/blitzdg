@@ -366,6 +366,28 @@ Describe(Nodes1DProvisioner_Object) {
     Assert::That(abs(p(1)-(-sqrt(5./8.))), IsLessThan(eps));
     Assert::That(abs(p(2)-sqrt(5./2.)), IsLessThan(eps));
   }
+
+  It(Should_Generate_4th_Order_Quadrature_Points_and_Weights) {
+    
+    Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+    
+    Array<double, 1> x(5);
+    Array<double, 1> w(5);
+
+    nodes1D.computeJacobiQuadWeights(0., 0., 4, x, w);
+
+    Assert::That(abs(x(0) - -9.06179845938664e-01), IsLessThan(eps));
+    Assert::That(abs(x(1) - -5.38469310105683e-01), IsLessThan(eps));
+    Assert::That(abs(x(2) - -9.62591786604533e-17), IsLessThan(eps));
+    Assert::That(abs(x(3) -  5.38469310105683e-01), IsLessThan(eps));
+    Assert::That(abs(x(4) -  9.06179845938664e-01), IsLessThan(eps));
+
+    Assert::That(abs(w(0) - 0.236926885056189), IsLessThan(eps));
+    Assert::That(abs(w(1) - 0.478628670499366), IsLessThan(eps));
+    Assert::That(abs(w(2) - 0.568888888888889), IsLessThan(eps));
+    Assert::That(abs(w(3) - 0.478628670499367), IsLessThan(eps));
+    Assert::That(abs(w(4) - 0.236926885056189), IsLessThan(eps));
+  }
 };
 
 int main(const int argc, const char *argv[])
