@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['sparsetriplet',['SparseTriplet',['../structSparseTriplet.html',1,'']]]
+  ['nodes1dprovisioner',['Nodes1DProvisioner',['../classNodes1DProvisioner.html',1,'']]]
 ];

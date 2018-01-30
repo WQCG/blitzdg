@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['factorize',['factorize',['../classLUSolver.html#ad2415fda3fe785e1d49a21b9004d0298',1,'LUSolver']]]
+  ['computejacobiquadweights',['computeJacobiQuadWeights',['../classNodes1DProvisioner.html#a170bb6cc92cd2f0fcbc11a3f345912dc',1,'Nodes1DProvisioner']]]
 ];

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['lusolver',['LUSolver',['../classLUSolver.html#a9b8d01132b6a20df839a73cf8bded8d4',1,'LUSolver']]]
+  ['factorize',['factorize',['../classLUSolver.html#ad2415fda3fe785e1d49a21b9004d0298',1,'LUSolver']]]
 ];

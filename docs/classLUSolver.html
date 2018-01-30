@@ -93,9 +93,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a9b8d01132b6a20df839a73cf8bded8d4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLUSolver.html#a9b8d01132b6a20df839a73cf8bded8d4">LUSolver</a> (Array&lt; double, 2 &gt; *const &amp;)</td></tr>
-<tr class="memdesc:a9b8d01132b6a20df839a73cf8bded8d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#a9b8d01132b6a20df839a73cf8bded8d4">More...</a><br /></td></tr>
-<tr class="separator:a9b8d01132b6a20df839a73cf8bded8d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a50cc15a95f58dea28db5a66fff6d3e40"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLUSolver.html#a50cc15a95f58dea28db5a66fff6d3e40">LUSolver</a> (Array&lt; double, 2 &gt; *const &amp;, <a class="el" href="classSparseMatrixConverter.html">SparseMatrixConverter</a> const &amp;)</td></tr>
+<tr class="memdesc:a50cc15a95f58dea28db5a66fff6d3e40"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#a50cc15a95f58dea28db5a66fff6d3e40">More...</a><br /></td></tr>
+<tr class="separator:a50cc15a95f58dea28db5a66fff6d3e40"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5afecc00613fadd8cc61a5b92ad32402"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5afecc00613fadd8cc61a5b92ad32402"></a>
 Array&lt; double, 2 &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLUSolver.html#a5afecc00613fadd8cc61a5b92ad32402">get_A</a> ()</td></tr>
 <tr class="memdesc:a5afecc00613fadd8cc61a5b92ad32402"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference to the matrix A. <br /></td></tr>
@@ -108,7 +108,7 @@ Array&lt; double, 2 &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom
 <tr class="separator:aae3fbf619ff5c110253898e14f860c44"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a9b8d01132b6a20df839a73cf8bded8d4"></a>
+<a class="anchor" id="a50cc15a95f58dea28db5a66fff6d3e40"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -116,8 +116,18 @@ Array&lt; double, 2 &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom
           <td class="memname">LUSolver::LUSolver </td>
           <td>(</td>
           <td class="paramtype">Array&lt; double, 2 &gt; *const &amp;&#160;</td>
-          <td class="paramname"><em>Ain</em></td><td>)</td>
+          <td class="paramname"><em>Ain</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="classSparseMatrixConverter.html">SparseMatrixConverter</a> const &amp;&#160;</td>
+          <td class="paramname"><em>_matrixConverter</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -171,7 +181,7 @@ Array&lt; double, 2 &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom
 </div><div class="memdoc">
 
 <p>Solve Ax=b using UMFPACK. </p>
-<p>Requires <a class="el" href="classLUSolver.html#ad2415fda3fe785e1d49a21b9004d0298" title="Factorize the matrix A with UMFPACK. ">LUSolver.factorize()</a> to be called first. 'x' is returned in 'soln' reference. 'b' is speified by 'rhs' reference. </p>
+<p>Requires <a class="el" href="classLUSolver.html#ad2415fda3fe785e1d49a21b9004d0298" title="Factorize the matrix A with UMFPACK. ">LUSolver.factorize()</a> to be called first. 'x' is returned in 'soln' reference. 'b' is specified by 'rhs' reference. </p>
 
 </div>
 </div>

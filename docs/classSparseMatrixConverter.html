@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.11"/>
-<title>blitzdg: Member List</title>
+<title>blitzdg: SparseMatrixConverter Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -83,19 +83,40 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 </div><!-- top -->
 <div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="classSparseMatrixConverter-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">LUSolver Member List</div>  </div>
+<div class="title">SparseMatrixConverter Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-
-<p>This is the complete list of members for <a class="el" href="classLUSolver.html">LUSolver</a>, including all inherited members.</p>
-<table class="directory">
-  <tr class="even"><td class="entry"><a class="el" href="classLUSolver.html#ad2415fda3fe785e1d49a21b9004d0298">factorize</a>()</td><td class="entry"><a class="el" href="classLUSolver.html">LUSolver</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classLUSolver.html#a5afecc00613fadd8cc61a5b92ad32402">get_A</a>()</td><td class="entry"><a class="el" href="classLUSolver.html">LUSolver</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classLUSolver.html#a50cc15a95f58dea28db5a66fff6d3e40">LUSolver</a>(Array&lt; double, 2 &gt; *const &amp;, SparseMatrixConverter const &amp;)</td><td class="entry"><a class="el" href="classLUSolver.html">LUSolver</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classLUSolver.html#aae3fbf619ff5c110253898e14f860c44">solve</a>(Array&lt; double, 1 &gt; const &amp;, Array&lt; double, 1 &gt; &amp;)</td><td class="entry"><a class="el" href="classLUSolver.html">LUSolver</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>~LUSolver</b>() (defined in <a class="el" href="classLUSolver.html">LUSolver</a>)</td><td class="entry"><a class="el" href="classLUSolver.html">LUSolver</a></td><td class="entry"></td></tr>
-</table></div><!-- contents -->
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a5e3c108263b82624d50adb685c3828de"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5e3c108263b82624d50adb685c3828de"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>fullToSparseTriplet</b> (const Array&lt; double, 2 &gt; &amp;A, <a class="el" href="structSparseTriplet.html">SparseTriplet</a> &amp;triplet)</td></tr>
+<tr class="separator:a5e3c108263b82624d50adb685c3828de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a76b7e71381760adf99b1a6df515640b7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a76b7e71381760adf99b1a6df515640b7"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>sparseTripletToCompressedColumn</b> (const int numRows, const int numCols, const <a class="el" href="structSparseTriplet.html">SparseTriplet</a> &amp;triplet, int *Aptr, int *Aind, double *Avalues)</td></tr>
+<tr class="separator:a76b7e71381760adf99b1a6df515640b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c49afa47f337bdda97fa2bb40b19f32"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5c49afa47f337bdda97fa2bb40b19f32"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>fullToCompressedColumn</b> (const Array&lt; double, 2 &gt; &amp;A, int *Aptr, int *Aind, double *Avalues)</td></tr>
+<tr class="separator:a5c49afa47f337bdda97fa2bb40b19f32"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5119320327e9798117099a77a48c1453"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5119320327e9798117099a77a48c1453"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>fullToPodArray</b> (const Array&lt; double, 2 &gt; &amp;A, double *Apod)</td></tr>
+<tr class="separator:a5119320327e9798117099a77a48c1453"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a17e85ee9d2840e35a62312ac3c315a74"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a17e85ee9d2840e35a62312ac3c315a74"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>podArrayToFull</b> (const double *Apod, Array&lt; double, 2 &gt; &amp;A)</td></tr>
+<tr class="separator:a17e85ee9d2840e35a62312ac3c315a74"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23eb4ae2b391c30bf16ce764b3940f38"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a23eb4ae2b391c30bf16ce764b3940f38"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>getNumNonZeros</b> (const Array&lt; double, 2 &gt; &amp;A)</td></tr>
+<tr class="separator:a23eb4ae2b391c30bf16ce764b3940f38"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<hr/>The documentation for this class was generated from the following files:<ul>
+<li>include/<a class="el" href="SparseMatrixConverter_8hpp_source.html">SparseMatrixConverter.hpp</a></li>
+<li>src/SparseMatrixConverter.cpp</li>
+</ul>
+</div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

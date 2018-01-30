@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['meshmanager',['MeshManager',['../classMeshManager.html',1,'']]]
+  ['lusolver',['LUSolver',['../classLUSolver.html',1,'']]]
 ];

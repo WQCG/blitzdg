@@ -93,9 +93,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:abb0df01f541605c3dbca69afdddb2162"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classNodes1DProvisioner.html#abb0df01f541605c3dbca69afdddb2162">Nodes1DProvisioner</a> (int NOrder, int NumElements, double xmin, double xmax)</td></tr>
-<tr class="memdesc:abb0df01f541605c3dbca69afdddb2162"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#abb0df01f541605c3dbca69afdddb2162">More...</a><br /></td></tr>
-<tr class="separator:abb0df01f541605c3dbca69afdddb2162"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ac3707f7b3d1431f68d42adf05b52c0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classNodes1DProvisioner.html#a2ac3707f7b3d1431f68d42adf05b52c0">Nodes1DProvisioner</a> (int NOrder, int NumElements, double xmin, double xmax, <a class="el" href="classSparseMatrixConverter.html">SparseMatrixConverter</a> &amp;converter, <a class="el" href="classEigenSolver.html">EigenSolver</a> &amp;eigenSolver)</td></tr>
+<tr class="memdesc:a2ac3707f7b3d1431f68d42adf05b52c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#a2ac3707f7b3d1431f68d42adf05b52c0">More...</a><br /></td></tr>
+<tr class="separator:a2ac3707f7b3d1431f68d42adf05b52c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a431d54203a74c796e63b0fa1435f9ddc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a431d54203a74c796e63b0fa1435f9ddc"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classNodes1DProvisioner.html#a431d54203a74c796e63b0fa1435f9ddc">buildNodes</a> ()</td></tr>
 <tr class="memdesc:a431d54203a74c796e63b0fa1435f9ddc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build nodes and geometric factors for all elements. <br /></td></tr>
@@ -116,13 +116,20 @@ Array&lt; double, 1 &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom
 Array&lt; double, 2 &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classNodes1DProvisioner.html#ad53cba8043620b184322a4ff2bf8ef32">get_Dr</a> ()</td></tr>
 <tr class="memdesc:ad53cba8043620b184322a4ff2bf8ef32"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get reference to differentiation matrix Dr on the standard element. <br /></td></tr>
 <tr class="separator:ad53cba8043620b184322a4ff2bf8ef32"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a34779657d4fdc66d4a86303894803173"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a34779657d4fdc66d4a86303894803173"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>computeJacobiPolynomial</b> (Array&lt; double, 1 &gt; const &amp;x, const double alpha, const double beta, const int N, Array&lt; double, 1 &gt; &amp;p)</td></tr>
+<tr class="separator:a34779657d4fdc66d4a86303894803173"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a170bb6cc92cd2f0fcbc11a3f345912dc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a170bb6cc92cd2f0fcbc11a3f345912dc"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classNodes1DProvisioner.html#a170bb6cc92cd2f0fcbc11a3f345912dc">computeJacobiQuadWeights</a> (double alpha, double beta, int N, Array&lt; double, 1 &gt; &amp;x, Array&lt; double, 1 &gt; &amp;w)</td></tr>
+<tr class="memdesc:a170bb6cc92cd2f0fcbc11a3f345912dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the Nth order Gauss quadrature points, x, and weights, w, associated with the Jacobi polynomial, of type (alpha,beta) &gt; -1 ( != -0.5). <br /></td></tr>
+<tr class="separator:a170bb6cc92cd2f0fcbc11a3f345912dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5ad405d08d1b0e0b232502891b0edab4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5ad405d08d1b0e0b232502891b0edab4"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classNodes1DProvisioner.html#a5ad405d08d1b0e0b232502891b0edab4">~Nodes1DProvisioner</a> ()</td></tr>
 <tr class="memdesc:a5ad405d08d1b0e0b232502891b0edab4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor. <br /></td></tr>
 <tr class="separator:a5ad405d08d1b0e0b232502891b0edab4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="abb0df01f541605c3dbca69afdddb2162"></a>
+<a class="anchor" id="a2ac3707f7b3d1431f68d42adf05b52c0"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -130,25 +137,37 @@ Array&lt; double, 2 &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom
           <td class="memname">Nodes1DProvisioner::Nodes1DProvisioner </td>
           <td>(</td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>NOrder</em>, </td>
+          <td class="paramname"><em>_NOrder</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>NumElements</em>, </td>
+          <td class="paramname"><em>_NumElements</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>xmin</em>, </td>
+          <td class="paramname"><em>_xmin</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>xmax</em>&#160;</td>
+          <td class="paramname"><em>_xmax</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classSparseMatrixConverter.html">SparseMatrixConverter</a> &amp;&#160;</td>
+          <td class="paramname"><em>converter</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classEigenSolver.html">EigenSolver</a> &amp;&#160;</td>
+          <td class="paramname"><em>eigenSolver</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
