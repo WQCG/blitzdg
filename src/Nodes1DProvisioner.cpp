@@ -161,3 +161,25 @@ void Nodes1DProvisioner::computeJacobiQuadWeights(double alpha, double beta, int
     double gamma0 = pow(2,(alpha+beta+1))/(alpha+beta+1)*tgamma(alpha+1)*tgamma(beta+1)/tgamma(alpha+beta+1);
     w = (v1*v1)*gamma0;
 }
+
+/**  Compute the Nth order Gauss Lobatto quadrature points, x,
+  *  associated with the Jacobi polynomial, of type (alpha,beta) > -1 ( <> -0.5).
+  */
+void Nodes1DProvisioner::computeGaussLobottoPoints(double alpha, double beta, int N, Array<double,1> & x) {
+    if (N==1) {
+        x(0) = -1.0;
+        x(1) = 1.0;
+        return;
+    }
+
+    x(0) = -1.0;
+    x(N) = 1.0;
+
+    Array<double, 1> xJG(N-1);
+    Array<double, 1> w(N-1);
+
+    computeJacobiQuadWeights(alpha, beta, N-2, xJG, w);
+    
+    for(int i=1; i < N; i++)
+        x(i) = xJG(i-1);
+}                
