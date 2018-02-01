@@ -134,14 +134,15 @@ void Nodes1DProvisioner::computeJacobiQuadWeights(double alpha, double beta, int
         if (i < N) {
             J(i,i+1) = 2./(h1+2)*sqrt((i+1)*((i+1)+alpha+beta)*((i+1)+alpha)*((i+1)+beta)/(h1+1)/(h1+3));
         }
+        if ( i > 0) {
+            J(i, i-1) = 0.0;
+        }
     }
 
     if ((alpha + beta) < 10*eps ) {
         J(0,0) = 0.0;
     }
     J = J(ii,jj) + J(jj,ii);
-
-    cout << J << endl;
 
     //SparseMatrixConverter & matConverter = *MatrixConverter;
     EigenSolver & eigSolver = *EigSolver;
@@ -151,9 +152,7 @@ void Nodes1DProvisioner::computeJacobiQuadWeights(double alpha, double beta, int
     eigSolver.solve(J, x, eigenvectors);
 
     // The eigenvalues give the x points.
-    cout << x << endl;
-    cout << eigenvectors << endl;
-
+    
     // The weights are given by:
     Array<double, 1> v1(N+1);
     v1 = eigenvectors( 0, Range::all() ); 
@@ -163,7 +162,7 @@ void Nodes1DProvisioner::computeJacobiQuadWeights(double alpha, double beta, int
 }
 
 /**  Compute the Nth order Gauss Lobatto quadrature points, x,
-  *  associated with the Jacobi polynomial, of type (alpha,beta) > -1 ( <> -0.5).
+  *  associated with the Jacobi polynomial, of type (alpha,beta) > -1 ( != -0.5).
   */
 void Nodes1DProvisioner::computeGaussLobottoPoints(double alpha, double beta, int N, Array<double,1> & x) {
     if (N==1) {
@@ -178,7 +177,7 @@ void Nodes1DProvisioner::computeGaussLobottoPoints(double alpha, double beta, in
     Array<double, 1> xJG(N-1);
     Array<double, 1> w(N-1);
 
-    computeJacobiQuadWeights(alpha, beta, N-2, xJG, w);
+    computeJacobiQuadWeights(alpha+1., beta+1., N-2, xJG, w);
     
     for(int i=1; i < N; i++)
         x(i) = xJG(i-1);

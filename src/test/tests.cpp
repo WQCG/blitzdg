@@ -285,10 +285,8 @@ Describe(EigenSolver_Object) {
                    0,0,0,0,0,
                    0,0,0,0,0;
 
-    cout << "Solving eigenproblem!";
     solver.solve(Asymmetric, eigenvalues, eigenvectors);
-    cout << "eigenvectors: " << eigenvectors << endl;
-
+    
     Array<double, 2> expectedEvecs(5,5);
 
     expectedEvecs = 0.344185,-0.540215,0.563165,-0.456254,0.253736,
@@ -367,6 +365,7 @@ Describe(Nodes1DProvisioner_Object) {
     Assert::That(abs(p(2)-sqrt(5./2.)), IsLessThan(eps));
   }
 
+
   It(Should_Generate_4th_Order_Quadrature_Points_and_Weights) {
     
     Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
@@ -388,6 +387,35 @@ Describe(Nodes1DProvisioner_Object) {
     Assert::That(abs(w(3) - 0.478628670499367), IsLessThan(eps));
     Assert::That(abs(w(4) - 0.236926885056189), IsLessThan(eps));
   }
+
+  It(Should_Generate_1st_Order_Quadrature_Points_and_Weights) {
+    
+    Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+    
+    Array<double, 1> x(2);
+    Array<double, 1> w(2);
+
+    nodes1D.computeJacobiQuadWeights(0., 0., 1, x, w);
+
+    Assert::That(abs(x(0) - -0.577350269189626), IsLessThan(eps));
+    Assert::That(abs(x(1) -  0.577350269189626), IsLessThan(eps));
+
+    Assert::That(abs(w(0) - 1.0), IsLessThan(eps));
+    Assert::That(abs(w(1) - 1.0), IsLessThan(eps));
+  }
+
+  It(Should_Generate_3rd_Order_Legendre_Gauss_Lobatto_Nodes) {
+    Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+    
+    Array<double, 1> x(4);
+    nodes1D.computeGaussLobottoPoints(0., 0., 3, x);
+
+    cout << x << endl;
+    Assert::That(abs(x(0) - -1), IsLessThan(eps));
+    Assert::That(abs(x(1) - -0.447213595499958), IsLessThan(eps));
+    Assert::That(abs(x(2) -  0.447213595499958), IsLessThan(eps));
+    Assert::That(abs(x(3) -  1), IsLessThan(eps));
+  } 
 };
 
 int main(const int argc, const char *argv[])
