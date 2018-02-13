@@ -1,8 +1,6 @@
 #include <iostream>
 #include <math.h>
 #include <Nodes1DProvisioner.hpp>
-// #include <arpack++/arlssym.h>
-// #include <arpack++/arlsnsym.h>
 
 using namespace std;
 
@@ -17,27 +15,18 @@ Nodes1DProvisioner::Nodes1DProvisioner(int _NOrder, int _NumElements, double _xm
     Max_x = _xmax;
     MatrixConverter = &converter;
     EigSolver = &eigenSolver;
+
+    rGrid = new Array<double,1>(NOrder+1);
 }
 
 /**
  * Build nodes and geometric factors for all elements.
  */
 void Nodes1DProvisioner::buildNodes() {
-    Array<double, 1> x(3);
-    x = -1.,0.,1.;
-    Array<double, 1>  p(3);
+    const double alpha = 0.0;
+    const double beta = 0.0;
 
-    double alpha = 0.0;
-    double beta = 0.0;
-
-    computeJacobiPolynomial(x, alpha, beta, NOrder, p);
-    cout << p << endl;
-
-    int N = 4;
-    Array<double, 1> x1(N+1);
-    Array<double, 1> w(N+1);
-
-    computeJacobiQuadWeights(alpha, beta, N, x1, w);
+    computeGaussLobottoPoints(alpha, beta, NOrder, *rGrid);
 }
 
 /**
@@ -50,15 +39,15 @@ void Nodes1DProvisioner::buildDr() {
 /**
  * Get reference to physical x-grid.
  */
-Array<double, 2> & Nodes1DProvisioner::get_xGrid() {
-    throw("Not implemented.");
+Array<double, 1> & Nodes1DProvisioner::get_xGrid() {
+    return *xGrid;
 }
 
 /**
  * Get reference to r-grid on the standard element.
  */
 Array<double, 1> & Nodes1DProvisioner::get_rGrid() {
-    throw("Not implemented.");
+    return *rGrid;
 }
 
 
@@ -72,10 +61,14 @@ Array<double, 2> & Nodes1DProvisioner::get_Dr() {
 /**
  * Destructor
  */
-Nodes1DProvisioner::~Nodes1DProvisioner() {}
+Nodes1DProvisioner::~Nodes1DProvisioner() {
+    if (rGrid == nullptr) { delete[] rGrid; }
+}
 
-
-void Nodes1DProvisioner::computeJacobiPolynomial(Array<double,1> const & x,  const double alpha, const double beta, const int N, Array<double,1> & p) {
+/**  Compute the Nth Jacobi polynomial of type (alpha,beta) > -1 ( != -0.5)
+  *   and weights, w, associated with the Jacobi polynomial at the points x.
+  */
+void Nodes1DProvisioner::computeJacobiPolynomial(Array<double,1> const & x, const double alpha, const double beta, const int N, Array<double,1> & p) {
     Range all = Range::all();
     int Np = (x.length())(0);
 
@@ -158,6 +151,7 @@ void Nodes1DProvisioner::computeJacobiQuadWeights(double alpha, double beta, int
     v1 = eigenvectors( 0, Range::all() ); 
 
     double gamma0 = pow(2,(alpha+beta+1))/(alpha+beta+1)*tgamma(alpha+1)*tgamma(beta+1)/tgamma(alpha+beta+1);
+
     w = (v1*v1)*gamma0;
 }
 

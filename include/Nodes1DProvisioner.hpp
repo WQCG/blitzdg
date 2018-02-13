@@ -13,8 +13,8 @@ class Nodes1DProvisioner {
     int NumElements;
     int NOrder;
     
-    Array<double, 1> xGrid;
-    Array<double, 1> rGrid;
+    Array<double, 1> * xGrid;
+    Array<double, 1> * rGrid;
 
     Array<double, 2> Dr;
 
@@ -28,7 +28,7 @@ class Nodes1DProvisioner {
 
     void buildDr();
 
-    Array<double, 2> & get_xGrid();
+    Array<double, 1> & get_xGrid();
     Array<double, 1> & get_rGrid();
     Array<double, 2> & get_Dr();
 

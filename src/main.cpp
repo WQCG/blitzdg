@@ -29,6 +29,8 @@ int main(int argc, char **argv) {
 	Nodes1DProvisioner nodes1DProvisioner(N, K, xmin, xmax, matrixConverter, eigenSolver);
 	
   nodes1DProvisioner.buildNodes();
+
+  cout << nodes1DProvisioner.get_rGrid();
   
   return 0;
 }
