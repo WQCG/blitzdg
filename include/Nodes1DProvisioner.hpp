@@ -16,7 +16,8 @@ class Nodes1DProvisioner {
     Array<double, 1> * xGrid;
     Array<double, 1> * rGrid;
 
-    Array<double, 2> Dr;
+    Array<double, 2> * V;
+    Array<double, 2> * Dr;
 
     SparseMatrixConverter * MatrixConverter;
     EigenSolver * EigSolver;
@@ -25,14 +26,18 @@ class Nodes1DProvisioner {
     Nodes1DProvisioner(int NOrder, int NumElements, double xmin, double xmax, SparseMatrixConverter & converter, EigenSolver & eigenSolver);
 
     void buildNodes();
-
     void buildDr();
+    void buildVandermondeMatrix();
+
 
     Array<double, 1> & get_xGrid();
     Array<double, 1> & get_rGrid();
     Array<double, 2> & get_Dr();
+    Array<double, 2> & get_V();
 
-    void computeJacobiPolynomial(Array<double,1> const & x, const double alpha, const double beta, const int N,  Array<double,1> & p);
+
+    // these can be moved to a helper (polynomials) class or made private within this class.
+    void computeJacobiPolynomial(Array<double,1> const & x, const double alpha, const double beta, const int N, Array<double,1> & p);
     void computeJacobiQuadWeights(double alpha, double beta, int N, Array<double,1> & x, Array<double,1> & w);
     void computeGaussLobottoPoints(double alpha, double beta, int N, Array<double,1> & x);
 

@@ -30,7 +30,12 @@ int main(int argc, char **argv) {
 	
   nodes1DProvisioner.buildNodes();
 
-  cout << nodes1DProvisioner.get_rGrid();
+  cout << nodes1DProvisioner.get_rGrid() << endl;
+
+
+  nodes1DProvisioner.buildVandermondeMatrix();
+  
+  cout << nodes1DProvisioner.get_V() << endl;
   
   return 0;
 }

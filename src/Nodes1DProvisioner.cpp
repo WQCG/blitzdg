@@ -30,6 +30,22 @@ void Nodes1DProvisioner::buildNodes() {
 }
 
 /**
+ * Compute Vandermonde matrix which maps modal coefficients to nodal values.
+ */
+void Nodes1DProvisioner::buildVandermondeMatrix() {
+    V = new Array<double, 2>(NOrder+1, NOrder+1);
+
+    Array<double, 2> & Vref = *V;
+
+    Array<double, 1> p(NOrder+1);
+
+    for (int j=1; j <= NOrder+1; j++) {
+        computeJacobiPolynomial(get_rGrid(), 0.0, 0.0, j-1, p);
+        Vref(Range::all(), j) = p;
+    }
+}
+
+/**
  * Build differentiation matrix Dr on the standard element.
  */
 void Nodes1DProvisioner::buildDr() {
@@ -56,6 +72,13 @@ Array<double, 1> & Nodes1DProvisioner::get_rGrid() {
  */
 Array<double, 2> & Nodes1DProvisioner::get_Dr() {
     throw("Not implemented.");
+}
+
+/**
+ * Get reference to generalized Vandermonde matrix V.
+ */
+Array<double, 2> & Nodes1DProvisioner::get_V() {
+    return *V;
 }
 
 /**
