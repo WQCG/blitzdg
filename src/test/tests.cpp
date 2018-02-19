@@ -12,6 +12,8 @@ using namespace std;
 
 const int N=5;
 const double eps=10*numeric_limits<double>::epsilon();
+const float epsf = 5.e-7;
+
 
 Array<double,2> A(N,N), B(N,N), C(N,N), D(N,N), Adiag(N,N), Asymmetric(N,N);
 Array<double,1> b(N), soln(N), d(N), e(N), x(N);
@@ -295,8 +297,6 @@ Describe(EigenSolver_Object) {
                    -0.489198,-0.456254,0.0711849,0.540215,0.505587,
                     0.344185,0.540215,0.563165,0.456254,0.253736;
 
-    const float epsf = 5.e-7;
-
     Assert::That(eigenvalues(0) - -0.90618,    IsLessThan(epsf));
     Assert::That(eigenvalues(1) - -0.538469,   IsLessThan(epsf));
     Assert::That(eigenvalues(2) - 9.62592e-17, IsLessThan(epsf));
@@ -365,6 +365,34 @@ Describe(Nodes1DProvisioner_Object) {
     Assert::That(abs(p(2)-sqrt(5./2.)), IsLessThan(eps));
   }
 
+   It(Should_Generate_0th_Order_Legendre_Polynomial_4pt_Grid) {
+    Array<double, 1> x(4);
+    x = -1,-0.447214,0.447214,1;
+    Array<double, 1> p(4);
+
+    Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+
+    nodes1D.computeJacobiPolynomial(x, 0.0, 0.0, 0, p);
+
+    Assert::That(abs(p(0)-sqrt(1./2.)), IsLessThan(eps));
+    Assert::That(abs(p(1)-sqrt(1./2.)), IsLessThan(eps));
+    Assert::That(abs(p(2)-sqrt(1./2.)), IsLessThan(eps));
+  } 
+
+  It(Should_Generate_1st_Order_Legendre_Polynomial_4pt_Grid) {
+    Array<double, 1> x(4);
+    x = -1,-0.447214,0.447214,1;
+    Array<double, 1> p(4);
+
+    Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+
+    nodes1D.computeJacobiPolynomial(x, 0.0, 0.0, 1, p);
+
+    Assert::That(abs(p(0)- -1.224744871391589), IsLessThan(epsf));
+    Assert::That(abs(p(1)- -0.547722557505166), IsLessThan(epsf));
+    Assert::That(abs(p(2)-  0.547722557505166), IsLessThan(epsf));
+    Assert::That(abs(p(3)-  1.224744871391589), IsLessThan(epsf));
+  } 
 
   It(Should_Generate_4th_Order_Quadrature_Points_and_Weights) {
     

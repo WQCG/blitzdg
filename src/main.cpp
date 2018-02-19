@@ -32,7 +32,6 @@ int main(int argc, char **argv) {
 
   cout << nodes1DProvisioner.get_rGrid() << endl;
 
-
   nodes1DProvisioner.buildVandermondeMatrix();
   
   cout << nodes1DProvisioner.get_V() << endl;
