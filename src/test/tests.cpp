@@ -447,8 +447,8 @@ Describe(Nodes1DProvisioner_Object) {
   It(Should_Build_3rd_Order_Vandermonde_Matrix) {
     Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
 
+    nodes1D.buildNodes();
     nodes1D.buildVandermondeMatrix();
-  
     Array<double, 2> & V = nodes1D.get_V();
 
     Array<double, 2> expectedV(4,4);
@@ -457,11 +457,9 @@ Describe(Nodes1DProvisioner_Object) {
                 0.70711,0.54772,-0.31623,-0.83666,
                 0.70711,1.22474,1.58114,1.87083;
 
-    cout << "V: " << endl << V << endl;
-
     Array<double, 2> res(4,4);
     res  = V - expectedV;
-    Assert::That(sum(res(ii)*res(ii)), IsLessThan(eps));
+    Assert::That(sum(res(ii)*res(ii)), IsLessThan(epsf));
   }
 };
 
