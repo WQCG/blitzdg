@@ -37,11 +37,10 @@ void Nodes1DProvisioner::buildVandermondeMatrix() {
 
     Array<double, 2> & Vref = *V;
 
-    Array<double, 1> p(NOrder+1);
-
     for (int j=1; j <= NOrder+1; j++) {
-        computeJacobiPolynomial(get_rGrid(), 0.0, 0.0, j-1, p);
-        Vref(Range::all(), j) = p;
+        Array<double, 1> p(NOrder+1);
+        computeJacobiPolynomial(*rGrid, 0.0, 0.0, j-1, p);
+        Vref(Range::all(), j-1) = p;
     }
 }
 
@@ -82,10 +81,11 @@ Array<double, 2> & Nodes1DProvisioner::get_V() {
 }
 
 /**
- * Destructor
+ * Destructoructor
  */
 Nodes1DProvisioner::~Nodes1DProvisioner() {
-    if (rGrid == nullptr) { delete[] rGrid; }
+    if (rGrid != nullptr) { delete[] rGrid; }
+    if (V != nullptr) { delete[] V; }
 }
 
 /**  Compute the Nth Jacobi polynomial of type (alpha,beta) > -1 ( != -0.5)

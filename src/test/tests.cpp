@@ -410,12 +410,31 @@ Describe(Nodes1DProvisioner_Object) {
     Array<double, 1> x(4);
     nodes1D.computeGaussLobottoPoints(0., 0., 3, x);
 
-    cout << x << endl;
     Assert::That(abs(x(0) - -1), IsLessThan(eps));
     Assert::That(abs(x(1) - -0.447213595499958), IsLessThan(eps));
     Assert::That(abs(x(2) -  0.447213595499958), IsLessThan(eps));
     Assert::That(abs(x(3) -  1), IsLessThan(eps));
-  } 
+  }
+
+  It(Should_Build_3rd_Order_Vandermonde_Matrix) {
+    Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+
+    nodes1D.buildVandermondeMatrix();
+  
+    Array<double, 2> & V = nodes1D.get_V();
+
+    Array<double, 2> expectedV(4,4);
+    expectedV = 0.70711,-1.22474, 1.58114,-1.87083,
+                0.70711,-0.54772,-0.31623,0.83666,
+                0.70711,0.54772,-0.31623,-0.83666,
+                0.70711,1.22474,1.58114,1.87083;
+
+    cout << "V: " << endl << V << endl;
+
+    Array<double, 2> res(4,4);
+    res  = V - expectedV;
+    Assert::That(sum(res(ii)*res(ii)), IsLessThan(eps));
+  }
 };
 
 int main(const int argc, const char *argv[])
