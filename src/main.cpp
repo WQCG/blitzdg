@@ -30,11 +30,16 @@ int main(int argc, char **argv) {
 	
   nodes1DProvisioner.buildNodes();
 
-  cout << nodes1DProvisioner.get_rGrid() << endl;
+  Array<double,1> rGrid = nodes1DProvisioner.get_rGrid();
+  cout << rGrid << endl;
 
   nodes1DProvisioner.buildVandermondeMatrix();
   
   cout << nodes1DProvisioner.get_V() << endl;
-  
+
+  Array<double,1> dp(N+1);
+  nodes1DProvisioner.computeGradJacobi(rGrid, 0.0, 0.0, N, dp);
+  cout << dp << endl;
+
   return 0;
 }

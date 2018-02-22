@@ -40,6 +40,7 @@ class Nodes1DProvisioner {
     void computeJacobiPolynomial(Array<double,1> const & x, const double alpha, const double beta, const int N, Array<double,1> & p);
     void computeJacobiQuadWeights(double alpha, double beta, int N, Array<double,1> & x, Array<double,1> & w);
     void computeGaussLobottoPoints(double alpha, double beta, int N, Array<double,1> & x);
+    void computeGradJacobi(Array<double,1> const & x, const double alpha, const double beta, const int N, Array<double,1> & dp);
 
     ~Nodes1DProvisioner();
 };

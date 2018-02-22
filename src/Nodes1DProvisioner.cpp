@@ -196,4 +196,16 @@ void Nodes1DProvisioner::computeGaussLobottoPoints(double alpha, double beta, in
     
     for(int i=1; i < N; i++)
         x(i) = xJG(i-1);
-}                
+}
+
+void Nodes1DProvisioner::computeGradJacobi(Array<double,1> const & x, const double alpha, const double beta, const int N, Array<double,1> & dp) {
+    if (N == 0) {
+        dp = 0.0;
+        return;
+    }
+
+    Array<double, 1> p(N+1);
+
+    computeJacobiPolynomial(x, alpha+1, beta+1, N-1, p);
+    dp = sqrt(N*(N+alpha+beta+1))*p;
+}
