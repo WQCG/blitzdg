@@ -7,8 +7,8 @@ TESTTARGET := bin/test
 SRCEXT := cpp
 SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
-BINOBJECTS := $(shell echo $(OBJECTS) | sed 's/build\/test\/tests.o//')
-TESTOBJECTS := $(shell echo $(OBJECTS) | sed 's/build\/main.o//')
+BINOBJECTS := $(shell echo $(OBJECTS) | tr -s " " "\012" | sed -r 's/build\/test\/.*?\.o//')
+TESTOBJECTS := $(shell echo $(OBJECTS) | sed 's/build\/main\.o//')
 
 CFLAGS := -g -Wall -std=c++0x -fprofile-arcs -ftest-coverage 
 LINKERFLAGS := -fprofile-arcs
