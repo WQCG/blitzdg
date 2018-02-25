@@ -9,7 +9,7 @@ using namespace igloo;
 using namespace blitz;
 using namespace std;
 
-namespace nodes1DProvisionerTests {
+namespace Nodes1DProvisionerTests {
     const int N=5;
     const double eps=10*numeric_limits<double>::epsilon();
     const float epsf = 5.e-7;

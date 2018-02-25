@@ -13,19 +13,17 @@ using namespace std;
 const int N=5;
 const double eps=10*numeric_limits<double>::epsilon();
 const float epsf = 5.e-7;
-
-
-Array<double,2> A(N,N), B(N,N), C(N,N), D(N,N), Adiag(N,N), Asymmetric(N,N);
-Array<double,1> b(N), soln(N), d(N), e(N), x(N);
-
 firstIndex ii;
 secondIndex jj;
 
 LUSolver * luSolver = nullptr;
-MeshManager * meshManager=nullptr;
 SparseMatrixConverter * matrixConverter = nullptr;
 Nodes1DProvisioner * nodes1DProvisioner = nullptr;
 EigenSolver * eigenSolver = nullptr;
+
+
+Array<double, 1> b(N), x(N), d(N), e(N);
+Array<double, 2> A(N,N), B(N,N);
 
 
 Describe(Simple_blitz_array_operations)
@@ -132,186 +130,8 @@ Describe(LUSolver_Object)
   }
 };
 
-Describe(MeshManager_Object) {
-  void SetUp() {
-    meshManager = new MeshManager();
-  }
-
-  It(Reads_Vertex_Files) {
-    MeshManager & mgr = *meshManager;
-
-    mgr.readVertices("input/2box.V");
-
-    Assert::That(mgr.get_NumVerts(), Equals(6));
-    Assert::That(mgr.get_Dim(), Equals(2));
-
-    double * verts = mgr.get_Vertices();
-
-    Assert::That(verts[0], Equals(0.0));
-    Assert::That(verts[1], Equals(0.0));
-
-    Assert::That(verts[2], Equals(0.5));
-    Assert::That(verts[3], Equals(0.0));
-
-    Assert::That(verts[4], Equals(1.0));
-    Assert::That(verts[5], Equals(0.0));
-
-    Assert::That(verts[6], Equals(1.0));
-    Assert::That(verts[7], Equals(1.0));
-
-    Assert::That(verts[8], Equals(0.5));
-    Assert::That(verts[9], Equals(1.0));
-
-    Assert::That(verts[10], Equals(0.0));
-    Assert::That(verts[11], Equals(1.0));
-  }
-
-  It(Reads_Element_Files) {
-    MeshManager & mgr = *meshManager;
-
-    mgr.readElements("input/2box.E2V");
-
-    Assert::That(mgr.get_NumElements(), Equals(2));
-    Assert::That(mgr.get_ElementType(), Equals(4));
-
-    int * elements = mgr.get_Elements();
-
-    Assert::That(elements[0], Equals(1));
-    Assert::That(elements[1], Equals(2));
-    Assert::That(elements[2], Equals(5));
-    Assert::That(elements[3], Equals(6));
-
-    Assert::That(elements[4], Equals(2));
-    Assert::That(elements[5], Equals(3));
-    Assert::That(elements[6], Equals(4));
-    Assert::That(elements[7], Equals(5));
-  }
-
-  It(Can_Print_Vertices_And_DoesNotThrow) {
-    MeshManager & mgr = *meshManager;
-    mgr.readVertices("input/2box.V");
-    cout << endl << "Vertices:" << endl;
-    mgr.printVertices();
-  }
-
-  It(Can_Print_Elements_And_DoesNotThrow) {
-    MeshManager & mgr = *meshManager;
-    mgr.readElements("input/2box.E2V");
-    cout << endl << "Elements" << endl;
-    mgr.printElements();
-  }
-
-  It(Can_Partition_A_Mesh) {
-    MeshManager & mgr = *meshManager;
-    mgr.readVertices("input/2box.V");
-    mgr.readElements("input/2box.E2V");
-
-    mgr.partitionMesh(2);
-
-    int * & epMap = mgr.get_ElementPartitionMap();
-    Assert::That(epMap[0], Equals(1));
-    Assert::That(epMap[1], Equals(2));
-
-    int * & vpMap = mgr.get_VertexPartitionMap();
-    Assert::That(vpMap[0], Equals(1));
-    Assert::That(vpMap[1], Equals(1));
-    Assert::That(vpMap[2], Equals(2));
-    Assert::That(vpMap[3], Equals(2));
-    Assert::That(vpMap[4], Equals(1));
-    Assert::That(vpMap[5], Equals(2));
-  }
-};
-
-Describe(EigenSolver_Object) {
-  void SetUp() {
-
-    Adiag = 1,0,0,0,0,
-        0,2,0,0,0,
-        0,0,3,0,0,
-        0,0,0,4,0,
-        0,0,0,0,5;
-
-    Asymmetric = 0,0.57735,0,0,0,
-                 0.57735,-0,0.516398,0,0,
-                 0,0.516398,-0,0.507093,0,
-                 0,0,0.507093,-0,0.503953,
-                 0,0,0,0.503953,-0;
-
-    matrixConverter = new SparseMatrixConverter();
-  }
-
-  It(Should_Solve_Trivial_Symmetric_Eigenproblem) {
-    eigenSolver = new EigenSolver(*matrixConverter);
-    EigenSolver & solver = *eigenSolver;
-
-    Array<double, 1> eigenvalues(5);
-    eigenvalues = 0,0,0,0,0;
-    Array<double, 2> eigenvectors(5,5);
-    eigenvectors = 0,0,0,0,0,
-                   0,0,0,0,0,
-                   0,0,0,0,0,
-                   0,0,0,0,0,
-                   0,0,0,0,0;
-
-    solver.solve(Adiag, eigenvalues, eigenvectors);
-    
-    Array<double, 2> expectedEvecs(5,5);
-    
-    expectedEvecs = 1,0,0,0,0,
-                    0,1,0,0,0,
-                    0,0,1,0,0,
-                    0,0,0,1,0,
-                    0,0,0,0,1;
-
-    Assert::That(eigenvalues(0), Equals(1.));
-    Assert::That(eigenvalues(1), Equals(2.));
-    Assert::That(eigenvalues(2), Equals(3.));
-    Assert::That(eigenvalues(3), Equals(4.));
-    Assert::That(eigenvalues(4), Equals(5.));
-
-    Array <double, 2> res(5,5);
-    res = eigenvectors - expectedEvecs;
-    Assert::That(sum(res(ii)*res(ii)), IsLessThan(eps));
-  }
-
-  It(Should_Solve_NonTrivial_Symmetric_Eigenproblem) {
-    eigenSolver = new EigenSolver(*matrixConverter);
-    EigenSolver & solver = *eigenSolver;
-
-    Array<double, 1> eigenvalues(5);
-    eigenvalues = 0,0,0,0,0;
-    Array<double, 2> eigenvectors(5,5);
-    eigenvectors = 0,0,0,0,0,
-                   0,0,0,0,0,
-                   0,0,0,0,0,
-                   0,0,0,0,0,
-                   0,0,0,0,0;
-
-    solver.solve(Asymmetric, eigenvalues, eigenvectors);
-    
-    Array<double, 2> expectedEvecs(5,5);
-
-    expectedEvecs = 0.344185,-0.540215,0.563165,-0.456254,0.253736,
-                   -0.489198,0.456254,0.0711849,-0.540215,0.505587,
-                    0.533334,2.06417e-16,-0.596285,-2.67144e-16,0.6,
-                   -0.489198,-0.456254,0.0711849,0.540215,0.505587,
-                    0.344185,0.540215,0.563165,0.456254,0.253736;
-
-    Assert::That(eigenvalues(0) - -0.90618,    IsLessThan(epsf));
-    Assert::That(eigenvalues(1) - -0.538469,   IsLessThan(epsf));
-    Assert::That(eigenvalues(2) - 9.62592e-17, IsLessThan(epsf));
-    Assert::That(eigenvalues(3) - 0.538469,    IsLessThan(epsf));
-    Assert::That(eigenvalues(4) - 0.90618,     IsLessThan(epsf));
-
-    Array<double, 2> res(5,5);
-    res = eigenvectors - expectedEvecs;
-    Assert::That(sum(res(ii)*res(ii)), IsLessThan(epsf));
-  }
-};
-
 int main(const int argc, const char *argv[])
 {
-  TestRunner::RunAllTests(argc, argv);
-  //return TestRunner::RunAllTests(argc, argv);
+  return TestRunner::RunAllTests(argc, argv);
   // exit code returns number of failed tests.
 }
