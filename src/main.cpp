@@ -41,5 +41,11 @@ int main(int argc, char **argv) {
   nodes1DProvisioner.computeGradJacobi(rGrid, 0.0, 0.0, N, dp);
   cout << dp << endl;
 
+  Array<double, 2> DVr(N+1, N+1);
+
+  nodes1DProvisioner.computeGradVandermonde(DVr);
+
+  cout << DVr << endl;
+
   return 0;
 }

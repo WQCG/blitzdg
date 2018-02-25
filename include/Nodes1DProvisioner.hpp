@@ -28,6 +28,7 @@ class Nodes1DProvisioner {
     void buildNodes();
     void buildDr();
     void buildVandermondeMatrix();
+    void computeGradVandermonde(Array<double,2> & DVr);
 
 
     Array<double, 1> & get_xGrid();

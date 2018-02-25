@@ -204,8 +204,17 @@ void Nodes1DProvisioner::computeGradJacobi(Array<double,1> const & x, const doub
         return;
     }
 
-    Array<double, 1> p(N+1);
+    Array<double, 1> p(x.length());
 
     computeJacobiPolynomial(x, alpha+1, beta+1, N-1, p);
     dp = sqrt(N*(N+alpha+beta+1))*p;
+}
+
+void Nodes1DProvisioner::computeGradVandermonde(Array<double,2> & DVr) {
+
+    for (int i=0; i<=NOrder; i++) {
+        Array<double, 1> dp(NOrder+1);
+        computeGradJacobi(*rGrid, 0.0, 0.0, i, dp);
+        DVr(Range::all(), i) = dp;
+    }
 }
