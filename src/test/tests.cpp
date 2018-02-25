@@ -461,6 +461,26 @@ Describe(Nodes1DProvisioner_Object) {
     res  = V - expectedV;
     Assert::That(sum(res(ii)*res(ii)), IsLessThan(epsf));
   }
+
+  It(Should_Build_4th_Order_GradVandermonde_Matrix) {
+    Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+
+    nodes1D.buildNodes();
+
+    Array<double, 2> DVr(5,5);
+    nodes1D.computeGradVandermonde(DVr);
+
+    Array<double, 2> expectedDVr(5,5);
+    expectedDVr = 0.00000,1.22474,-4.74342,11.22497,-21.21320,
+                  0.00000,1.22474,-3.10530, 3.20713, -0.00000,
+                  0.00000,1.22474,-0.00000,-2.80624,  0.00000,
+                  0.00000,1.22474, 3.10530, 3.20713,  0.00000,
+                  0.00000,1.22474 ,4.74342,11.22497, 21.21320;
+
+    Array<double, 2> res(4,4);
+    res = DVr - expectedDVr;
+    Assert::That(sum(res(ii)*res(ii)), IsLessThan(epsf));
+  }
 };
 
 int main(const int argc, const char *argv[])
