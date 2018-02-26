@@ -57,8 +57,6 @@ void EigenSolver::solve(const Array<double,2> & A, Array<double,1> & eigenvalues
     firstIndex ii;
     secondIndex jj;
     eigenvectors = eigenvectors(jj,ii);
-
-    
 }
 
 EigenSolver::~EigenSolver() {

@@ -3,7 +3,7 @@
 #include <Nodes1DProvisioner.hpp>
 #include <LUSolver.hpp>
 #include <EigenSolver.hpp>
-#include <MeshManager.hpp>
+#include <DirectSolver.hpp>
 
 using namespace igloo;
 using namespace blitz;
@@ -18,10 +18,10 @@ namespace Nodes1DProvisionerTests {
     secondIndex jj;
 
     LUSolver * luSolver = nullptr;
-    MeshManager * meshManager=nullptr;
     SparseMatrixConverter * matrixConverter = nullptr;
     Nodes1DProvisioner * nodes1DProvisioner = nullptr;
     EigenSolver * eigenSolver = nullptr;
+    DirectSolver * directSolver = nullptr;
 
     Describe(Nodes1DProvisioner_Object) {
         void SetUp() {
@@ -32,8 +32,8 @@ namespace Nodes1DProvisionerTests {
 
             matrixConverter = new SparseMatrixConverter();
             eigenSolver = new EigenSolver(*matrixConverter);
-
-            nodes1DProvisioner = new Nodes1DProvisioner(NOrder, NumElements, xmin, xmax, *matrixConverter, *eigenSolver);
+            directSolver = new DirectSolver(*matrixConverter);
+            nodes1DProvisioner = new Nodes1DProvisioner(NOrder, NumElements, xmin, xmax, *matrixConverter, *eigenSolver, *directSolver);
         }
 
         It(Should_Generate_0th_Order_Legendre_Polynomial) {

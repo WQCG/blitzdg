@@ -8,13 +8,14 @@ using namespace std;
  * Constructor. Takes order of polynomials, number of elements, and dimensions of the domain.
  * Assumes equally-spaced elements.
  */
-Nodes1DProvisioner::Nodes1DProvisioner(int _NOrder, int _NumElements, double _xmin, double _xmax, SparseMatrixConverter & converter, EigenSolver & eigenSolver) {
+Nodes1DProvisioner::Nodes1DProvisioner(int _NOrder, int _NumElements, double _xmin, double _xmax, SparseMatrixConverter & converter, EigenSolver & eigenSolver, DirectSolver & directSolver) {
     NOrder = _NOrder;
     NumElements = _NumElements;
     Min_x = _xmin;
     Max_x = _xmax;
     MatrixConverter = &converter;
     EigSolver = &eigenSolver;
+    LinSolver = &directSolver;
 
     rGrid = new Array<double,1>(NOrder+1);
 }
@@ -48,7 +49,14 @@ void Nodes1DProvisioner::buildVandermondeMatrix() {
  * Build differentiation matrix Dr on the standard element.
  */
 void Nodes1DProvisioner::buildDr() {
-    throw("Not implemented.");
+    Dr = new Array<double, 2>(NOrder+1, NOrder+1);
+
+    Array<double, 2> & Vref = *V;
+    Array<double, 2> DVr(NOrder+1, NOrder+1);
+
+    computeGradVandermonde(DVr);
+
+    // Dr = DVr / V;
 } 
 
 /**

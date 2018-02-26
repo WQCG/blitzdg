@@ -13,6 +13,7 @@
 #include <Nodes1DProvisioner.hpp>
 #include <SparseMatrixConverter.hpp>
 #include <EigenSolver.hpp>
+#include <DirectSolver.hpp>
 
 using namespace std;
 using namespace blitz;
@@ -25,8 +26,9 @@ int main(int argc, char **argv) {
 
   SparseMatrixConverter matrixConverter;
   EigenSolver eigenSolver(matrixConverter);
+  DirectSolver directSolver(matrixConverter);
 
-	Nodes1DProvisioner nodes1DProvisioner(N, K, xmin, xmax, matrixConverter, eigenSolver);
+	Nodes1DProvisioner nodes1DProvisioner(N, K, xmin, xmax, matrixConverter, eigenSolver, directSolver);
 	
   nodes1DProvisioner.buildNodes();
 

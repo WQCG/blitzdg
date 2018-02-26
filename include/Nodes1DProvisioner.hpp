@@ -2,6 +2,7 @@
 #include <blitz/array.h>
 #include <SparseMatrixConverter.hpp>
 #include <EigenSolver.hpp>
+#include <DirectSolver.hpp>
 
 using namespace std;
 using namespace blitz;
@@ -21,21 +22,20 @@ class Nodes1DProvisioner {
 
     SparseMatrixConverter * MatrixConverter;
     EigenSolver * EigSolver;
+    DirectSolver * LinSolver;
 
   public:
-    Nodes1DProvisioner(int NOrder, int NumElements, double xmin, double xmax, SparseMatrixConverter & converter, EigenSolver & eigenSolver);
+    Nodes1DProvisioner(int NOrder, int NumElements, double xmin, double xmax, SparseMatrixConverter & converter, EigenSolver & eigenSolver, DirectSolver & directSolver);
 
     void buildNodes();
     void buildDr();
     void buildVandermondeMatrix();
     void computeGradVandermonde(Array<double,2> & DVr);
 
-
     Array<double, 1> & get_xGrid();
     Array<double, 1> & get_rGrid();
     Array<double, 2> & get_Dr();
     Array<double, 2> & get_V();
-
 
     // these can be moved to a helper (polynomials) class or made private within this class.
     void computeJacobiPolynomial(Array<double,1> const & x, const double alpha, const double beta, const int N, Array<double,1> & p);
