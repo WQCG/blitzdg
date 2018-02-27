@@ -49,5 +49,7 @@ int main(int argc, char **argv) {
 
   cout << DVr << endl;
 
+  nodes1DProvisioner.buildDr();
+
   return 0;
 }
