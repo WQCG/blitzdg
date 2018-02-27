@@ -17,7 +17,7 @@ extern "C" {
 }
 
 /**
- * Solve AX=B using LAPACK. Here, B and X are allowed to have multiple columns.
+ * Solve A*X=B using LAPACK. Here, B and X are allowed to have multiple columns.
  */
 void DirectSolver::solve(const Array<double,2> & A, const Array<double, 2> & B, Array<double, 2> & X) {
 

@@ -10,7 +10,7 @@ using namespace blitz;
 namespace DirectSolverTests {
     const int N=5;
     const double eps=10*numeric_limits<double>::epsilon();
-    const float epsf = 5.e-7;
+    const float epsf = 1.e-5;
 
     DirectSolver * directSolver = nullptr;
     SparseMatrixConverter * matrixConverter = nullptr;
@@ -49,18 +49,19 @@ namespace DirectSolverTests {
 
             cout << x << endl;
             
-            /*
-              -1.32806
-                -0.38880
-                -0.96358
-                -0.33740
-                0.82171 */
+            Array<double, 1> expectedx(N);
 
-            Assert::That(x(0), Equals(-1.32806));
-            Assert::That(x(1), Equals(-0.38880));
-            Assert::That(x(2), Equals(-0.96358));
-            Assert::That(x(3), Equals(-0.33740));
-            Assert::That(x(4), Equals(0.82171));
+            expectedx = -1.32806,
+                        -0.38880,
+                        -0.96358,
+                        -0.33740,
+                         0.82171;
+
+            Assert::That(abs(x(0)-expectedx(0)), IsLessThan(epsf));
+            Assert::That(abs(x(1)-expectedx(1)), IsLessThan(epsf));
+            Assert::That(abs(x(2)-expectedx(2)), IsLessThan(epsf));
+            Assert::That(abs(x(3)-expectedx(3)), IsLessThan(epsf));
+            Assert::That(abs(x(4)-expectedx(4)), IsLessThan(epsf));
         }
     };
 }
