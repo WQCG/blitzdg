@@ -1,4 +1,4 @@
-CC := g++
+CC := $(or $(CXX), g++)
 SRCDIR := src
 BUILDDIR := build
 TARGET := bin/blitzdg
