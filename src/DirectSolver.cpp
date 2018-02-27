@@ -62,10 +62,6 @@ void DirectSolver::solve(const Array<double,2> & A, const Array<double, 2> & B, 
     MatrixConverter.podArrayToFull(Xpod, Xtrans);
 
     X = Xtrans(jj,ii);
-
-    cout << "A: " << A << endl;
-    cout << "B: " << B << endl;
-    cout << "X: " << X << endl;
 }
 
 DirectSolver::~DirectSolver() {

@@ -20,6 +20,8 @@ namespace DirectSolverTests {
 
     Array<double, 2> b(N,1), x(N,1);
     Array<double, 2> A(N,N);
+    Array<double, 1> expectedx(N);
+
 
     Describe(DirectSolver_Object) {
         void SetUp() {
@@ -35,6 +37,11 @@ namespace DirectSolverTests {
                                  0.35453,
                                  0.88904,
                                  -1.22226;
+            expectedx = -1.32806,
+                        -0.38880,
+                        -0.96358,
+                        -0.33740,
+                         0.82171;
 
 
             matrixConverter = new SparseMatrixConverter();
@@ -46,16 +53,6 @@ namespace DirectSolverTests {
             DirectSolver & solver = *directSolver;
 
             solver.solve(A, b, x);
-
-            cout << x << endl;
-            
-            Array<double, 1> expectedx(N);
-
-            expectedx = -1.32806,
-                        -0.38880,
-                        -0.96358,
-                        -0.33740,
-                         0.82171;
 
             Assert::That(abs(x(0)-expectedx(0)), IsLessThan(epsf));
             Assert::That(abs(x(1)-expectedx(1)), IsLessThan(epsf));
