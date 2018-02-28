@@ -10,7 +10,7 @@ Currently only supporting running/development on linux systems, primarily ubuntu
 
 1. `git clone https://github.com/dsteinmo/blitzdg.git`
 2. `cd blitzdg && ./pull-deps.sh`
-3.  `make && ./bin/blitzdg` (The binary currently doesn't do much).
+3. `make && ./bin/blitzdg` (The binary currently doesn't do much).
 4. Run unit tests with `make test`.
 
 ### Running with Docker
@@ -23,12 +23,11 @@ You can also run the build and tests inside a docker container.
 
 ## Dependencies
 
-So far: 
+So far:
 
 * `blitz++`
 * `SuiteSparse (umfpack)`
 * `metis`
-* `arpack++`
 * `boost`
 * `igloo` for BDD-style testing.
 
