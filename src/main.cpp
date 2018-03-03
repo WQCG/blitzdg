@@ -30,28 +30,21 @@ int main(int argc, char **argv) {
 
 	Nodes1DProvisioner nodes1DProvisioner(N, K, xmin, xmax, matrixConverter, eigenSolver, directSolver);
 	
+  nodes1DProvisioner.buildNodes();
+
   Array<double,1> rGrid = nodes1DProvisioner.get_rGrid();
   cout << rGrid << endl;
 
-  nodes1DProvisioner.buildVandermondeMatrix();
-  
   cout << nodes1DProvisioner.get_V() << endl;
-
-  Array<double,1> dp(N+1);
-  nodes1DProvisioner.computeGradJacobi(rGrid, 0.0, 0.0, N, dp);
-  cout << dp << endl;
 
   Array<double, 2> DVr(N+1, N+1);
 
   nodes1DProvisioner.computeGradVandermonde(DVr);
 
   cout << DVr << endl;
+  cout << nodes1DProvisioner.get_Dr() << endl;
 
-  nodes1DProvisioner.buildNodes();
-
-  Array<double, 2> & x = nodes1DProvisioner.get_xGrid();
-
-  cout << x << endl;
+  cout << nodes1DProvisioner.get_xGrid() << endl;
 
   return 0;
 }

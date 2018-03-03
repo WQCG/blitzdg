@@ -17,7 +17,6 @@ Nodes1DProvisioner::Nodes1DProvisioner(int _NOrder, int _NumElements, double _xm
     EigSolver = &eigenSolver;
     LinSolver = &directSolver;
 
-
     rGrid = new Array<double, 1>(NOrder+1);
     xGrid = new Array<double, 2>(NOrder+1, NumElements);
 }
@@ -32,6 +31,7 @@ void Nodes1DProvisioner::buildNodes() {
     Array<double,1> & r = *rGrid;
 
     computeGaussLobottoPoints(alpha, beta, NOrder, r);
+    
     buildVandermondeMatrix();
     buildDr();
 
