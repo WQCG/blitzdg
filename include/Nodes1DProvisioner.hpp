@@ -14,7 +14,7 @@ class Nodes1DProvisioner {
     int NumElements;
     int NOrder;
     
-    Array<double, 1> * xGrid;
+    Array<double, 2> * xGrid;
     Array<double, 1> * rGrid;
 
     Array<double, 2> * V;
@@ -32,7 +32,7 @@ class Nodes1DProvisioner {
     void buildVandermondeMatrix();
     void computeGradVandermonde(Array<double,2> & DVr);
 
-    Array<double, 1> & get_xGrid();
+    Array<double, 2> & get_xGrid();
     Array<double, 1> & get_rGrid();
     Array<double, 2> & get_Dr();
     Array<double, 2> & get_V();

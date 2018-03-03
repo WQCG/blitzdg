@@ -30,8 +30,6 @@ int main(int argc, char **argv) {
 
 	Nodes1DProvisioner nodes1DProvisioner(N, K, xmin, xmax, matrixConverter, eigenSolver, directSolver);
 	
-  nodes1DProvisioner.buildNodes();
-
   Array<double,1> rGrid = nodes1DProvisioner.get_rGrid();
   cout << rGrid << endl;
 
@@ -49,7 +47,11 @@ int main(int argc, char **argv) {
 
   cout << DVr << endl;
 
-  nodes1DProvisioner.buildDr();
+  nodes1DProvisioner.buildNodes();
+
+  Array<double, 2> & x = nodes1DProvisioner.get_xGrid();
+
+  cout << x << endl;
 
   return 0;
 }

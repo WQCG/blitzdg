@@ -17,7 +17,9 @@ Nodes1DProvisioner::Nodes1DProvisioner(int _NOrder, int _NumElements, double _xm
     EigSolver = &eigenSolver;
     LinSolver = &directSolver;
 
-    rGrid = new Array<double,1>(NOrder+1);
+
+    rGrid = new Array<double, 1>(NOrder+1);
+    xGrid = new Array<double, 2>(NOrder+1, NumElements);
 }
 
 /**
@@ -27,7 +29,19 @@ void Nodes1DProvisioner::buildNodes() {
     const double alpha = 0.0;
     const double beta = 0.0;
 
-    computeGaussLobottoPoints(alpha, beta, NOrder, *rGrid);
+    Array<double,1> & r = *rGrid;
+
+    computeGaussLobottoPoints(alpha, beta, NOrder, r);
+    buildVandermondeMatrix();
+    buildDr();
+
+    double L = Max_x - Min_x;
+    double width = L / NumElements;
+
+    Array<double, 2> & x = *xGrid;
+    for (int k=0; k < NumElements; k++) {
+        x(Range::all(), k) = Min_x + width*(k + 0.5*(r+1.));
+    }
 }
 
 /**
@@ -83,7 +97,7 @@ void Nodes1DProvisioner::buildDr() {
 /**
  * Get reference to physical x-grid.
  */
-Array<double, 1> & Nodes1DProvisioner::get_xGrid() {
+Array<double, 2> & Nodes1DProvisioner::get_xGrid() {
     return *xGrid;
 }
 
@@ -99,7 +113,7 @@ Array<double, 1> & Nodes1DProvisioner::get_rGrid() {
  * Get reference to differentiation matrix Dr on the standard element.
  */
 Array<double, 2> & Nodes1DProvisioner::get_Dr() {
-    throw("Not implemented.");
+    return *Dr;
 }
 
 /**
