@@ -59,8 +59,21 @@ void Nodes1DProvisioner::buildDr() {
     computeGradVandermonde(DVr);
 
     // Dr = DVr / V;
+
+    firstIndex ii;
+    secondIndex jj;
+
+    Array<double, 2> Vtrans(NOrder+1, NOrder+1);
+    Array<double, 2> DVrtrans(NOrder+1, NOrder+1);
+    Array<double, 2> Drtrans(NOrder+1, NOrder+1);
+
+    Vtrans = Vref(jj, ii);
+    DVrtrans = DVr(jj, ii);
+
     DirectSolver & linSolver = *LinSolver;
-    linSolver.solve( Vref, DVr,  Drref);
+    linSolver.solve( Vtrans, DVrtrans,  Drtrans);
+
+    Drref = Drtrans(jj, ii);
 
     cout << "V: " << Vref << endl;
     cout << "DVr: " << DVr << endl;
