@@ -185,14 +185,12 @@ void Nodes1DProvisioner::computeJacobiQuadWeights(double alpha, double beta, int
 
     // Form symmetric matrix.
     Array<double, 2> J(N+1,N+1);
+    J = 0.;
     for (int i=0; i < N+1; i++) {
         double h1 = 2.*i+alpha+beta;
         J(i,i)   = -0.5*(alpha*alpha-beta*beta)/(h1+2.)/h1;
         if (i < N) {
             J(i,i+1) = 2./(h1+2)*sqrt((i+1)*((i+1)+alpha+beta)*((i+1)+alpha)*((i+1)+beta)/(h1+1)/(h1+3));
-        }
-        if ( i > 0) {
-            J(i, i-1) = 0.0;
         }
     }
 

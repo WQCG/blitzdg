@@ -146,6 +146,27 @@ namespace Nodes1DProvisionerTests {
             Assert::That(abs(w(1) - 1.0), IsLessThan(eps));
         }
 
+        It(Should_Compute_2nd_Order_Quadrature_Points_and_Weights) {
+
+            Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+
+            Array<double, 1> xx(3);
+            Array<double, 1> ww(3);
+
+            nodes1D.computeJacobiQuadWeights(0., 0., 2, xx, ww);
+
+            cout << xx << endl;
+            cout << ww << endl;
+
+            Assert::That(abs(xx(0) - -7.74596669241483e-01), IsLessThan(eps));
+            Assert::That(abs(xx(1) -  0.0), IsLessThan(eps));
+            Assert::That(abs(xx(2) -  7.74596669241483e-01), IsLessThan(eps));
+
+            Assert::That(abs(ww(0) -  0.555555555555556), IsLessThan(eps));
+            Assert::That(abs(ww(1) -  0.888888888888889), IsLessThan(eps));
+            Assert::That(abs(ww(2) -  0.555555555555556), IsLessThan(eps));
+        }
+
         It(Should_Generate_3rd_Order_Legendre_Gauss_Lobatto_Nodes) {
             Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
             
