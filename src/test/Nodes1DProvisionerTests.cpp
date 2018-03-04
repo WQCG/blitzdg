@@ -214,6 +214,24 @@ namespace Nodes1DProvisionerTests {
             Assert::That(sqrt(sum(res(ii)*res(ii))), IsLessThan(epsf));
         }
 
+        It(Should_Build_3rd_Order_Differentiation_Matrix) {
+            Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+            nodes1D.buildNodes();
+
+            Array<double, 2> & Dr = nodes1D.get_Dr();
+
+            Array<double, 2> expectedDr(4,4);
+            expectedDr = -3.0000e+00, 4.0451e+00,-1.5451e+00, 5.0000e-01,
+                         -8.0902e-01,-4.0540e-16, 1.1180e+00,-3.0902e-01,
+                          3.0902e-01,-1.1180e+00, 6.2804e-16, 8.0902e-01,
+                         -5.0000e-01, 1.5451e+00,-4.0451e+00, 3.0000e+00; 
+
+
+            Array<double, 2> res(4,4);
+            res = Dr - expectedDr;
+            Assert::That(sqrt(sum(res(ii)*res(ii))), IsLessThan(epsf));
+        }
+
         It(Should_Build_A_1D_X_Grid) {
             Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
 
