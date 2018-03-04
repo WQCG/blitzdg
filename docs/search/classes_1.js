@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['lusolver',['LUSolver',['../classLUSolver.html',1,'']]]
+  ['eigensolver',['EigenSolver',['../classEigenSolver.html',1,'']]]
 ];

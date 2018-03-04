@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['eigensolver',['EigenSolver',['../classEigenSolver.html',1,'']]]
+  ['directsolver',['DirectSolver',['../classDirectSolver.html',1,'']]]
 ];

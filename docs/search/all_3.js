@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['factorize',['factorize',['../classLUSolver.html#ad2415fda3fe785e1d49a21b9004d0298',1,'LUSolver']]]
+  ['eigensolver',['EigenSolver',['../classEigenSolver.html',1,'EigenSolver'],['../classEigenSolver.html#af40dc818f0c3ee669269fb4ccd2197bd',1,'EigenSolver::EigenSolver()']]]
 ];
