@@ -12,7 +12,7 @@ using namespace std;
 namespace Nodes1DProvisionerTests {
     const int N=5;
     const double eps=10*numeric_limits<double>::epsilon();
-    const float epsf = 5.e-7;
+    const float epsf = 5.e-6;
 
     firstIndex ii;
     secondIndex jj;
@@ -191,7 +191,7 @@ namespace Nodes1DProvisionerTests {
 
             Array<double, 2> res(4,4);
             res  = V - expectedV;
-            Assert::That(sum(res(ii)*res(ii)), IsLessThan(epsf));
+            Assert::That(sqrt(sum(res(ii)*res(ii))), IsLessThan(epsf));
         }
 
         It(Should_Build_4th_Order_GradVandermonde_Matrix) {
