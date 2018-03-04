@@ -85,7 +85,7 @@ void Nodes1DProvisioner::buildDr() {
     DVrtrans = DVr(jj, ii);
 
     DirectSolver & linSolver = *LinSolver;
-    linSolver.solve( Vtrans, DVrtrans,  Drtrans);
+    linSolver.solve(Vtrans, DVrtrans,  Drtrans);
 
     Drref = Drtrans(jj, ii);
 

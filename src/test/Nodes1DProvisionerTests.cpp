@@ -155,9 +155,6 @@ namespace Nodes1DProvisionerTests {
 
             nodes1D.computeJacobiQuadWeights(0., 0., 2, xx, ww);
 
-            cout << xx << endl;
-            cout << ww << endl;
-
             Assert::That(abs(xx(0) - -7.74596669241483e-01), IsLessThan(eps));
             Assert::That(abs(xx(1) -  0.0), IsLessThan(eps));
             Assert::That(abs(xx(2) -  7.74596669241483e-01), IsLessThan(eps));
@@ -188,9 +185,9 @@ namespace Nodes1DProvisionerTests {
 
             Array<double, 2> expectedV(4,4);
             expectedV = 0.70711,-1.22474, 1.58114,-1.87083,
-                        0.70711,-0.54772,-0.31623,0.83666,
-                        0.70711,0.54772,-0.31623,-0.83666,
-                        0.70711,1.22474,1.58114,1.87083;
+                        0.70711,-0.54772,-0.31623, 0.83666,
+                        0.70711, 0.54772,-0.31623,-0.83666,
+                        0.70711, 1.22474, 1.58114, 1.87083;
 
             Array<double, 2> res(4,4);
             res  = V - expectedV;
@@ -207,14 +204,32 @@ namespace Nodes1DProvisionerTests {
 
             Array<double, 2> expectedDVr(5,5);
             expectedDVr = 0.00000,1.22474,-4.74342,11.22497,-21.21320,
-                        0.00000,1.22474,-3.10530, 3.20713, -0.00000,
-                        0.00000,1.22474,-0.00000,-2.80624,  0.00000,
-                        0.00000,1.22474, 3.10530, 3.20713,  0.00000,
-                        0.00000,1.22474 ,4.74342,11.22497, 21.21320;
+                          0.00000,1.22474,-3.10530, 3.20713, -0.00000,
+                          0.00000,1.22474,-0.00000,-2.80624,  0.00000,
+                          0.00000,1.22474, 3.10530, 3.20713,  0.00000,
+                          0.00000,1.22474 ,4.74342,11.22497, 21.21320;
 
             Array<double, 2> res(4,4);
             res = DVr - expectedDVr;
-            Assert::That(sum(res(ii)*res(ii)), IsLessThan(epsf));
+            Assert::That(sqrt(sum(res(ii)*res(ii))), IsLessThan(epsf));
+        }
+
+        It(Should_Build_A_1D_X_Grid) {
+            Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+
+            nodes1D.buildNodes();
+
+            Array<double, 2> & x = nodes1D.get_xGrid();
+
+            Array<double,2> expectedx(4,5);
+            expectedx = -1.000000,-0.600000,-0.200000,0.200000,0.600000,
+                        -0.889443,-0.489443,-0.089443,0.310557,0.710557,
+                        -0.710557,-0.310557, 0.089443,0.489443,0.889443,
+                        -0.600000,-0.200000, 0.200000,0.600000,1.000000;
+
+            Array<double, 2> res(4,5);
+            res = x - expectedx;
+            Assert::That(sqrt(sum(res(ii)*res(ii))), IsLessThan(epsf));
         }
     };
 }
