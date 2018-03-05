@@ -78,5 +78,5 @@ LUSolver::~LUSolver() {
     if (Triplet.col != nullptr) delete[] Triplet.col;
     if (Triplet.val != nullptr) delete[] Triplet.val;
     if (Numeric != nullptr) umfpack_di_free_numeric (&Numeric);
-    if (Symbolic != nullptr) umfpack_di_free_symbolic (&Symbolic) ;
+    if (Symbolic != nullptr) umfpack_di_free_symbolic (&Symbolic);
 }
