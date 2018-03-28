@@ -7,12 +7,12 @@ TESTTARGET := bin/test
 SRCEXT := cpp
 SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
-BINOBJECTS := $(shell echo $(OBJECTS) | tr -s " " "\012" | sed -r 's/build\/test\/.*?\.o//')
+BINOBJECTS := build/*.o
 TESTOBJECTS := $(shell echo $(OBJECTS) | sed 's/build\/main\.o//')
 
 CFLAGS := -g -Wall -std=c++0x -fprofile-arcs -ftest-coverage 
 LINKERFLAGS := -fprofile-arcs
-LIB := -pthread -L lib -lblitz -lumfpack -lmetis -lsuperlu -lblas -llapack
+LIB := -pthread -L lib -lblitz -lumfpack -lmetis -lblas -llapack
 INC := -I include -I /usr/include
 
 $(TARGET): $(TESTTARGET)
