@@ -20,7 +20,6 @@ RUN ./pull-deps.sh
 ADD Makefile run.sh /opt/blitzdg/
 ADD input /opt/blitzdg/input/
 ADD include /opt/blitzdg/include
-ADD test /opt/blitzdg/test/
 ADD src /opt/blitzdg/src/
 
 CMD ["/bin/bash", "/opt/blitzdg/run.sh"]
