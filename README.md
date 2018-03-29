@@ -27,11 +27,12 @@ So far:
 
 * `blitz++`
 * `SuiteSparse (umfpack)`
+* `LAPACK`
 * `metis`
 * `boost`
 * `igloo` for BDD-style testing.
 
-Dependency installation is outlined in `pull-deps.sh` (tested on Ubuntu).
+Dependency installation is outlined in `pull-deps.sh` (tested on Ubuntu) and `pull-deps-mac.sh` (test on Mac OSX Sierra).
 
 ## Contributing
 
@@ -42,6 +43,10 @@ If you add code, please write tests using the igloo testing framework that is in
 ## Maintainer
 
 * [Derek Steinmoeller](https://github.com/dsteinmo)
+
+## Documentation
+
+[Here](https://dsteinmo.github.io/blitzdg "blitzdg Documentation")
 
 ## License
 
