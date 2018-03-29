@@ -101,10 +101,10 @@ void MeshManager::partitionMesh(int numPartitions) {
 
     // set up mesh partitioning options
     metisOptions = new int[METIS_NOPTIONS];
-    metisOptions[METIS_OPTION_PTYPE] = METIS_PTYPE_KWAY; // default
-    metisOptions[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_VOL; // total communication volume minimization.
+    metisOptions[METIS_OPTION_PTYPE] = METIS_PTYPE_RB; // default
+    metisOptions[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_CUT; // total communication volume minimization.
     metisOptions[METIS_OPTION_CTYPE] = METIS_CTYPE_SHEM;
-    metisOptions[METIS_OPTION_IPTYPE] = METIS_IPTYPE_NODE;
+    metisOptions[METIS_OPTION_IPTYPE] = METIS_IPTYPE_GROW;
     metisOptions[METIS_OPTION_RTYPE] = METIS_RTYPE_GREEDY;
     metisOptions[METIS_OPTION_NCUTS] = 1;
     metisOptions[METIS_OPTION_NITER] = 10; // default
@@ -112,9 +112,8 @@ void MeshManager::partitionMesh(int numPartitions) {
     metisOptions[METIS_OPTION_UFACTOR] = 30; // max load imbalance of 1.03
     metisOptions[METIS_OPTION_NUMBERING] = 1; // 1-based numbering.
     metisOptions[METIS_OPTION_DBGLVL] = METIS_DBG_INFO; //debug level='info'. 0 for nothing.
-    metisOptions[METIS_OPTION_CONTIG] = 1; // enforce a contiguous partition.
 
-    int * eind = EToV;
+	int * eind = EToV;
     int * eptr = new int[NumElements+1];
 
     // output arrays
