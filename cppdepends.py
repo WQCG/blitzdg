@@ -31,8 +31,8 @@ threshhold is a multiple of the average number of times a file is included.   If
 Example usage: python cppdenends.py code/project/src graph.pdf 2
 """
 
-includePattern = re.compile( """#include *"([^"]*)""" )
-ignorePattern = re.compile( "~|\\.svn")
+includePattern = re.compile( """#include *["<]([^">]*)""" )
+ignorePattern = re.compile( "~|\\.svn|blitz|igloo|suitesparse")
 nodes = collections.defaultdict(lambda : [])
 numNodeIncluded = collections.defaultdict(lambda : 0)
 
@@ -128,7 +128,13 @@ if __name__ == "__main__":
 
     #Colorize nodes included above the threshhold
     num_includes = sum(numNodeIncluded.values())
-    avg = float(num_includes) / float(len(numNodeIncluded.values()))
+    
+    nodeLen = float(len(numNodeIncluded.values()))
+    if nodeLen == 0.0:
+        avg = 0.0
+    else:
+        avg = float(num_includes) / float(len(numNodeIncluded.values()))
+
     for key in numNodeIncluded:
         if  numNodeIncluded[key] > float(threshold) * avg:
             outdot.write('"' + key + '" [color=orange]\n')
