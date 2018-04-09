@@ -1,6 +1,7 @@
 #pragma once
 #include <blitz/array.h>
 #include <boost/algorithm/string.hpp>
+#include <vector>
 
 using namespace std;
 using namespace boost;
