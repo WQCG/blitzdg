@@ -2,5 +2,7 @@ version: 1.0.{build}
 build_script:
 - pwsh: >-
     copy c:\MinGW\bin\mingw32-make.exe c:\MinGW\bin\make.exe
+
     $env:PATH = $env:PATH + ";c:\MinGW\bin"
+
     make
