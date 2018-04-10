@@ -4,6 +4,8 @@ blitzdg is an open-source project aiming to implement parallel discontinuous Gal
 
 [![Build Status](https://travis-ci.org/dsteinmo/blitzdg.svg?branch=master)](https://travis-ci.org/dsteinmo/blitzdg)  [![Coverage Status](https://coveralls.io/repos/github/dsteinmo/blitzdg/badge.svg)](https://coveralls.io/github/dsteinmo/blitzdg)
 
+[![Windows Build Status](https://ci.appveyor.com/api/projects/status/pmx725yhsrnq3thu?svg=true)](https://ci.appveyor.com/project/dsteinmo/blitzdg)
+
 ## Running
 
 Currently only supporting running/development on linux systems, primarily ubuntu. Tested with GNU g++ compiler and GNU make.
