@@ -1,4 +1,4 @@
-on: 1.0.{build}
+version: 1.0.{build}
 build_script:
 - pwsh: >-
     copy c:\MinGW\bin\mingw32-make.exe c:\MinGW\bin\make.exe
