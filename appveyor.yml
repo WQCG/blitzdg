@@ -6,3 +6,5 @@ build_script:
     $env:PATH = $env:PATH + ";c:\MinGW\bin"
 
     make
+
+    if($LASTEXITCODE -ne 0) { exit 1 }
