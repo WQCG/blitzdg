@@ -18,7 +18,7 @@ INC := -I include -I /usr/include
 LIB := -L lib -lblitz -lumfpack -lmetis -llapack -lblas
 EXPLICITLIBS := -lgfortran -lamd -lcholmod -lcolamd -lsuitesparseconfig -lquadmath -lGKlib
 
-ifdef WINDIR
+ifeq ($(OS), Windows_NT)
 	LIB += $(EXPLICITLIBS)
 endif
 

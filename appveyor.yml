@@ -1,6 +1,4 @@
 version: 1.0.{build}
-environment:
-  windir: c:\Windows
 build_script:
 - pwsh: |
     ls env:\
