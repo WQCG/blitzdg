@@ -1,11 +1,10 @@
 version: 1.0.{build}
 build_script:
 - pwsh: |
-    ls env:\
     Invoke-RestMethod -Uri https://s3.amazonaws.com/dsteinmo-libs/include-deps.zip -OutFile include-deps.zip
     Invoke-RestMethod -Uri https://s3.amazonaws.com/dsteinmo-libs/deps-win-mingw64.zip -OutFile deps-win-mingw64.zip
     Expand-Archive -Path include-deps.zip -DestinationPath .\include\
     Expand-Archive -Path deps-win-mingw64.zip -DestinationPath .\lib\
     rm .\lib\libgfortran.a
-    & C:\MinGW\msys\1.0\bin\bash -e -l -c "set && cd /c/projects/blitzdg && make"
+    & C:\MinGW\msys\1.0\bin\bash -e -l -c "set && ls /mingw/lib/gcc/mingw32/5.3.0/ && cd /c/projects/blitzdg && make"
     if($LASTEXITCODE -ne 0) { exit 1 }
