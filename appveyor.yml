@@ -2,11 +2,9 @@ version: 1.0.{build}
 build_script:
 - pwsh: |
     ls env:\
-    copy c:\MinGW\bin\mingw32-make.exe c:\MinGW\bin\make.exe
-    $env:PATH = $env:PATH + ";c:\MinGW\bin"
     Invoke-RestMethod -Uri https://s3.amazonaws.com/dsteinmo-libs/include-deps.zip -OutFile include-deps.zip
     Invoke-RestMethod -Uri https://s3.amazonaws.com/dsteinmo-libs/deps-win-mingw64.zip -OutFile deps-win-mingw64.zip
     Expand-Archive -Path include-deps.zip -DestinationPath .\include\
     Expand-Archive -Path deps-win-mingw64.zip -DestinationPath .\lib\
-    make
+    & C:\MinGW\msys\1.0\bin\bash -e -l -c "set && make"
     if($LASTEXITCODE -ne 0) { exit 1 }
