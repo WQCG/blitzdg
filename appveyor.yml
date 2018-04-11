@@ -1,6 +1,9 @@
 version: 1.0.{build}
+environment:
+  windir: c:\Windows
 build_script:
 - pwsh: |
+    ls env:\
     copy c:\MinGW\bin\mingw32-make.exe c:\MinGW\bin\make.exe
     $env:PATH = $env:PATH + ";c:\MinGW\bin"
     Invoke-RestMethod -Uri https://s3.amazonaws.com/dsteinmo-libs/include-deps.zip -OutFile include-deps.zip
