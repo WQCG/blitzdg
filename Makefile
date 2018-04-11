@@ -14,8 +14,13 @@ TESTOBJECTS := $(patsubst build/main.o,,$(ALLOBJECTS))
 
 CFLAGS := -g -Wall -std=c++0x -fprofile-arcs -ftest-coverage 
 LINKERFLAGS := -fprofile-arcs
-LIB := -L lib -lblitz -lumfpack -lmetis -llapack -lblas -lgfortran -lamd -lcholmod -lcolamd -lsuitesparseconfig -lquadmath -lGKlib
 INC := -I include -I /usr/include
+LIB := -L lib -lblitz -lumfpack -lmetis -llapack -lblas
+EXPLICITLIBS := -lgfortran -lamd -lcholmod -lcolamd -lsuitesparseconfig -lquadmath -lGKlib
+
+ifdef WINDIR
+	LIB += $(EXPLICITLIBS)
+endif
 
 $(TARGET): $(OBJECTS) $(TESTTARGET)
 	@echo " Linking main binary..."
