@@ -5,7 +5,7 @@ build_script:
     $env:PATH = $env:PATH + ";c:\MinGW\bin"
     Invoke-RestMethod -Uri https://s3.amazonaws.com/dsteinmo-libs/include-deps.zip -OutFile include-deps.zip
     Invoke-RestMethod -Uri https://s3.amazonaws.com/dsteinmo-libs/deps-win-mingw64.zip -OutFile deps-win-mingw64.zip
-    Expand-Archive -Path include-deps.zip -DestinationPath .\include\ -Confirm
-    Expand-Archive -Path deps-win-mingw64.zip -DestinationPath .\lib\ -Confirm
+    Expand-Archive -Path include-deps.zip -DestinationPath .\include\
+    Expand-Archive -Path deps-win-mingw64.zip -DestinationPath .\lib\
     make
     if($LASTEXITCODE -ne 0) { exit 1 }
