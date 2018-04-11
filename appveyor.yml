@@ -6,5 +6,6 @@ build_script:
     Invoke-RestMethod -Uri https://s3.amazonaws.com/dsteinmo-libs/deps-win-mingw64.zip -OutFile deps-win-mingw64.zip
     Expand-Archive -Path include-deps.zip -DestinationPath .\include\
     Expand-Archive -Path deps-win-mingw64.zip -DestinationPath .\lib\
+    rm .\lib\libgfortran.a
     & C:\MinGW\msys\1.0\bin\bash -e -l -c "set && cd /c/projects/blitzdg && make"
     if($LASTEXITCODE -ne 0) { exit 1 }
