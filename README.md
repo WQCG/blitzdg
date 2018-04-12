@@ -38,7 +38,7 @@ Dependency installation is outlined in `pull-deps.sh` (tested on Ubuntu) and `pu
 
 The Windows build requires [MinGW/MinGW64](http://www.mingw.org/wiki/Getting_Started "MinGW Installation Instructions") and is currently tested in the AppVeyor CI process. There is currently not a Visual Studio/MSVC build.
 
-Run `.\pull-deps.ps1` in Powershell (4+ or Powershell Core (pwsh)).
+Run `.\pull-deps.ps1` in Powershell (4+ or Powershell Core (`pwsh`)).
 
 ## Contributing
 
