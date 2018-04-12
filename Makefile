@@ -1,25 +1,33 @@
 CC := $(or $(CXX), g++)
-SRCDIR := src
+SRCDIR := ./src
 BUILDDIR := build
+BINDIR := bin
 TARGET := bin/blitzdg
 TESTTARGET := bin/test
 
 SRCEXT := cpp
-SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
-OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
-BINOBJECTS := build/*.o
-TESTOBJECTS := $(shell echo $(OBJECTS) | sed 's/build\/main\.o//')
+SOURCES := $(wildcard $(SRCDIR)/*.cpp)
+SOURCES += $(wildcard $(SRCDIR)/test/*.cpp)
+ALLOBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
+OBJECTS := $(patsubst build/test/tests.o,,$(ALLOBJECTS))
+TESTOBJECTS := $(patsubst build/main.o,,$(ALLOBJECTS)) 
 
 CFLAGS := -g -Wall -std=c++0x -fprofile-arcs -ftest-coverage 
 LINKERFLAGS := -fprofile-arcs
-LIB := -pthread -L lib -lblitz -lumfpack -lmetis -lblas -llapack
 INC := -I include -I /usr/include
+LIB := -L lib -lblitz -lmetis -lumfpack -llapack -lblas 
+EXPLICITLIBS := -lamd -lcholmod -lcolamd -lsuitesparseconfig -lGKlib -lgfortran -lquadmath
 
-$(TARGET): $(TESTTARGET)
+ifeq ($(OS), Windows_NT)
+	LIB += $(EXPLICITLIBS)
+endif
+
+$(TARGET): $(OBJECTS) $(TESTTARGET)
 	@echo " Linking main binary..."
-	@echo " $(CC) $(LINKERFLAGS) $(BINOBJECTS) -o $(TARGET) $(LIB)"; $(CC) $(LINKERFLAGS) $(BINOBJECTS) -o $(TARGET) $(LIB)
+	@mkdir -p bin
+	@echo " $(CC) $(LINKERFLAGS) $(OBJECTS) -o $(TARGET) $(LIB)"; $(CC) $(LINKERFLAGS) $(OBJECTS) -o $(TARGET) $(LIB)
 
-$(TESTTARGET): $(OBJECTS)
+$(TESTTARGET): $(TESTOBJECTS)
 	@mkdir -p bin
 	@echo " Linking tests..."
 	@echo " $(CC) $(LINKERFLAGS) $(TESTOBJECTS) -o $(TESTTARGET) $(LIB)"; $(CC) $(LINKERFLAGS) $(TESTOBJECTS) -o $(TESTTARGET) $(LIB)
@@ -32,7 +40,7 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 
 clean:
 	@echo " Cleaning...";
-	@echo " $(RM) -r $(BUILDDIR) $(TARGET) $(TESTTARGET)"; $(RM) -r $(BUILDDIR) $(TARGET) $(TESTTARGET)
+	@echo " $(RM) -r $(BUILDDIR) $(BINDIR)"; $(RM) -r $(BUILDDIR) $(BINDIR)
 
 test: bin/test
 	@bin/test
