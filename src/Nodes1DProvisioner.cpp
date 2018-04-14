@@ -3,6 +3,7 @@
 #include <Nodes1DProvisioner.hpp>
 
 using namespace std;
+using namespace blitz;
 
 /**
  * Constructor. Takes order of polynomials, number of elements, and dimensions of the domain.
@@ -42,6 +43,22 @@ void Nodes1DProvisioner::buildNodes() {
     for (int k=0; k < NumElements; k++) {
         x(Range::all(), k) = Min_x + width*(k + 0.5*(r+1.));
     }
+}
+
+/**
+ * Compute Jacobian (determinant) J and geometric factor rx (dr/dx) using nodes and differentiation matrix.
+ */
+void Nodes1DProvisioner::computeJacobian(Array<double,2> & J, Array<double,2> & rx) {
+    firstIndex ii;
+    secondIndex jj;
+    secondIndex kk;
+
+
+    Array<double,2> & x = get_xGrid();
+    Array<double,2> & Dr = get_Dr();
+
+    J = sum(Dr(ii,jj)*x(jj,kk), jj);
+    rx = 1/J;
 }
 
 /**
