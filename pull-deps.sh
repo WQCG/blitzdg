@@ -1,5 +1,6 @@
 #!/bin/bash
 unameOut="$(uname -s)"
+echo "uname is: $unameOut"
 case "${unameOut}" in
     Linux*)     machine=Linux;;
     Darwin*)    machine=Mac;;
