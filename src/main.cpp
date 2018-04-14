@@ -46,5 +46,11 @@ int main(int argc, char **argv) {
 
   cout << nodes1DProvisioner.get_xGrid() << endl;
 
+  Array<double,2> J(N+1, K);
+  Array<double,2> rx(N+1, K);
+  nodes1DProvisioner.computeJacobian(J, rx);
+  cout << J << endl;
+  cout << rx << endl;
+
   return 0;
 }
