@@ -12,7 +12,7 @@ ALLOBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 OBJECTS := $(patsubst build/test/tests.o,,$(ALLOBJECTS))
 TESTOBJECTS := $(patsubst build/main.o,,$(ALLOBJECTS)) 
 
-CFLAGS := -g -Wall -std=c++0x -fprofile-arcs -ftest-coverage 
+CFLAGS := -g -Wall -std=c++0x -fprofile-arcs -ftest-coverage
 LINKERFLAGS := -fprofile-arcs
 INC := -I include -I /usr/include
 LIB := -L lib -lblitz -lmetis -lumfpack -llapack -lblas 
@@ -36,7 +36,7 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)
 	@mkdir -p $(BUILDDIR)/test
 	@echo " Building...";
-	@echo " $(CC) $(CFLAGS) $(INC) -c -o $@ $<"; $(CC) $(CFLAGS) $(INC) -c -o $@ $<
+	@echo " $(CC) $(CFLAGS) $(EXTRACFLAGS) $(INC) -c -o $@ $<"; $(CC) $(CFLAGS) $(EXTRACFLAGS) $(INC) -c -o $@ $<
 
 clean:
 	@echo " Cleaning...";

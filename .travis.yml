@@ -6,5 +6,7 @@ after_success:
   - coveralls --exclude include/igloo --gcov-options '\-lp'
 sudo: required
 env:
+  - EXTRACFLAGS=-Wno-deprecated-declarations
   global:
     secure: kKHQbJVsCGbAEuiGCwIUsIQukTb4jeZ3vdxNvtbf+irds/9IaNUALaxFPo7rVW5x9xs+8G2pbcVxWfVWNAYWXNXjjdv1v9b7hC4Qh+5POFB7eOLVTULSseJPGME0bGQXgCA3uB7VuHrH72uzyHDBVXb/b9nXsfmfLtABe7eS+U9Ki7FCw5roaz9xqsG9CJ3uwZsSOJFXCFNwVr5vsz9eK5m9p1JLLBOZ1RgYkpnUsctF5jxU9HgH+HazHcbAxvAGAKSBHmm4CoFqegSMuhHFtQL3c5cWCg6J3sbnHre6Z4BlWRNxbX02AvOkJt47GHdoKZ1Su1YIiMh7MSr/wolNvB/qf5FJ2M5P8lwt01/tcJSOxzRBDAzOE/m9pNwJ1v5h7YdUt3B++5ilGwc23qAer+epxC6Kxc6OgiOoEufOKFjTv/9x+1pLSevwK0SqobCrJdsujXUlQaWi70SMrYN3Cg8dhdADhk5mShaHYgBQtvLqUbVhWyxXI65AJuW1ityI798umYQgx3C6o+A7UXCD0I4uO+2MOjbYaAyeJis/KD6Ebyk57OQDEBEYsDDH318zcGGOFJeJC5+ybHSLsMOoTfXp+1eIA0BlN14Xcom5kS9r7e3iSZEGqacDhb73I8kN2YEkUKJvroLIEGffmWQNgfto3SR0J2qzchK5mO4y5ys=
+  
