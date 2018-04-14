@@ -11,10 +11,10 @@ esac
 echo "Machine type is: ${machine}."
 
 if [ "$machine" == "Linux" ] ; then
-    apt-get -y install libblitz0-dev libblitz-doc && \
-    apt-get -y install libsuitesparse-dev && \
-    ln -s /usr/lib/x86_64-linux-gnu/libumfpack.so.5.7.1 /usr/lib/x86_64-linux-gnu/libumfpack.so && \
-    apt-get -y install libmetis-dev libmetis-doc && \
+    apt-get -y install libblitz0-dev libblitz-doc
+    apt-get -y install libsuitesparse-dev
+    ln -s /usr/lib/x86_64-linux-gnu/libumfpack.so.5.7.1 /usr/lib/x86_64-linux-gnu/libumfpack.so
+    apt-get -y install libmetis-dev libmetis-doc
     apt-get -y install libboost-dbg libboost-dev libboost-doc
 fi
 
