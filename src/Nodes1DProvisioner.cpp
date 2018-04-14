@@ -51,7 +51,7 @@ void Nodes1DProvisioner::buildNodes() {
 void Nodes1DProvisioner::computeJacobian(Array<double,2> & J, Array<double,2> & rx) {
     firstIndex ii;
     secondIndex jj;
-    secondIndex kk;
+    firstIndex kk;
 
 
     Array<double,2> & x = get_xGrid();
