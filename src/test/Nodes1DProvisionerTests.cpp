@@ -249,5 +249,34 @@ namespace Nodes1DProvisionerTests {
             res = x - expectedx;
             Assert::That(sqrt(sum(res(ii)*res(ii))), IsLessThan(epsf));
         }
+
+        It(Should_Compute_Jacobian) {
+            Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+
+            nodes1D.buildNodes();
+
+            Array<double,2> J(4, 5), rx(4, 5);
+
+            nodes1D.buildDr();
+            nodes1D.computeJacobian(J, rx);
+
+            Array<double,2> expectedJ(4,5), expectedrx(4,5);
+            expectedJ = 0.20000,0.20000,0.20000,0.20000,0.20000,
+                        0.20000,0.20000,0.20000,0.20000,0.20000,
+                        0.20000,0.20000,0.20000,0.20000,0.20000,
+                        0.20000,0.20000,0.20000,0.20000,0.20000;
+
+            expectedrx =5,5,5,5,5,
+                        5,5,5,5,5,
+                        5,5,5,5,5,
+                        5,5,5,5,5;
+
+            Array<double,2> resJ(4,5), resrx(4,5);
+            resJ = J - expectedJ;
+            resrx = rx - expectedrx;
+
+            Assert::That(sqrt(sum(resJ(ii)*resJ(ii))), IsLessThan(epsf));
+            Assert::That(sqrt(sum(resrx(ii)*resrx(ii))), IsLessThan(epsf));
+        }
     };
 }
