@@ -10,17 +10,15 @@ case "${unameOut}" in
 esac
 echo "Machine type is: ${machine}."
 
-if [ $machine -eq "Linux" ]
-then
-    apt-get -y install libblitz0-dev libblitz-doc \
+if [ "$machine" == "Linux" ] ; then
+    apt-get -y install libblitz0-dev libblitz-doc && \
     apt-get -y install libsuitesparse-dev && \
     ln -s /usr/lib/x86_64-linux-gnu/libumfpack.so.5.7.1 /usr/lib/x86_64-linux-gnu/libumfpack.so && \
     apt-get -y install libmetis-dev libmetis-doc && \
     apt-get -y install libboost-dbg libboost-dev libboost-doc
 fi
 
-if [ $machine -eq "Mac"]
-then
+if [ "$machine" == "Mac" ] ; then
     brew install boost
     brew install blitz
     brew install lapack
@@ -37,10 +35,8 @@ then
     cp -r blitz-0.10/blitz include
 fi
 
-
 curl -fSL https://github.com/joakimkarlsson/igloo/archive/igloo.1.1.1.tar.gz -o ./igloo.1.1.1.tar.gz
 tar xzf ./igloo.1.1.1.tar.gz
 cp -r igloo-igloo.1.1.1/igloo include/.
 rm -rf igloo-igloo.1.1.1
 rm igloo.1.1.1.tar.gz
-
