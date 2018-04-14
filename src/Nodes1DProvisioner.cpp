@@ -51,13 +51,13 @@ void Nodes1DProvisioner::buildNodes() {
 void Nodes1DProvisioner::computeJacobian(Array<double,2> & J, Array<double,2> & rx) {
     firstIndex ii;
     secondIndex jj;
-    firstIndex kk;
+    thirdIndex kk;
 
 
     Array<double,2> & x = get_xGrid();
     Array<double,2> & Dr = get_Dr();
 
-    J = sum(Dr(ii,jj)*x(jj,kk), jj);
+    J = sum(Dr(ii,kk)*x(kk,jj), kk);
     rx = 1/J;
 }
 
