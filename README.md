@@ -9,7 +9,7 @@ blitzdg is an open-source project aiming to implement parallel discontinuous Gal
 Build and development support has broadened from linux only to Mac OSX and Windows systems. Tested with GNU make (written to be cross-platform) and g++ on linux/MinGW64/Mac OSX Sierra.
 
 1. `git clone https://github.com/dsteinmo/blitzdg.git`
-2. `cd blitzdg && ./pull-deps.sh` (on Mac OSX: `./pull-deps-mac`)
+2. `cd blitzdg && ./pull-deps.sh`
 3. `make && ./bin/blitzdg` (The binary currently doesn't do much).
 4. Run unit tests with `make test`.
 
