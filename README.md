@@ -56,4 +56,4 @@ If you add code, please write tests using the igloo testing framework that is in
 
 ## License
 
-MIT
+[GNU Public License Version 3]
