@@ -1,3 +1,6 @@
+// Copyright (C) 2017-2018  Derek Steinmoeller. 
+// See COPYING and LICENSE files at project root for more details. 
+
 #include <suitesparse/umfpack.h>
 #include <LUSolver.hpp>
 #include <iostream>
