@@ -8,10 +8,6 @@ using namespace std;
 using namespace blitz;
 
 class Nodes1DProvisioner {
-    
-    static const int NumFacePoints;
-    static const int NumFaces;
-
     double Min_x;
     double Max_x;
     int NumElements;
@@ -31,6 +27,8 @@ class Nodes1DProvisioner {
     DirectSolver * LinSolver;
 
   public:
+    static const int NumFacePoints;
+    static const int NumFaces;
     Nodes1DProvisioner(int NOrder, int NumElements, double xmin, double xmax, SparseMatrixConverter & converter, EigenSolver & eigenSolver, DirectSolver & directSolver);
 
     void buildNodes();
@@ -44,6 +42,7 @@ class Nodes1DProvisioner {
     Array<double, 2> & get_Dr();
     Array<double, 2> & get_V();
     Array<double, 2> & get_EToV();
+    int get_NumLocalPoints();
 
     // these can be moved to a helper (polynomials) class or made private within this class.
     void computeJacobiPolynomial(Array<double,1> const & x, const double alpha, const double beta, const int N, Array<double,1> & p);

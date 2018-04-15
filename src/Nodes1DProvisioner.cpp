@@ -162,6 +162,10 @@ Array<double, 2> & Nodes1DProvisioner::get_V() {
     return *V;
 }
 
+int Nodes1DProvisioner::get_NumLocalPoints() {
+    return NumLocalPoints;
+}
+
 /**
  * Destructor.
  */

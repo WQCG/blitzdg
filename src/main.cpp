@@ -32,12 +32,14 @@ int main(int argc, char **argv) {
 	
   nodes1DProvisioner.buildNodes();
 
+  int Np = nodes1DProvisioner.get_NumLocalPoints();
+
   Array<double,1> rGrid = nodes1DProvisioner.get_rGrid();
   cout << rGrid << endl;
 
   cout << nodes1DProvisioner.get_V() << endl;
 
-  Array<double, 2> DVr(N+1, N+1);
+  Array<double, 2> DVr(Np, Np);
 
   nodes1DProvisioner.computeGradVandermonde(DVr);
 
@@ -48,8 +50,8 @@ int main(int argc, char **argv) {
 
   cout << x << endl;
 
-  Array<double,2> J(N+1, K);
-  Array<double,2> rx(N+1, K);
+  Array<double,2> J(Np, K);
+  Array<double,2> rx(Np, K);
 
   nodes1DProvisioner.computeJacobian(J, rx);
 
