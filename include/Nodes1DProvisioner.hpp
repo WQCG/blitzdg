@@ -9,16 +9,22 @@ using namespace blitz;
 
 class Nodes1DProvisioner {
     
+    static const int NumFacePoints;
+    static const int NumFaces;
+
     double Min_x;
     double Max_x;
     int NumElements;
     int NOrder;
+    int NumLocalPoints;
     
     Array<double, 2> * xGrid;
     Array<double, 1> * rGrid;
 
     Array<double, 2> * V;
     Array<double, 2> * Dr;
+    Array<double, 2> * Lift;
+    Array<double, 2> * EToV;
 
     SparseMatrixConverter * MatrixConverter;
     EigenSolver * EigSolver;
@@ -37,6 +43,7 @@ class Nodes1DProvisioner {
     Array<double, 1> & get_rGrid();
     Array<double, 2> & get_Dr();
     Array<double, 2> & get_V();
+    Array<double, 2> & get_EToV();
 
     // these can be moved to a helper (polynomials) class or made private within this class.
     void computeJacobiPolynomial(Array<double,1> const & x, const double alpha, const double beta, const int N, Array<double,1> & p);

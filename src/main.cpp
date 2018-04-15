@@ -44,13 +44,14 @@ int main(int argc, char **argv) {
   cout << DVr << endl;
   cout << nodes1DProvisioner.get_Dr() << endl;
 
-  cout << nodes1DProvisioner.get_xGrid() << endl;
+  Array<double,2> x = nodes1DProvisioner.get_xGrid();
+
+  cout << x << endl;
 
   Array<double,2> J(N+1, K);
   Array<double,2> rx(N+1, K);
+
   nodes1DProvisioner.computeJacobian(J, rx);
-  cout << J << endl;
-  cout << rx << endl;
 
   return 0;
 }

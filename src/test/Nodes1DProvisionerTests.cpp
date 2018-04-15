@@ -250,6 +250,22 @@ namespace Nodes1DProvisionerTests {
             Assert::That(sqrt(sum(res(ii)*res(ii))), IsLessThan(epsf));
         }
 
+        It(Should_Build_Element_To_Vertex_Connectivity) {
+            Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+
+            nodes1D.buildNodes();
+
+            Array<double, 2> EToV = nodes1D.get_EToV();
+
+            cout << "EToV: " << EToV << endl;
+
+            Assert::That(EToV(0,0), Equals(1)); Assert::That(EToV(0,1), Equals(2));
+            Assert::That(EToV(1,0), Equals(2)); Assert::That(EToV(1,1), Equals(3));
+            Assert::That(EToV(2,0), Equals(3)); Assert::That(EToV(2,1), Equals(4));
+            Assert::That(EToV(3,0), Equals(4)); Assert::That(EToV(3,1), Equals(5));
+            Assert::That(EToV(4,0), Equals(5)); Assert::That(EToV(4,1), Equals(6));
+        }
+
         It(Should_Compute_Jacobian) {
             Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
 

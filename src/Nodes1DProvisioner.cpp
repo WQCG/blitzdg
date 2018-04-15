@@ -5,6 +5,9 @@
 using namespace std;
 using namespace blitz;
 
+const int Nodes1DProvisioner::NumFacePoints = 1;
+const int Nodes1DProvisioner::NumFaces = 2;
+
 /**
  * Constructor. Takes order of polynomials, number of elements, and dimensions of the domain.
  * Assumes equally-spaced elements.
@@ -18,8 +21,13 @@ Nodes1DProvisioner::Nodes1DProvisioner(int _NOrder, int _NumElements, double _xm
     EigSolver = &eigenSolver;
     LinSolver = &directSolver;
 
-    rGrid = new Array<double, 1>(NOrder+1);
-    xGrid = new Array<double, 2>(NOrder+1, NumElements);
+    // This is true in 1D only.
+    NumLocalPoints = NOrder + 1;
+
+    rGrid = new Array<double, 1>(NumLocalPoints);
+    xGrid = new Array<double, 2>(NumLocalPoints, NumElements);
+    Lift = new Array<double, 2>(NumLocalPoints, NumFacePoints*NumFaces);
+    EToV = new Array<double, 2>(NumElements, NumFaces);
 }
 
 /**
@@ -42,6 +50,14 @@ void Nodes1DProvisioner::buildNodes() {
     Array<double, 2> & x = *xGrid;
     for (int k=0; k < NumElements; k++) {
         x(Range::all(), k) = Min_x + width*(k + 0.5*(r+1.));
+    }
+
+    Array<double, 2> & E2V = *EToV;
+
+    // Create Element-to-Vertex connectivity table.
+    for (int k=0; k < NumElements; k++) {
+        E2V(k, 0) = k+1;
+        E2V(k, 1) = k+2;
     }
 }
 
@@ -125,6 +141,12 @@ Array<double, 1> & Nodes1DProvisioner::get_rGrid() {
     return *rGrid;
 }
 
+/**
+ * Get reference to Element-to-Vertex connectivity table.
+ */
+Array<double, 2> & Nodes1DProvisioner::get_EToV() {
+    return *EToV;
+}
 
 /**
  * Get reference to differentiation matrix Dr on the standard element.
@@ -141,7 +163,7 @@ Array<double, 2> & Nodes1DProvisioner::get_V() {
 }
 
 /**
- * Destructoructor
+ * Destructor.
  */
 Nodes1DProvisioner::~Nodes1DProvisioner() {
 }
