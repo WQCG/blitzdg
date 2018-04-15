@@ -31,6 +31,8 @@ Nodes1DProvisioner::Nodes1DProvisioner(int _NOrder, int _NumElements, double _xm
     xGrid = new Array<double, 2>(NumLocalPoints, NumElements);
     Lift = new Array<double, 2>(NumLocalPoints, NumFacePoints*NumFaces);
     EToV = new Array<double, 2>(NumElements, NumFaces);
+    EToE = new Array<int, 2>(NumElements, NumFaces);
+    EToF = new Array<int, 2>(NumElements, NumFaces);
 }
 
 /**
@@ -63,6 +65,12 @@ void Nodes1DProvisioner::buildNodes() {
         E2V(k, 0) = k+1;
         E2V(k, 1) = k+2;
     }
+
+    buildConnectivityMatrices();
+}
+
+void Nodes1DProvisioner::buildConnectivityMatrices() {
+
 }
 
 void Nodes1DProvisioner::buildLift() {
@@ -179,6 +187,20 @@ Array<double, 1> & Nodes1DProvisioner::get_rGrid() {
  */
 Array<double, 2> & Nodes1DProvisioner::get_EToV() {
     return *EToV;
+}
+
+/**
+ * Get reference to Element-to-Element connectivity table.
+ */
+Array<int, 2> & Nodes1DProvisioner::get_EToE() {
+    return *EToE;
+}
+
+/**
+ * Get reference to Element-to-Face connectivity table.
+ */
+Array<int, 2> & Nodes1DProvisioner::get_EToF() {
+    return *EToF;
 }
 
 /**
