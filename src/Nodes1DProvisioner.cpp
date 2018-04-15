@@ -43,6 +43,7 @@ void Nodes1DProvisioner::buildNodes() {
     
     buildVandermondeMatrix();
     buildDr();
+    buildLift();
 
     double L = Max_x - Min_x;
     double width = L / NumElements;
@@ -59,6 +60,27 @@ void Nodes1DProvisioner::buildNodes() {
         E2V(k, 0) = k+1;
         E2V(k, 1) = k+2;
     }
+}
+
+void Nodes1DProvisioner::buildLift() {
+    int Np = NumLocalPoints;
+    firstIndex ii;
+    secondIndex jj;
+    thirdIndex kk;
+
+    Array<double, 2> E(Np, NumFaces*NumFacePoints);
+    E = 0*jj;
+    E(0, 0)  = 1.;
+    E(Np-1, 1) = 1.;
+
+    Array<double, 2> & Vref = *V;
+    Array<double, 2> & L = *Lift;
+
+    Array<double, 2> Vtrans(Np, Np);
+    Vtrans = Vref(jj,ii);
+    Array<double, 2> temp(Np, NumFaces*NumFacePoints);
+    temp = sum(Vtrans(ii,kk)*E(kk,jj), kk);
+    L = sum(Vref(ii,kk)*temp(kk,jj), kk);
 }
 
 /**
@@ -126,6 +148,14 @@ void Nodes1DProvisioner::buildDr() {
     cout << "DVr: " << DVr << endl;
     cout << "Dr: " << Drref << endl;
 } 
+
+
+/**
+ * Get reference to 1D Lifting Operator.
+ */
+Array<double, 2> & Nodes1DProvisioner::get_Lift() {
+    return *Lift;
+}
 
 /**
  * Get reference to physical x-grid.

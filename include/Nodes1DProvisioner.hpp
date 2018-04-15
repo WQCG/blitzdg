@@ -21,6 +21,7 @@ class Nodes1DProvisioner {
     Array<double, 2> * Dr;
     Array<double, 2> * Lift;
     Array<double, 2> * EToV;
+    Array<int, 2> * EToE;
 
     SparseMatrixConverter * MatrixConverter;
     EigenSolver * EigSolver;
@@ -34,14 +35,18 @@ class Nodes1DProvisioner {
     void buildNodes();
     void buildDr();
     void buildVandermondeMatrix();
+    void buildLift();
     void computeGradVandermonde(Array<double,2> & DVr);
     void computeJacobian(Array<double,2> & J, Array<double,2> & rx);
-
+    
     Array<double, 2> & get_xGrid();
     Array<double, 1> & get_rGrid();
     Array<double, 2> & get_Dr();
     Array<double, 2> & get_V();
     Array<double, 2> & get_EToV();
+    Array<double, 2> & get_Lift();
+  
+    Array<int, 2> & get_EToE();
     int get_NumLocalPoints();
 
     // these can be moved to a helper (polynomials) class or made private within this class.

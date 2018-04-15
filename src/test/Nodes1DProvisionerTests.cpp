@@ -257,8 +257,6 @@ namespace Nodes1DProvisionerTests {
 
             Array<double, 2> EToV = nodes1D.get_EToV();
 
-            cout << "EToV: " << EToV << endl;
-
             Assert::That(EToV(0,0), Equals(1)); Assert::That(EToV(0,1), Equals(2));
             Assert::That(EToV(1,0), Equals(2)); Assert::That(EToV(1,1), Equals(3));
             Assert::That(EToV(2,0), Equals(3)); Assert::That(EToV(2,1), Equals(4));
@@ -293,6 +291,20 @@ namespace Nodes1DProvisionerTests {
 
             Assert::That(sqrt(sum(resJ(ii)*resJ(ii))), IsLessThan(epsf));
             Assert::That(sqrt(sum(resrx(ii)*resrx(ii))), IsLessThan(epsf));
+        }
+
+        It(Should_Build_1D_Lift_Operator) {
+            Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+
+            nodes1D.buildNodes();
+            Array<double, 2> Lift = nodes1D.get_Lift();
+
+            Array<double, 2> expectedLift(5,2);
+            expectedLift = 12.5,2.5,
+                           -1.07143,-1.07143,
+                           0.9375,0.9375,
+                           -1.07143,-1.07143,
+                           2.5,12.5;
         }
     };
 }
