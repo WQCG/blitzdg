@@ -4,6 +4,7 @@
 #include <iostream>
 #include <math.h>
 #include <Nodes1DProvisioner.hpp>
+#include <SparseTriplet.hpp>
 
 using namespace std;
 using namespace blitz;
@@ -69,7 +70,77 @@ void Nodes1DProvisioner::buildNodes() {
     buildConnectivityMatrices();
 }
 
+/**
+ * Build global connectivity matrices (EToE, EToF) for 1D grid
+ * based using EToV (Element-to-Vertex) matrix.
+ */
 void Nodes1DProvisioner::buildConnectivityMatrices() {
+
+    firstIndex ii;
+    secondIndex jj;
+    thirdIndex kk;
+
+    int totalFaces = NumFaces*NumElements;
+    int numVertices = NumElements + 1;
+
+    int localVertNum[2];
+    localVertNum[0] = 0; localVertNum[1] = 1;
+
+    // Build global face-to-vertex array. (should be sparse matrix in 2D/3D).
+    Array<double, 2> FToV(totalFaces, numVertices);
+    FToV = 0*jj;
+
+    Array<double, 2> & E2V = *EToV;
+
+    cout << E2V << endl;
+
+    int globalFaceNum = 0;
+    for (int k=0; k <= NumElements; k++) {
+        for (int f=0; f < NumFaces; f++) {
+            int v = localVertNum[f];
+            int vGlobal = (int)E2V(k,v);
+            FToV(globalFaceNum, vGlobal-1) = 1;
+            globalFaceNum++;
+        }
+    }
+
+    cout << FToV << endl;
+
+    Array<double, 2> FToF(totalFaces, totalFaces);
+    Array<double, 2> I(totalFaces, totalFaces);
+
+    for (int f=0; f < totalFaces; f++)
+        I(f,f) = 1;
+
+    //Array<double, 2> FToVtrans = FToV(jj,ii);
+
+    // Global Face-to-Face connectivity matrix.
+    FToF = sum(FToV(ii,kk)*FToV(jj,kk), kk) - I;
+
+    cout << FToF << endl;
+
+
+/*
+% 
+
+% Build global face to global face sparse array
+SpFToF = SpFToV*SpFToV' - speye(TotalFaces);
+
+% Find complete face to face connections
+[faces1, faces2] = find(SpFToF==1);
+
+% Convert face global number to element and face numbers
+element1 = floor( (faces1-1)/Nfaces )  + 1;
+face1    =   mod( (faces1-1), Nfaces ) + 1;
+element2 = floor( (faces2-1)/Nfaces )  + 1;
+face2    =   mod( (faces2-1), Nfaces ) + 1;
+
+% Rearrange into Nelements x Nfaces sized arrays
+ind = sub2ind([K, Nfaces], element1, face1);
+EToE      = (1:K)'*ones(1,Nfaces);
+EToF      = ones(K,1)*(1:Nfaces);
+EToE(ind) = element2; EToF(ind) = face2;
+*/
 
 }
 
