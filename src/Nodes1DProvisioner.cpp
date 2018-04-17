@@ -117,31 +117,47 @@ void Nodes1DProvisioner::buildConnectivityMatrices() {
     // Global Face-to-Face connectivity matrix.
     FToF = sum(FToV(ii,kk)*FToV(jj,kk), kk) - I;
 
-    cout << FToF << endl;
+    Array<int,1> f1(totalFaces - 2); // '- 2' => for physical boundaries.
+    Array<int,1> f2(totalFaces - 2);
 
+    int connectionsCount = 0;
+    for (int i=0; i < totalFaces; i++) {
+        for (int j=0; j < totalFaces; j++) {
+            if (FToF(i,j) == 1) {
+                f1(connectionsCount) = i;
+                f2(connectionsCount) = j;
+                connectionsCount++;
+            }
+        }
+    }
 
-/*
-% 
+    Array<int, 1> e1(totalFaces - 2);
+    Array<int, 1> e2(totalFaces - 2);
 
-% Build global face to global face sparse array
-SpFToF = SpFToV*SpFToV' - speye(TotalFaces);
+    // Convert face global number to local element and face numbers.
+    e1 = floor(f1 / NumFaces);
+    f1 = (f1 % NumFaces);
+    e2 = floor(f2 / NumFaces);
+    f2 = (f2 % NumFaces);
 
-% Find complete face to face connections
-[faces1, faces2] = find(SpFToF==1);
+    // Build connectivity matrices.
+    Array<int, 2> & E2E = *EToE;
+    Array<int, 2> & E2F = *EToF;
+    for (int k = 0; k < NumElements; k++) {
+        for (int f = 0; f < NumFaces; f++) {
+            E2E(k, f) = k;
+            E2F(k, f) = f;
+        }
+    }
 
-% Convert face global number to element and face numbers
-element1 = floor( (faces1-1)/Nfaces )  + 1;
-face1    =   mod( (faces1-1), Nfaces ) + 1;
-element2 = floor( (faces2-1)/Nfaces )  + 1;
-face2    =   mod( (faces2-1), Nfaces ) + 1;
-
-% Rearrange into Nelements x Nfaces sized arrays
-ind = sub2ind([K, Nfaces], element1, face1);
-EToE      = (1:K)'*ones(1,Nfaces);
-EToF      = ones(K,1)*(1:Nfaces);
-EToE(ind) = element2; EToF(ind) = face2;
-*/
-
+    for (int i=0; i < totalFaces - 2; i++) {
+        int ee1 = e1(i);
+        int ee2 = e2(i);
+        int ff1 = f1(i);
+        int ff2 = f2(i);
+        E2E(ee1, ff1) = ee2;
+        E2F(ee1, ff1) = ff2;
+    }
 }
 
 void Nodes1DProvisioner::buildLift() {
