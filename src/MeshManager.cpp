@@ -49,9 +49,8 @@ void MeshManager::printArray(T * & arr, int numRows, int numCols) {
 	}
 }
 
-template<typename T>
-vector<int> MeshManager::readCsvFile(string csvFile, string delimiters, T * & result) {
-
+    template<typename T>
+    void  MeshManager::readCsvFile(string csvFile, string delimiters, T * & result, int * & dims) {
     ifstream fileStream(csvFile);
 
     string line("");
@@ -70,7 +69,9 @@ vector<int> MeshManager::readCsvFile(string csvFile, string delimiters, T * & re
         numLines++;
     }
 
-    vector<int> dims = {numLines,numCols}; 
+     dims = new int[2];
+     dims[0] = numLines;
+     dims[1] = numCols;
     // roll-back stream.
     fileStream.clear();
     fileStream.seekg(0, std::ios::beg);
@@ -89,7 +90,6 @@ vector<int> MeshManager::readCsvFile(string csvFile, string delimiters, T * & re
     }
     fileStream.close();
 
-    return dims;
 }
 
 /**
@@ -116,7 +116,7 @@ void MeshManager::partitionMesh(int numPartitions) {
     metisOptions[METIS_OPTION_NUMBERING] = 1; // 1-based numbering.
     metisOptions[METIS_OPTION_DBGLVL] = METIS_DBG_INFO; //debug level='info'. 0 for nothing.
 
-	int * eind = EToV;
+    int * eind = EToV;
     int * eptr = new int[NumElements+1];
 
     // output arrays
@@ -158,7 +158,8 @@ void MeshManager::partitionMesh(int numPartitions) {
  * Read a list of vertices from a file. x-, y-, (and z-) are coordinates delimited by spaces, e.g., 0.5 1.0.
  */
 void MeshManager::readVertices(string vertFile) {
-    vector<int> dims = readCsvFile<double>(vertFile, CsvDelimeters, Vert);
+    int * dims;
+    readCsvFile<double>(vertFile, CsvDelimeters, Vert, dims);
     NumVerts = dims[0];
     Dim = dims[1];
 }
@@ -167,7 +168,8 @@ void MeshManager::readVertices(string vertFile) {
  * Read a list of elments from a file. Vertex numbers are written in a row and delimited by spaces, e.g., 1 2 3 4
  */
 void MeshManager::readElements(string E2VFile) {
-    vector<int> dims = readCsvFile<int>(E2VFile, CsvDelimeters, EToV);
+    int * dims;
+    readCsvFile<int>(E2VFile, CsvDelimeters, EToV, dims);
     NumElements = dims[0];
     ElementType = dims[1];
 }

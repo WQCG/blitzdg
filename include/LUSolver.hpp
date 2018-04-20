@@ -16,7 +16,7 @@ class LUSolver {
     int * Ai;
     double * Ax;
     int * Map;
-    double * null = (double *) NULL ;
+    double * null;
 
     void * Symbolic;
     void * Numeric;
