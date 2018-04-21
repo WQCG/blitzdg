@@ -2,7 +2,7 @@
 
 blitzdg is an open-source project aiming to implement parallel discontinuous Galerkin (dg) solvers for common partial differential equations systems using blitz++ for array and tensor manipulations and MPI for distributed parallelism.
 
-[![Build Status](https://travis-ci.org/dsteinmo/blitzdg.svg?branch=master)](https://travis-ci.org/dsteinmo/blitzdg)  [![Coverage Status](https://coveralls.io/repos/github/dsteinmo/blitzdg/badge.svg)](https://coveralls.io/github/dsteinmo/blitzdg) [![Windows Build Status](https://ci.appveyor.com/api/projects/status/pmx725yhsrnq3thu?svg=true)](https://ci.appveyor.com/project/dsteinmo/blitzdg)
+[![Build Status](https://travis-ci.org/dsteinmo/blitzdg.svg?branch=master)](https://travis-ci.org/WQCG/blitzdg)  [![Coverage Status](https://coveralls.io/repos/github/WQCG/blitzdg/badge.svg?branch=master)](https://coveralls.io/github/WQCG/blitzdg?branch=master) [![Windows Build Status](https://ci.appveyor.com/api/projects/status/pmx725yhsrnq3thu?svg=true)](https://ci.appveyor.com/project/WQCG/blitzdg)
 
 ## Running
 
@@ -42,7 +42,7 @@ Run `.\pull-deps.ps1` in Powershell (4+ or Powershell Core (`pwsh`)).
 
 ## Contributing
 
-We accept pull requests. 
+We accept pull requests.
 
 If you add code, please write tests using the igloo testing framework that is included as a project dependency.
 

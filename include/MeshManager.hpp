@@ -22,7 +22,7 @@ class MeshManager {
     int * VertexPartitionMap;
 
     template<typename T>
-    vector<int> readCsvFile(string csvFile, string delimiters, T * & result);
+    void  readCsvFile(string csvFile, string delimiters, T * & result, int * & dims);
 
     template<typename T>
     void printArray(T * & arr, int numRows, int numCols);
@@ -51,7 +51,7 @@ class MeshManager {
     int * & get_Elements();
 
     int get_NumElements();
-	  int get_ElementType();
+    int get_ElementType();
 
     int * & get_ElementPartitionMap();
     int * & get_VertexPartitionMap();
