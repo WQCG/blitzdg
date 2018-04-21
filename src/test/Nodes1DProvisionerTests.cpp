@@ -302,12 +302,17 @@ namespace Nodes1DProvisionerTests {
             nodes1D.buildNodes();
             Array<double, 2> Lift = nodes1D.get_Lift();
 
-            Array<double, 2> expectedLift(5,2);
-            expectedLift = 12.5,2.5,
-                           -1.07143,-1.07143,
-                           0.9375,0.9375,
-                           -1.07143,-1.07143,
-                           2.5,12.5;
+            Array<double, 2> expectedLift(4,2);
+            expectedLift =  8.00000,-2.00000,
+                           -0.89443, 0.89443,
+                            0.89443,-0.89443,
+                           -2.00000, 8.00000;
+
+
+            Array<double, 2> resLift(5,2);
+
+            resLift = Lift - expectedLift;
+            Assert::That(sqrt(sum(resLift(ii)*resLift(ii))), IsLessThan(epsf));
         }
     };
 }
