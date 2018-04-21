@@ -7,5 +7,5 @@ build_script:
     Invoke-RestMethod -Uri https://s3.amazonaws.com/dsteinmo-libs/deps-appveyor.zip -OutFile deps-win-mingw64.zip
     Expand-Archive -Path include-deps.zip -DestinationPath .\include\
     Expand-Archive -Path deps-win-mingw64.zip -DestinationPath .\lib\
-    & C:\MinGW\msys\1.0\bin\bash -e -l -c "set && ls /mingw/lib/gcc/mingw32/5.3.0/ && cd $APPVEYOR_BUILD_FOLDER && make"
+    & C:\MinGW\msys\1.0\bin\bash -e -l -c "set && ls /mingw/lib/gcc/mingw32/5.3.0/ && cd $OLDPWD && make"
     if($LASTEXITCODE -ne 0) { exit 1 }
