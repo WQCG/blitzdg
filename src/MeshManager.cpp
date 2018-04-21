@@ -98,9 +98,11 @@ void MeshManager::printArray(T * & arr, int numRows, int numCols) {
  */
 void MeshManager::partitionMesh(int numPartitions) {
     int * metisOptions =  NULL;
-    int objval =0 ;
     int * epart = NULL;
     int * npart = NULL;
+    int * objval;
+
+    int * numPartitionsPtr = &numPartitions;
 
     // set up mesh partitioning options
     metisOptions = new int[METIS_NOPTIONS];
@@ -122,13 +124,16 @@ void MeshManager::partitionMesh(int numPartitions) {
     // output arrays
     epart = new int[NumElements];
     npart = new int[NumVerts];
+    objval = new int;
     // Assume mesh with homogenous element type, then eptr 
     // dictates an equal stride of size ElementType across EToV array.
     for (int i=0; i <= NumElements; i++)
         eptr[i] = ElementType*i;
 
+    *objval = 0;
+
     int result =  METIS_PartMeshNodal( &NumElements, &NumVerts, eptr, eind, NULL, NULL,
-                    &numPartitions, NULL, metisOptions, &objval, epart, npart);
+                    numPartitionsPtr, NULL, metisOptions, objval, epart, npart);
 
     if (result == METIS_OK)
         cout << "METIS partitioning successful!" << endl;
@@ -139,7 +144,7 @@ void MeshManager::partitionMesh(int numPartitions) {
     else
         cout << "Unknown METIS error: " << result << endl;
 
-    cout << "total communication volume of partition: " << objval << endl;
+    cout << "total communication volume of partition: " << *objval << endl;
 
     cout << "Element partitioning vector: " << endl;
     for (int i=0; i<NumElements; i++)
