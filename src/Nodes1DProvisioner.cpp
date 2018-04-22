@@ -92,8 +92,6 @@ void Nodes1DProvisioner::buildConnectivityMatrices() {
 
     Array<double, 2> & E2V = *EToV;
 
-    cout << E2V << endl;
-
     int globalFaceNum = 0;
     for (int k=0; k <= NumElements; k++) {
         for (int f=0; f < NumFaces; f++) {
@@ -104,15 +102,11 @@ void Nodes1DProvisioner::buildConnectivityMatrices() {
         }
     }
 
-    cout << FToV << endl;
-
     Array<double, 2> FToF(totalFaces, totalFaces);
     Array<double, 2> I(totalFaces, totalFaces);
 
     for (int f=0; f < totalFaces; f++)
         I(f,f) = 1;
-
-    //Array<double, 2> FToVtrans = FToV(jj,ii);
 
     // Global Face-to-Face connectivity matrix.
     FToF = sum(FToV(ii,kk)*FToV(jj,kk), kk) - I;
@@ -241,10 +235,6 @@ void Nodes1DProvisioner::buildDr() {
     linSolver.solve(Vtrans, DVrtrans,  Drtrans);
 
     Drref = Drtrans(jj, ii);
-
-    cout << "V: " << Vref << endl;
-    cout << "DVr: " << DVr << endl;
-    cout << "Dr: " << Drref << endl;
 } 
 
 
