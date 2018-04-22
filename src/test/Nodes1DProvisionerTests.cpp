@@ -15,7 +15,7 @@ using namespace std;
 namespace Nodes1DProvisionerTests {
     const int N=5;
     const double eps=10*numeric_limits<double>::epsilon();
-    const float epsf = 5.e-6;
+    const float epsf = 5.7e-6;
 
     firstIndex ii;
     secondIndex jj;
@@ -253,6 +253,20 @@ namespace Nodes1DProvisionerTests {
             Assert::That(sqrt(sum(res(ii)*res(ii))), IsLessThan(epsf));
         }
 
+        It(Should_Build_Element_To_Vertex_Connectivity) {
+            Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+
+            nodes1D.buildNodes();
+
+            Array<int, 2> EToV = nodes1D.get_EToV();
+
+            Assert::That(EToV(0,0), Equals(0)); Assert::That(EToV(0,1), Equals(1));
+            Assert::That(EToV(1,0), Equals(1)); Assert::That(EToV(1,1), Equals(2));
+            Assert::That(EToV(2,0), Equals(2)); Assert::That(EToV(2,1), Equals(3));
+            Assert::That(EToV(3,0), Equals(3)); Assert::That(EToV(3,1), Equals(4));
+            Assert::That(EToV(4,0), Equals(4)); Assert::That(EToV(4,1), Equals(5));
+        }
+
         It(Should_Compute_Jacobian) {
             Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
 
@@ -280,6 +294,55 @@ namespace Nodes1DProvisionerTests {
 
             Assert::That(sqrt(sum(resJ(ii)*resJ(ii))), IsLessThan(epsf));
             Assert::That(sqrt(sum(resrx(ii)*resrx(ii))), IsLessThan(epsf));
+        }
+
+        It(Should_Build_1D_Lift_Operator) {
+            Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+
+            nodes1D.buildNodes();
+            Array<double, 2> Lift = nodes1D.get_Lift();
+
+            Array<double, 2> expectedLift(4,2);
+            expectedLift =  8.00000,-2.00000,
+                           -0.89443, 0.89443,
+                            0.89443,-0.89443,
+                           -2.00000, 8.00000;
+
+
+            Array<double, 2> resLift(4,2);
+
+            resLift = Lift - expectedLift;
+            Assert::That(sqrt(sum(resLift*resLift)), IsLessThan(epsf));
+        }
+
+        It(Should_Build_1D_Connectivity_Matrices) {
+            Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+
+            nodes1D.buildNodes();
+            Array<int, 2> EToE = nodes1D.get_EToE();
+            Array<int, 2> EToF = nodes1D.get_EToF();
+
+            Array<int, 2> expectedEToE(5,2);
+            expectedEToE = 0,1,
+                           0,2,
+                           1,3,
+                           2,4,
+                           3,4;
+
+            Array<int, 2> expectedEToF(5,2);
+            expectedEToF = 0,0,
+                           1,0,
+                           1,0,
+                           1,0,
+                           1,1;
+
+            Array<int, 2> resEToE(5,2), resEToF(5,2);
+
+            resEToE = EToE - expectedEToE;
+            resEToF = EToF - expectedEToF;
+
+            Assert::That(sqrt(sum(resEToE*resEToE)), Equals(0));
+            Assert::That(sqrt(sum(resEToF*resEToF)), Equals(0));
         }
     };
 }
