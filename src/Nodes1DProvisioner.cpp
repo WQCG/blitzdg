@@ -147,6 +147,12 @@ Array<double, 2> & Nodes1DProvisioner::get_V() {
  * Destructoructor
  */
 Nodes1DProvisioner::~Nodes1DProvisioner() {
+    delete rGrid;
+    delete xGrid;
+    delete Lift;
+    delete EToV;
+    delete EToE;
+    delete EToF;
 }
 
 /**  Compute the Nth Jacobi polynomial of type (alpha,beta) > -1 ( != -0.5)
