@@ -258,13 +258,13 @@ namespace Nodes1DProvisionerTests {
 
             nodes1D.buildNodes();
 
-            Array<double, 2> EToV = nodes1D.get_EToV();
+            Array<int, 2> EToV = nodes1D.get_EToV();
 
-            Assert::That(EToV(0,0), Equals(1)); Assert::That(EToV(0,1), Equals(2));
-            Assert::That(EToV(1,0), Equals(2)); Assert::That(EToV(1,1), Equals(3));
-            Assert::That(EToV(2,0), Equals(3)); Assert::That(EToV(2,1), Equals(4));
-            Assert::That(EToV(3,0), Equals(4)); Assert::That(EToV(3,1), Equals(5));
-            Assert::That(EToV(4,0), Equals(5)); Assert::That(EToV(4,1), Equals(6));
+            Assert::That(EToV(0,0), Equals(0)); Assert::That(EToV(0,1), Equals(1));
+            Assert::That(EToV(1,0), Equals(1)); Assert::That(EToV(1,1), Equals(2));
+            Assert::That(EToV(2,0), Equals(2)); Assert::That(EToV(2,1), Equals(3));
+            Assert::That(EToV(3,0), Equals(3)); Assert::That(EToV(3,1), Equals(4));
+            Assert::That(EToV(4,0), Equals(4)); Assert::That(EToV(4,1), Equals(5));
         }
 
         It(Should_Compute_Jacobian) {

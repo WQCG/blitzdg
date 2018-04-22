@@ -31,7 +31,7 @@ Nodes1DProvisioner::Nodes1DProvisioner(int _NOrder, int _NumElements, double _xm
     rGrid = new Array<double, 1>(NumLocalPoints);
     xGrid = new Array<double, 2>(NumLocalPoints, NumElements);
     Lift = new Array<double, 2>(NumLocalPoints, NumFacePoints*NumFaces);
-    EToV = new Array<double, 2>(NumElements, NumFaces);
+    EToV = new Array<int, 2>(NumElements, NumFaces);
     EToE = new Array<int, 2>(NumElements, NumFaces);
     EToF = new Array<int, 2>(NumElements, NumFaces);
 }
@@ -59,12 +59,12 @@ void Nodes1DProvisioner::buildNodes() {
         x(Range::all(), k) = Min_x + width*(k + 0.5*(r+1.));
     }
 
-    Array<double, 2> & E2V = *EToV;
+    Array<int, 2> & E2V = *EToV;
 
     // Create Element-to-Vertex connectivity table.
     for (int k=0; k < NumElements; k++) {
-        E2V(k, 0) = k+1;
-        E2V(k, 1) = k+2;
+        E2V(k, 0) = k;
+        E2V(k, 1) = k+1;
     }
 
     buildConnectivityMatrices();
@@ -90,14 +90,14 @@ void Nodes1DProvisioner::buildConnectivityMatrices() {
     Array<double, 2> FToV(totalFaces, numVertices);
     FToV = 0*jj;
 
-    Array<double, 2> & E2V = *EToV;
+    Array<int, 2> & E2V = *EToV;
 
     int globalFaceNum = 0;
-    for (int k=0; k <= NumElements; k++) {
+    for (int k=0; k < NumElements; k++) {
         for (int f=0; f < NumFaces; f++) {
             int v = localVertNum[f];
-            int vGlobal = (int)E2V(k,v);
-            FToV(globalFaceNum, vGlobal-1) = 1;
+            int vGlobal = E2V(k,v);
+            FToV(globalFaceNum, vGlobal) = 1;
             globalFaceNum++;
         }
     }
@@ -262,7 +262,7 @@ Array<double, 1> & Nodes1DProvisioner::get_rGrid() {
 /**
  * Get reference to Element-to-Vertex connectivity table.
  */
-Array<double, 2> & Nodes1DProvisioner::get_EToV() {
+Array<int, 2> & Nodes1DProvisioner::get_EToV() {
     return *EToV;
 }
 

@@ -23,7 +23,7 @@ class Nodes1DProvisioner {
     Array<double, 2> * V;
     Array<double, 2> * Dr;
     Array<double, 2> * Lift;
-    Array<double, 2> * EToV;
+    Array<int, 2> * EToV;
     Array<int, 2> * EToE;
     Array<int, 2> * EToF;
 
@@ -49,7 +49,7 @@ class Nodes1DProvisioner {
     Array<double, 1> & get_rGrid();
     Array<double, 2> & get_Dr();
     Array<double, 2> & get_V();
-    Array<double, 2> & get_EToV();
+    Array<int, 2> & get_EToV();
     Array<double, 2> & get_Lift();
   
     Array<int, 2> & get_EToE();
