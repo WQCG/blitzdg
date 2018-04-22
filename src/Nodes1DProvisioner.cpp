@@ -4,9 +4,13 @@
 #include <iostream>
 #include <math.h>
 #include <Nodes1DProvisioner.hpp>
+#include <SparseTriplet.hpp>
 
 using namespace std;
 using namespace blitz;
+
+const int Nodes1DProvisioner::NumFacePoints = 1;
+const int Nodes1DProvisioner::NumFaces = 2;
 
 /**
  * Constructor. Takes order of polynomials, number of elements, and dimensions of the domain.
@@ -21,8 +25,15 @@ Nodes1DProvisioner::Nodes1DProvisioner(int _NOrder, int _NumElements, double _xm
     EigSolver = &eigenSolver;
     LinSolver = &directSolver;
 
-    rGrid = new Array<double, 1>(NOrder+1);
-    xGrid = new Array<double, 2>(NOrder+1, NumElements);
+    // This is true in 1D only.
+    NumLocalPoints = NOrder + 1;
+
+    rGrid = new Array<double, 1>(NumLocalPoints);
+    xGrid = new Array<double, 2>(NumLocalPoints, NumElements);
+    Lift = new Array<double, 2>(NumLocalPoints, NumFacePoints*NumFaces);
+    EToV = new Array<int, 2>(NumElements, NumFaces);
+    EToE = new Array<int, 2>(NumElements, NumFaces);
+    EToF = new Array<int, 2>(NumElements, NumFaces);
 }
 
 /**
@@ -38,6 +49,7 @@ void Nodes1DProvisioner::buildNodes() {
     
     buildVandermondeMatrix();
     buildDr();
+    buildLift();
 
     double L = Max_x - Min_x;
     double width = L / NumElements;
@@ -46,6 +58,121 @@ void Nodes1DProvisioner::buildNodes() {
     for (int k=0; k < NumElements; k++) {
         x(Range::all(), k) = Min_x + width*(k + 0.5*(r+1.));
     }
+
+    Array<int, 2> & E2V = *EToV;
+
+    // Create Element-to-Vertex connectivity table.
+    for (int k=0; k < NumElements; k++) {
+        E2V(k, 0) = k;
+        E2V(k, 1) = k+1;
+    }
+
+    buildConnectivityMatrices();
+}
+
+/**
+ * Build global connectivity matrices (EToE, EToF) for 1D grid
+ * based using EToV (Element-to-Vertex) matrix.
+ */
+void Nodes1DProvisioner::buildConnectivityMatrices() {
+
+    firstIndex ii;
+    secondIndex jj;
+    thirdIndex kk;
+
+    int totalFaces = NumFaces*NumElements;
+    int numVertices = NumElements + 1;
+
+    int localVertNum[2];
+    localVertNum[0] = 0; localVertNum[1] = 1;
+
+    // Build global face-to-vertex array. (should be sparse matrix in 2D/3D).
+    Array<double, 2> FToV(totalFaces, numVertices);
+    FToV = 0*jj;
+
+    Array<int, 2> & E2V = *EToV;
+
+    int globalFaceNum = 0;
+    for (int k=0; k < NumElements; k++) {
+        for (int f=0; f < NumFaces; f++) {
+            int v = localVertNum[f];
+            int vGlobal = E2V(k,v);
+            FToV(globalFaceNum, vGlobal) = 1;
+            globalFaceNum++;
+        }
+    }
+
+    Array<double, 2> FToF(totalFaces, totalFaces);
+    Array<double, 2> I(totalFaces, totalFaces);
+
+    for (int f=0; f < totalFaces; f++)
+        I(f,f) = 1;
+
+    // Global Face-to-Face connectivity matrix.
+    FToF = sum(FToV(ii,kk)*FToV(jj,kk), kk) - I;
+
+    Array<int,1> f1(totalFaces - 2); // '- 2' => for physical boundaries.
+    Array<int,1> f2(totalFaces - 2);
+
+    int connectionsCount = 0;
+    for (int i=0; i < totalFaces; i++) {
+        for (int j=0; j < totalFaces; j++) {
+            if (FToF(i,j) == 1) {
+                f1(connectionsCount) = i;
+                f2(connectionsCount) = j;
+                connectionsCount++;
+            }
+        }
+    }
+
+    Array<int, 1> e1(totalFaces - 2);
+    Array<int, 1> e2(totalFaces - 2);
+
+    // Convert face global number to local element and face numbers.
+    e1 = floor(f1 / NumFaces);
+    f1 = (f1 % NumFaces);
+    e2 = floor(f2 / NumFaces);
+    f2 = (f2 % NumFaces);
+
+    // Build connectivity matrices.
+    Array<int, 2> & E2E = *EToE;
+    Array<int, 2> & E2F = *EToF;
+    for (int k = 0; k < NumElements; k++) {
+        for (int f = 0; f < NumFaces; f++) {
+            E2E(k, f) = k;
+            E2F(k, f) = f;
+        }
+    }
+
+    for (int i=0; i < totalFaces - 2; i++) {
+        int ee1 = e1(i);
+        int ee2 = e2(i);
+        int ff1 = f1(i);
+        int ff2 = f2(i);
+        E2E(ee1, ff1) = ee2;
+        E2F(ee1, ff1) = ff2;
+    }
+}
+
+void Nodes1DProvisioner::buildLift() {
+    int Np = NumLocalPoints;
+    firstIndex ii;
+    secondIndex jj;
+    thirdIndex kk;
+
+    Array<double, 2> E(Np, NumFaces*NumFacePoints);
+    E = 0*jj;
+    E(0, 0)  = 1.;
+    E(Np-1, 1) = 1.;
+
+    Array<double, 2> & Vref = *V;
+    Array<double, 2> & L = *Lift;
+
+    Array<double, 2> Vtrans(Np, Np);
+    Vtrans = Vref(jj,ii);
+    Array<double, 2> temp(Np, NumFaces*NumFacePoints);
+    temp = sum(Vtrans(ii,kk)*E(kk,jj), kk);
+    L = sum(Vref(ii,kk)*temp(kk,jj), kk);
 }
 
 /**
@@ -108,11 +235,15 @@ void Nodes1DProvisioner::buildDr() {
     linSolver.solve(Vtrans, DVrtrans,  Drtrans);
 
     Drref = Drtrans(jj, ii);
-
-    cout << "V: " << Vref << endl;
-    cout << "DVr: " << DVr << endl;
-    cout << "Dr: " << Drref << endl;
 } 
+
+
+/**
+ * Get reference to 1D Lifting Operator.
+ */
+Array<double, 2> & Nodes1DProvisioner::get_Lift() {
+    return *Lift;
+}
 
 /**
  * Get reference to physical x-grid.
@@ -128,6 +259,26 @@ Array<double, 1> & Nodes1DProvisioner::get_rGrid() {
     return *rGrid;
 }
 
+/**
+ * Get reference to Element-to-Vertex connectivity table.
+ */
+Array<int, 2> & Nodes1DProvisioner::get_EToV() {
+    return *EToV;
+}
+
+/**
+ * Get reference to Element-to-Element connectivity table.
+ */
+Array<int, 2> & Nodes1DProvisioner::get_EToE() {
+    return *EToE;
+}
+
+/**
+ * Get reference to Element-to-Face connectivity table.
+ */
+Array<int, 2> & Nodes1DProvisioner::get_EToF() {
+    return *EToF;
+}
 
 /**
  * Get reference to differentiation matrix Dr on the standard element.
@@ -143,8 +294,12 @@ Array<double, 2> & Nodes1DProvisioner::get_V() {
     return *V;
 }
 
+int Nodes1DProvisioner::get_NumLocalPoints() {
+    return NumLocalPoints;
+}
+
 /**
- * Destructoructor
+ * Destructor.
  */
 Nodes1DProvisioner::~Nodes1DProvisioner() {
     delete rGrid;
