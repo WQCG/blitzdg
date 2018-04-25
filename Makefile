@@ -16,7 +16,7 @@ CFLAGS := -g -Wall -std=c++0x -fprofile-arcs -ftest-coverage
 LINKERFLAGS := -fprofile-arcs
 INC := -I include -I /usr/include
 LIB := -L lib -lblitz -lmetis -lumfpack -llapack -lblas 
-EXPLICITLIBS := -lamd -lcholmod -lcolamd -lsuitesparseconfig -lGKlib -lgfortran -lquadmath
+EXPLICITLIBS := -lamd -lcholmod -lcolamd -lsuitesparseconfig -lgfortran -lquadmath
 
 ifeq ($(OS), Windows_NT)
 	LIB += $(EXPLICITLIBS)

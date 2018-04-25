@@ -16,6 +16,7 @@ namespace MeshManagerTests {
         }
 
         It(Reads_Vertex_Files) {
+            cout << "MeshManager" << endl;
             MeshManager & mgr = *meshManager;
 
             mgr.readVertices("input/2box.V");
@@ -45,6 +46,7 @@ namespace MeshManagerTests {
         }
 
         It(Reads_Element_Files) {
+            cout << "Reads Elements Files" << endl;
             MeshManager & mgr = *meshManager;
 
             mgr.readElements("input/2box.E2V");
@@ -66,6 +68,7 @@ namespace MeshManagerTests {
         }
 
         It(Can_Print_Vertices_And_DoesNotThrow) {
+            cout << "Can_Print_Vertices_And_DoesNotThrow" << endl;
             MeshManager & mgr = *meshManager;
             mgr.readVertices("input/2box.V");
             cout << endl << "Vertices:" << endl;
@@ -73,13 +76,15 @@ namespace MeshManagerTests {
         }
 
         It(Can_Print_Elements_And_DoesNotThrow) {
+            cout << "Can_Print_Elements_And_DoesNotThrow" << endl;
             MeshManager & mgr = *meshManager;
             mgr.readElements("input/2box.E2V");
             cout << endl << "Elements" << endl;
             mgr.printElements();
         }
 
-        It(Can_Partition_A_Mesh) {
+       It(Can_Partition_A_Mesh) {
+            cout << "Can_Partition_A_Mesh" << endl;
             MeshManager & mgr = *meshManager;
             mgr.readVertices("input/2box.V");
             mgr.readElements("input/2box.E2V");
@@ -98,6 +103,6 @@ namespace MeshManagerTests {
             Assert::That(vpMap[3], IsGreaterThan(0));
             Assert::That(vpMap[4], IsGreaterThan(0));
             Assert::That(vpMap[5], IsGreaterThan(0));
-        }
+        } 
     };
 }

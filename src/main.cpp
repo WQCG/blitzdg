@@ -58,5 +58,17 @@ int main(int argc, char **argv) {
 
   nodes1DProvisioner.computeJacobian(J, rx);
 
+  cout << "Can_Partition_A_Mesh" << endl;
+  MeshManager * manager = new MeshManager();
+  MeshManager & mgr = *manager;
+  mgr.readVertices("input/2box.V");
+  mgr.readElements("input/2box.E2V");
+
+  mgr.partitionMesh(2);
+
+  //int * & epMap = mgr.get_ElementPartitionMap();
+  //int * & vpMap = mgr.get_VertexPartitionMap();
+
+  delete manager;
   return 0;
 }
