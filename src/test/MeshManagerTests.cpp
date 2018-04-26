@@ -89,6 +89,8 @@ namespace MeshManagerTests {
             mgr.readVertices("input/2box.V");
             mgr.readElements("input/2box.E2V");
 
+            cout << "K: " << mgr.get_NumElements() << endl;
+            cout << "Nv: " << mgr.get_NumVerts() << endl;
             mgr.partitionMesh(2);
 
             int * & epMap = mgr.get_ElementPartitionMap();
