@@ -10,4 +10,7 @@ build_script:
     & C:\MinGW\msys\1.0\bin\bash -e -l -c "set && ls /mingw/lib/gcc/mingw32/5.3.0/ && cd /c/projects/blitzdg-vdg02 && make"
     if($LASTEXITCODE -ne 0) { exit 1 }
 test_script:
-  - .\bin\test.exe
+  - dir bin&&bin\test.exe
+
+artifacts:
+  - path: bin
