@@ -76,9 +76,7 @@ namespace MeshManagerTests {
         }
 
         It(Reads_Vertex_Files) {
-
             string vertexFile = get_VertexFilePath();
-            cout << "MeshManager Reads Vertex File: " << vertexFile << endl;
             MeshManager & mgr = *meshManager;
 
             mgr.readVertices(vertexFile);
@@ -109,8 +107,6 @@ namespace MeshManagerTests {
 
         It(Reads_Element_Files) {
             string eToVFile = get_EToVFilePath();
-
-            cout << "MeshManager Reads Elements Files: " << eToVFile << endl;
             MeshManager & mgr = *meshManager;
 
             mgr.readElements(eToVFile);
@@ -132,21 +128,23 @@ namespace MeshManagerTests {
         }
 
         It(Can_Print_Vertices_And_DoesNotThrow) {
-            string vertexFile = get_VertexFilePath();
             cout << "Can_Print_Vertices_And_DoesNotThrow" << endl;
+            string vertexFile = get_VertexFilePath();
             MeshManager & mgr = *meshManager;
             mgr.readVertices(vertexFile);
             cout << "Vertices:" << endl;
             mgr.printVertices();
+            cout << flush;
         }
 
         It(Can_Print_Elements_And_DoesNotThrow) {
-            string eToVFile = get_EToVFilePath();
             cout << "Can_Print_Elements_And_DoesNotThrow" << endl;
+            string eToVFile = get_EToVFilePath();
             MeshManager & mgr = *meshManager;
             mgr.readElements(eToVFile);
             cout << endl << "Elements" << endl;
             mgr.printElements();
+            cout << flush;
         }
 
        It(Can_Partition_A_Mesh) {
