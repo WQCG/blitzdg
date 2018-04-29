@@ -15,21 +15,22 @@ namespace MeshManagerTests {
         typedef vector< iterator_range<string::iterator> > find_vector_type;
 
         MeshManager * meshManager=nullptr;
-        string ExePath;
-        string PathDelimeter;
 
         void SetUp() {
             meshManager = new MeshManager();
+        }
+
+        string get_VertexFilePath() {
 
             // Deal with paths to the test input files.
             int cap = 1024;
             char * pathBuffer = new char[cap];
             wai_getExecutablePath(pathBuffer, cap, NULL);
-            ExePath = string(pathBuffer);
+            string ExePath(pathBuffer);
 
             find_vector_type FindVec;
 
-            PathDelimeter = "/";
+            string PathDelimeter = "/";
             replace_last(ExePath, ".exe", "");
             replace_last(ExePath, "/bin/test", "");
             find_all( FindVec, ExePath, "\\" );
@@ -37,9 +38,7 @@ namespace MeshManagerTests {
                 PathDelimeter = "\\";
                 replace_last(ExePath, "\\bin\\test", "");
             }
-        }
 
-        string get_VertexFilePath() {
             std::vector<std::string> pathVec;
             pathVec.push_back(ExePath);
             pathVec.push_back("input");
@@ -48,6 +47,24 @@ namespace MeshManagerTests {
         }
 
         string get_EToVFilePath() {
+
+            // Deal with paths to the test input files.
+            int cap = 1024;
+            char * pathBuffer = new char[cap];
+            wai_getExecutablePath(pathBuffer, cap, NULL);
+            string ExePath(pathBuffer);
+
+            find_vector_type FindVec;
+
+            string PathDelimeter = "/";
+            replace_last(ExePath, ".exe", "");
+            replace_last(ExePath, "/bin/test", "");
+            find_all( FindVec, ExePath, "\\" );
+            if (FindVec.size() > 0) {
+                PathDelimeter = "\\";
+                replace_last(ExePath, "\\bin\\test", "");
+            }
+
             std::vector<std::string> pathVec;
             pathVec.push_back(ExePath);
             pathVec.push_back("input");
