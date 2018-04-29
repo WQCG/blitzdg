@@ -23,9 +23,9 @@ namespace MeshManagerTests {
                 // Deal with paths to the test input files.
                 int cap = 1024;
                 char * pathBuffer = new char[cap];
-                wai_getExecutablePath(pathBuffer, cap, NULL);
+                int length = wai_getExecutablePath(pathBuffer, cap, NULL);
                 ExePath = new string(pathBuffer);
-
+                trim_right(*ExePath);
             }
         }
 
@@ -73,6 +73,8 @@ namespace MeshManagerTests {
         It(Reads_Vertex_Files) {
             string vertexFile = "";
             get_VertexFilePath(vertexFile);
+            cout << *ExePath << endl;
+
             cout << "MeshManager Reads Vertex File: " << vertexFile << endl;
             MeshManager & mgr = *meshManager;
 
