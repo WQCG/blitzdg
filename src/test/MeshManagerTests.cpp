@@ -55,10 +55,6 @@ namespace MeshManagerTests {
             return join(pathVec, PathDelimeter);
         }
 
-        void TearDown() {
-            delete meshManager;
-        }
-
         It(Reads_Vertex_Files) {
 
             string vertexFile = get_VertexFilePath();
