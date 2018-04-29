@@ -43,6 +43,8 @@ namespace MeshManagerTests {
             pathVec.push_back(ExePath);
             pathVec.push_back("input");
             pathVec.push_back("2box.V");
+
+            delete pathBuffer;
             return join(pathVec, PathDelimeter);
         }
 
@@ -69,6 +71,7 @@ namespace MeshManagerTests {
             pathVec.push_back(ExePath);
             pathVec.push_back("input");
             pathVec.push_back("2box.E2V");
+            delete pathBuffer;
             return join(pathVec, PathDelimeter);
         }
 
