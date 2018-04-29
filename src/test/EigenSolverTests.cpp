@@ -88,6 +88,7 @@ namespace EigenSolverTests {
         }
 
         It(Should_Solve_NonTrivial_Symmetric_Eigenproblem) {
+            cout << "EigenSolver" << endl;
             eigenSolver = new EigenSolver(*matrixConverter);
             EigenSolver & solver = *eigenSolver;
 

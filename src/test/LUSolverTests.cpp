@@ -45,7 +45,9 @@ namespace LUSolverTests {
             luSolver = new LUSolver(&A, *matrixConverter);
         }
 
+        /*
         It(Solves_Ax_equals_b)  {
+            cout << "LUSolver" << endl;
             LUSolver & solver = *luSolver;
             Array <double, 1> soln(N);
 
@@ -58,9 +60,10 @@ namespace LUSolverTests {
             Assert::That(abs(soln(2)-x(2)), IsLessThan(eps));
             Assert::That(abs(soln(3)-x(3)), IsLessThan(eps));
             Assert::That(abs(soln(4)-x(4)), IsLessThan(eps));
-        }
+        } */
 
         It(ZZZZ_Destructor_Call_Does_Not_Throw) {
+            cout << "Destructor thing" << endl;
             LUSolver & solver = *luSolver;
 
             bool thrown = false;

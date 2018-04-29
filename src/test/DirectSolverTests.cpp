@@ -28,6 +28,7 @@ namespace DirectSolverTests {
 
     Describe(DirectSolver_Object) {
         void SetUp() {
+            cout << "DirectSolver" << endl;
 
             A = -1.550762,0.524638,1.483705,-2.354095,1.397928,
             0.370182,-0.747854,-0.020957,-1.120856,0.121897,
@@ -51,6 +52,7 @@ namespace DirectSolverTests {
         }
 
         It(Should_Solve_Random_Linear_System) {
+            cout << "It Should Solve Random Linear System" << endl;
             directSolver = new DirectSolver(*matrixConverter);
 
             DirectSolver & solver = *directSolver;

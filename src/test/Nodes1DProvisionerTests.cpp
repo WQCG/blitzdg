@@ -40,6 +40,7 @@ namespace Nodes1DProvisionerTests {
         }
 
         It(Should_Generate_0th_Order_Legendre_Polynomial) {
+            cout << "Nodes1D" << endl;
             Array<double, 1> x(3);
             x = -1.,0.,1.;
             Array<double, 1>  p(3);
@@ -54,6 +55,7 @@ namespace Nodes1DProvisionerTests {
         }
 
         It(Should_Generate_1st_Order_Legendre_Polynomial) {
+            cout << "Should_Generate_1st_Order_Legendre_Polynomial" << endl;
             Array<double, 1> x(3);
             x = -1.,0.,1.;
             Array<double, 1>  p(3);
@@ -69,6 +71,7 @@ namespace Nodes1DProvisionerTests {
 
 
         It(Should_Generate_2nd_Order_Legendre_Polynomial) {
+            cout << "Should_Generate_2nd_Order_Legendre_Polynomial" << endl;
             Array<double, 1> x(3);
             x = -1.,0.,1.;
             Array<double, 1>  p(3);
@@ -83,6 +86,7 @@ namespace Nodes1DProvisionerTests {
         }
 
         It(Should_Generate_0th_Order_Legendre_Polynomial_4pt_Grid) {
+            cout << "Should_Generate_0th_Order_Legendre_Polynomial_4pt_Grid" << endl;
             Array<double, 1> x(4);
             x = -1,-0.447214,0.447214,1;
             Array<double, 1> p(4);
@@ -97,6 +101,7 @@ namespace Nodes1DProvisionerTests {
         } 
 
         It(Should_Generate_1st_Order_Legendre_Polynomial_4pt_Grid) {
+            cout << "Should_Generate_1st_Order_Legendre_Polynomial_4pt_Grid" << endl;
             Array<double, 1> x(4);
             x = -1,-0.447214,0.447214,1;
             Array<double, 1> p(4);
@@ -112,6 +117,7 @@ namespace Nodes1DProvisionerTests {
         } 
 
         It(Should_Generate_4th_Order_Quadrature_Points_and_Weights) {
+            cout << "Should_Generate_4th_Order_Quadrature_Points_and_Weights" << endl;
             
             Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
             
@@ -134,6 +140,7 @@ namespace Nodes1DProvisionerTests {
         }
 
         It(Should_Generate_1st_Order_Quadrature_Points_and_Weights) {
+            cout << "Should_Generate_1st_Order_Quadrature_Points_and_Weights" << endl;
             
             Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
             
@@ -150,6 +157,7 @@ namespace Nodes1DProvisionerTests {
         }
 
         It(Should_Compute_2nd_Order_Quadrature_Points_and_Weights) {
+            cout << "Should_Compute_2nd_Order_Quadrature_Points_and_Weights" << endl;
 
             Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
 
@@ -168,6 +176,7 @@ namespace Nodes1DProvisionerTests {
         }
 
         It(Should_Generate_3rd_Order_Legendre_Gauss_Lobatto_Nodes) {
+            cout << "Should_Generate_3rd_Order_Legendre_Gauss_Lobatto_Nodes" << endl;
             Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
             
             Array<double, 1> x(4);
@@ -180,6 +189,7 @@ namespace Nodes1DProvisionerTests {
         }
 
         It(Should_Build_3rd_Order_Vandermonde_Matrix) {
+            cout << "Should_Build_3rd_Order_Vandermonde_Matrix" << endl;
             Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
 
             nodes1D.buildNodes();
@@ -198,6 +208,7 @@ namespace Nodes1DProvisionerTests {
         }
 
         It(Should_Build_4th_Order_GradVandermonde_Matrix) {
+            cout << "Should_Build_4th_Order_GradVandermonde_Matrix" << endl;
             Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
 
             nodes1D.buildNodes();
@@ -218,6 +229,7 @@ namespace Nodes1DProvisionerTests {
         }
 
         It(Should_Build_3rd_Order_Differentiation_Matrix) {
+            cout << "Should_Build_3rd_Order_Differentiation_Matrix" << endl;
             Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
             nodes1D.buildNodes();
 
@@ -236,6 +248,8 @@ namespace Nodes1DProvisionerTests {
         }
 
         It(Should_Build_A_1D_X_Grid) {
+            cout << "Should_Build_A_1D_X_Grid" << endl;
+
             Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
 
             nodes1D.buildNodes();
@@ -254,6 +268,7 @@ namespace Nodes1DProvisionerTests {
         }
 
         It(Should_Build_Element_To_Vertex_Connectivity) {
+            cout << "Should_Build_Element_To_Vertex_Connectivity" << endl;
             Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
 
             nodes1D.buildNodes();
@@ -268,6 +283,7 @@ namespace Nodes1DProvisionerTests {
         }
 
         It(Should_Compute_Jacobian) {
+            cout << "Should_Compute_Jacobian" << endl;
             Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
 
             nodes1D.buildNodes();
@@ -297,6 +313,7 @@ namespace Nodes1DProvisionerTests {
         }
 
         It(Should_Build_1D_Lift_Operator) {
+            cout << "Should_Build_1D_Lift_Operator" << endl;
             Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
 
             nodes1D.buildNodes();
@@ -316,6 +333,7 @@ namespace Nodes1DProvisionerTests {
         }
 
         It(Should_Build_1D_Connectivity_Matrices) {
+            cout << "Should_Build_1D_Connectivity_Matrices" << endl;
             Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
 
             nodes1D.buildNodes();

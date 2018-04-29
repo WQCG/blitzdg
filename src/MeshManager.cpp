@@ -97,42 +97,49 @@ void MeshManager::printArray(T * & arr, int numRows, int numCols) {
  * MeshManager.get_ElementPartitionMap() and MeshManager.get_VertexPartitionMap().
  */
 void MeshManager::partitionMesh(int numPartitions) {
-    int * metisOptions =  NULL;
-    int * epart = NULL;
-    int * npart = NULL;
-    int * objval;
-
+    int * eind = EToV;
+    int * eptr = new int[NumElements+1];
+    int * objval = new int;
     int * numPartitionsPtr = &numPartitions;
 
     // set up mesh partitioning options
-    metisOptions = new int[METIS_NOPTIONS];
-    metisOptions[METIS_OPTION_PTYPE] = METIS_PTYPE_RB; // default
+    int * metisOptions = new int[METIS_NOPTIONS];
+    metisOptions[METIS_OPTION_PTYPE] = METIS_PTYPE_KWAY;
     metisOptions[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_CUT; // total communication volume minimization.
     metisOptions[METIS_OPTION_CTYPE] = METIS_CTYPE_SHEM;
-    metisOptions[METIS_OPTION_IPTYPE] = METIS_IPTYPE_GROW;
+    metisOptions[METIS_OPTION_IPTYPE] = METIS_IPTYPE_METISRB;
     metisOptions[METIS_OPTION_RTYPE] = METIS_RTYPE_GREEDY;
     metisOptions[METIS_OPTION_NCUTS] = 1;
     metisOptions[METIS_OPTION_NITER] = 10; // default
-    metisOptions[METIS_OPTION_SEED] = 123; // random number seed.
-    metisOptions[METIS_OPTION_UFACTOR] = 30; // max load imbalance of 1.03
-    metisOptions[METIS_OPTION_NUMBERING] = 1; // 1-based numbering.
+    metisOptions[METIS_OPTION_SEED] = -1; // random number seed.
+    metisOptions[METIS_OPTION_UFACTOR] = 1.030; // max load imbalance of 1.03
+    metisOptions[METIS_OPTION_NUMBERING] = 0; // 0-based numbering.
     metisOptions[METIS_OPTION_DBGLVL] = METIS_DBG_INFO; //debug level='info'. 0 for nothing.
+    metisOptions[METIS_OPTION_MINCONN] = 1;
+    metisOptions[METIS_OPTION_NOOUTPUT] = 0;
+    metisOptions[METIS_OPTION_CONTIG] = 1;
 
-    int * eind = EToV;
-    int * eptr = new int[NumElements+1];
+   // output arrays
+    int * epart = new int[NumElements];
+    int * npart = new int[NumVerts];
 
-    // output arrays
-    epart = new int[NumElements];
-    npart = new int[NumVerts];
-    objval = new int;
     // Assume mesh with homogenous element type, then eptr 
     // dictates an equal stride of size ElementType across EToV array.
-    for (int i=0; i <= NumElements; i++)
+    for (int i=0; i <= NumElements; i++) {
         eptr[i] = ElementType*i;
+        cout << eptr[i] << endl;
+    }
 
     *objval = 0;
 
-    int result =  METIS_PartMeshNodal( &NumElements, &NumVerts, eptr, eind, NULL, NULL,
+    int * NE = &NumElements;
+    int * NV = &NumVerts;
+
+    int * ncommon = new int;
+    *ncommon = 1;
+
+    cout << "About to call METIS_PartMeshNodal" << endl;
+    int result =  METIS_PartMeshNodal( NE, NV, eptr, eind, NULL, NULL,
                     numPartitionsPtr, NULL, metisOptions, objval, epart, npart);
 
     if (result == METIS_OK)
@@ -156,7 +163,6 @@ void MeshManager::partitionMesh(int numPartitions) {
 
     ElementPartitionMap = epart;
     VertexPartitionMap = npart;
-
 }
 
 /**
