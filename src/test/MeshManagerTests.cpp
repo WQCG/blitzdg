@@ -3,23 +3,69 @@
 
 #include <igloo/igloo_alt.h>
 #include <MeshManager.hpp>
+#include <whereami.h>
 
 using namespace igloo;
 using namespace std;
-
-MeshManager * meshManager=nullptr;
+using namespace boost;
 
 namespace MeshManagerTests {
+
     Describe(MeshManager_Object) {
+        typedef vector< iterator_range<string::iterator> > find_vector_type;
+
+        MeshManager * meshManager=nullptr;
+        string ExePath;
+        string PathDelimeter;
+
         void SetUp() {
             meshManager = new MeshManager();
+
+            // Deal with paths to the test input files.
+            int cap = 1024;
+            char * pathBuffer = new char[cap];
+            wai_getExecutablePath(pathBuffer, cap, NULL);
+            ExePath = string(pathBuffer);
+
+            find_vector_type FindVec;
+
+            PathDelimeter = "/";
+            replace_last(ExePath, ".exe", "");
+            replace_last(ExePath, "/bin/test", "");
+            find_all( FindVec, ExePath, "\\" );
+            if (FindVec.size() > 0) {
+                PathDelimeter = "\\";
+                replace_last(ExePath, "\\bin\\test", "");
+            }
+        }
+
+        string get_VertexFilePath() {
+            std::vector<std::string> pathVec;
+            pathVec.push_back(ExePath);
+            pathVec.push_back("input");
+            pathVec.push_back("2box.V");
+            return join(pathVec, PathDelimeter);
+        }
+
+        string get_EToVFilePath() {
+            std::vector<std::string> pathVec;
+            pathVec.push_back(ExePath);
+            pathVec.push_back("input");
+            pathVec.push_back("2box.E2V");
+            return join(pathVec, PathDelimeter);
+        }
+
+        void TearDown() {
+            delete meshManager;
         }
 
         It(Reads_Vertex_Files) {
-            cout << "MeshManager" << endl;
+
+            string vertexFile = get_VertexFilePath();
+            cout << "MeshManager Reads Vertex File: " << vertexFile << endl;
             MeshManager & mgr = *meshManager;
 
-            mgr.readVertices("input/2box.V");
+            mgr.readVertices(vertexFile);
 
             Assert::That(mgr.get_NumVerts(), Equals(6));
             Assert::That(mgr.get_Dim(), Equals(2));
@@ -46,10 +92,12 @@ namespace MeshManagerTests {
         }
 
         It(Reads_Element_Files) {
-            cout << "Reads Elements Files" << endl;
+            string eToVFile = get_EToVFilePath();
+
+            cout << "MeshManager Reads Elements Files: " << eToVFile << endl;
             MeshManager & mgr = *meshManager;
 
-            mgr.readElements("input/2box.E2V");
+            mgr.readElements(eToVFile);
 
             Assert::That(mgr.get_NumElements(), Equals(2));
             Assert::That(mgr.get_ElementType(), Equals(4));
@@ -68,26 +116,31 @@ namespace MeshManagerTests {
         }
 
         It(Can_Print_Vertices_And_DoesNotThrow) {
+            string vertexFile = get_VertexFilePath();
             cout << "Can_Print_Vertices_And_DoesNotThrow" << endl;
             MeshManager & mgr = *meshManager;
-            mgr.readVertices("input/2box.V");
-            cout << endl << "Vertices:" << endl;
+            mgr.readVertices(vertexFile);
+            cout << "Vertices:" << endl;
             mgr.printVertices();
         }
 
         It(Can_Print_Elements_And_DoesNotThrow) {
+            string eToVFile = get_EToVFilePath();
             cout << "Can_Print_Elements_And_DoesNotThrow" << endl;
             MeshManager & mgr = *meshManager;
-            mgr.readElements("input/2box.E2V");
+            mgr.readElements(eToVFile);
             cout << endl << "Elements" << endl;
             mgr.printElements();
         }
 
        It(Can_Partition_A_Mesh) {
             cout << "Can_Partition_A_Mesh" << endl;
+            string eToVFile = get_EToVFilePath();
+            string vertexFile = get_VertexFilePath();
+
             MeshManager & mgr = *meshManager;
-            mgr.readVertices("input/2box.V");
-            mgr.readElements("input/2box.E2V");
+            mgr.readVertices(vertexFile);
+            mgr.readElements(eToVFile);
 
             cout << "K: " << mgr.get_NumElements() << endl;
             cout << "Nv: " << mgr.get_NumVerts() << endl;
