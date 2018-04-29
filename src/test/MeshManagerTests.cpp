@@ -15,63 +15,58 @@ namespace MeshManagerTests {
         typedef vector< iterator_range<string::iterator> > find_vector_type;
 
         MeshManager * meshManager=nullptr;
+        string *ExePath = nullptr;
 
         void SetUp() {
             meshManager = new MeshManager();
+            if (ExePath == nullptr) {
+                // Deal with paths to the test input files.
+                int cap = 1024;
+                char * pathBuffer = new char[cap];
+                wai_getExecutablePath(pathBuffer, cap, NULL);
+                ExePath = new string(pathBuffer);
+
+            }
         }
 
-        string get_VertexFilePath() {
-
-            // Deal with paths to the test input files.
-            int cap = 1024;
-            char * pathBuffer = new char[cap];
-            wai_getExecutablePath(pathBuffer, cap, NULL);
-            string ExePath(pathBuffer);
-
+        string get_VertexFilePath() {    
             find_vector_type FindVec;
 
             string PathDelimeter = "/";
-            replace_last(ExePath, ".exe", "");
-            replace_last(ExePath, "/bin/test", "");
-            find_all( FindVec, ExePath, "\\" );
+            string path(*ExePath);
+            replace_last(path, ".exe", "");
+            replace_last(path, "/bin/test", "");
+            find_all( FindVec, path, "\\" );
             if (FindVec.size() > 0) {
                 PathDelimeter = "\\";
-                replace_last(ExePath, "\\bin\\test", "");
+                replace_last(path, "\\bin\\test", "");
             }
 
             std::vector<std::string> pathVec;
-            pathVec.push_back(ExePath);
+            pathVec.push_back(path);
             pathVec.push_back("input");
             pathVec.push_back("2box.V");
 
-            delete pathBuffer;
             return join(pathVec, PathDelimeter);
         }
 
         string get_EToVFilePath() {
-
-            // Deal with paths to the test input files.
-            int cap = 1024;
-            char * pathBuffer = new char[cap];
-            wai_getExecutablePath(pathBuffer, cap, NULL);
-            string ExePath(pathBuffer);
-
+            string path(*ExePath);
             find_vector_type FindVec;
 
             string PathDelimeter = "/";
-            replace_last(ExePath, ".exe", "");
-            replace_last(ExePath, "/bin/test", "");
-            find_all( FindVec, ExePath, "\\" );
+            replace_last(path, ".exe", "");
+            replace_last(path, "/bin/test", "");
+            find_all( FindVec, path, "\\" );
             if (FindVec.size() > 0) {
                 PathDelimeter = "\\";
-                replace_last(ExePath, "\\bin\\test", "");
+                replace_last(path, "\\bin\\test", "");
             }
 
             std::vector<std::string> pathVec;
-            pathVec.push_back(ExePath);
+            pathVec.push_back(path);
             pathVec.push_back("input");
             pathVec.push_back("2box.E2V");
-            delete pathBuffer;
             return join(pathVec, PathDelimeter);
         }
 
