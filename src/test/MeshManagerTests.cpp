@@ -24,7 +24,11 @@ namespace MeshManagerTests {
                 int cap = 1024;
                 char * pathBuffer = new char[cap];
                 int length = wai_getExecutablePath(pathBuffer, cap, NULL);
-                ExePath = new string(pathBuffer);
+                ExePath = new string();
+
+                for(int i=0; i < length; i++) {
+                    *ExePath += pathBuffer[i]; 
+                }
                 trim_right(*ExePath);
             }
         }
