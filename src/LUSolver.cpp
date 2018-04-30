@@ -41,8 +41,8 @@ void LUSolver::factorize() {
     // convert sparse Triplet to compressed column format
     MatrixConverter.fullToCompressedColumn(*A, Ap, Ai, Ax);
 
-    umfpack_di_symbolic(n_rows, n_cols, Ap, Ai, Ax, &Symbolic, null, null);
-    umfpack_di_numeric (Ap, Ai, Ax, Symbolic, &Numeric, null, null) ;
+    umfpack_di_symbolic(n_rows, n_cols, Ap, Ai, Ax, &Symbolic, (double *) NULL, (double *) NULL);
+    umfpack_di_numeric (Ap, Ai, Ax, Symbolic, &Numeric, (double *) NULL, (double *) NULL) ;
     cout << "Done!" << endl;
 }
 
@@ -61,7 +61,7 @@ void LUSolver::solve(Array<double, 1> const & rhs, Array<double,1> & soln) {
     double * x = new double[n];
 
     cout << "Solving Ax = b.." << endl;
-    umfpack_di_solve (UMFPACK_A, Ap, Ai, Ax, x, b, Numeric, null, null);
+    umfpack_di_solve (UMFPACK_A, Ap, Ai, Ax, x, b, Numeric, (double *)NULL, (double  *)NULL);
     cout << "Done." << endl;
 
     for(int i =0; i<n; i++) {
