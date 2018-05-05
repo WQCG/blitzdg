@@ -21,6 +21,12 @@
 using namespace std;
 using namespace blitz;
 
+
+void computeRHS(const Array<double,2> & u, const double c, Nodes1DProvisioner & nodes1D, Array<double,2> & RHS) {
+  //something like: RHS = -c*rx*(Dr*u) + c*LIFT*Fscale*numFlux
+  Array<double,2> & Dr = nodes1D.get_Dr();
+}
+
 int main(int argc, char **argv) {
 	
   // Physical parameters
@@ -36,13 +42,17 @@ int main(int argc, char **argv) {
 	int K = 20;
   double CFL = 0.5;
 
-  //Build dependencies.
+  // Blitz indices
+  firstIndex ii;
+  secondIndex jj;
+
+  // Build dependencies.
   SparseMatrixConverter matrixConverter;
   EigenSolver eigenSolver(matrixConverter);
   DirectSolver directSolver(matrixConverter);
 	Nodes1DProvisioner nodes1DProvisioner(N, K, xmin, xmax, matrixConverter, eigenSolver, directSolver);
 	
-   
+  // Pre-processing. Build grid, and get data we need for initialization.
   nodes1DProvisioner.buildNodes();
   int Np = nodes1DProvisioner.get_NumLocalPoints();
   
@@ -50,24 +60,21 @@ int main(int argc, char **argv) {
   Array<double,2> rx(Np, K);
   nodes1DProvisioner.computeJacobian(J, rx);
 
-
   Array<double,2> & x = nodes1DProvisioner.get_xGrid();
-  Array<double,2> & Dr = nodes1DProvisioner.get_Dr();
-  Array<double,2> & V = nodes1DProvisioner.get_V();
-
-
-  cout << Dr << endl;
-
-  cout << V << endl;
 
   double min_dx = x(1,0) - x(0,0);
 
   double dt = CFL*min_dx/c;
 
-  double u = 1;
+  Array<double, 2> u(Np, K);
+  Array<double, 2> RHS(Np, K);
+
+  u = exp(-5*(x(ii)*x(ii)));
   while (t < finalTime) {
 
-    u = u - dt*c*u;
+    computeRHS(u, c, nodes1DProvisioner, RHS);
+    // Forward Euler time-step for now, to be replaced.
+    u = u + dt*RHS;
 
     cout << u << endl;
     t += dt;
