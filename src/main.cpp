@@ -54,11 +54,9 @@ int main(int argc, char **argv) {
 	
   // Pre-processing. Build grid, and get data we need for initialization.
   nodes1DProvisioner.buildNodes();
+  nodes1DProvisioner.computeJacobian();
+
   int Np = nodes1DProvisioner.get_NumLocalPoints();
-  
-  Array<double,2> J(Np, K);
-  Array<double,2> rx(Np, K);
-  nodes1DProvisioner.computeJacobian(J, rx);
 
   Array<double,2> & x = nodes1DProvisioner.get_xGrid();
 
