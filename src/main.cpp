@@ -21,6 +21,10 @@
 using namespace std;
 using namespace blitz;
 
+// Blitz indices
+firstIndex ii;
+secondIndex jj;
+thirdIndex kk;
 
 void computeRHS(const Array<double,2> & u, const double c, Nodes1DProvisioner & nodes1D, Array<double,2> & RHS) {
   //something like: RHS = -c*rx*(Dr*u) + c*LIFT*Fscale*numFlux
@@ -28,7 +32,7 @@ void computeRHS(const Array<double,2> & u, const double c, Nodes1DProvisioner & 
   Array<double,2> & rx = nodes1D.get_rx();
   Array<double,2> & Lift = nodes1D.get_Lift();
 
-  RHS = -c*rx*(Dr*u);
+  RHS = -c*rx*(sum(Dr(ii,jj)*u(jj,kk), jj));
 }
 
 int main(int argc, char **argv) {
@@ -45,10 +49,6 @@ int main(int argc, char **argv) {
   int N = 4;
 	int K = 20;
   double CFL = 0.5;
-
-  // Blitz indices
-  firstIndex ii;
-  secondIndex jj;
 
   // Build dependencies.
   SparseMatrixConverter matrixConverter;
