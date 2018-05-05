@@ -25,6 +25,10 @@ using namespace blitz;
 void computeRHS(const Array<double,2> & u, const double c, Nodes1DProvisioner & nodes1D, Array<double,2> & RHS) {
   //something like: RHS = -c*rx*(Dr*u) + c*LIFT*Fscale*numFlux
   Array<double,2> & Dr = nodes1D.get_Dr();
+  Array<double,2> & rx = nodes1D.get_rx();
+  Array<double,2> & Lift = nodes1D.get_Lift();
+
+  RHS = -c*rx*(Dr*u);
 }
 
 int main(int argc, char **argv) {
@@ -70,11 +74,11 @@ int main(int argc, char **argv) {
   u = exp(-5*(x(ii)*x(ii)));
   while (t < finalTime) {
 
+    // Calculate Righ-hand side at current time-step.
     computeRHS(u, c, nodes1DProvisioner, RHS);
+
     // Forward Euler time-step for now, to be replaced.
     u = u + dt*RHS;
-
-    cout << u << endl;
     t += dt;
   }
   
