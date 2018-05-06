@@ -34,6 +34,7 @@ int main(int argc, char **argv) {
 	Nodes1DProvisioner nodes1DProvisioner(N, K, xmin, xmax, matrixConverter, eigenSolver, directSolver);
 	
   nodes1DProvisioner.buildNodes();
+  nodes1DProvisioner.computeJacobian();
 
   int Np = nodes1DProvisioner.get_NumLocalPoints();
 
@@ -52,11 +53,6 @@ int main(int argc, char **argv) {
   Array<double,2> x = nodes1DProvisioner.get_xGrid();
 
   cout << x << endl;
-
-  Array<double,2> J(Np, K);
-  Array<double,2> rx(Np, K);
-
-  nodes1DProvisioner.computeJacobian(J, rx);
 
   cout << "Can_Partition_A_Mesh" << endl;
   MeshManager * manager = new MeshManager();
