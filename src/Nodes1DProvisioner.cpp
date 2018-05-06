@@ -30,6 +30,9 @@ Nodes1DProvisioner::Nodes1DProvisioner(int _NOrder, int _NumElements, double _xm
 
     rGrid = new Array<double, 1>(NumLocalPoints);
     xGrid = new Array<double, 2>(NumLocalPoints, NumElements);
+    J =  new Array<double, 2>(NumLocalPoints, NumElements);
+    rx = new Array<double, 2>(NumLocalPoints, NumElements);
+
     Lift = new Array<double, 2>(NumLocalPoints, NumFacePoints*NumFaces);
     EToV = new Array<int, 2>(NumElements, NumFaces);
     EToE = new Array<int, 2>(NumElements, NumFaces);
@@ -178,7 +181,7 @@ void Nodes1DProvisioner::buildLift() {
 /**
  * Compute Jacobian (determinant) J and geometric factor rx (dr/dx) using nodes and differentiation matrix.
  */
-void Nodes1DProvisioner::computeJacobian(Array<double,2> & J, Array<double,2> & rx) {
+void Nodes1DProvisioner::computeJacobian() {
     firstIndex ii;
     secondIndex jj;
     thirdIndex kk;
@@ -186,9 +189,11 @@ void Nodes1DProvisioner::computeJacobian(Array<double,2> & J, Array<double,2> & 
 
     Array<double,2> & x = get_xGrid();
     Array<double,2> & Dr = get_Dr();
+    Array<double,2> & Jref = get_J();
+    Array<double,2> & rxref = get_rx();
 
-    J = sum(Dr(ii,kk)*x(kk,jj), kk);
-    rx = 1/J;
+    Jref = sum(Dr(ii,kk)*x(kk,jj), kk);
+    rxref = 1/Jref;
 }
 
 /**
@@ -294,6 +299,20 @@ Array<double, 2> & Nodes1DProvisioner::get_V() {
     return *V;
 }
 
+/**
+ * Get reference to Jacobian scaling array J.
+ */
+Array<double, 2> & Nodes1DProvisioner::get_J() {
+    return *J;
+}
+
+/**
+ * Get reference to geometric scaling array rx.
+ */
+Array<double, 2> & Nodes1DProvisioner::get_rx() {
+    return *rx;
+}
+
 int Nodes1DProvisioner::get_NumLocalPoints() {
     return NumLocalPoints;
 }
@@ -304,6 +323,8 @@ int Nodes1DProvisioner::get_NumLocalPoints() {
 Nodes1DProvisioner::~Nodes1DProvisioner() {
     delete rGrid;
     delete xGrid;
+    delete J;
+    delete rx;
     delete Lift;
     delete EToV;
     delete EToE;

@@ -23,6 +23,9 @@ class Nodes1DProvisioner {
     Array<double, 2> * V;
     Array<double, 2> * Dr;
     Array<double, 2> * Lift;
+    Array<double, 2> * J;
+    Array<double, 2> * rx;
+
     Array<int, 2> * EToV;
     Array<int, 2> * EToE;
     Array<int, 2> * EToF;
@@ -43,12 +46,15 @@ class Nodes1DProvisioner {
     void buildVandermondeMatrix();
     void buildLift();
     void computeGradVandermonde(Array<double,2> & DVr);
-    void computeJacobian(Array<double,2> & J, Array<double,2> & rx);
+    void computeJacobian();
     
     Array<double, 2> & get_xGrid();
     Array<double, 1> & get_rGrid();
     Array<double, 2> & get_Dr();
     Array<double, 2> & get_V();
+    Array<double, 2> & get_J();
+    Array<double, 2> & get_rx();
+
     Array<int, 2> & get_EToV();
     Array<double, 2> & get_Lift();
   
