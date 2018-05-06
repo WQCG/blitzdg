@@ -45,6 +45,7 @@ class Nodes1DProvisioner {
 
     void buildNodes();
     void buildConnectivityMatrices();
+    void buildFaceMask();
     void buildDr();
     void buildVandermondeMatrix();
     void buildLift();

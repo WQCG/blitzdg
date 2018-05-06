@@ -40,7 +40,7 @@ namespace Nodes1DProvisionerTests {
         }
 
         It(Should_Generate_0th_Order_Legendre_Polynomial) {
-            cout << "Nodes1D" << endl;
+            cout << "Should_Generate_0th_Order_Legendre_Polynomial" << endl;
             Array<double, 1> x(3);
             x = -1.,0.,1.;
             Array<double, 1>  p(3);
@@ -361,6 +361,27 @@ namespace Nodes1DProvisionerTests {
 
             Assert::That(sqrt(sum(resEToE*resEToE)), Equals(0));
             Assert::That(sqrt(sum(resEToF*resEToF)), Equals(0));
+        }
+
+        It(Should_Build_Face_Mask) {
+            cout << "Should_Build_Face_Mask" << endl;
+            Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+            nodes1D.buildNodes();
+
+            Array<int, 1> Fmask = nodes1D.get_Fmask();
+            Array<double, 2> Fx = nodes1D.get_Fx();
+
+            Assert::That(Fmask(0), Equals(0));
+            Assert::That(Fmask(1), Equals(3));
+
+            Array<double, 2> expectedFx(2, 5);
+            expectedFx = -1,-0.6,-0.2,0.2,0.6,
+                         -0.6,-0.2,0.2,0.6,1;
+
+            Array<double, 2> resFx;
+            resFx = Fx - expectedFx;
+
+            Assert::That(sqrt(sum(resFx*resFx)), Equals(0));
         }
     };
 }

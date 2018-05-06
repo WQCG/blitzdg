@@ -34,6 +34,8 @@ Nodes1DProvisioner::Nodes1DProvisioner(int _NOrder, int _NumElements, double _xm
     EToV = new Array<int, 2>(NumElements, NumFaces);
     EToE = new Array<int, 2>(NumElements, NumFaces);
     EToF = new Array<int, 2>(NumElements, NumFaces);
+    Fmask = new Array<int, 1> (NumFacePoints*NumFaces);
+    Fx = new Array<double, 2>(NumFacePoints*NumFaces, NumElements);
 }
 
 /**
@@ -68,6 +70,21 @@ void Nodes1DProvisioner::buildNodes() {
     }
 
     buildConnectivityMatrices();
+    buildFaceMask();
+}
+
+void Nodes1DProvisioner::buildFaceMask() {
+    Array<double, 2> & x = *xGrid;
+    Array<double, 2> & Fxref = *Fx;
+    Array<int, 1> & Fmaskref = *Fmask;
+
+    Fmaskref = 0, (NumLocalPoints - 1);
+
+    for (int k = 0;  k < NumElements; k++) {
+        for (int f = 0; f < NumFacePoints*NumFaces; f++) {
+            Fxref(f, k) = x(Fmaskref(f), k);
+        }
+    }
 }
 
 /**
@@ -294,8 +311,25 @@ Array<double, 2> & Nodes1DProvisioner::get_V() {
     return *V;
 }
 
+/**
+ * Get the number of points per element.
+ */
 int Nodes1DProvisioner::get_NumLocalPoints() {
     return NumLocalPoints;
+}
+
+/**
+ * Get the faces-only x-grid.
+ */
+Array<double, 2> & Nodes1DProvisioner::get_Fx() {
+    return *Fx;
+}
+
+/**
+ * Get the index-mask for the face nodes.
+ */
+Array<int, 1> & Nodes1DProvisioner::get_Fmask() {
+    return *Fmask;
 }
 
 /**
@@ -308,6 +342,8 @@ Nodes1DProvisioner::~Nodes1DProvisioner() {
     delete EToV;
     delete EToE;
     delete EToF;
+    delete Fmask;
+    delete Fx;
 }
 
 /**  Compute the Nth Jacobi polynomial of type (alpha,beta) > -1 ( != -0.5)
