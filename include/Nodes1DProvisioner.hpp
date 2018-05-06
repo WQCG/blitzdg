@@ -50,7 +50,7 @@ class Nodes1DProvisioner {
     void buildVandermondeMatrix();
     void buildLift();
     void computeGradVandermonde(Array<double,2> & DVr);
-    void computeJacobian(Array<double,2> & J, Array<double,2> & rx);
+    void computeJacobian();
     
     Array<double, 2> & get_xGrid();
     Array<double, 1> & get_rGrid();

@@ -288,10 +288,11 @@ namespace Nodes1DProvisionerTests {
 
             nodes1D.buildNodes();
 
-            Array<double,2> J(4, 5), rx(4, 5);
-
             nodes1D.buildDr();
-            nodes1D.computeJacobian(J, rx);
+            nodes1D.computeJacobian();
+
+            Array<double, 2> & J = nodes1D.get_J();
+            Array<double, 2> & rx = nodes1D.get_rx();
 
             Array<double,2> expectedJ(4,5), expectedrx(4,5);
             expectedJ = 0.20000,0.20000,0.20000,0.20000,0.20000,
