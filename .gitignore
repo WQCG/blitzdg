@@ -8,3 +8,9 @@ include/igloo
 .coveralls.yml
 doxygen/
 *.ps.gz
+*.zip
+*.json
+/include/blitz
+/include/boost/
+/include/metis.h
+/include/suitesparse/
