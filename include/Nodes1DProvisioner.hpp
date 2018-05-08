@@ -49,6 +49,7 @@ class Nodes1DProvisioner {
     void buildDr();
     void buildVandermondeMatrix();
     void buildLift();
+    void buildMaps();
     void computeGradVandermonde(Array<double,2> & DVr);
     void computeJacobian();
     

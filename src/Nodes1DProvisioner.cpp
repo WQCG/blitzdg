@@ -76,6 +76,21 @@ void Nodes1DProvisioner::buildNodes() {
     buildFaceMask();
 }
 
+/**
+ * Build volume to surface maps.
+ */
+void Nodes1DProvisioner::buildMaps() {
+    firstIndex ii;
+    Array<double, 1> nodeIds(NumLocalPoints*NumElements);
+
+    nodeIds(Range::all()) = ii;
+
+    cout << "nodeIds: " << nodeIds << endl;
+}
+
+/**
+ *  Build Fmask. Mask that when applied to volume nodes gives the surface nodes.
+ */
 void Nodes1DProvisioner::buildFaceMask() {
     Array<double, 2> & x = *xGrid;
     Array<double, 2> & Fxref = *Fx;

@@ -384,5 +384,11 @@ namespace Nodes1DProvisionerTests {
 
             Assert::That(sqrt(sum(resFx*resFx)), Equals(0));
         }
+
+        It(Should_Build_Volume_Maps) {
+            Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+            nodes1D.buildNodes();
+            nodes1D.buildMaps();
+        }
     };
 }
