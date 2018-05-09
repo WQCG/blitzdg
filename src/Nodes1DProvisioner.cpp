@@ -5,9 +5,11 @@
 #include <math.h>
 #include <Nodes1DProvisioner.hpp>
 #include <SparseTriplet.hpp>
+#include <Types.hpp>
 
 using namespace std;
 using namespace blitz;
+using namespace blitzdg;
 
 const int Nodes1DProvisioner::NumFacePoints = 1;
 const int Nodes1DProvisioner::NumFaces = 2;
@@ -81,11 +83,33 @@ void Nodes1DProvisioner::buildNodes() {
  */
 void Nodes1DProvisioner::buildMaps() {
     firstIndex ii;
-    Array<double, 1> nodeIds(NumLocalPoints*NumElements);
+    secondIndex jj;
 
-    nodeIds(Range::all()) = ii;
+    cout << NumLocalPoints << endl;
+    cout << NumElements << endl;
 
-    cout << "nodeIds: " << nodeIds << endl;
+    index_matrix_type nodeIds(NumLocalPoints, NumElements);
+    index_vector_type vmapM(NumFacePoints*NumFaces*NumElements);
+    index_vector_type vmapP(NumFacePoints*NumFaces*NumElements);
+
+    index_vector_type & Fmsk = *Fmask;
+
+    // Assemble global volume node numbering.
+    nodeIds = ii + NumLocalPoints*jj;
+
+    vmapM = 0*ii;
+    vmapP = 0*ii;
+
+    index_type count=0;
+    for (index_type k = 0; k < NumElements; k++) {
+        for( index_type f = 0; f < NumFaces; f++ ) {
+            vmapM(count) = nodeIds(Fmsk(f), k);
+            count++;
+        }
+    }
+
+    cout << "vmapM: " << vmapM << endl;
+    cout << "vmapP: " << vmapP << endl;
 }
 
 /**
