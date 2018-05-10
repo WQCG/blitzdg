@@ -13,6 +13,7 @@ using namespace blitzdg;
 
 const int Nodes1DProvisioner::NumFacePoints = 1;
 const int Nodes1DProvisioner::NumFaces = 2;
+const double Nodes1DProvisioner::NodeTol = 1.e-5;
 
 /**
  * Constructor. Takes order of polynomials, number of elements, and dimensions of the domain.
@@ -41,6 +42,9 @@ Nodes1DProvisioner::Nodes1DProvisioner(int _NOrder, int _NumElements, double _xm
     EToF = new Array<int, 2>(NumElements, NumFaces);
     Fmask = new Array<int, 1> (NumFacePoints*NumFaces);
     Fx = new Array<double, 2>(NumFacePoints*NumFaces, NumElements);
+
+    vmapM = new index_vector_type(NumFacePoints*NumFaces*NumElements);
+    vmapP = new index_vector_type(NumFacePoints*NumFaces*NumElements);
 }
 
 /**
@@ -85,31 +89,69 @@ void Nodes1DProvisioner::buildMaps() {
     firstIndex ii;
     secondIndex jj;
 
-    cout << NumLocalPoints << endl;
-    cout << NumElements << endl;
-
     index_matrix_type nodeIds(NumLocalPoints, NumElements);
-    index_vector_type vmapM(NumFacePoints*NumFaces*NumElements);
-    index_vector_type vmapP(NumFacePoints*NumFaces*NumElements);
+    //index_vector_type vmapM(NumFacePoints*NumFaces*NumElements);
+    //index_vector_type vmapP(NumFacePoints*NumFaces*NumElements);
 
+    // Set up reference to the objects we need to interact with.
+    SparseMatrixConverter & matConverter = *MatrixConverter;
+    
     index_vector_type & Fmsk = *Fmask;
+    index_vector_type & vmM = *vmapM;
+    index_vector_type & vmP = *vmapP;
+
+    index_matrix_type & E2E = *EToE;
+    index_matrix_type & E2F = *EToF;
+    matrix_type & xmat = *xGrid;
+
+    matrix_type xmatTrans(NumElements, NumLocalPoints);
+    xmatTrans = xmat(jj,ii);
+
+
+    cout << "x:" << xmat << endl;
+
+    double * x = new double[NumElements*NumLocalPoints];
+    matConverter.fullToPodArray(xmatTrans, x);
 
     // Assemble global volume node numbering.
     nodeIds = ii + NumLocalPoints*jj;
 
-    vmapM = 0*ii;
-    vmapP = 0*ii;
+    cout << nodeIds << endl;
+
+    vmM = 0*ii;
+    vmP = 0*ii;
 
     index_type count=0;
     for (index_type k = 0; k < NumElements; k++) {
         for( index_type f = 0; f < NumFaces; f++ ) {
-            vmapM(count) = nodeIds(Fmsk(f), k);
+            vmM(count) = nodeIds(Fmsk(f), k);
             count++;
         }
     }
 
-    cout << "vmapM: " << vmapM << endl;
-    cout << "vmapP: " << vmapP << endl;
+    count = 0;
+    for (index_type k1=0; k1 < NumElements; k1++) {
+        for (index_type f1=0; f1 < NumFaces; f1++) {
+            index_type k2 = E2E(k1, f1);
+            index_type f2 = E2F(k1, f1);
+
+            index_type vidM = vmM(k1*NumFaces + f1);
+            index_type vidP = vmM(k2*NumFaces + f2);
+
+            real_type x1 = x[vidM];
+            real_type x2 = x[vidP];
+
+            real_type dist = sqrt(pow(x1 - x2, 2));
+
+            if ( dist < NodeTol) {
+                vmP(count) = vidP;
+            }
+            count++;
+        }
+    }
+
+    cout << "vmapM: " << vmM << endl;
+    cout << "vmapP: " << vmP << endl;
 }
 
 /**
@@ -388,6 +430,20 @@ Array<int, 1> & Nodes1DProvisioner::get_Fmask() {
 }
 
 /**
+ * Get the volume to surface map, 'minus' traces.
+ */
+index_vector_type & Nodes1DProvisioner::get_vmapM() {
+    return *vmapM;
+}
+
+/**
+ * Get the volume to surface map, 'plus' traces.
+ */
+index_vector_type & Nodes1DProvisioner::get_vmapP() {
+    return *vmapP;
+}
+
+/**
  * Destructor.
  */
 Nodes1DProvisioner::~Nodes1DProvisioner() {
@@ -401,6 +457,8 @@ Nodes1DProvisioner::~Nodes1DProvisioner() {
     delete EToF;
     delete Fmask;
     delete Fx;
+    delete vmapM;
+    delete vmapP;
 }
 
 /**  Compute the Nth Jacobi polynomial of type (alpha,beta) > -1 ( != -0.5)
@@ -473,7 +531,6 @@ void Nodes1DProvisioner::computeJacobiQuadWeights(double alpha, double beta, int
     }
     J = J(ii,jj) + J(jj,ii);
 
-    //SparseMatrixConverter & matConverter = *MatrixConverter;
     EigenSolver & eigSolver = *EigSolver;
     
     Array<double, 2> eigenvectors(N+1, N+1);

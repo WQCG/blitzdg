@@ -7,10 +7,12 @@
 #include <LUSolver.hpp>
 #include <EigenSolver.hpp>
 #include <DirectSolver.hpp>
+#include <Types.hpp>
 
 using namespace igloo;
 using namespace blitz;
 using namespace std;
+using namespace blitzdg;
 
 namespace Nodes1DProvisionerTests {
     const int N=5;
@@ -389,6 +391,24 @@ namespace Nodes1DProvisionerTests {
             Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
             nodes1D.buildNodes();
             nodes1D.buildMaps();
+
+            index_vector_type vmapM = nodes1D.get_vmapM();
+            index_vector_type vmapP = nodes1D.get_vmapP();
+
+            index_vector_type expectedVmapM(10);
+            index_vector_type expectedVmapP(10);
+
+            expectedVmapM = 0,3,4,7,8,11,12,15,16,19;
+            expectedVmapP = 0,4,3,8,7,12,11,16,15,19;
+
+            index_vector_type resVmapM(10);
+            index_vector_type resVmapP(10);
+
+            resVmapM = vmapM - expectedVmapM;
+            resVmapP = vmapP - expectedVmapP;
+
+            Assert::That(sqrt(sum(resVmapM*resVmapM)), Equals(0));
+            Assert::That(sqrt(sum(resVmapP*resVmapP)), Equals(0));
         }
     };
 }

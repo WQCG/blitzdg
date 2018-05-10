@@ -6,6 +6,7 @@
 #include <SparseMatrixConverter.hpp>
 #include <EigenSolver.hpp>
 #include <DirectSolver.hpp>
+#include <Types.hpp>
 
 using namespace std;
 using namespace blitz;
@@ -33,6 +34,9 @@ class Nodes1DProvisioner {
     Array<int, 2> * EToE;
     Array<int, 2> * EToF;
 
+    blitzdg::index_vector_type * vmapM;
+    blitzdg::index_vector_type * vmapP;
+
     SparseMatrixConverter * MatrixConverter;
     EigenSolver * EigSolver;
     DirectSolver * LinSolver;
@@ -40,6 +44,7 @@ class Nodes1DProvisioner {
   public:
     static const int NumFacePoints;
     static const int NumFaces;
+    static const double NodeTol;
 
     Nodes1DProvisioner(int NOrder, int NumElements, double xmin, double xmax, SparseMatrixConverter & converter, EigenSolver & eigenSolver, DirectSolver & directSolver);
 
@@ -68,6 +73,10 @@ class Nodes1DProvisioner {
   
     Array<int, 2> & get_EToE();
     Array<int, 2> & get_EToF();
+
+    blitzdg::index_vector_type & get_vmapM();
+    blitzdg::index_vector_type & get_vmapP();
+
     int get_NumLocalPoints();
 
     // these can be moved to a helper (polynomials) class or made private within this class.
