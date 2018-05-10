@@ -7,10 +7,12 @@
 #include <LUSolver.hpp>
 #include <EigenSolver.hpp>
 #include <DirectSolver.hpp>
+#include <Types.hpp>
 
 using namespace igloo;
 using namespace blitz;
 using namespace std;
+using namespace blitzdg;
 
 namespace Nodes1DProvisionerTests {
     const int N=5;
@@ -40,7 +42,7 @@ namespace Nodes1DProvisionerTests {
         }
 
         It(Should_Generate_0th_Order_Legendre_Polynomial) {
-            cout << "Nodes1D" << endl;
+            cout << "Should_Generate_0th_Order_Legendre_Polynomial" << endl;
             Array<double, 1> x(3);
             x = -1.,0.,1.;
             Array<double, 1>  p(3);
@@ -273,7 +275,7 @@ namespace Nodes1DProvisionerTests {
 
             nodes1D.buildNodes();
 
-            Array<int, 2> EToV = nodes1D.get_EToV();
+            const index_matrix_type & EToV = nodes1D.get_EToV();
 
             Assert::That(EToV(0,0), Equals(0)); Assert::That(EToV(0,1), Equals(1));
             Assert::That(EToV(1,0), Equals(1)); Assert::That(EToV(1,1), Equals(2));
@@ -362,6 +364,51 @@ namespace Nodes1DProvisionerTests {
 
             Assert::That(sqrt(sum(resEToE*resEToE)), Equals(0));
             Assert::That(sqrt(sum(resEToF*resEToF)), Equals(0));
+        }
+
+        It(Should_Build_Face_Mask) {
+            cout << "Should_Build_Face_Mask" << endl;
+            Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+            nodes1D.buildNodes();
+
+            Array<int, 1> Fmask = nodes1D.get_Fmask();
+            Array<double, 2> Fx = nodes1D.get_Fx();
+
+            Assert::That(Fmask(0), Equals(0));
+            Assert::That(Fmask(1), Equals(3));
+
+            Array<double, 2> expectedFx(2, 5);
+            expectedFx = -1,-0.6,-0.2,0.2,0.6,
+                         -0.6,-0.2,0.2,0.6,1;
+
+            Array<double, 2> resFx;
+            resFx = Fx - expectedFx;
+
+            Assert::That(sqrt(sum(resFx*resFx)), Equals(0));
+        }
+
+        It(Should_Build_Volume_Maps) {
+            Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+            nodes1D.buildNodes();
+            nodes1D.buildMaps();
+
+            index_vector_type vmapM = nodes1D.get_vmapM();
+            index_vector_type vmapP = nodes1D.get_vmapP();
+
+            index_vector_type expectedVmapM(10);
+            index_vector_type expectedVmapP(10);
+
+            expectedVmapM = 0,3,4,7,8,11,12,15,16,19;
+            expectedVmapP = 0,4,3,8,7,12,11,16,15,19;
+
+            index_vector_type resVmapM(10);
+            index_vector_type resVmapP(10);
+
+            resVmapM = vmapM - expectedVmapM;
+            resVmapP = vmapP - expectedVmapP;
+
+            Assert::That(sqrt(sum(resVmapM*resVmapM)), Equals(0));
+            Assert::That(sqrt(sum(resVmapP*resVmapP)), Equals(0));
         }
     };
 }
