@@ -90,8 +90,6 @@ void Nodes1DProvisioner::buildMaps() {
     secondIndex jj;
 
     index_matrix_type nodeIds(NumLocalPoints, NumElements);
-    //index_vector_type vmapM(NumFacePoints*NumFaces*NumElements);
-    //index_vector_type vmapP(NumFacePoints*NumFaces*NumElements);
 
     // Set up reference to the objects we need to interact with.
     SparseMatrixConverter & matConverter = *MatrixConverter;
