@@ -74,8 +74,8 @@ class Nodes1DProvisioner {
     Array<int, 2> & get_EToE();
     Array<int, 2> & get_EToF();
 
-    blitzdg::index_vector_type & get_vmapM();
-    blitzdg::index_vector_type & get_vmapP();
+    const blitzdg::index_vector_type & get_vmapM();
+    const blitzdg::index_vector_type & get_vmapP();
 
     int get_NumLocalPoints();
 

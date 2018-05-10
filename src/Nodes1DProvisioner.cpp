@@ -422,14 +422,14 @@ Array<int, 1> & Nodes1DProvisioner::get_Fmask() {
 /**
  * Get the volume to surface map, 'minus' traces.
  */
-index_vector_type & Nodes1DProvisioner::get_vmapM() {
+const index_vector_type & Nodes1DProvisioner::get_vmapM() {
     return *vmapM;
 }
 
 /**
  * Get the volume to surface map, 'plus' traces.
  */
-index_vector_type & Nodes1DProvisioner::get_vmapP() {
+const index_vector_type & Nodes1DProvisioner::get_vmapP() {
     return *vmapP;
 }
 
