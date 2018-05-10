@@ -15,8 +15,8 @@ TESTOBJECTS := $(patsubst build/main.o,,$(ALLOBJECTS))
 CFLAGS := -g -Wall -std=c++0x -fprofile-arcs -ftest-coverage
 LINKERFLAGS := -fprofile-arcs
 INC := -I include -I /usr/include
-LIB := -L lib -lblitz -lmetis -lumfpack -llapack -lblas 
-EXPLICITLIBS := -lamd -lcholmod -lcolamd -lsuitesparseconfig -lgfortran -lquadmath -lmingwex
+LIB := -L lib -lblitz -lmetis -lumfpack -llapack -lblas
+EXPLICITLIBS := -lgfortran -lcholmod -lamd -lcolamd -lquadmath -lsuitesparseconfig
 
 ifeq ($(OS), Windows_NT)
 	LIB += $(EXPLICITLIBS)
