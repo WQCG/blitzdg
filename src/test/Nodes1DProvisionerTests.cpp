@@ -275,7 +275,7 @@ namespace Nodes1DProvisionerTests {
 
             nodes1D.buildNodes();
 
-            Array<int, 2> EToV = nodes1D.get_EToV();
+            const index_matrix_type & EToV = nodes1D.get_EToV();
 
             Assert::That(EToV(0,0), Equals(0)); Assert::That(EToV(0,1), Equals(1));
             Assert::That(EToV(1,0), Equals(1)); Assert::That(EToV(1,1), Equals(2));
