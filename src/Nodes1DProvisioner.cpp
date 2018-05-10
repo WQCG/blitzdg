@@ -131,10 +131,8 @@ void Nodes1DProvisioner::buildMaps() {
             index_type vidM = vmM(k1*NumFaces + f1);
             index_type vidP = vmM(k2*NumFaces + f2);
 
-            real_type x1 = x[vidM];
-            real_type x2 = x[vidP];
-
-            real_type dist = sqrt(pow(x1 - x2, 2));
+            real_type dx = x[vidM] - x[vidP];
+            real_type dist = sqrt(dx * dx);
 
             if ( dist < NodeTol) {
                 vmP(count) = vidP;
