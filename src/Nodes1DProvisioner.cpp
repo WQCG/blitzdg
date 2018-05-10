@@ -107,16 +107,11 @@ void Nodes1DProvisioner::buildMaps() {
     matrix_type xmatTrans(NumElements, NumLocalPoints);
     xmatTrans = xmat(jj,ii);
 
-
-    cout << "x:" << xmat << endl;
-
     double * x = new double[NumElements*NumLocalPoints];
     matConverter.fullToPodArray(xmatTrans, x);
 
     // Assemble global volume node numbering.
     nodeIds = ii + NumLocalPoints*jj;
-
-    cout << nodeIds << endl;
 
     vmM = 0*ii;
     vmP = 0*ii;
@@ -149,9 +144,6 @@ void Nodes1DProvisioner::buildMaps() {
             count++;
         }
     }
-
-    cout << "vmapM: " << vmM << endl;
-    cout << "vmapP: " << vmP << endl;
 }
 
 /**
