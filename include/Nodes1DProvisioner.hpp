@@ -17,6 +17,11 @@ class Nodes1DProvisioner {
     int NumElements;
     int NOrder;
     int NumLocalPoints;
+
+    blitzdg::index_type mapI;
+    blitzdg::index_type mapO;
+    blitzdg::index_type vmapI;
+    blitzdg::index_type vmapO;
     
     Array<double, 2> * xGrid;
     Array<double, 1> * rGrid;
@@ -76,6 +81,11 @@ class Nodes1DProvisioner {
 
     const blitzdg::index_vector_type & get_vmapM();
     const blitzdg::index_vector_type & get_vmapP();
+
+    const blitzdg::index_type get_mapI();
+    const blitzdg::index_type get_mapO();
+    const blitzdg::index_type get_vmapI();
+    const blitzdg::index_type get_vmapO();
 
     int get_NumLocalPoints();
 

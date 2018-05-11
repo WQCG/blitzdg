@@ -30,6 +30,10 @@ Nodes1DProvisioner::Nodes1DProvisioner(int _NOrder, int _NumElements, double _xm
 
     // This is true in 1D only.
     NumLocalPoints = NOrder + 1;
+    mapI = 0;
+    mapO = NumFacePoints*NumFaces*NumElements - 1;
+    vmapI = 0;
+    vmapO = NumLocalPoints*NumElements - 1;
 
     rGrid = new Array<double, 1>(NumLocalPoints);
     xGrid = new Array<double, 2>(NumLocalPoints, NumElements);
@@ -431,6 +435,25 @@ const index_vector_type & Nodes1DProvisioner::get_vmapM() {
  */
 const index_vector_type & Nodes1DProvisioner::get_vmapP() {
     return *vmapP;
+}
+
+/**
+ * Get the surface index of the inflow boundary.
+ */
+const index_type Nodes1DProvisioner::get_mapI() {
+    return mapI;
+}
+
+const index_type Nodes1DProvisioner::get_mapO() {
+    return mapO;
+}
+
+const index_type Nodes1DProvisioner::get_vmapI() {
+    return vmapI;
+}
+
+const index_type Nodes1DProvisioner::get_vmapO() {
+    return vmapO;
 }
 
 /**
