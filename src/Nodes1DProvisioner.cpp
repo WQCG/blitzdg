@@ -46,6 +46,7 @@ Nodes1DProvisioner::Nodes1DProvisioner(int _NOrder, int _NumElements, double _xm
     EToF = new Array<int, 2>(NumElements, NumFaces);
     Fmask = new Array<int, 1> (NumFacePoints*NumFaces);
     Fx = new Array<double, 2>(NumFacePoints*NumFaces, NumElements);
+    Fscale = new matrix_type(NumFacePoints*NumFaces, NumElements);
 
     vmapM = new index_vector_type(NumFacePoints*NumFaces*NumElements);
     vmapP = new index_vector_type(NumFacePoints*NumFaces*NumElements);
@@ -165,6 +166,7 @@ void Nodes1DProvisioner::buildFaceMask() {
     }
 }
 
+
 /**
  * Build global connectivity matrices (EToE, EToF) for 1D grid
  * based using EToV (Element-to-Vertex) matrix.
@@ -271,21 +273,29 @@ void Nodes1DProvisioner::buildLift() {
 }
 
 /**
- * Compute Jacobian (determinant) J and geometric factor rx (dr/dx) using nodes and differentiation matrix.
+ * Compute Jacobian (determinant) J and geometric factor rx (dr/dx), and Fscale using nodes and differentiation matrix.
  */
 void Nodes1DProvisioner::computeJacobian() {
     firstIndex ii;
     secondIndex jj;
     thirdIndex kk;
 
-
     Array<double,2> & x = get_xGrid();
     Array<double,2> & Dr = get_Dr();
     Array<double,2> & Jref = get_J();
     Array<double,2> & rxref = get_rx();
 
+    matrix_type & Fscaleref = *Fscale;
+
+    // is Fmask not intiialized at this point?
+    index_vector_type & Fmsk = get_Fmask();
+
     Jref = sum(Dr(ii,kk)*x(kk,jj), kk);
     rxref = 1/Jref;
+
+    for(index_type f=0; f < NumFaces; f++) {
+        Fscaleref(f, Range::all()) = 1/Jref(Fmsk(f), Range::all());
+    }
 }
 
 /**
@@ -417,6 +427,14 @@ Array<double, 2> & Nodes1DProvisioner::get_Fx() {
 }
 
 /**
+ * Get the Face-scaling factor (Inverse of Jacobian at Face nodes).
+ */
+
+const matrix_type & Nodes1DProvisioner::get_Fscale() {
+    return *Fscale;
+}
+
+/**
  * Get the index-mask for the face nodes.
  */
 Array<int, 1> & Nodes1DProvisioner::get_Fmask() {
@@ -470,6 +488,7 @@ Nodes1DProvisioner::~Nodes1DProvisioner() {
     delete EToF;
     delete Fmask;
     delete Fx;
+    delete Fscale;
     delete vmapM;
     delete vmapP;
 }

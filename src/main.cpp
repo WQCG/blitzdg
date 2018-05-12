@@ -32,7 +32,7 @@ void computeRHS(const Array<double,2> & u, const double c, Nodes1DProvisioner & 
   Array<double,2> & rx = nodes1D.get_rx();
   Array<double,2> & Lift = nodes1D.get_Lift();
 
-  RHS = -c*rx*(sum(Dr(ii,jj)*u(jj,kk), jj));
+  //RHS = -c*rx*(sum(Dr(ii,jj)*u(jj,kk), jj));
 }
 
 int main(int argc, char **argv) {

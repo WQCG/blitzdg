@@ -35,6 +35,8 @@ class Nodes1DProvisioner {
     Array<int, 1> * Fmask;
     Array<double, 2> * Fx;
 
+    blitzdg::matrix_type *Fscale;
+
     Array<int, 2> * EToV;
     Array<int, 2> * EToE;
     Array<int, 2> * EToF;
@@ -72,6 +74,7 @@ class Nodes1DProvisioner {
 
     Array<int, 1> & get_Fmask();
     Array<double, 2> & get_Fx();
+    const blitzdg::matrix_type & get_Fscale();
 
     Array<int, 2> & get_EToV();
     Array<double, 2> & get_Lift();
