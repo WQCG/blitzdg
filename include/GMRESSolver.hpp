@@ -319,7 +319,7 @@ GMRESOut GMRESSolver::solve(Matvec mvec, Precon precon, const vector_type& b,
         // check for stagnation
         bool stagnated = true;
         for (index_type j = 0; j < N; ++j) {
-            if (x(j) !=  real_type(0) && 
+            if (x(j) != real_type(0) && 
             std::abs(pv(j)) > params.stgTol * std::abs(x(j))) 
             {
                 stagnated = false;

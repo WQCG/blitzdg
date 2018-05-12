@@ -35,7 +35,7 @@ namespace GMRESSolverTests {
     GMRESSolver* solver = nullptr;
 
     Describe(GMRESSolver_Object) {
-        void Setup() {
+        void SetUp() {
             solver = new GMRESSolver();
         }
 
