@@ -340,8 +340,8 @@ namespace Nodes1DProvisionerTests {
             Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
 
             nodes1D.buildNodes();
-            Array<int, 2> EToE = nodes1D.get_EToE();
-            Array<int, 2> EToF = nodes1D.get_EToF();
+            Array<int, 2> & EToE = nodes1D.get_EToE();
+            Array<int, 2> & EToF = nodes1D.get_EToF();
 
             Array<int, 2> expectedEToE(5,2);
             expectedEToE = 0,1,
