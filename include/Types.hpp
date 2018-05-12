@@ -7,4 +7,6 @@ namespace blitzdg {
     using real_type = double;
     using vector_type = blitz::Array<double, 1>;
     using matrix_type = blitz::Array<double, 2>;
+    using index_vector_type = blitz::Array<int, 1>;
+    using index_matrix_type = blitz::Array<int, 2>;
 }

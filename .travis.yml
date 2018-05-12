@@ -1,4 +1,7 @@
 language: cpp
+addons:
+  apt:
+    update: true
 before_install:
   - pip install --user cpp-coveralls
 install: make get-deps

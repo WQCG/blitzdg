@@ -6,6 +6,7 @@
 #include <SparseMatrixConverter.hpp>
 #include <EigenSolver.hpp>
 #include <DirectSolver.hpp>
+#include <Types.hpp>
 
 using namespace std;
 using namespace blitz;
@@ -26,9 +27,15 @@ class Nodes1DProvisioner {
     Array<double, 2> * J;
     Array<double, 2> * rx;
 
+    Array<int, 1> * Fmask;
+    Array<double, 2> * Fx;
+
     Array<int, 2> * EToV;
     Array<int, 2> * EToE;
     Array<int, 2> * EToF;
+
+    blitzdg::index_vector_type * vmapM;
+    blitzdg::index_vector_type * vmapP;
 
     SparseMatrixConverter * MatrixConverter;
     EigenSolver * EigSolver;
@@ -37,14 +44,17 @@ class Nodes1DProvisioner {
   public:
     static const int NumFacePoints;
     static const int NumFaces;
+    static const double NodeTol;
 
     Nodes1DProvisioner(int NOrder, int NumElements, double xmin, double xmax, SparseMatrixConverter & converter, EigenSolver & eigenSolver, DirectSolver & directSolver);
 
     void buildNodes();
     void buildConnectivityMatrices();
+    void buildFaceMask();
     void buildDr();
     void buildVandermondeMatrix();
     void buildLift();
+    void buildMaps();
     void computeGradVandermonde(Array<double,2> & DVr);
     void computeJacobian();
     
@@ -55,11 +65,18 @@ class Nodes1DProvisioner {
     Array<double, 2> & get_J();
     Array<double, 2> & get_rx();
 
+    Array<int, 1> & get_Fmask();
+    Array<double, 2> & get_Fx();
+
     Array<int, 2> & get_EToV();
     Array<double, 2> & get_Lift();
   
     Array<int, 2> & get_EToE();
     Array<int, 2> & get_EToF();
+
+    const blitzdg::index_vector_type & get_vmapM();
+    const blitzdg::index_vector_type & get_vmapP();
+
     int get_NumLocalPoints();
 
     // these can be moved to a helper (polynomials) class or made private within this class.
