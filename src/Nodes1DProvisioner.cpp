@@ -141,7 +141,7 @@ void Nodes1DProvisioner::buildMaps() {
         }
     }
 
-    delete x;
+    delete[] x;
 }
 
 /**
