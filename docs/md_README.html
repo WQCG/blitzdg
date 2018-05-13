@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.11"/>
-<title>blitzdg: We&#39;ve moved!</title>
+<title>blitzdg: blitzdg</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -77,10 +77,51 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="headertitle">
-<div class="title">We've moved! </div>  </div>
+<div class="title">blitzdg </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>To <a href="https://github.com/WQCG/blitzdg" title="WQCG blitzdg repo">https://github.com/WQCG/blitzdg</a>. </p>
+<div class="textblock"><p>blitzdg is an open-source project aiming to implement parallel discontinuous Galerkin (dg) solvers for common partial differential equations systems using blitz++ for array and tensor manipulations and MPI for distributed parallelism.</p>
+<p><a href="https://travis-ci.org/WQCG/blitzdg"></a> <a href="https://coveralls.io/github/WQCG/blitzdg?branch=master"></a> <a href="https://ci.appveyor.com/project/WQCG/blitzdg"></a></p>
+<h2>Running</h2>
+<p>Build and development support has broadened from linux only to Mac OSX and Windows systems. Tested with GNU make (written to be cross-platform) and g++ on linux/MinGW64/Mac OSX Sierra.</p>
+<ol type="1">
+<li><code>git clone <a href="https://github.com/dsteinmo/blitzdg.git">https://github.com/dsteinmo/blitzdg.git</a></code></li>
+<li><code>cd blitzdg &amp;&amp; ./pull-deps.sh</code></li>
+<li><code>make &amp;&amp; ./bin/blitzdg</code> (The binary currently doesn't do much).</li>
+<li>Run unit tests with <code>make test</code>.</li>
+</ol>
+<h3>Running with Docker</h3>
+<p>You can also run the build and tests inside a docker (linux) container.</p>
+<ol type="1">
+<li><code>git clone <a href="https://github.com/dsteinmo/blitzdg.git">https://github.com/dsteinmo/blitzdg.git</a> &amp;&amp; cd blitzdg</code></li>
+<li><code>docker build -t blitzdg .</code></li>
+<li><code>docker run -t blitzdg</code></li>
+</ol>
+<h2>Dependencies</h2>
+<p>So far:</p>
+<ul>
+<li><code>blitz++</code></li>
+<li><code>SuiteSparse (umfpack)</code></li>
+<li><code>LAPACK</code></li>
+<li><code>metis</code></li>
+<li><code>boost</code></li>
+<li><code>igloo</code> for BDD-style testing.</li>
+</ul>
+<p>Dependency installation is outlined in <code>pull-deps.sh</code> (tested on Ubuntu) and <code>pull-deps-mac.sh</code>.</p>
+<h3>Windows Dependencies</h3>
+<p>The Windows build requires <a href="http://www.mingw.org/wiki/Getting_Started" title="MinGW Installation Instructions">MinGW/MinGW64</a> and is currently tested in the AppVeyor CI process. There is currently not a Visual Studio/MSVC build.</p>
+<p>Run <code>.\pull-deps.ps1</code> in Powershell (4+ or Powershell Core (<code>pwsh</code>)).</p>
+<h2>Contributing</h2>
+<p>We accept pull requests.</p>
+<p>If you add code, please write tests using the igloo testing framework that is included as a project dependency.</p>
+<h2>Maintainer</h2>
+<ul>
+<li><a href="https://github.com/dsteinmo">Derek Steinmoeller</a></li>
+</ul>
+<h2>Documentation</h2>
+<p><a href="https://dsteinmo.github.io/blitzdg" title="blitzdg Documentation">Here</a></p>
+<h2>License</h2>
+<p><a href="https://www.gnu.org/licenses/gpl-3.0.en.html" title="GPLv3 License">GNU Public License Version 3</a> </p>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
