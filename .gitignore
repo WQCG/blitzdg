@@ -10,6 +10,7 @@ doxygen/
 *.ps.gz
 *.zip
 *.json
+*.stackdump
 /include/blitz
 /include/boost/
 /include/metis.h

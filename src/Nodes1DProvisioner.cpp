@@ -141,7 +141,7 @@ void Nodes1DProvisioner::buildMaps() {
         }
     }
 
-    delete x;
+    delete[] x;
 }
 
 /**
@@ -196,6 +196,9 @@ void Nodes1DProvisioner::buildConnectivityMatrices() {
     Array<double, 2> FToF(totalFaces, totalFaces);
     Array<double, 2> I(totalFaces, totalFaces);
 
+    FToF = 0*jj;
+    I = 0*jj;
+
     for (int f=0; f < totalFaces; f++)
         I(f,f) = 1;
 
@@ -204,6 +207,9 @@ void Nodes1DProvisioner::buildConnectivityMatrices() {
 
     Array<int,1> f1(totalFaces - 2); // '- 2' => for physical boundaries.
     Array<int,1> f2(totalFaces - 2);
+
+    f1 = 0*ii;
+    f2 = 0*ii;
 
     int connectionsCount = 0;
     for (int i=0; i < totalFaces; i++) {
@@ -303,19 +309,20 @@ void Nodes1DProvisioner::buildVandermondeMatrix() {
  * Build differentiation matrix Dr on the standard element.
  */
 void Nodes1DProvisioner::buildDr() {
+    firstIndex ii;
+    secondIndex jj;
+
     Dr = new Array<double, 2>(NOrder+1, NOrder+1);
 
     Array<double, 2> & Vref = *V;
     Array<double, 2> & Drref = *Dr;
 
     Array<double, 2> DVr(NOrder+1, NOrder+1);
+    DVr = 0.*jj;
 
     computeGradVandermonde(DVr);
 
     // Dr = DVr / V;
-
-    firstIndex ii;
-    secondIndex jj;
 
     Array<double, 2> Vtrans(NOrder+1, NOrder+1);
     Array<double, 2> DVrtrans(NOrder+1, NOrder+1);
@@ -574,8 +581,10 @@ void Nodes1DProvisioner::computeGradJacobi(Array<double,1> const & x, const doub
 
 void Nodes1DProvisioner::computeGradVandermonde(Array<double,2> & DVr) {
 
+    firstIndex ii;
     for (int i=0; i<=NOrder; i++) {
         Array<double, 1> dp(NOrder+1);
+        dp = 0.*ii;
         computeGradJacobi(*rGrid, 0.0, 0.0, i, dp);
         DVr(Range::all(), i) = dp;
     }
