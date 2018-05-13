@@ -17,5 +17,3 @@ deploy:
   skip_cleanup: true
   bucket: "dsteinmo-libs"
   local_dir: bin
-  on:
-    branch: gmresSolver
