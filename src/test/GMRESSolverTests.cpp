@@ -9,16 +9,16 @@ using std::cout;
 
 namespace GMRESSolverTests {
     class Matvec {
-        const matrix_type& mref_;
+        matrix_type mat_;
     public:
-        Matvec(const matrix_type& mat)
-            : mref_{ mat }
+        explicit Matvec(const matrix_type& mat)
+            : mat_{ mat }
         {}
 
         bool operator()(const vector_type& in, vector_type& out) const {
             blitz::firstIndex i;
             blitz::secondIndex j;
-            out = blitz::sum(mref_(i, j) * in(j), j);
+            out = blitz::sum(mat_(i, j) * in(j), j);
             return true;
         }
     };
@@ -32,13 +32,7 @@ namespace GMRESSolverTests {
         }
     };
 
-    GMRESSolver* solver = nullptr;
-
     Describe(GMRESSolver_Object) {
-        void SetUp() {
-            solver = new GMRESSolver();
-        }
-
         It(Solve_Ax_equals_b) {
             index_type N = 5;
             vector_type b(N), x(N);
@@ -63,7 +57,7 @@ namespace GMRESSolverTests {
                 5.;
 
             cout << "GMRESSolver: nonsingular system\n";
-            GMRESSolver& gmres = *solver;
+            GMRESSolver gmres;
             vector_type soln(N);
             for (index_type i = 0; i < N; ++i)
                 soln(i) = rand() / (real_type(1) + RAND_MAX);
@@ -93,7 +87,7 @@ namespace GMRESSolverTests {
                 19.;
 
             cout << "GMRESSolver: singular system\n";
-            GMRESSolver& gmres = *solver;
+            GMRESSolver gmres;
             vector_type soln(N);
             for (index_type i = 0; i < N; ++i)
                 soln(i) = rand() / (real_type(1) + RAND_MAX);
@@ -102,9 +96,5 @@ namespace GMRESSolverTests {
             cout << soln << "\n";
             Assert::That(result.flag, Equals(ConvFlag::maxits));
         }
-
-        void TearDown() {
-            delete solver;
-        }
     };
-}
+} // namespace GMRESSolverTests
