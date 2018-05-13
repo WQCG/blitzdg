@@ -5,9 +5,15 @@ addons:
 before_install:
   - pip install --user cpp-coveralls
 install: make get-deps
+script: make
 after_success:
   - coveralls --exclude include/igloo --gcov-options '\-lp'
 sudo: required
 env:
   global:
     - EXTRACFLAGS=-Wno-deprecated-declarations
+deploy:
+  provider: s3
+  skip_cleanup: true
+  bucket: "dsteinmo-libs"
+  local_dir: bin
