@@ -196,6 +196,9 @@ void Nodes1DProvisioner::buildConnectivityMatrices() {
     Array<double, 2> FToF(totalFaces, totalFaces);
     Array<double, 2> I(totalFaces, totalFaces);
 
+    FToF = 0*jj;
+    I = 0*jj;
+
     for (int f=0; f < totalFaces; f++)
         I(f,f) = 1;
 
@@ -204,6 +207,9 @@ void Nodes1DProvisioner::buildConnectivityMatrices() {
 
     Array<int,1> f1(totalFaces - 2); // '- 2' => for physical boundaries.
     Array<int,1> f2(totalFaces - 2);
+
+    f1 = 0*ii;
+    f2 = 0*ii;
 
     int connectionsCount = 0;
     for (int i=0; i < totalFaces; i++) {
