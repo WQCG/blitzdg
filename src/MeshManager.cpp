@@ -7,9 +7,11 @@
 #include <fstream>
 #include <boost/algorithm/string.hpp>
 #include <metis.h>
+#include <Types.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace blitzdg;
 
 /**
  * Constructor.
@@ -100,7 +102,8 @@ void MeshManager::partitionMesh(int numPartitions) {
     int * eind = EToV;
     int * eptr = new int[NumElements+1];
     int * objval = new int;
-    int * numPartitionsPtr = &numPartitions;
+    int * numPartitionsPtr = new int;
+    *numPartitionsPtr = numPartitions;
 
     // set up mesh partitioning options
     int * metisOptions = new int[METIS_NOPTIONS];
@@ -123,6 +126,12 @@ void MeshManager::partitionMesh(int numPartitions) {
     int * epart = new int[NumElements];
     int * npart = new int[NumVerts];
 
+    for (index_type i=0; i < NumElements; i++)
+        epart[i] = 0;
+
+    for (index_type i=0; i < NumVerts; i++)
+        npart[i] = 0;
+
     // Assume mesh with homogenous element type, then eptr 
     // dictates an equal stride of size ElementType across EToV array.
     for (int i=0; i <= NumElements; i++) {
@@ -132,15 +141,18 @@ void MeshManager::partitionMesh(int numPartitions) {
 
     *objval = 0;
 
-    int * NE = &NumElements;
-    int * NV = &NumVerts;
+    int * NE = new int;
+    int * NV = new int;
+
+    *NE = NumElements;
+    *NV = NumVerts;
 
     int * ncommon = new int;
     *ncommon = 1;
 
     cout << "About to call METIS_PartMeshNodal" << endl;
-    int result =  METIS_PartMeshNodal( NE, NV, eptr, eind, NULL, NULL,
-                    numPartitionsPtr, NULL, metisOptions, objval, epart, npart);
+    int result =  METIS_PartMeshNodal( NE, NV, eptr, eind, (idx_t*)NULL, (idx_t*)NULL,
+                    numPartitionsPtr, (real_t*)NULL, metisOptions, objval, epart, npart);
 
     if (result == METIS_OK)
         cout << "METIS partitioning successful!" << endl;
@@ -163,6 +175,14 @@ void MeshManager::partitionMesh(int numPartitions) {
 
     ElementPartitionMap = epart;
     VertexPartitionMap = npart;
+
+    delete NE;
+    delete NV;
+    delete ncommon;
+    delete objval;
+    delete numPartitionsPtr;
+    delete[] eptr;
+    delete[] metisOptions;
 }
 
 /**
