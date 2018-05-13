@@ -309,19 +309,20 @@ void Nodes1DProvisioner::buildVandermondeMatrix() {
  * Build differentiation matrix Dr on the standard element.
  */
 void Nodes1DProvisioner::buildDr() {
+    firstIndex ii;
+    secondIndex jj;
+
     Dr = new Array<double, 2>(NOrder+1, NOrder+1);
 
     Array<double, 2> & Vref = *V;
     Array<double, 2> & Drref = *Dr;
 
     Array<double, 2> DVr(NOrder+1, NOrder+1);
+    DVr = 0.*jj;
 
     computeGradVandermonde(DVr);
 
     // Dr = DVr / V;
-
-    firstIndex ii;
-    secondIndex jj;
 
     Array<double, 2> Vtrans(NOrder+1, NOrder+1);
     Array<double, 2> DVrtrans(NOrder+1, NOrder+1);
@@ -580,8 +581,10 @@ void Nodes1DProvisioner::computeGradJacobi(Array<double,1> const & x, const doub
 
 void Nodes1DProvisioner::computeGradVandermonde(Array<double,2> & DVr) {
 
+    firstIndex ii;
     for (int i=0; i<=NOrder; i++) {
         Array<double, 1> dp(NOrder+1);
+        dp = 0.*ii;
         computeGradJacobi(*rGrid, 0.0, 0.0, i, dp);
         DVr(Range::all(), i) = dp;
     }
