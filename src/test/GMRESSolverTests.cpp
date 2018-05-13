@@ -102,9 +102,5 @@ namespace GMRESSolverTests {
             cout << soln << "\n";
             Assert::That(result.flag, Equals(ConvFlag::maxits));
         }
-
-        void TearDown() {
-            delete solver;
-        }
     };
 }
