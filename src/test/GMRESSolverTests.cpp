@@ -14,29 +14,37 @@ namespace GMRESSolverTests {
         explicit Matvec(const matrix_type& mat)
             : mat_{ mat }
         {}
-//        matrix_type * A;
-//    public:
-//        Matvec() {
-//            A = new matrix_type(5,5);
-            
-//            *A = 2.,3.,0.,0.,0.,
-//                3.,0.,4.,0.,6.,
-//                0.,-1.,-3.,2.,0.,
-//                0.,0.,1.,0.,0.,
-//                0.,4.,2.,0.,1.;
-//        }
 
         bool operator()(const vector_type& in, vector_type& out) const {
             blitz::firstIndex i;
             blitz::secondIndex j;
             out = blitz::sum(mat_(i, j) * in(j), j);
-//            matrix_type & Aref = *A;
+            return true;
+        }
+    };
 
-//            out = blitz::sum(Aref(i, j) * in(j), j);
+    class MatvecNonsingular {
+        matrix_type * A;
+    public:
+        MatvecNonsingular() {
+            A = new matrix_type(5,5);
+            
+            *A = 2.,3.,0.,0.,0.,
+                3.,0.,4.,0.,6.,
+                0.,-1.,-3.,2.,0.,
+                0.,0.,1.,0.,0.,
+                0.,4.,2.,0.,1.;
+        }
+
+        bool operator()(const vector_type& in, vector_type& out) const {
+            blitz::firstIndex i;
+            blitz::secondIndex j;
+            matrix_type & Aref = *A;
+            out = blitz::sum(Aref(i, j) * in(j), j);
             return true;
         }
 
-        ~Matvec() {
+        ~MatvecNonsingular() {
             delete A;
         }
     };
@@ -58,7 +66,6 @@ namespace GMRESSolverTests {
             blitz::firstIndex i;
             blitz::secondIndex j;
             matrix_type & Aref = *A;
-
             out = blitz::sum(Aref(i, j) * in(j), j);
             return true;
         }
@@ -82,6 +89,12 @@ namespace GMRESSolverTests {
             index_type N = 5;
             vector_type b(N), x(N);
             matrix_type A(N, N);
+            
+            A = 2.,3.,0.,0.,0.,
+                3.,0.,4.,0.,6.,
+                0.,-1.,-3.,2.,0.,
+                0.,0.,1.,0.,0.,
+                0.,4.,2.,0.,1.;
 
             b =  8.,
                 45.,
@@ -102,7 +115,7 @@ namespace GMRESSolverTests {
                 soln(i) = rand() / (real_type(1) + RAND_MAX);
             GMRESParams params;
             params.verbose = true;
-            GMRESOut result = gmres.solve(Matvec(), Precon(), b, soln, params);
+            GMRESOut result = gmres.solve(Matvec(A), Precon(), b, soln, params);
             cout << result << "\n";
             cout << soln << "\n";
             Assert::That(result.flag, Equals(ConvFlag::success));
@@ -112,6 +125,12 @@ namespace GMRESSolverTests {
             index_type N = 5;
             vector_type b(N);
             matrix_type A(N, N);
+
+            A = 2.,3.,0.,0.,2.,
+                3.,0.,4.,0.,3.,
+                0.,-1.,-3.,2.,0.,
+                0.,0.,1.,0.,0.,
+                0.,4.,2.,0.,0.;
 
             b =  8.,
                 45.,
@@ -124,7 +143,7 @@ namespace GMRESSolverTests {
             vector_type soln(N);
             for (index_type i = 0; i < N; ++i)
                 soln(i) = rand() / (real_type(1) + RAND_MAX);
-            GMRESOut result = gmres.solve(MatvecSingular(), Precon(), b, soln);
+            GMRESOut result = gmres.solve(Matvec(A), Precon(), b, soln);
             cout << result << "\n";
             cout << soln << "\n";
             Assert::That(result.flag, Equals(ConvFlag::maxits));
