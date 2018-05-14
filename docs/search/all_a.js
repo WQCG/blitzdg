@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['mattimesvec',['matTimesVec',['../GMRESSolver_8hpp.html#a6f274deca2f46a57e1fefab015a1c1fa',1,'blitzdg::details']]],
   ['matvec',['Matvec',['../classGMRESSolverTests_1_1Matvec.html',1,'GMRESSolverTests']]],
   ['matvecnonsingular',['MatvecNonsingular',['../classGMRESSolverTests_1_1MatvecNonsingular.html',1,'GMRESSolverTests']]],
   ['matvecsingular',['MatvecSingular',['../classGMRESSolverTests_1_1MatvecSingular.html',1,'GMRESSolverTests']]],

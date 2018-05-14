@@ -1,4 +1,7 @@
 var searchData=
 [
-  ['operator_3c_3c',['operator&lt;&lt;',['../GMRESSolver_8hpp.html#afcef465b1811e1a58461f319ff1c353c',1,'blitzdg::operator&lt;&lt;(std::ostream &amp;strm, ConvFlag flag)'],['../GMRESSolver_8hpp.html#a0d95699cddba020429bb348745cf0775',1,'blitzdg::operator&lt;&lt;(std::ostream &amp;strm, const GMRESOut &amp;out)']]]
+  ['nodes1dprovisioner',['Nodes1DProvisioner',['../classNodes1DProvisioner.html#a4612c529e497484ac088e0b5d83b8479',1,'Nodes1DProvisioner']]],
+  ['norm1',['norm1',['../LinAlgHelpers_8hpp.html#adef49510d6efa522d207b8c98cc8a65f',1,'blitzdg']]],
+  ['norm2',['norm2',['../LinAlgHelpers_8hpp.html#a1d922d2af405d2fcefc6199deacc3309',1,'blitzdg']]],
+  ['norminf',['normInf',['../LinAlgHelpers_8hpp.html#a51d517d6bcc17b305c77baac2c241e66',1,'blitzdg']]]
 ];

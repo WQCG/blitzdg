@@ -91,8 +91,7 @@ $(function() {
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for GMRESSolver.hpp:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="GMRESSolver_8hpp__incl.svg" width="100%" height="496"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
-</div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="GMRESSolver_8hpp__incl.svg" width="100%" height="496"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 </div>
 <p><a href="GMRESSolver_8hpp_source.html">Go to the source code of this file.</a></p>
@@ -104,6 +103,9 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structblitzdg_1_1GMRESOut.html">blitzdg::GMRESOut</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">GMRES output information.  <a href="structblitzdg_1_1GMRESOut.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classblitzdg_1_1GMRESSolver.html">blitzdg::GMRESSolver</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Preconditioned, restarted GMRES with Modified Gram-Schmidt orthogonalization.  <a href="classblitzdg_1_1GMRESSolver.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
@@ -128,14 +130,15 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a444461a1f46f5ec50f95aea45d936be4"><td class="memItemLeft" align="right" valign="top"><a id="a444461a1f46f5ec50f95aea45d936be4"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>blitzdg::details::backSolve</b> (index_type n, matrix_type &amp;A, vector_type &amp;x)</td></tr>
+<tr class="memitem:a444461a1f46f5ec50f95aea45d936be4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="GMRESSolver_8hpp.html#a444461a1f46f5ec50f95aea45d936be4">blitzdg::details::backSolve</a> (index_type n, matrix_type &amp;A, vector_type &amp;x)</td></tr>
+<tr class="memdesc:a444461a1f46f5ec50f95aea45d936be4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calls the BLAS function dtrsv to solve the triangular linear system <img class="formulaInl" alt="$Uy = x$" src="form_21.png"/>, where <img class="formulaInl" alt="$U$" src="form_22.png"/> is the upper triangular part of the <img class="formulaInl" alt="$n\times n$" src="form_23.png"/> leading principal submatrix of <img class="formulaInl" alt="$A$" src="form_24.png"/>.  <a href="GMRESSolver_8hpp.html#a444461a1f46f5ec50f95aea45d936be4">More...</a><br /></td></tr>
 <tr class="separator:a444461a1f46f5ec50f95aea45d936be4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6f274deca2f46a57e1fefab015a1c1fa"><td class="memItemLeft" align="right" valign="top"><a id="a6f274deca2f46a57e1fefab015a1c1fa"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>blitzdg::details::matTimesVec</b> (index_type n, matrix_type &amp;A, vector_type &amp;x, vector_type &amp;result)</td></tr>
+<tr class="memitem:a6f274deca2f46a57e1fefab015a1c1fa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="GMRESSolver_8hpp.html#a6f274deca2f46a57e1fefab015a1c1fa">blitzdg::details::matTimesVec</a> (index_type n, matrix_type &amp;A, vector_type &amp;x, vector_type &amp;result)</td></tr>
+<tr class="memdesc:a6f274deca2f46a57e1fefab015a1c1fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calls the BLAS function dgemv to compute the matrix-vector product <img class="formulaInl" alt="$Ax$" src="form_25.png"/>.  <a href="GMRESSolver_8hpp.html#a6f274deca2f46a57e1fefab015a1c1fa">More...</a><br /></td></tr>
 <tr class="separator:a6f274deca2f46a57e1fefab015a1c1fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a932140d3f58b7d649a68ed4fb354604b"><td class="memItemLeft" align="right" valign="top"><a id="a932140d3f58b7d649a68ed4fb354604b"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>blitzdg::details::isNonzero</b> (const vector_type &amp;x)</td></tr>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="GMRESSolver_8hpp.html#a932140d3f58b7d649a68ed4fb354604b">blitzdg::details::isNonzero</a> (const vector_type &amp;x)</td></tr>
+<tr class="memdesc:a932140d3f58b7d649a68ed4fb354604b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if the input array x is not uniquely zero. <br /></td></tr>
 <tr class="separator:a932140d3f58b7d649a68ed4fb354604b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac9147b6aee6fbf22e95b2fb3f68ed426"><td class="memItemLeft" align="right" valign="top"><a id="ac9147b6aee6fbf22e95b2fb3f68ed426"></a>
 std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="GMRESSolver_8hpp.html#ac9147b6aee6fbf22e95b2fb3f68ed426">blitzdg::ConvFlagToStr</a> (ConvFlag flag)</td></tr>
@@ -156,7 +159,127 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Implements a right-preconditioned GMRES iterative method. </p>
-</div></div><!-- contents -->
+</div><h2 class="groupheader">Function Documentation</h2>
+<a id="file_a444461a1f46f5ec50f95aea45d936be4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#file_a444461a1f46f5ec50f95aea45d936be4">&#9670;&nbsp;</a></span>backSolve()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void blitzdg::details::backSolve </td>
+          <td>(</td>
+          <td class="paramtype">index_type&#160;</td>
+          <td class="paramname"><em>n</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">matrix_type &amp;&#160;</td>
+          <td class="paramname"><em>A</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">vector_type &amp;&#160;</td>
+          <td class="paramname"><em>x</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Calls the BLAS function dtrsv to solve the triangular linear system <img class="formulaInl" alt="$Uy = x$" src="form_21.png"/>, where <img class="formulaInl" alt="$U$" src="form_22.png"/> is the upper triangular part of the <img class="formulaInl" alt="$n\times n$" src="form_23.png"/> leading principal submatrix of <img class="formulaInl" alt="$A$" src="form_24.png"/>. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>The order of <img class="formulaInl" alt="$U$" src="form_22.png"/>. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">A</td><td>The dense matrix. Note: A must be stored in column-major format. </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">x</td><td>The rhs on input. The solution on output. </td></tr>
+  </table>
+  </dd>
+</dl>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="GMRESSolver_8hpp_a444461a1f46f5ec50f95aea45d936be4_cgraph.svg" width="148" height="62"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
+<div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="GMRESSolver_8hpp_a444461a1f46f5ec50f95aea45d936be4_icgraph.svg" width="148" height="62"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
+
+</div>
+</div>
+<a id="file_a6f274deca2f46a57e1fefab015a1c1fa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#file_a6f274deca2f46a57e1fefab015a1c1fa">&#9670;&nbsp;</a></span>matTimesVec()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void blitzdg::details::matTimesVec </td>
+          <td>(</td>
+          <td class="paramtype">index_type&#160;</td>
+          <td class="paramname"><em>n</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">matrix_type &amp;&#160;</td>
+          <td class="paramname"><em>A</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">vector_type &amp;&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">vector_type &amp;&#160;</td>
+          <td class="paramname"><em>result</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Calls the BLAS function dgemv to compute the matrix-vector product <img class="formulaInl" alt="$Ax$" src="form_25.png"/>. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>The number of columns of A to use in the product. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">A</td><td>The dense matrix. Note: A must be stored in column-major format. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The real-valued vector. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">result</td><td>The computed product <img class="formulaInl" alt="$Ax$" src="form_25.png"/>. </td></tr>
+  </table>
+  </dd>
+</dl>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="GMRESSolver_8hpp_a6f274deca2f46a57e1fefab015a1c1fa_cgraph.svg" width="163" height="62"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
+<div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="GMRESSolver_8hpp_a6f274deca2f46a57e1fefab015a1c1fa_icgraph.svg" width="163" height="62"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
+
+</div>
+</div>
+</div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">
