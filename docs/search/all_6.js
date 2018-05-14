@@ -26,5 +26,6 @@ var searchData=
   ['get_5fxgrid',['get_xGrid',['../classNodes1DProvisioner.html#a7e5aa3755720243efe195e8f8f76129b',1,'Nodes1DProvisioner']]],
   ['gmresout',['GMRESOut',['../structblitzdg_1_1GMRESOut.html',1,'blitzdg']]],
   ['gmresparams',['GMRESParams',['../structblitzdg_1_1GMRESParams.html',1,'blitzdg']]],
-  ['gmressolver',['GMRESSolver',['../classblitzdg_1_1GMRESSolver.html',1,'blitzdg']]]
+  ['gmressolver',['GMRESSolver',['../classblitzdg_1_1GMRESSolver.html',1,'blitzdg']]],
+  ['gmressolver_2ehpp',['GMRESSolver.hpp',['../GMRESSolver_8hpp.html',1,'']]]
 ];

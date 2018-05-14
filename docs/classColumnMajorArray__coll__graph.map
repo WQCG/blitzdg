@@ -1,7 +1,0 @@
-<map id="ColumnMajorArray&lt; N_rank &gt;" name="ColumnMajorArray&lt; N_rank &gt;">
-<area shape="rect" id="node2" href="$classGeneralArrayStorage.html" title="Declaration of class GeneralArrayStorage&lt;N_rank&gt; " alt="" coords="71,215,187,256"/>
-<area shape="rect" id="node3" href="$classTinyVector.html" title="TinyVector\&lt; bool, N\l_rank \&gt;" alt="" coords="9,96,120,137"/>
-<area shape="rect" id="node4" href="$classETBase.html" title="ETBase\&lt; TinyVector\l\&lt; bool, N_length \&gt; \&gt;" alt="" coords="5,5,119,47"/>
-<area shape="rect" id="node5" href="$classTinyVector.html" title="TinyVector\&lt; int, N\l_rank \&gt;" alt="" coords="147,96,249,137"/>
-<area shape="rect" id="node6" href="$classETBase.html" title="ETBase\&lt; TinyVector\l\&lt; int, N_length \&gt; \&gt;" alt="" coords="143,5,256,47"/>
-</map>

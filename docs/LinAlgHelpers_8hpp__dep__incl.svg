@@ -9,24 +9,24 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 80)">
 <title>include/LinAlgHelpers.hpp</title>
 <polygon fill="#ffffff" stroke="transparent" points="-4,4 -4,-80 110,-80 110,4 -4,4"/>
-<!-- Node44 -->
+<!-- Node4 -->
 <g id="node1" class="node">
-<title>Node44</title>
+<title>Node4</title>
 <polygon fill="#bfbfbf" stroke="#000000" points="1,-56.5 1,-75.5 105,-75.5 105,-56.5 1,-56.5"/>
 <text text-anchor="middle" x="53" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">include/LinAlgHelpers.hpp</text>
 </g>
-<!-- Node45 -->
+<!-- Node5 -->
 <g id="node2" class="node">
-<title>Node45</title>
+<title>Node5</title>
 <g id="a_node2"><a xlink:href="GMRESSolver_8hpp.html" target="_top" xlink:title="Implements a right&#45;preconditioned GMRES iterative method. ">
 <polygon fill="#ffffff" stroke="#000000" points="0,-.5 0,-19.5 106,-19.5 106,-.5 0,-.5"/>
 <text text-anchor="middle" x="53" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">include/GMRESSolver.hpp</text>
 </a>
 </g>
 </g>
-<!-- Node44&#45;&gt;Node45 -->
+<!-- Node4&#45;&gt;Node5 -->
 <g id="edge1" class="edge">
-<title>Node44&#45;&gt;Node45</title>
+<title>Node4&#45;&gt;Node5</title>
 <path fill="none" stroke="#191970" d="M53,-46.1575C53,-37.155 53,-26.9199 53,-19.6427"/>
 <polygon fill="#191970" stroke="#191970" points="49.5001,-46.2455 53,-56.2455 56.5001,-46.2456 49.5001,-46.2455"/>
 </g>

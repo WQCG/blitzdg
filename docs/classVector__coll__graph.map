@@ -1,8 +1,0 @@
-<map id="Vector&lt; P_numtype &gt;" name="Vector&lt; P_numtype &gt;">
-<area shape="rect" id="node2" href="$classArray.html" title="Array\&lt; P_numtype, 1 \&gt;" alt="" coords="397,78,523,105"/>
-<area shape="rect" id="node3" href="$classMemoryBlockReference.html" title="MemoryBlockReference\l\&lt; P_numtype \&gt;" alt="" coords="184,5,313,47"/>
-<area shape="rect" id="node4" href="$classTinyVector.html" title="TinyVector\&lt; diffType,\l N_rank \&gt;" alt="" coords="190,71,307,112"/>
-<area shape="rect" id="node5" href="$classETBase.html" title="ETBase\&lt; TinyVector\l\&lt; diffType, N_length \&gt; \&gt;" alt="" coords="5,71,135,112"/>
-<area shape="rect" id="node6" href="$classTinyVector.html" title="TinyVector\&lt; int, N\l_rank \&gt;" alt="" coords="198,136,299,177"/>
-<area shape="rect" id="node7" href="$classETBase.html" title="ETBase\&lt; TinyVector\l\&lt; int, N_length \&gt; \&gt;" alt="" coords="13,136,127,177"/>
-</map>

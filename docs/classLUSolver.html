@@ -72,17 +72,17 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a50cc15a95f58dea28db5a66fff6d3e40"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLUSolver.html#a50cc15a95f58dea28db5a66fff6d3e40">LUSolver</a> (<a class="el" href="classArray.html">Array</a>&lt; double, 2 &gt; *const &amp;, <a class="el" href="classSparseMatrixConverter.html">SparseMatrixConverter</a> const &amp;)</td></tr>
+<tr class="memitem:a50cc15a95f58dea28db5a66fff6d3e40"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLUSolver.html#a50cc15a95f58dea28db5a66fff6d3e40">LUSolver</a> (Array&lt; double, 2 &gt; *const &amp;, <a class="el" href="classSparseMatrixConverter.html">SparseMatrixConverter</a> const &amp;)</td></tr>
 <tr class="memdesc:a50cc15a95f58dea28db5a66fff6d3e40"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#a50cc15a95f58dea28db5a66fff6d3e40">More...</a><br /></td></tr>
 <tr class="separator:a50cc15a95f58dea28db5a66fff6d3e40"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5afecc00613fadd8cc61a5b92ad32402"><td class="memItemLeft" align="right" valign="top"><a id="a5afecc00613fadd8cc61a5b92ad32402"></a>
-<a class="el" href="classArray.html">Array</a>&lt; double, 2 &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLUSolver.html#a5afecc00613fadd8cc61a5b92ad32402">get_A</a> ()</td></tr>
+Array&lt; double, 2 &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLUSolver.html#a5afecc00613fadd8cc61a5b92ad32402">get_A</a> ()</td></tr>
 <tr class="memdesc:a5afecc00613fadd8cc61a5b92ad32402"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference to the matrix A. <br /></td></tr>
 <tr class="separator:a5afecc00613fadd8cc61a5b92ad32402"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad2415fda3fe785e1d49a21b9004d0298"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLUSolver.html#ad2415fda3fe785e1d49a21b9004d0298">factorize</a> ()</td></tr>
 <tr class="memdesc:ad2415fda3fe785e1d49a21b9004d0298"><td class="mdescLeft">&#160;</td><td class="mdescRight">Factorize the matrix A with UMFPACK.  <a href="#ad2415fda3fe785e1d49a21b9004d0298">More...</a><br /></td></tr>
 <tr class="separator:ad2415fda3fe785e1d49a21b9004d0298"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aae3fbf619ff5c110253898e14f860c44"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLUSolver.html#aae3fbf619ff5c110253898e14f860c44">solve</a> (<a class="el" href="classArray.html">Array</a>&lt; double, 1 &gt; const &amp;, <a class="el" href="classArray.html">Array</a>&lt; double, 1 &gt; &amp;)</td></tr>
+<tr class="memitem:aae3fbf619ff5c110253898e14f860c44"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLUSolver.html#aae3fbf619ff5c110253898e14f860c44">solve</a> (Array&lt; double, 1 &gt; const &amp;, Array&lt; double, 1 &gt; &amp;)</td></tr>
 <tr class="memdesc:aae3fbf619ff5c110253898e14f860c44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Solve Ax=b using UMFPACK.  <a href="#aae3fbf619ff5c110253898e14f860c44">More...</a><br /></td></tr>
 <tr class="separator:aae3fbf619ff5c110253898e14f860c44"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -96,7 +96,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">LUSolver::LUSolver </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classArray.html">Array</a>&lt; double, 2 &gt; *const &amp;&#160;</td>
+          <td class="paramtype">Array&lt; double, 2 &gt; *const &amp;&#160;</td>
           <td class="paramname"><em>Ain</em>, </td>
         </tr>
         <tr>
@@ -148,13 +148,13 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">void LUSolver::solve </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classArray.html">Array</a>&lt; double, 1 &gt; const &amp;&#160;</td>
+          <td class="paramtype">Array&lt; double, 1 &gt; const &amp;&#160;</td>
           <td class="paramname"><em>rhs</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classArray.html">Array</a>&lt; double, 1 &gt; &amp;&#160;</td>
+          <td class="paramtype">Array&lt; double, 1 &gt; &amp;&#160;</td>
           <td class="paramname"><em>soln</em>&#160;</td>
         </tr>
         <tr>
