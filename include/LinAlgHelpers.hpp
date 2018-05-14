@@ -15,10 +15,10 @@ namespace blitzdg {
      *     ca + sb &=& r\\
      *     cb - sa &=& 0
      * \f}
-     * @param[in,out] a \f$x\f$-coordinate
-     * @param[in,out] b \f$y\f$-coordinate
-     * @param[in,out] c real scalar
-     * @param[in,out] s real scalar
+     * @param[in,out] a The \f$x\f$-coordinate.
+     * @param[in,out] b The \f$y\f$-coordinate.
+     * @param[out] c A real scalar.
+     * @param[out] s A real scalar.
      * 
      * On output: \f$c,\,s\f$ are the Givens rotation parameters,
      * \f$a = r\f$, and \f$b = 0\f$.
@@ -27,10 +27,10 @@ namespace blitzdg {
 
     /**
      * Applies a Givens rotation \f$G(c,s)\f$ to the tuple \f$(x,y)\f$.
-     * @param[in] c Givens rotation parameter
-     * @param[in] s Givens rotation parameter
-     * @param[in,out] x \f$x\f$-coordinate
-     * @param[in,out] y \f$y\f$-coordinate
+     * @param[in] c Givens rotation parameter.
+     * @param[in] s Givens rotation parameter.
+     * @param[in,out] x The \f$x\f$-coordinate.
+     * @param[in,out] y The \f$y\f$-coordinate.
      * 
      * On output:
      * \f{eqnarray*}{
@@ -45,27 +45,21 @@ namespace blitzdg {
     }
 
     /**
-     * Vector 1-norm.
-     * @param[in] x real-valued vector
-     * @return The 1-norm of x.
+     * Returns the one-norm of the input vector x.
      */
     inline real_type norm1(const vector_type& x) {
         return blitz::sum(blitz::abs(x));
     }
 
     /**
-     * Vector 2-norm.
-     * @param[in] x real-valued vector
-     * @return The 2-norm of x.
+     * Returns the two-norm of the input vector x.
      */
     inline real_type norm2(const vector_type& x) {
         return std::sqrt(blitz::sum(x * x));
     }
 
     /**
-     * Vector infinity-norm.
-     * @param[in] x real-valued vector
-     * @return The infinity-norm of x.
+     * Returns the infinity-norm of the input vector x.
      */
     inline real_type normInf(const vector_type& x) {
         return blitz::max(blitz::abs(x));

@@ -17,17 +17,30 @@
 
 namespace blitzdg {
     namespace details {
-        // Solves U*y = x, where U is the upper triangular part of 
-        // the n x n leading principal submatrix of A. On input
-        // the rhs is contained in x and on output the solution 
-        // y overwrites x. Note that A must be stored in
-        // column-major format.
+        /**
+         * Calls the BLAS function dtrsv to solve the triangular
+         * linear system \f$Uy = x\f$, where \f$U\f$ is the upper
+         * triangular part of the \f$n\times n\f$ leading principal
+         * submatrix of \f$A\f$.
+         * @param[in] n The order of \f$U\f$.
+         * @param[in] A The dense matrix. Note: A must be stored in column-major format.
+         * @param[in,out] x The rhs on input. The solution on output.
+         */
         void backSolve(index_type n, matrix_type& A, vector_type& x);
 
-        // computes result = A(:,0:n-1)*x(0:n-1)
+        /**
+         * Calls the BLAS function dgemv to compute the matrix-vector 
+         * product \f$Ax\f$.
+         * @param[in] n The number of columns of A to use in the product.
+         * @param[in] A The dense matrix. Note: A must be stored in column-major format.
+         * @param[in] x The real-valued vector.
+         * @param[out] result The computed product \f$Ax\f$.
+         */
         void matTimesVec(index_type n, matrix_type& A, vector_type& x, vector_type& result);
 
-        // checks if array is not uniquely zero
+        /**
+         * Returns true if the input array x is not uniquely zero.
+         */ 
         inline bool isNonzero(const vector_type& x) {
             return std::any_of(x.begin(), x.end(),
                 [](real_type val) { return val != real_type(0); });
@@ -38,16 +51,26 @@ namespace blitzdg {
      * Convergence flags for GMRESSolver.
      */
     enum class ConvFlag { 
-        unconverged,  /**< neither converged nor diverged */
-        success,      /**< converged with residual norm <= convTol */
-        diverged,     /**< diverged with residual norm >= divTol */
-        maxits,       /**< maximum iterations reached */
-        stagnation,   /**< insufficient change in solution */
-        breakdown,    /**< input matrix or preconditioner are (likely) singular */
-        true_rnrm,    /**< true residual norm > convTol */
-        inf_or_nan,   /**< residual norm is inf or nan */
-        precon_fail,  /**< application of preconditioner failed */
-        matvec_fail   /**< matrix-vector product failed */
+        /** neither converged nor diverged */
+        unconverged,  
+        /** converged with residual norm <= convTol */
+        success, 
+        /** diverged with residual norm >= divTol */    
+        diverged,    
+        /** maximum iterations reached */ 
+        maxits, 
+        /** insufficient change in solution */      
+        stagnation,
+        /** input matrix or preconditioner are (likely) singular */   
+        breakdown, 
+        /** true residual norm > convTol */   
+        true_rnrm,    
+        /** residual norm is inf or nan */
+        inf_or_nan,   
+        /** application of preconditioner failed */
+        precon_fail,  
+        /** matrix-vector product failed */
+        matvec_fail   
     };
 
     /**
@@ -126,7 +149,7 @@ namespace blitzdg {
      * The solver terminates with convergence flag ConvFlag::success.
      * 
      * <li> The divergence criterion is met:
-     * \f$\|r_k\| \geq \text{divTol}\cdot\|r_0\|
+     * \f$\|r_k\| \geq \text{divTol}\cdot\|r_0\|\f$
      * The solver terminates with convergence flag ConvFlag::diverged.
      * 
      * <li> The stagnation criterion is met:
@@ -160,13 +183,15 @@ namespace blitzdg {
     public:
         /**
          * Calls GMRES to solves the linear system \f$Ax = b\f$.
-         * @param[in] mvec is a functor that computes a matrix-vector product.
-         * It must define an overload of operator() with the signature:
+         * @param[in] mvec is a functor that computes the matrix-vector product,
+         * i.e., it computes \f$Ax\f$. It must define an overload of operator() 
+         * with the signature:
          * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          * bool operator()(const vector_type& in, vector_type& out)
          * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          * which returns true if successful.
-         * @param[in] precon is a functor that applies the preconditioner to a vector.
+         * @param[in] precon is a functor that applies the preconditioner
+         * to a vector, i.e., it computes \f$M^{-1}x\f$.
          * It must define an overload of operator() with the signature:
          * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          * bool operator()(const vector_type& in, vector_type& out)
