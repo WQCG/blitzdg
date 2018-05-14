@@ -1,3 +1,7 @@
+/**
+ * @file GMRESSolver.hpp
+ * @brief Implements a right-preconditioned GMRES iterative method.
+ */
 #pragma once
 #include "LinAlgHelpers.hpp"
 #include "Types.hpp"
@@ -64,8 +68,8 @@ namespace blitzdg {
      */
     struct GMRESParams {
         bool verbose;        /**< if true, output convergence history to console */
-        bool testTrueRnrm;   /**< if true, check that true residual norm <= convTol */
-        index_type kspaceSz; /**< max size of Krylov subspace before restarting */
+        bool testTrueRnrm;   /**< if true, check the true residual norm for convergence */
+        index_type kspaceSz; /**< max dimension of the Krylov subspace */
         index_type maxits;   /**< max number of outer iterations */
         real_type relTol;    /**< relative convergence tolerance */
         real_type absTol;    /**< absolute convergence tolerance */
@@ -79,8 +83,8 @@ namespace blitzdg {
     };
 
     /**
-     * Checks the input parameters in GMRESParams and throws and exception
-     * if any are out of range.
+     * Checks the input parameters in GMRESParams and throws an 
+     * std::invalid_argument exception if any are out of range.
      */ 
     void checkGMRESParams(const GMRESParams& p);
 
@@ -109,21 +113,53 @@ namespace blitzdg {
      * Preconditioned, restarted GMRES with Modified
      * Gram-Schmidt orthogonalization.
      * 
-     * Solves the preconditioned linear system A*M^{-1}*u = b, 
-     * where u = M*x and M is the preconditioner. The solver 
-     * converges at the kth iteration if
-     *     k < maxits*kspaceSz and ||r_k|| <= max(relTol*||b||, absTol).
-     * The solver diverges at the kth iteration if
-     *     ||r_k|| >= divTol*||r_0||.
-     * The solver stagnates at the kth iteration if
-     *     |x_{k+1}(i) - x_k(i)| <= stgTol*|x_{k+1}(i)| for all i.
-     * The norm ||.|| is always the vector 2-norm and r_k is
-     * the unpreconditioned residual of the kth iterate x_k.
+     * Solves the right-preconditioned linear system \f$AM^{-1}u = b\f$, 
+     * where \f$u = Mx\f$ and \f$M\f$ is the preconditioner. 
+     * 
+     * <b>Stopping Criteria<\b>
+     * 
+     * The solver iterates until one of the following criteria are met:
+     * 
+     * <ul>
+     * <li> The convergence criterion is met: 
+     * \f$\|r_k\| \leq \max(\text{relTol}\cdot\|b\|, \text{absTol})\f$
+     * The solver terminates with convergence flag ConvFlag::success.
+     * 
+     * <li> The divergence criterion is met:
+     * \f$\|r_k\| \geq \text{divTol}\cdot\|r_0\|
+     * The solver terminates with convergence flag ConvFlag::diverged.
+     * 
+     * <li> The stagnation criterion is met:
+     * \f$|x_{k+1}(i) - x_k(i)| \leq \text{stgTol}\cdot|x_{k+1}(i)|~~\forall i\f$
+     * The solver terminates with convergence flag ConvFlag::stagnation.
+     * 
+     * <li> The maximum number of iterations \f$\text{maxits}\cdot\text{kspaceSz}\f$ is reached.
+     * The solver terminates with convergence flag ConvFlag::maxits.
+     * <\ul>
+     * 
+     * The norm \f$\|\cdot\|\f$ is always the vector 2-norm and \f$r_k\f$ is
+     * the unpreconditioned residual of the \f$k\f$th iterate \f$x_k\f$.
+     * 
+     * Various other factors may cause the solver to terminate. These include:
+     * 
+     * <ul>
+     * <li> The input matrix or the preconditioner are singular. 
+     * The solver termintes with convergence flag ConvFlag::breakdown.
+     * 
+     * <li> The residual norm is inf or nan.
+     * The solver terminates with convergence flag ConvFlag::inf_or_nan.
+     * 
+     * <li> The matrix-vector multiply fails.
+     * The solver terminates with convergence flag ConvFlag::matvec_fail.
+     * 
+     * <li> Application of the preconditioner fails.
+     * The solver terminates with convergence flag ConvFlag::precon_fail.
+     * <\ul>
      */
     class GMRESSolver {
     public:
         /**
-         * Solves the linear system A*x = b.
+         * Calls GMRES to solves the linear system \f$Ax = b\f$.
          * @param[in] mvec is a functor that computes a matrix-vector product.
          * It must define an overload of operator() with the signature:
          * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
