@@ -397,7 +397,6 @@ namespace Nodes1DProvisionerTests {
         It(Should_Build_Volume_Maps) {
             Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
             nodes1D.buildNodes();
-            nodes1D.buildMaps();
 
             index_vector_type vmapM = nodes1D.get_vmapM();
             index_vector_type vmapP = nodes1D.get_vmapP();

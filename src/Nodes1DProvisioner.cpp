@@ -86,6 +86,7 @@ void Nodes1DProvisioner::buildNodes() {
 
     buildConnectivityMatrices();
     buildFaceMask();
+	buildMaps();
     buildNormals();
 }
 
@@ -102,8 +103,6 @@ void Nodes1DProvisioner::buildNormals() {
             count++;
         }
     }
-
-    cout << "nx: " << nxref << endl;
 }
 
 /**
