@@ -1,0 +1,5 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$class__Numeric__limits__base.html" title="_Numeric_limits_base\l\&lt; float \&gt;" alt="" coords="5,35,125,76"/>
+<area shape="rect" id="node2" href="$class__Floating__limits.html" title="_Floating_limits\&lt; float,\l FLT_MANT_DIG, FLT_DIG,\l FLT_MIN_EXP, FLT_MAX_EXP,\l FLT_MIN_10_EXP, FLT_MAX\l_10_EXP, 0x7f800000u, 0x7f810000u,\l 0x7fc10000u, true, round_to_nearest \&gt;" alt="" coords="173,5,371,105"/>
+<area shape="rect" id="node3" href="$classnumeric__limits_3_01float_01_4.html" title="numeric_limits\&lt; float \&gt;" alt="" coords="419,42,541,69"/>
+</map>

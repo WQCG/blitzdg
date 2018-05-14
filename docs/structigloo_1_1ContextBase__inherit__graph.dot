@@ -1,0 +1,28 @@
+digraph "igloo::ContextBase"
+{
+ // INTERACTIVE_SVG=YES
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node0 [label="igloo::ContextBase",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
+  Node0 -> Node1 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1 [label="igloo::ContextWithAttribute\l\< InnerContext \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structigloo_1_1ContextWithAttribute.html"];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="igloo::NestedContextProvider\l\< InnerContext, OuterContext,\l ISONLY, ISSKIP \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structigloo_1_1NestedContextProvider.html"];
+  Node2 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="igloo::ContextProvider\l\< InnerContext, OuterContext,\l ISONLY, ISSKIP \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structigloo_1_1ContextProvider.html"];
+  Node1 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="igloo::NestedContextProvider\l\< InnerContext, ContextWithAttribute\l\< void \>, ISONLY, ISSKIP \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structigloo_1_1NestedContextProvider.html"];
+  Node4 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="igloo::ContextProvider\l\< InnerContext, ContextWithAttribute\l\< void \>, void, ISONLY, ISSKIP \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structigloo_1_1ContextProvider_3_01InnerContext_00_01ContextWithAttribute_3_01void_01_4_00_01void_00_01ISONLY_00_01ISSKIP_01_4.html"];
+  Node0 -> Node6 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="igloo::ContextWithAttribute\l\< SequenceContainerTestsBase\< T \> \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structigloo_1_1ContextWithAttribute.html"];
+  Node6 -> Node7 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node7 [label="igloo::NestedContextProvider\l\< SequenceContainerTestsBase\l\< T \>, IGLOO_CURRENT_CONTEXT,\l ISONLY, ISSKIP \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structigloo_1_1NestedContextProvider.html"];
+  Node7 -> Node8 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node8 [label="igloo::ContextProvider\l\< SequenceContainerTestsBase\l\< T \>, IGLOO_CURRENT_CONTEXT,\l IGLOO_ROOT_CONTEXT, false, false \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structigloo_1_1ContextProvider.html"];
+  Node8 -> Node9 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node9 [label="SequenceContainerTestsBase\< T \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structSequenceContainerTestsBase.html"];
+  Node0 -> Node10 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node10 [label="igloo::ContextWithAttribute\l\< ContextType \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structigloo_1_1ContextWithAttribute.html"];
+}

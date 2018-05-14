@@ -1,0 +1,4 @@
+<map id="simdTypes::paddedLength" name="simdTypes::paddedLength">
+<area shape="rect" id="node2" href="$classArray.html#abc8b772aea64da89e92f029d64403ac5" title="This routine takes the storage information for the array (ascendingFlag_[], base_[], and ordering_[]) and the size of the array (length_[]) and computes the stride vector (stride_[]) and the zero offset (see explanation in array.h). " alt="" coords="193,5,308,47"/>
+<area shape="rect" id="node3" href="$classArray.html#a22b37cc98defdc9d72f390931512697c" title="This method is called to allocate memory for a new array. " alt="" coords="193,71,308,112"/>
+</map>

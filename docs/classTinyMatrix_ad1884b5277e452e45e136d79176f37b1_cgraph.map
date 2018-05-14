@@ -1,0 +1,4 @@
+<map id="TinyMatrix::_tm_evaluate" name="TinyMatrix::_tm_evaluate">
+<area shape="rect" id="node2" href="$struct__tm__evaluator.html#a7d693e7c5d175e980e39b9b7f14b8913" title="The select_evaluation function redirects expressions that do not contains solely TinyMatrix operands ..." alt="" coords="187,5,304,47"/>
+<area shape="rect" id="node3" href="$struct__tm__evaluator.html#a416ea85773d61ddac30f6e4eced6d2f5" title="This version of the evaluation function assumes that the TinyMatrixs have appropriate alignment (as w..." alt="" coords="352,5,481,47"/>
+</map>

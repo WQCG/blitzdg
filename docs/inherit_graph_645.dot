@@ -1,0 +1,26 @@
+digraph "Graphical Class Hierarchy"
+{
+ // INTERACTIVE_SVG=YES
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node0 [label="snowhouse::ConstraintOperator",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structsnowhouse_1_1ConstraintOperator.html"];
+  Node0 -> Node1 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1 [label="snowhouse::AndOperator",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structsnowhouse_1_1AndOperator.html"];
+  Node0 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="snowhouse::CollectionOperator",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structsnowhouse_1_1CollectionOperator.html"];
+  Node2 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="snowhouse::AllOperator",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structsnowhouse_1_1AllOperator.html"];
+  Node2 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="snowhouse::AtLeastOperator",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structsnowhouse_1_1AtLeastOperator.html"];
+  Node2 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="snowhouse::AtMostOperator",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structsnowhouse_1_1AtMostOperator.html"];
+  Node2 -> Node6 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="snowhouse::ExactlyOperator",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structsnowhouse_1_1ExactlyOperator.html"];
+  Node2 -> Node7 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node7 [label="snowhouse::NoneOperator",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structsnowhouse_1_1NoneOperator.html"];
+  Node0 -> Node8 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node8 [label="snowhouse::NotOperator",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structsnowhouse_1_1NotOperator.html"];
+  Node0 -> Node9 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node9 [label="snowhouse::OrOperator",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structsnowhouse_1_1OrOperator.html"];
+}
