@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['hasfileinformation',['HasFileInformation',['../structHasFileInformation.html',1,'']]],
-  ['haslengthconstraint',['HasLengthConstraint',['../structsnowhouse_1_1HasLengthConstraint.html',1,'snowhouse']]],
-  ['haslinenumber',['HasLineNumber',['../structHasLineNumber.html',1,'']]]
+  ['gmresout',['GMRESOut',['../structblitzdg_1_1GMRESOut.html',1,'blitzdg']]],
+  ['gmresparams',['GMRESParams',['../structblitzdg_1_1GMRESParams.html',1,'blitzdg']]],
+  ['gmressolver',['GMRESSolver',['../classblitzdg_1_1GMRESSolver.html',1,'blitzdg']]]
 ];
