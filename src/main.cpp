@@ -11,6 +11,7 @@
   */
 
 #include <iostream>
+#include <fstream>
 #include <blitz/array.h>
 #include <MeshManager.hpp>
 #include <Nodes1DProvisioner.hpp>
@@ -34,8 +35,15 @@ void computeRHS(const matrix_type & u, const double c, Nodes1DProvisioner & node
 	const matrix_type & Fscale = nodes1D.get_Fscale();
 	const matrix_type & nx = nodes1D.get_nx();
 
+	// Get volume to surface maps.
 	const Array<int,1> & vmapM = nodes1D.get_vmapM();
 	const Array<int,1> & vmapP = nodes1D.get_vmapP();
+
+	// boundary indices;
+	const index_type vmapI = nodes1D.get_vmapI();
+	const index_type mapO = nodes1D.get_mapO();
+	const index_type mapI = nodes1D.get_mapI();
+
 
 	int numFaces = nodes1D.NumFaces;
 	int Nfp = nodes1D.NumFacePoints;
@@ -51,18 +59,33 @@ void computeRHS(const matrix_type & u, const double c, Nodes1DProvisioner & node
 	matrix_type uCol(Np, K, ColumnMajorArray<2>());
 	uCol = u; // is this gross?
 
+
+	// maybe this loop can be blitz-ified...
 	index_type count = 0;
 	for (index_type k1=0; k1 < K; k1++) {
 		for (index_type f1=0; f1 < numFaces; f1++) {
 			index_type vM = vmapM(count);
 			index_type vP = vmapP(count);
 
+			double uM = uCol(vM);
+			double uP = uCol(vP);
+
+			// Inflow BC:
+			if (count == mapI)
+				uP = uCol(vmapI);
+
+			// Outflow BC;
+			if (count == mapO)
+				uP = uM; // exit stage left.
+
 			// Compute jump in flux:
-			du(f1,k1) = (uCol(vM) - uCol(vP))*0.5*(c*nx(f1,k1) - (1-alpha)*abs(c*nx(f1,k1))); 
+			du(f1,k1) = (uM - uP)*0.5*(c*nx(f1,k1) - (1-alpha)*abs(c*nx(f1,k1))); 
 			count++;
 		}
 	}
 
+	// Assumes PDE has been left-multiplied by local inverse mass matrix, so all we have left
+	// is the differentiation matrix contribution, and the surface integral
 	RHS =-c*rx*(sum(Dr(ii,kk)*u(kk,jj), kk)) + Lift*(Fscale*(du));;
 }
 
@@ -79,7 +102,7 @@ int main(int argc, char **argv) {
 	// Numerical parameters:
 	int N = 4;
 	int K = 20;
-	double CFL = 0.5;
+	double CFL = 0.05;
 
 	// Build dependencies.
 	SparseMatrixConverter matrixConverter;
@@ -102,14 +125,26 @@ int main(int argc, char **argv) {
 	matrix_type u(Np, K);
 	matrix_type RHS(Np, K);
 
-	u = exp(-5*(x(ii)*x(ii)));
+	u = exp(-10*(x(ii,jj)*x(ii,jj)));
+
+	index_type count = 0;
 	while (t < finalTime) {
+		// Toy outputting for now.
+		if ((count % 10) == 0) {
+			ofstream outFile;
+			outFile.open("advec1d." + to_string(count));
+			outFile << u;
+			outFile.close();
+		}
+
 		// Calculate Righ-hand side at current time-step.
 		computeRHS(u, c, nodes1DProvisioner, RHS);
 
 		// Forward Euler time-step for now, to be replaced.
 		u = u + dt*RHS;
+
 		t += dt;
+		count++;
 	}
 
 	return 0;
