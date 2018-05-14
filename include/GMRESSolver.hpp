@@ -33,7 +33,7 @@ namespace blitzdg {
          * product \f$Ax\f$.
          * @param[in] n The number of columns of A to use in the product.
          * @param[in] A The dense matrix. Note: A must be stored in column-major format.
-         * @param[in] x The real-valued vector.
+         * @param[in] x A real-valued vector.
          * @param[out] result The computed product \f$Ax\f$.
          */
         void matTimesVec(index_type n, matrix_type& A, vector_type& x, vector_type& result);
@@ -48,29 +48,19 @@ namespace blitzdg {
     } // namespace details
 
     /**
-     * Convergence flags for GMRESSolver.
+     * An enum class representing convergence flags for GMRESSolver.
      */
     enum class ConvFlag { 
-        /** neither converged nor diverged */
-        unconverged,  
-        /** converged with residual norm <= convTol */
-        success, 
-        /** diverged with residual norm >= divTol */    
-        diverged,    
-        /** maximum iterations reached */ 
-        maxits, 
-        /** insufficient change in solution */      
-        stagnation,
-        /** input matrix or preconditioner are (likely) singular */   
-        breakdown, 
-        /** true residual norm > convTol */   
-        true_rnrm,    
-        /** residual norm is inf or nan */
-        inf_or_nan,   
-        /** application of preconditioner failed */
-        precon_fail,  
-        /** matrix-vector product failed */
-        matvec_fail   
+        unconverged, /**< neither converged nor diverged */
+        success,     /**< converged with residual norm <= convTol */
+        diverged,    /**< diverged with residual norm >= divTol */    
+        maxits,      /**< maximum iterations reached */ 
+        stagnation,  /**< insufficient change in solution */      
+        breakdown,   /**< input matrix or preconditioner are (likely) singular */   
+        true_rnrm,   /**< true residual norm > convTol */   
+        inf_or_nan,  /**< residual norm is inf or nan */
+        precon_fail, /**< application of preconditioner failed */
+        matvec_fail  /**< matrix-vector product failed */
     };
 
     /**
@@ -139,26 +129,26 @@ namespace blitzdg {
      * Solves the right-preconditioned linear system \f$AM^{-1}u = b\f$, 
      * where \f$u = Mx\f$ and \f$M\f$ is the preconditioner. 
      * 
-     * <b>Stopping Criteria<\b>
+     * <b>Stopping Criteria</b>
      * 
      * The solver iterates until one of the following criteria are met:
      * 
      * <ul>
      * <li> The convergence criterion is met: 
-     * \f$\|r_k\| \leq \max(\text{relTol}\cdot\|b\|, \text{absTol})\f$
-     * The solver terminates with convergence flag ConvFlag::success.
+     * \f$\|r_k\| \leq \max(\mathrm{relTol}\cdot\|b\|, \mathrm{absTol})\f$
+     * The solver terminates with convergence flag ConvFlag::success.</li>
      * 
      * <li> The divergence criterion is met:
-     * \f$\|r_k\| \geq \text{divTol}\cdot\|r_0\|\f$
-     * The solver terminates with convergence flag ConvFlag::diverged.
+     * \f$\|r_k\| \geq \mathrm{divTol}\cdot\|r_0\|\f$
+     * The solver terminates with convergence flag ConvFlag::diverged.</li>
      * 
      * <li> The stagnation criterion is met:
-     * \f$|x_{k+1}(i) - x_k(i)| \leq \text{stgTol}\cdot|x_{k+1}(i)|~~\forall i\f$
-     * The solver terminates with convergence flag ConvFlag::stagnation.
+     * \f$|x_{k+1}(i) - x_k(i)| \leq \mathrm{stgTol}\cdot|x_{k+1}(i)|~~\forall i\f$
+     * The solver terminates with convergence flag ConvFlag::stagnation.</li>
      * 
-     * <li> The maximum number of iterations \f$\text{maxits}\cdot\text{kspaceSz}\f$ is reached.
-     * The solver terminates with convergence flag ConvFlag::maxits.
-     * <\ul>
+     * <li> The maximum number of iterations \f$\mathrm{maxits}\cdot\mathrm{kspaceSz}\f$ is reached.
+     * The solver terminates with convergence flag ConvFlag::maxits.</li>
+     * </ul>
      * 
      * The norm \f$\|\cdot\|\f$ is always the vector 2-norm and \f$r_k\f$ is
      * the unpreconditioned residual of the \f$k\f$th iterate \f$x_k\f$.
@@ -167,17 +157,17 @@ namespace blitzdg {
      * 
      * <ul>
      * <li> The input matrix or the preconditioner are singular. 
-     * The solver termintes with convergence flag ConvFlag::breakdown.
+     * The solver termintes with convergence flag ConvFlag::breakdown.</li>
      * 
      * <li> The residual norm is inf or nan.
-     * The solver terminates with convergence flag ConvFlag::inf_or_nan.
+     * The solver terminates with convergence flag ConvFlag::inf_or_nan.</li>
      * 
      * <li> The matrix-vector multiply fails.
-     * The solver terminates with convergence flag ConvFlag::matvec_fail.
+     * The solver terminates with convergence flag ConvFlag::matvec_fail.</li>
      * 
      * <li> Application of the preconditioner fails.
-     * The solver terminates with convergence flag ConvFlag::precon_fail.
-     * <\ul>
+     * The solver terminates with convergence flag ConvFlag::precon_fail.</li>
+     * </ul>
      */
     class GMRESSolver {
     public:
@@ -198,7 +188,7 @@ namespace blitzdg {
          * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          * which returns true if successful.
          * @param[in] b The rhs of the linear system.
-         * @param[in,out] x The initial guess on input and the solution on output
+         * @param[in,out] x The initial guess on input. The solution on output.
          * @param[in] params The input parameters for GMRES.
          * @return The convergence information.
          */
