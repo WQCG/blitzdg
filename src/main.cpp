@@ -12,8 +12,6 @@
 
 #include <iostream>
 #include <fstream>
-#include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
 
 #include <blitz/array.h>
 #include <MeshManager.hpp>
@@ -136,7 +134,10 @@ int main(int argc, char **argv) {
 		// Toy outputting for now.
 		if ((count % 10) == 0) {
 			ofstream outFile;
-			outFile.open("advec1d." + lexical_cast<string>(count));
+
+			stringstream fileNameStrm;
+			fileNameStrm << "advec1d." << count;
+			outFile.open(fileNameStrm.str());
 			outFile << u;
 			outFile.close();
 		}
