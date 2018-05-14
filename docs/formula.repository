@@ -8,3 +8,21 @@
 \form#7:$b = 0$
 \form#8:$(x,y)$
 \form#9:\begin{eqnarray*} x &=& cx + sy\\ y &=& cy - sx \end{eqnarray*}
+\form#10:$AM^{-1}u = b$
+\form#11:$u = Mx$
+\form#12:$M$
+\form#13:$\|r_k\| \leq \max(\mathrm{relTol}\cdot\|b\|, \mathrm{absTol})$
+\form#14:$\|r_k\| \geq \mathrm{divTol}\cdot\|r_0\|$
+\form#15:$|x_{k+1}(i) - x_k(i)| \leq \mathrm{stgTol}\cdot|x_{k+1}(i)|~~\forall i$
+\form#16:$\mathrm{maxits}\cdot\mathrm{kspaceSz}$
+\form#17:$\|\cdot\|$
+\form#18:$r_k$
+\form#19:$k$
+\form#20:$x_k$
+\form#21:$Uy = x$
+\form#22:$U$
+\form#23:$n\times n$
+\form#24:$A$
+\form#25:$Ax$
+\form#26:$Ax = b$
+\form#27:$M^{-1}x$
