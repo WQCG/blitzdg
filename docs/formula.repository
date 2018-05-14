@@ -1,0 +1,10 @@
+\form#0:$(a,b)$
+\form#1:$c,\,s$
+\form#2:$G(c,s)$
+\form#3:\begin{eqnarray*} ca + sb &=& r\\ cb - sa &=& 0 \end{eqnarray*}
+\form#4:$x$
+\form#5:$y$
+\form#6:$a = r$
+\form#7:$b = 0$
+\form#8:$(x,y)$
+\form#9:\begin{eqnarray*} x &=& cx + sy\\ y &=& cy - sx \end{eqnarray*}

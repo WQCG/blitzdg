@@ -1,0 +1,34 @@
+<map id="include/LinAlgHelpers.hpp" name="include/LinAlgHelpers.hpp">
+<area shape="rect" id="node2" href="$Types_8hpp.html" title="Defines the basic types used throughout this project. " alt="" coords="917,80,986,107"/>
+<area shape="rect" id="node3" href="$array_8h_source.html" title="blitz/array.h" alt="" coords="915,155,988,181"/>
+<area shape="rect" id="node4" href="$array-impl_8h_source.html" title="blitz/array&#45;impl.h" alt="" coords="903,229,999,256"/>
+<area shape="rect" id="node5" href="$blitz_8h_source.html" title="blitz/blitz.h" alt="" coords="525,677,594,704"/>
+<area shape="rect" id="node17" href="$memblock_8h_source.html" title="blitz/memblock.h" alt="" coords="113,528,209,555"/>
+<area shape="rect" id="node21" href="$range_8h_source.html" title="blitz/range.h" alt="" coords="772,453,848,480"/>
+<area shape="rect" id="node27" href="$tinyvec2_8h_source.html" title="blitz/tinyvec2.h" alt="" coords="989,528,1077,555"/>
+<area shape="rect" id="node29" href="$slice_8h_source.html" title="blitz/array/slice.h" alt="" coords="1170,603,1266,629"/>
+<area shape="rect" id="node31" href="$tvecglobs_8h_source.html" title="blitz/tvecglobs.h" alt="" coords="1390,453,1483,480"/>
+<area shape="rect" id="node39" href="$indexexpr_8h_source.html" title="blitz/indexexpr.h" alt="" coords="904,304,999,331"/>
+<area shape="rect" id="node40" href="$domain_8h_source.html" title="blitz/array/domain.h" alt="" coords="362,379,471,405"/>
+<area shape="rect" id="node41" href="$map_8h_source.html" title="blitz/array/map.h" alt="" coords="497,304,593,331"/>
+<area shape="rect" id="node42" href="$multi_8h_source.html" title="blitz/array/multi.h" alt="" coords="1355,304,1452,331"/>
+<area shape="rect" id="node43" href="$storage_8h_source.html" title="blitz/array/storage.h" alt="" coords="1477,304,1586,331"/>
+<area shape="rect" id="node6" href="$bzconfig_8h_source.html" title="blitz/bzconfig.h" alt="" coords="121,827,209,853"/>
+<area shape="rect" id="node7" href="$compiler_8h_source.html" title="blitz/compiler.h" alt="" coords="197,752,287,779"/>
+<area shape="rect" id="node9" href="$tuning_8h_source.html" title="blitz/tuning.h" alt="" coords="424,752,503,779"/>
+<area shape="rect" id="node10" href="$tau_8h_source.html" title="blitz/tau.h" alt="" coords="527,752,592,779"/>
+<area shape="rect" id="node15" href="$bzdebug_8h_source.html" title="blitz/bzdebug.h" alt="" coords="311,752,400,779"/>
+<area shape="rect" id="node18" href="$simdtypes_8h_source.html" title="blitz/simdtypes.h" alt="" coords="87,603,183,629"/>
+<area shape="rect" id="node22" href="$etbase_8h_source.html" title="blitz/etbase.h" alt="" coords="803,603,884,629"/>
+<area shape="rect" id="node23" href="$asexpr_8h_source.html" title="blitz/array/asexpr.h" alt="" coords="757,528,863,555"/>
+<area shape="rect" id="node26" href="$prettyprint_8h_source.html" title="blitz/prettyprint.h" alt="" coords="511,528,607,555"/>
+<area shape="rect" id="node24" href="$et-forward_8h_source.html" title="blitz/et&#45;forward.h" alt="" coords="682,603,778,629"/>
+<area shape="rect" id="node25" href="$numtrait_8h_source.html" title="blitz/numtrait.h" alt="" coords="1008,603,1095,629"/>
+<area shape="rect" id="node28" href="$listinit_8h_source.html" title="blitz/listinit.h" alt="" coords="908,603,984,629"/>
+<area shape="rect" id="node32" href="$metaprog_8h_source.html" title="blitz/meta/metaprog.h" alt="" coords="1377,603,1496,629"/>
+<area shape="rect" id="node33" href="$tvcross_8h_source.html" title="blitz/tvcross.h" alt="" coords="1722,528,1805,555"/>
+<area shape="rect" id="node34" href="$dot_8h_source.html" title="blitz/meta/dot.h" alt="" coords="1475,528,1564,555"/>
+<area shape="rect" id="node37" href="$product_8h_source.html" title="blitz/meta/product.h" alt="" coords="1589,528,1698,555"/>
+<area shape="rect" id="node38" href="$sum_8h_source.html" title="blitz/meta/sum.h" alt="" coords="1304,528,1399,555"/>
+<area shape="rect" id="node35" href="$promote_8h_source.html" title="blitz/promote.h" alt="" coords="1521,603,1609,629"/>
+</map>
