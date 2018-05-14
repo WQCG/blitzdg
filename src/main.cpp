@@ -19,7 +19,7 @@
 #include <DirectSolver.hpp>
 
 using namespace std;
-BZ_USING_NAMESPACE(blitz)
+using namespace blitz;
 using namespace blitzdg;
 
 // Blitz indices
@@ -28,7 +28,6 @@ secondIndex jj;
 thirdIndex kk;
 
 void computeRHS(const Array<double,2> & u, const double c, Nodes1DProvisioner & nodes1D, Array<double,2> & RHS) {
-	//something like: RHS = -c*rx*(Dr*u) + c*LIFT*Fscale*numFlux
 	Array<double,2> & Dr = nodes1D.get_Dr();
 	Array<double,2> & rx = nodes1D.get_rx();
 	Array<double,2> & Lift = nodes1D.get_Lift();
@@ -43,7 +42,7 @@ void computeRHS(const Array<double,2> & u, const double c, Nodes1DProvisioner & 
 	int Np = nodes1D.get_NumLocalPoints();
 	int K = nodes1D.get_NumElements();
 
-	double alpha = 0;   //1 == central flux, 0 == upwind flux.
+	double alpha = 0;   // 1 == central flux, 0 == upwind flux.
 
 	Array<double,2> du(numFaces*Nfp, K);
 	du = 0.*jj;
@@ -64,7 +63,7 @@ void computeRHS(const Array<double,2> & u, const double c, Nodes1DProvisioner & 
 		}
 	}
 
-	RHS =-c*rx*(sum(Dr(ii,jj)*u(jj,kk), jj)) + Lift*(Fscale*(du));
+	RHS =-c*rx*(sum(Dr(ii,kk)*u(kk,jj), kk)) + Lift*(Fscale*(du));;
 }
 
 int main(int argc, char **argv) {
