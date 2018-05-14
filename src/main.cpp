@@ -12,6 +12,8 @@
 
 #include <iostream>
 #include <fstream>
+#include <string>
+
 #include <blitz/array.h>
 #include <MeshManager.hpp>
 #include <Nodes1DProvisioner.hpp>
