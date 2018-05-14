@@ -12,7 +12,8 @@
 
 #include <iostream>
 #include <fstream>
-#include <string>
+#include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include <blitz/array.h>
 #include <MeshManager.hpp>
@@ -24,6 +25,7 @@
 using namespace std;
 using namespace blitz;
 using namespace blitzdg;
+using namespace boost;
 
 // Blitz indices
 firstIndex ii;
@@ -134,7 +136,7 @@ int main(int argc, char **argv) {
 		// Toy outputting for now.
 		if ((count % 10) == 0) {
 			ofstream outFile;
-			outFile.open("advec1d." + to_string(count));
+			outFile.open("advec1d." + lexical_cast<string>(count));
 			outFile << u;
 			outFile.close();
 		}
