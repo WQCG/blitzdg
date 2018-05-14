@@ -1,6 +1,0 @@
-<map id="operand2" name="operand2">
-<area shape="rect" id="node2" href="$classComplexOperand2.html" title="ComplexOperand2" alt="" coords="5,80,111,107"/>
-<area shape="rect" id="node3" href="$classMatExprOperand.html" title="MatExprOperand" alt="" coords="135,80,234,107"/>
-<area shape="rect" id="node4" href="$classMatOperand.html" title="MatOperand" alt="" coords="258,80,335,107"/>
-<area shape="rect" id="node5" href="$classScalarOperand2.html" title="ScalarOperand2" alt="" coords="360,80,455,107"/>
-</map>

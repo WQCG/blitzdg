@@ -1,8 +1,6 @@
 var searchData=
 [
-  ['defaultstringizer',['DefaultStringizer',['../structsnowhouse_1_1detail_1_1DefaultStringizer.html',1,'snowhouse::detail']]],
-  ['defaultstringizer_3c_20t_2c_20false_20_3e',['DefaultStringizer&lt; T, false &gt;',['../structsnowhouse_1_1detail_1_1DefaultStringizer_3_01T_00_01false_01_4.html',1,'snowhouse::detail']]],
-  ['defaulttestresultsoutput',['DefaultTestResultsOutput',['../classigloo_1_1DefaultTestResultsOutput.html',1,'igloo']]],
   ['directsolver',['DirectSolver',['../classDirectSolver.html',1,'DirectSolver'],['../classDirectSolver.html#a6b43b08944ef463ec2241e92e2dca882',1,'DirectSolver::DirectSolver()']]],
-  ['divtol',['divTol',['../structblitzdg_1_1GMRESParams.html#ac3cb3cc2c1108411c39bd568b2447015',1,'blitzdg::GMRESParams']]]
+  ['divtol',['divTol',['../structblitzdg_1_1GMRESParams.html#ac3cb3cc2c1108411c39bd568b2447015',1,'blitzdg::GMRESParams']]],
+  ['drotg',['DROTG',['../LinAlgHelpers_8hpp.html#a97694164030daa4ffedf310888bf0021',1,'blitzdg']]]
 ];

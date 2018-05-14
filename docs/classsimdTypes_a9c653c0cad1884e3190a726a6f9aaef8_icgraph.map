@@ -1,5 +1,0 @@
-<map id="simdTypes::isVectorAligned" name="simdTypes::isVectorAligned">
-<area shape="rect" id="node2" href="$classArray.html#a2b75ad927b8e5a5fae961d98ecff2e6e" title="Returns true if the array is aligned on a simd vector width. " alt="" coords="224,5,339,47"/>
-<area shape="rect" id="node3" href="$classFastArrayIteratorBase.html#a0cca04cb1f037296baedb6c4dc244717" title="Returns true if the iterator data is aligned on a simd vector. " alt="" coords="203,71,359,141"/>
-<area shape="rect" id="node4" href="$classMemoryBlockReference.html#a59d1018fa6ef1925efcccfbf5a698c08" title="Returns true if the offset from data_ is vector aligned. " alt="" coords="199,165,364,207"/>
-</map>

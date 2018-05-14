@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['eigensolver',['EigenSolver',['../classEigenSolver.html#af40dc818f0c3ee669269fb4ccd2197bd',1,'EigenSolver']]]
+  ['directsolver',['DirectSolver',['../classDirectSolver.html#a6b43b08944ef463ec2241e92e2dca882',1,'DirectSolver']]],
+  ['drotg',['DROTG',['../LinAlgHelpers_8hpp.html#a97694164030daa4ffedf310888bf0021',1,'blitzdg']]]
 ];

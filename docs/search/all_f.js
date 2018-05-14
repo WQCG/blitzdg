@@ -1,8 +1,7 @@
 var searchData=
 [
-  ['readelements',['readElements',['../classMeshManager.html#a947cfaa0fb765284196b98d5fbd8df94',1,'MeshManager']]],
-  ['readmesh',['readMesh',['../classMeshManager.html#a0648ad268511d72842d979d676fa42b6',1,'MeshManager']]],
-  ['readvertices',['readVertices',['../classMeshManager.html#aefe48f064f665e3c6eedbf1abcb0506e',1,'MeshManager']]],
-  ['relres',['relres',['../structblitzdg_1_1GMRESOut.html#a444491020b529dfe1bc6e55b717e51f6',1,'blitzdg::GMRESOut']]],
-  ['reltol',['relTol',['../structblitzdg_1_1GMRESParams.html#ae22a865abb0048b60586eb1b5c3cc973',1,'blitzdg::GMRESParams']]]
+  ['solve',['solve',['../classDirectSolver.html#a7a888c690a1d941a484e8fc11d5adc0d',1,'DirectSolver::solve()'],['../classEigenSolver.html#a6cdb35bedba5790d4e76b6556beb35d5',1,'EigenSolver::solve()'],['../classLUSolver.html#aae3fbf619ff5c110253898e14f860c44',1,'LUSolver::solve()']]],
+  ['sparsematrixconverter',['SparseMatrixConverter',['../classSparseMatrixConverter.html',1,'']]],
+  ['sparsetriplet',['SparseTriplet',['../structSparseTriplet.html',1,'']]],
+  ['stgtol',['stgTol',['../structblitzdg_1_1GMRESParams.html#ada7e4e42d58df664ee07f7f2b11ca453',1,'blitzdg::GMRESParams']]]
 ];

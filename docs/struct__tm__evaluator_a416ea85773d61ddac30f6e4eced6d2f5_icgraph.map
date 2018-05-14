@@ -1,4 +1,0 @@
-<map id="_tm_evaluator::evaluate_aligned" name="_tm_evaluator::evaluate_aligned">
-<area shape="rect" id="node2" href="$struct__tm__evaluator.html#a7d693e7c5d175e980e39b9b7f14b8913" title="The select_evaluation function redirects expressions that do not contains solely TinyMatrix operands ..." alt="" coords="183,5,300,47"/>
-<area shape="rect" id="node3" href="$classTinyMatrix.html#ad1884b5277e452e45e136d79176f37b1" title="This function selects evaluation path by calling select_evaluation with a bool argument which is fals..." alt="" coords="348,13,481,39"/>
-</map>

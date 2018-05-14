@@ -1,7 +1,0 @@
-<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classoperand2.html" title="operand2" alt="" coords="5,81,69,108"/>
-<area shape="rect" id="node2" href="$classComplexOperand2.html" title="ComplexOperand2" alt="" coords="117,5,223,32"/>
-<area shape="rect" id="node3" href="$classMatExprOperand.html" title="MatExprOperand" alt="" coords="121,56,219,83"/>
-<area shape="rect" id="node4" href="$classMatOperand.html" title="MatOperand" alt="" coords="131,107,209,133"/>
-<area shape="rect" id="node5" href="$classScalarOperand2.html" title="ScalarOperand2" alt="" coords="123,157,217,184"/>
-</map>

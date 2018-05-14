@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['verbose',['verbose',['../structblitzdg_1_1GMRESParams.html#a650ec6b002188a989e98b5088bd64094',1,'blitzdg::GMRESParams']]],
-  ['visualstudioresultsoutput',['VisualStudioResultsOutput',['../classigloo_1_1VisualStudioResultsOutput.html',1,'igloo']]]
+  ['_7enodes1dprovisioner',['~Nodes1DProvisioner',['../classNodes1DProvisioner.html#a5ad405d08d1b0e0b232502891b0edab4',1,'Nodes1DProvisioner']]]
 ];

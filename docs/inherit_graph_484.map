@@ -1,5 +1,0 @@
-<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classGeneralArrayStorage.html" title="Declaration of class GeneralArrayStorage&lt;N_rank&gt; " alt="" coords="5,35,121,76"/>
-<area shape="rect" id="node2" href="$classColumnMajorArray.html" title="Class ColumnMajorArray specializes GeneralArrayStorage to provide column major arrays (column major o..." alt="" coords="173,5,294,47"/>
-<area shape="rect" id="node3" href="$classFortranArray.html" title="Class FortranArray specializes GeneralArrayStorage to provide Fortran style arrays (column major orde..." alt="" coords="169,71,297,98"/>
-</map>
