@@ -417,5 +417,23 @@ namespace Nodes1DProvisionerTests {
             Assert::That(sqrt(sum(resVmapM*resVmapM)), Equals(0));
             Assert::That(sqrt(sum(resVmapP*resVmapP)), Equals(0));
         }
+
+        It(Should_Build_Normals) {
+
+            Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+            nodes1D.buildNodes();
+
+            const matrix_type & nx = nodes1D.get_nx();
+
+            matrix_type expectednx(2,5);
+            expectednx = -1,-1,-1,-1,-1,
+                          1, 1, 1, 1, 1;
+
+            matrix_type resnx(2,5);
+
+            resnx = nx - expectednx;
+
+            Assert::That(sqrt(sum(resnx*resnx)), Equals(0));
+        }
     };
 }

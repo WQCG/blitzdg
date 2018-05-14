@@ -31,6 +31,7 @@ class Nodes1DProvisioner {
     Array<double, 2> * Lift;
     Array<double, 2> * J;
     Array<double, 2> * rx;
+    blitzdg::matrix_type * nx;
 
     Array<int, 1> * Fmask;
     Array<double, 2> * Fx;
@@ -62,6 +63,7 @@ class Nodes1DProvisioner {
     void buildVandermondeMatrix();
     void buildLift();
     void buildMaps();
+    void buildNormals();
     void computeGradVandermonde(Array<double,2> & DVr);
     void computeJacobian();
     
@@ -71,6 +73,7 @@ class Nodes1DProvisioner {
     Array<double, 2> & get_V();
     Array<double, 2> & get_J();
     Array<double, 2> & get_rx();
+    const blitzdg::matrix_type & get_nx();
 
     Array<int, 1> & get_Fmask();
     Array<double, 2> & get_Fx();

@@ -47,6 +47,7 @@ Nodes1DProvisioner::Nodes1DProvisioner(int _NOrder, int _NumElements, double _xm
     Fmask = new Array<int, 1> (NumFacePoints*NumFaces);
     Fx = new Array<double, 2>(NumFacePoints*NumFaces, NumElements);
     Fscale = new matrix_type(NumFacePoints*NumFaces, NumElements);
+    nx = new matrix_type(NumFacePoints*NumFaces, NumElements);
 
     vmapM = new index_vector_type(NumFacePoints*NumFaces*NumElements);
     vmapP = new index_vector_type(NumFacePoints*NumFaces*NumElements);
@@ -85,6 +86,24 @@ void Nodes1DProvisioner::buildNodes() {
 
     buildConnectivityMatrices();
     buildFaceMask();
+    buildNormals();
+}
+
+/**
+ * Build unit normals at element faces. Trivial in 1D.
+ */
+void Nodes1DProvisioner::buildNormals() {
+    matrix_type & nxref = *nx;
+
+    index_type count = 0;
+    for (index_type k=0; k < NumElements; k++) {
+        for (index_type f=0; f < NumFaces*NumFacePoints; f++) {
+            nxref(f,k) = pow(-1., count+1);
+            count++;
+        }
+    }
+
+    cout << "nx: " << nxref << endl;
 }
 
 /**
@@ -422,6 +441,13 @@ Array<double, 2> & Nodes1DProvisioner::get_rx() {
     return *rx;
 }
 
+/**
+ * Get reference to normals array nx.
+ */
+const matrix_type & Nodes1DProvisioner::get_nx() {
+    return *nx;
+} 
+
 int Nodes1DProvisioner::get_NumLocalPoints() {
     return NumLocalPoints;
 }
@@ -496,6 +522,7 @@ Nodes1DProvisioner::~Nodes1DProvisioner() {
     delete Fmask;
     delete Fx;
     delete Fscale;
+    delete nx;
     delete vmapM;
     delete vmapP;
 }
