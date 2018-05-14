@@ -370,6 +370,12 @@ void Nodes1DProvisioner::buildDr() {
     Drref = Drtrans(jj, ii);
 } 
 
+/**
+ * Get number of elements.
+ */
+int Nodes1DProvisioner::get_NumElements() {
+    return NumElements;
+}
 
 /**
  * Get reference to 1D Lifting Operator.

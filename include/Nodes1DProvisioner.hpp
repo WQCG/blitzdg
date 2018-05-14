@@ -94,6 +94,7 @@ class Nodes1DProvisioner {
     const blitzdg::index_type get_vmapO();
 
     int get_NumLocalPoints();
+    int get_NumElements();
 
     // these can be moved to a helper (polynomials) class or made private within this class.
     void computeJacobiPolynomial(Array<double,1> const & x, const double alpha, const double beta, const int N, Array<double,1> & p);
