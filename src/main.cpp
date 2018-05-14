@@ -27,12 +27,12 @@ firstIndex ii;
 secondIndex jj;
 thirdIndex kk;
 
-void computeRHS(const Array<double,2> & u, const double c, Nodes1DProvisioner & nodes1D, Array<double,2> & RHS) {
-	Array<double,2> & Dr = nodes1D.get_Dr();
-	Array<double,2> & rx = nodes1D.get_rx();
-	Array<double,2> & Lift = nodes1D.get_Lift();
-	const Array<double,2> & Fscale = nodes1D.get_Fscale();
-	const Array<double,2> & nx = nodes1D.get_nx();
+void computeRHS(const matrix_type & u, const double c, Nodes1DProvisioner & nodes1D, matrix_type & RHS) {
+	matrix_type & Dr = nodes1D.get_Dr();
+	matrix_type & rx = nodes1D.get_rx();
+	matrix_type & Lift = nodes1D.get_Lift();
+	const matrix_type & Fscale = nodes1D.get_Fscale();
+	const matrix_type & nx = nodes1D.get_nx();
 
 	const Array<int,1> & vmapM = nodes1D.get_vmapM();
 	const Array<int,1> & vmapP = nodes1D.get_vmapP();
@@ -44,11 +44,11 @@ void computeRHS(const Array<double,2> & u, const double c, Nodes1DProvisioner & 
 
 	double alpha = 0;   // 1 == central flux, 0 == upwind flux.
 
-	Array<double,2> du(numFaces*Nfp, K);
+	matrix_type du(numFaces*Nfp, K);
 	du = 0.*jj;
-	Array<double,2> uM(numFaces*Nfp, K);
+	matrix_type uM(numFaces*Nfp, K);
 
-	Array<double,2> uCol(Np, K, ColumnMajorArray<2>());
+	matrix_type uCol(Np, K, ColumnMajorArray<2>());
 	uCol = u; // is this gross?
 
 	index_type count = 0;
@@ -93,14 +93,14 @@ int main(int argc, char **argv) {
 
 	int Np = nodes1DProvisioner.get_NumLocalPoints();
 
-	Array<double,2> & x = nodes1DProvisioner.get_xGrid();
+	matrix_type & x = nodes1DProvisioner.get_xGrid();
 
 	double min_dx = x(1,0) - x(0,0);
 
 	double dt = CFL*min_dx/c;
 
-	Array<double, 2> u(Np, K);
-	Array<double, 2> RHS(Np, K);
+	matrix_type u(Np, K);
+	matrix_type RHS(Np, K);
 
 	u = exp(-5*(x(ii)*x(ii)));
 	while (t < finalTime) {
