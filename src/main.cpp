@@ -11,6 +11,7 @@
   */
 
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 
 #include <blitz/array.h>
@@ -139,7 +140,7 @@ int main(int argc, char **argv) {
 			ofstream outFile;
 
 			stringstream fileNameStrm;
-			fileNameStrm << "advec1d." << count;
+			fileNameStrm << "advec1d" << setfill('0') << setw(7) << count << ".dat";
 			outFile.open(fileNameStrm.str());
 			outFile << u;
 			outFile.close();
