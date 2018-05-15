@@ -1,3 +1,7 @@
+/**
+ * @file GMRESSolver.hpp
+ * @brief Implements a right-preconditioned GMRES iterative method.
+ */
 #pragma once
 #include "LinAlgHelpers.hpp"
 #include "Types.hpp"
@@ -13,17 +17,33 @@
 
 namespace blitzdg {
     namespace details {
-        // Solves U*y = x, where U is the upper triangular part of 
-        // the n x n leading principal submatrix of A. On input
-        // the rhs is contained in x and on output the solution 
-        // y overwrites x. Note that A must be stored in
-        // column-major format.
+        /**
+         * Calls the BLAS function dtrsv to solve the triangular
+         * linear system \f$Uy = x\f$, where \f$U\f$ is the upper
+         * triangular part of the \f$n\times n\f$ leading principal
+         * submatrix of \f$A\f$.
+         * @param[in] n The order of \f$U\f$.
+         * @param[in] A A dense matrix.
+         * @param[in,out] x On input the right-hand side. On output the solution.
+         * @note The matrix A must be stored in column-major format and be at least n-by-n.
+         * @note The upper triangular matrix \f$U\f$ must be nonsingular.
+         */
         void backSolve(index_type n, matrix_type& A, vector_type& x);
 
-        // computes result = A(:,0:n-1)*x(0:n-1)
+        /**
+         * Calls the BLAS function dgemv to compute the matrix-vector 
+         * product \f$Ax\f$.
+         * @param[in] n The number of leading columns of A that are used in the product.
+         * @param[in] A A dense matrix.
+         * @param[in] x A real-valued vector.
+         * @param[out] result The computed product.
+         * @note The matrix A must be stored in column-major format and have at least n columns.
+         */
         void matTimesVec(index_type n, matrix_type& A, vector_type& x, vector_type& result);
 
-        // checks if array is not uniquely zero
+        /**
+         * Returns true if the input array x is not uniquely zero.
+         */ 
         inline bool isNonzero(const vector_type& x) {
             return std::any_of(x.begin(), x.end(),
                 [](real_type val) { return val != real_type(0); });
@@ -31,19 +51,19 @@ namespace blitzdg {
     } // namespace details
 
     /**
-     * Convergence flags for GMRESSolver.
+     * An enum class representing convergence flags for GMRESSolver.
      */
     enum class ConvFlag { 
-        unconverged,  /**< neither converged nor diverged */
-        success,      /**< converged with residual norm <= convTol */
-        diverged,     /**< diverged with residual norm >= divTol */
-        maxits,       /**< maximum iterations reached */
-        stagnation,   /**< insufficient change in solution */
-        breakdown,    /**< input matrix or preconditioner are (likely) singular */
-        true_rnrm,    /**< true residual norm > convTol */
-        inf_or_nan,   /**< residual norm is inf or nan */
-        precon_fail,  /**< application of preconditioner failed */
-        matvec_fail   /**< matrix-vector product failed */
+        unconverged, ///< Neither converged nor diverged. 
+        success,     ///< Converged with residual norm <= convTol. 
+        diverged,    ///< Diverged with residual norm >= divTol. 
+        maxits,      ///< Maximum iterations reached. 
+        stagnation,  ///< Insufficient change in solution.    
+        breakdown,   ///< Input matrix or preconditioner are (likely) singular. 
+        true_rnrm,   ///< True residual norm > convTol. 
+        inf_or_nan,  ///< Residual norm is inf or nan. 
+        precon_fail, ///< Application of preconditioner failed. 
+        matvec_fail  ///< Matrix-vector product failed. 
     };
 
     /**
@@ -63,14 +83,14 @@ namespace blitzdg {
      * Input parameters for the GMRES solver.
      */
     struct GMRESParams {
-        bool verbose;        /**< if true, output convergence history to console */
-        bool testTrueRnrm;   /**< if true, check that true residual norm <= convTol */
-        index_type kspaceSz; /**< max size of Krylov subspace before restarting */
-        index_type maxits;   /**< max number of outer iterations */
-        real_type relTol;    /**< relative convergence tolerance */
-        real_type absTol;    /**< absolute convergence tolerance */
-        real_type divTol;    /**< divergence tolerance */
-        real_type stgTol;    /**< stagnation tolerance */
+        bool verbose;        /**< If true, output convergence history to console. Defaults to false. */
+        bool testTrueRnrm;   /**< If true, check the true residual norm for convergence. Defaults to true. */
+        index_type kspaceSz; /**< Max dimension of the Krylov subspace. Defaults to 30.  */
+        index_type maxits;   /**< Max number of outer iterations. Defaults to 100. */
+        real_type relTol;    /**< Relative convergence tolerance. Defaults to 1e-6. */
+        real_type absTol;    /**< Absolute convergence tolerance. Defaults to 1e-6. */
+        real_type divTol;    /**< Divergence tolerance. Defaults to 1e5. */
+        real_type stgTol;    /**< Stagnation tolerance. Defaults to 1e-12. */
         GMRESParams()
             : verbose{ false }, testTrueRnrm{ true }, 
             kspaceSz{ 30 }, maxits{ 100 }, relTol{ 1e-6 }, 
@@ -79,8 +99,8 @@ namespace blitzdg {
     };
 
     /**
-     * Checks the input parameters in GMRESParams and throws and exception
-     * if any are out of range.
+     * Checks the parameters in GMRESParams and throws an 
+     * std::invalid_argument exception if any are out of range.
      */ 
     void checkGMRESParams(const GMRESParams& p);
 
@@ -88,11 +108,11 @@ namespace blitzdg {
      * GMRES output information.
      */
     struct GMRESOut {
-        ConvFlag flag;       /**< convergence flag */
-        index_type innerIts; /**< inner iteration number at which solution was computed */
-        index_type outerIts; /**< outer iteration number at which solution was computed */
-        real_type relres;    /**< relative residual norm of solution */
-        std::string msg;     /**< addtional output info */
+        ConvFlag flag;       /**< Convergence flag. See definition of ConvFlag. */
+        index_type innerIts; /**< Inner iteration number at which solution was computed. */
+        index_type outerIts; /**< Outer iteration number at which solution was computed. */
+        real_type relres;    /**< Relative residual norm of solution, i.e., \f$\|r\|/\|b\|\f$. */
+        std::string msg;     /**< Addtional output information. */
         GMRESOut()
             : flag{ ConvFlag::unconverged },
             innerIts{ 0 }, outerIts{ 0 }, relres{ real_type(0) },
@@ -101,7 +121,7 @@ namespace blitzdg {
     };
 
     /**
-     * Write a GMRES output to an output stream. 
+     * Write a GMRESOut object to an output stream. 
      */
     std::ostream& operator<<(std::ostream& strm, const GMRESOut& out);
 
@@ -109,35 +129,69 @@ namespace blitzdg {
      * Preconditioned, restarted GMRES with Modified
      * Gram-Schmidt orthogonalization.
      * 
-     * Solves the preconditioned linear system A*M^{-1}*u = b, 
-     * where u = M*x and M is the preconditioner. The solver 
-     * converges at the kth iteration if
-     *     k < maxits*kspaceSz and ||r_k|| <= max(relTol*||b||, absTol).
-     * The solver diverges at the kth iteration if
-     *     ||r_k|| >= divTol*||r_0||.
-     * The solver stagnates at the kth iteration if
-     *     |x_{k+1}(i) - x_k(i)| <= stgTol*|x_{k+1}(i)| for all i.
-     * The norm ||.|| is always the vector 2-norm and r_k is
-     * the unpreconditioned residual of the kth iterate x_k.
+     * Solves the right-preconditioned linear system \f$AM^{-1}u = b\f$, 
+     * where \f$u = Mx\f$ and \f$M\f$ is the preconditioner. 
+     * 
+     * <b>Stopping Criteria</b>
+     * 
+     * The solver iterates until one of the following criteria are met:
+     * 
+     * <ul>
+     * <li> The convergence criterion is met: 
+     * \f$\|r_k\| \leq \max(\mathrm{relTol}\cdot\|b\|, \mathrm{absTol})\f$
+     * The solver terminates with convergence flag ConvFlag::success.</li>
+     * 
+     * <li> The divergence criterion is met:
+     * \f$\|r_k\| \geq \mathrm{divTol}\cdot\|r_0\|\f$
+     * The solver terminates with convergence flag ConvFlag::diverged.</li>
+     * 
+     * <li> The stagnation criterion is met:
+     * \f$|x_{k+1}(i) - x_k(i)| \leq \mathrm{stgTol}\cdot|x_{k+1}(i)|~~\forall i\f$
+     * The solver terminates with convergence flag ConvFlag::stagnation.</li>
+     * 
+     * <li> The maximum number of iterations \f$\mathrm{maxits}\cdot\mathrm{kspaceSz}\f$ is reached.
+     * The solver terminates with convergence flag ConvFlag::maxits.</li>
+     * </ul>
+     * 
+     * The norm \f$\|\cdot\|\f$ is always the vector two-norm and \f$r_k\f$ is
+     * the unpreconditioned residual of the \f$k\f$th iterate \f$x_k\f$.
+     * 
+     * Various other factors may cause the solver to terminate. These include:
+     * 
+     * <ul>
+     * <li> The input matrix or the preconditioner are singular. 
+     * The solver terminates with convergence flag ConvFlag::breakdown.</li>
+     * 
+     * <li> The residual norm is inf or nan.
+     * The solver terminates with convergence flag ConvFlag::inf_or_nan.</li>
+     * 
+     * <li> The matrix-vector multiply fails.
+     * The solver terminates with convergence flag ConvFlag::matvec_fail.</li>
+     * 
+     * <li> Application of the preconditioner fails.
+     * The solver terminates with convergence flag ConvFlag::precon_fail.</li>
+     * </ul>
      */
     class GMRESSolver {
     public:
         /**
-         * Solves the linear system A*x = b.
-         * @param[in] mvec is a functor that computes a matrix-vector product.
+         * Calls GMRES to solves the linear system \f$Ax = b\f$.
+         * @param[in] mvec is a functor that computes the matrix-vector product,
+         * i.e., it computes \f$Ax\f$. It must define an overload of operator() 
+         * with the signature:
+         * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         * bool operator()(const vector_type& in, vector_type& out)
+         * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         * which returns true if successful.
+         * @param[in] precon is a functor that applies the preconditioner
+         * to a vector, i.e., it computes \f$M^{-1}x\f$.
          * It must define an overload of operator() with the signature:
          * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          * bool operator()(const vector_type& in, vector_type& out)
          * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          * which returns true if successful.
-         * @param[in] precon is a functor that applies the preconditioner to a vector.
-         * It must define an overload of operator() with the signature:
-         * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         * bool operator()(const vector_type& in, vector_type& out)
-         * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         * which returns true if successful.
-         * @param[in] b The rhs of the linear system.
-         * @param[in,out] x The initial guess on input and the solution on output
+         * @param[in] b The right-hand side of the linear system.
+         * @param[in,out] x On input the initial guess. On output the computed solution.
          * @param[in] params The input parameters for GMRES.
          * @return The convergence information.
          */

@@ -64,7 +64,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
-      <li><a href="inherits.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
@@ -103,42 +102,155 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a650ec6b002188a989e98b5088bd64094"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a650ec6b002188a989e98b5088bd64094"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structblitzdg_1_1GMRESParams.html#a650ec6b002188a989e98b5088bd64094">verbose</a></td></tr>
-<tr class="memdesc:a650ec6b002188a989e98b5088bd64094"><td class="mdescLeft">&#160;</td><td class="mdescRight">if true, output convergence history to console <br /></td></tr>
+<tr class="memitem:a650ec6b002188a989e98b5088bd64094"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structblitzdg_1_1GMRESParams.html#a650ec6b002188a989e98b5088bd64094">verbose</a></td></tr>
+<tr class="memdesc:a650ec6b002188a989e98b5088bd64094"><td class="mdescLeft">&#160;</td><td class="mdescRight">If true, output convergence history to console.  <a href="#a650ec6b002188a989e98b5088bd64094">More...</a><br /></td></tr>
 <tr class="separator:a650ec6b002188a989e98b5088bd64094"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a43a2be8fe6290a8cf5293df91b788be3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a43a2be8fe6290a8cf5293df91b788be3"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structblitzdg_1_1GMRESParams.html#a43a2be8fe6290a8cf5293df91b788be3">testTrueRnrm</a></td></tr>
-<tr class="memdesc:a43a2be8fe6290a8cf5293df91b788be3"><td class="mdescLeft">&#160;</td><td class="mdescRight">if true, check that true residual norm &lt;= convTol <br /></td></tr>
+<tr class="memitem:a43a2be8fe6290a8cf5293df91b788be3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structblitzdg_1_1GMRESParams.html#a43a2be8fe6290a8cf5293df91b788be3">testTrueRnrm</a></td></tr>
+<tr class="memdesc:a43a2be8fe6290a8cf5293df91b788be3"><td class="mdescLeft">&#160;</td><td class="mdescRight">If true, check the true residual norm for convergence.  <a href="#a43a2be8fe6290a8cf5293df91b788be3">More...</a><br /></td></tr>
 <tr class="separator:a43a2be8fe6290a8cf5293df91b788be3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab4df1bc8c5bf5146b71cdd05ab56b7e4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab4df1bc8c5bf5146b71cdd05ab56b7e4"></a>
-index_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structblitzdg_1_1GMRESParams.html#ab4df1bc8c5bf5146b71cdd05ab56b7e4">kspaceSz</a></td></tr>
-<tr class="memdesc:ab4df1bc8c5bf5146b71cdd05ab56b7e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">max size of Krylov subspace before restarting <br /></td></tr>
+<tr class="memitem:ab4df1bc8c5bf5146b71cdd05ab56b7e4"><td class="memItemLeft" align="right" valign="top">index_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structblitzdg_1_1GMRESParams.html#ab4df1bc8c5bf5146b71cdd05ab56b7e4">kspaceSz</a></td></tr>
+<tr class="memdesc:ab4df1bc8c5bf5146b71cdd05ab56b7e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Max dimension of the Krylov subspace.  <a href="#ab4df1bc8c5bf5146b71cdd05ab56b7e4">More...</a><br /></td></tr>
 <tr class="separator:ab4df1bc8c5bf5146b71cdd05ab56b7e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab4d19dfa08845daefbcaac6e2cf9d18b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab4d19dfa08845daefbcaac6e2cf9d18b"></a>
-index_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structblitzdg_1_1GMRESParams.html#ab4d19dfa08845daefbcaac6e2cf9d18b">maxits</a></td></tr>
-<tr class="memdesc:ab4d19dfa08845daefbcaac6e2cf9d18b"><td class="mdescLeft">&#160;</td><td class="mdescRight">max number of outer iterations <br /></td></tr>
+<tr class="memitem:ab4d19dfa08845daefbcaac6e2cf9d18b"><td class="memItemLeft" align="right" valign="top">index_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structblitzdg_1_1GMRESParams.html#ab4d19dfa08845daefbcaac6e2cf9d18b">maxits</a></td></tr>
+<tr class="memdesc:ab4d19dfa08845daefbcaac6e2cf9d18b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Max number of outer iterations.  <a href="#ab4d19dfa08845daefbcaac6e2cf9d18b">More...</a><br /></td></tr>
 <tr class="separator:ab4d19dfa08845daefbcaac6e2cf9d18b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae22a865abb0048b60586eb1b5c3cc973"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae22a865abb0048b60586eb1b5c3cc973"></a>
-real_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structblitzdg_1_1GMRESParams.html#ae22a865abb0048b60586eb1b5c3cc973">relTol</a></td></tr>
-<tr class="memdesc:ae22a865abb0048b60586eb1b5c3cc973"><td class="mdescLeft">&#160;</td><td class="mdescRight">relative convergence tolerance <br /></td></tr>
+<tr class="memitem:ae22a865abb0048b60586eb1b5c3cc973"><td class="memItemLeft" align="right" valign="top">real_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structblitzdg_1_1GMRESParams.html#ae22a865abb0048b60586eb1b5c3cc973">relTol</a></td></tr>
+<tr class="memdesc:ae22a865abb0048b60586eb1b5c3cc973"><td class="mdescLeft">&#160;</td><td class="mdescRight">Relative convergence tolerance.  <a href="#ae22a865abb0048b60586eb1b5c3cc973">More...</a><br /></td></tr>
 <tr class="separator:ae22a865abb0048b60586eb1b5c3cc973"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7bd106cca9f838a76ac9d5f4176f3bb7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7bd106cca9f838a76ac9d5f4176f3bb7"></a>
-real_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structblitzdg_1_1GMRESParams.html#a7bd106cca9f838a76ac9d5f4176f3bb7">absTol</a></td></tr>
-<tr class="memdesc:a7bd106cca9f838a76ac9d5f4176f3bb7"><td class="mdescLeft">&#160;</td><td class="mdescRight">absolute convergence tolerance <br /></td></tr>
+<tr class="memitem:a7bd106cca9f838a76ac9d5f4176f3bb7"><td class="memItemLeft" align="right" valign="top">real_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structblitzdg_1_1GMRESParams.html#a7bd106cca9f838a76ac9d5f4176f3bb7">absTol</a></td></tr>
+<tr class="memdesc:a7bd106cca9f838a76ac9d5f4176f3bb7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Absolute convergence tolerance.  <a href="#a7bd106cca9f838a76ac9d5f4176f3bb7">More...</a><br /></td></tr>
 <tr class="separator:a7bd106cca9f838a76ac9d5f4176f3bb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac3cb3cc2c1108411c39bd568b2447015"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac3cb3cc2c1108411c39bd568b2447015"></a>
-real_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structblitzdg_1_1GMRESParams.html#ac3cb3cc2c1108411c39bd568b2447015">divTol</a></td></tr>
-<tr class="memdesc:ac3cb3cc2c1108411c39bd568b2447015"><td class="mdescLeft">&#160;</td><td class="mdescRight">divergence tolerance <br /></td></tr>
+<tr class="memitem:ac3cb3cc2c1108411c39bd568b2447015"><td class="memItemLeft" align="right" valign="top">real_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structblitzdg_1_1GMRESParams.html#ac3cb3cc2c1108411c39bd568b2447015">divTol</a></td></tr>
+<tr class="memdesc:ac3cb3cc2c1108411c39bd568b2447015"><td class="mdescLeft">&#160;</td><td class="mdescRight">Divergence tolerance.  <a href="#ac3cb3cc2c1108411c39bd568b2447015">More...</a><br /></td></tr>
 <tr class="separator:ac3cb3cc2c1108411c39bd568b2447015"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ada7e4e42d58df664ee07f7f2b11ca453"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ada7e4e42d58df664ee07f7f2b11ca453"></a>
-real_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structblitzdg_1_1GMRESParams.html#ada7e4e42d58df664ee07f7f2b11ca453">stgTol</a></td></tr>
-<tr class="memdesc:ada7e4e42d58df664ee07f7f2b11ca453"><td class="mdescLeft">&#160;</td><td class="mdescRight">stagnation tolerance <br /></td></tr>
+<tr class="memitem:ada7e4e42d58df664ee07f7f2b11ca453"><td class="memItemLeft" align="right" valign="top">real_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structblitzdg_1_1GMRESParams.html#ada7e4e42d58df664ee07f7f2b11ca453">stgTol</a></td></tr>
+<tr class="memdesc:ada7e4e42d58df664ee07f7f2b11ca453"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stagnation tolerance.  <a href="#ada7e4e42d58df664ee07f7f2b11ca453">More...</a><br /></td></tr>
 <tr class="separator:ada7e4e42d58df664ee07f7f2b11ca453"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Input parameters for the GMRES solver. </p>
-</div><hr/>The documentation for this struct was generated from the following file:<ul>
+</div><h2 class="groupheader">Member Data Documentation</h2>
+<a class="anchor" id="a7bd106cca9f838a76ac9d5f4176f3bb7"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">real_type blitzdg::GMRESParams::absTol</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Absolute convergence tolerance. </p>
+<p>Defaults to 1e-6. </p>
+
+</div>
+</div>
+<a class="anchor" id="ac3cb3cc2c1108411c39bd568b2447015"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">real_type blitzdg::GMRESParams::divTol</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Divergence tolerance. </p>
+<p>Defaults to 1e5. </p>
+
+</div>
+</div>
+<a class="anchor" id="ab4df1bc8c5bf5146b71cdd05ab56b7e4"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">index_type blitzdg::GMRESParams::kspaceSz</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Max dimension of the Krylov subspace. </p>
+<p>Defaults to 30. </p>
+
+</div>
+</div>
+<a class="anchor" id="ab4d19dfa08845daefbcaac6e2cf9d18b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">index_type blitzdg::GMRESParams::maxits</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Max number of outer iterations. </p>
+<p>Defaults to 100. </p>
+
+</div>
+</div>
+<a class="anchor" id="ae22a865abb0048b60586eb1b5c3cc973"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">real_type blitzdg::GMRESParams::relTol</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Relative convergence tolerance. </p>
+<p>Defaults to 1e-6. </p>
+
+</div>
+</div>
+<a class="anchor" id="ada7e4e42d58df664ee07f7f2b11ca453"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">real_type blitzdg::GMRESParams::stgTol</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Stagnation tolerance. </p>
+<p>Defaults to 1e-12. </p>
+
+</div>
+</div>
+<a class="anchor" id="a43a2be8fe6290a8cf5293df91b788be3"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool blitzdg::GMRESParams::testTrueRnrm</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>If true, check the true residual norm for convergence. </p>
+<p>Defaults to true. </p>
+
+</div>
+</div>
+<a class="anchor" id="a650ec6b002188a989e98b5088bd64094"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool blitzdg::GMRESParams::verbose</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>If true, output convergence history to console. </p>
+<p>Defaults to false. </p>
+
+</div>
+</div>
+<hr/>The documentation for this struct was generated from the following file:<ul>
 <li>include/<a class="el" href="GMRESSolver_8hpp_source.html">GMRESSolver.hpp</a></li>
 </ul>
 </div><!-- contents -->

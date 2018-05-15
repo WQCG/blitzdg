@@ -1,12 +1,5 @@
 var searchData=
 [
-  ['nestedcontextprovider',['NestedContextProvider',['../structigloo_1_1NestedContextProvider.html',1,'igloo']]],
-  ['nestedcontextprovider_3c_20innercontext_2c_20contextwithattribute_3c_20void_20_3e_2c_20isonly_2c_20isskip_20_3e',['NestedContextProvider&lt; InnerContext, ContextWithAttribute&lt; void &gt;, ISONLY, ISSKIP &gt;',['../structigloo_1_1NestedContextProvider.html',1,'igloo']]],
-  ['nestedcontextprovider_3c_20sequencecontainertestsbase_3c_20t_20_3e_2c_20igloo_5fcurrent_5fcontext_2c_20isonly_2c_20isskip_20_3e',['NestedContextProvider&lt; SequenceContainerTestsBase&lt; T &gt;, IGLOO_CURRENT_CONTEXT, ISONLY, ISSKIP &gt;',['../structigloo_1_1NestedContextProvider.html',1,'igloo']]],
-  ['nil',['Nil',['../structsnowhouse_1_1Nil.html',1,'snowhouse']]],
-  ['nodes1dprovisioner',['Nodes1DProvisioner',['../classNodes1DProvisioner.html',1,'Nodes1DProvisioner'],['../classNodes1DProvisioner.html#a4612c529e497484ac088e0b5d83b8479',1,'Nodes1DProvisioner::Nodes1DProvisioner()']]],
-  ['noneoperator',['NoneOperator',['../structsnowhouse_1_1NoneOperator.html',1,'snowhouse']]],
-  ['notexpression',['NotExpression',['../structsnowhouse_1_1NotExpression.html',1,'snowhouse']]],
-  ['notoperator',['NotOperator',['../structsnowhouse_1_1NotOperator.html',1,'snowhouse']]],
-  ['nulltestlistener',['NullTestListener',['../classigloo_1_1NullTestListener.html',1,'igloo']]]
+  ['operator_3c_3c',['operator&lt;&lt;',['../GMRESSolver_8hpp.html#afcef465b1811e1a58461f319ff1c353c',1,'blitzdg::operator&lt;&lt;(std::ostream &amp;strm, ConvFlag flag)'],['../GMRESSolver_8hpp.html#a0d95699cddba020429bb348745cf0775',1,'blitzdg::operator&lt;&lt;(std::ostream &amp;strm, const GMRESOut &amp;out)']]],
+  ['outerits',['outerIts',['../structblitzdg_1_1GMRESOut.html#a4bb1bf98028bba63a764ec21ea324392',1,'blitzdg::GMRESOut']]]
 ];
