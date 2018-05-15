@@ -2,11 +2,13 @@
 // See COPYING and LICENSE files at project root for more details. 
 
 #pragma once
+#include "Types.hpp"
+
 namespace blitzdg {
     struct SparseTriplet {
-        int nz;
-        int *row;
-        int *col;
-        double *val;
+        index_type nz;
+        index_type* row;
+        index_type* col;
+        real_type* val;
     };
 } // namespace blitzdg
