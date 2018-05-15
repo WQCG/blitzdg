@@ -19,6 +19,7 @@
 #include <SparseMatrixConverter.hpp>
 #include <EigenSolver.hpp>
 #include <DirectSolver.hpp>
+#include <Warning.hpp>
 
 using namespace std;
 using namespace blitz;
@@ -29,14 +30,6 @@ using namespace boost;
 firstIndex ii;
 secondIndex jj;
 thirdIndex kk;
-
-void printDisclaimer() {
-	cout << "blitzdg, version 0.1.0a" << endl;
-	cout << "Copyright (C) 2017-2018 Waterloo Quantitative Consulting Group, Inc." << endl;
-	cout << "This is free software; see the source code for copying conditions." << endl;
-	cout << "There is ABSOLUTELY NO WARRANTY; not even for MERCHANTABILITY or" << endl;
-	cout << "FITNESS FOR A PARTICULAR PURPOSE." << endl << endl;
-}
 
 void computeRHS(const matrix_type & u, const double c, Nodes1DProvisioner & nodes1D, matrix_type & RHS) {
 	matrix_type & Dr = nodes1D.get_Dr();
