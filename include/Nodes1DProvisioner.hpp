@@ -1,6 +1,14 @@
 // Copyright (C) 2017-2018  Derek Steinmoeller. 
 // See COPYING and LICENSE files at project root for more details. 
 
+/**
+ * @file Nodes1DProvisioner.hpp
+ * @brief Class for computations relating to construction of
+ * one-dimensional nodes, operators, and geometric factors.
+ * based in part on the implementations described in "Nodal Discontinuous Galerkin Methods"
+ * by J.S. Hesthaven and T. Warburton, 2008.
+ */
+
 #pragma once
 #include <blitz/array.h>
 #include <SparseMatrixConverter.hpp>
