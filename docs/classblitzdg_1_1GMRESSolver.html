@@ -89,23 +89,24 @@ Public Member Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Preconditioned, restarted GMRES with Modified Gram-Schmidt orthogonalization. </p>
 <p>Solves the right-preconditioned linear system <img class="formulaInl" alt="$AM^{-1}u = b$" src="form_10.png"/>, where <img class="formulaInl" alt="$u = Mx$" src="form_11.png"/> and <img class="formulaInl" alt="$M$" src="form_12.png"/> is the preconditioner.</p>
-<p><b>Stopping Criteria&lt;<b></b> &gt;</b></p>
-<p><b>The solver iterates until one of the following criteria are met:</b></p>
-<p><b></p><ul>
+<p><b>Stopping Criteria</b></p>
+<p>The solver iterates until one of the following criteria are met:</p>
+<ul>
 <li>
-<p class="startli">The convergence criterion is met: <img class="formulaInl" alt="$\|r_k\| \leq \max(\text{relTol}\cdot\|b\|, \text{absTol})$" src="form_13.png"/> The solver terminates with convergence flag ConvFlag::success.</p>
+<p class="startli">The convergence criterion is met: <img class="formulaInl" alt="$\|r_k\| \leq \max(\mathrm{relTol}\cdot\|b\|, \mathrm{absTol})$" src="form_13.png"/> The solver terminates with convergence flag ConvFlag::success.</p>
 <p class="endli"></p>
 </li>
 <li>
-<p class="startli">The divergence criterion is met: <img class="formulaInl" alt="$\|r_k\| \geq \text{divTol}\cdot\|r_0\|$" src="form_14.png"/> The solver terminates with convergence flag ConvFlag::diverged.</p>
+<p class="startli">The divergence criterion is met: <img class="formulaInl" alt="$\|r_k\| \geq \mathrm{divTol}\cdot\|r_0\|$" src="form_14.png"/> The solver terminates with convergence flag ConvFlag::diverged.</p>
 <p class="endli"></p>
 </li>
 <li>
-<p class="startli">The stagnation criterion is met: <img class="formulaInl" alt="$|x_{k+1}(i) - x_k(i)| \leq \text{stgTol}\cdot|x_{k+1}(i)|~~\forall i$" src="form_15.png"/> The solver terminates with convergence flag ConvFlag::stagnation.</p>
+<p class="startli">The stagnation criterion is met: <img class="formulaInl" alt="$|x_{k+1}(i) - x_k(i)| \leq \mathrm{stgTol}\cdot|x_{k+1}(i)|~~\forall i$" src="form_15.png"/> The solver terminates with convergence flag ConvFlag::stagnation.</p>
 <p class="endli"></p>
 </li>
 <li>
-<p class="startli">The maximum number of iterations <img class="formulaInl" alt="$\text{maxits}\cdot\text{kspaceSz}$" src="form_16.png"/> is reached. The solver terminates with convergence flag ConvFlag::maxits. &lt;&gt;</p>
+The maximum number of iterations <img class="formulaInl" alt="$\mathrm{maxits}\cdot\mathrm{kspaceSz}$" src="form_16.png"/> is reached. The solver terminates with convergence flag ConvFlag::maxits. </li>
+</ul>
 <p>The norm <img class="formulaInl" alt="$\|\cdot\|$" src="form_17.png"/> is always the vector 2-norm and <img class="formulaInl" alt="$r_k$" src="form_18.png"/> is the unpreconditioned residual of the <img class="formulaInl" alt="$k$" src="form_19.png"/>th iterate <img class="formulaInl" alt="$x_k$" src="form_20.png"/>.</p>
 <p>Various other factors may cause the solver to terminate. These include:</p>
 <ul>
@@ -122,11 +123,8 @@ Public Member Functions</h2></td></tr>
 <p class="endli"></p>
 </li>
 <li>
-Application of the preconditioner fails. The solver terminates with convergence flag ConvFlag::precon_fail. &lt;&gt; </li>
+Application of the preconditioner fails. The solver terminates with convergence flag ConvFlag::precon_fail. </li>
 </ul>
-</li>
-</ul>
-<p></b></p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="afb23e4a48e6b92a1975f15dad37c2204"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#afb23e4a48e6b92a1975f15dad37c2204">&#9670;&nbsp;</a></span>solve()</h2>
@@ -180,7 +178,7 @@ template&lt;typename Matvec , typename Precon &gt; </div>
     <tr><td class="paramdir">[in]</td><td class="paramname">mvec</td><td>is a functor that computes the matrix-vector product, i.e., it computes <img class="formulaInl" alt="$Ax$" src="form_25.png"/>. It must define an overload of operator() with the signature: <div class="fragment"><div class="line"><span class="keywordtype">bool</span> operator()(<span class="keyword">const</span> vector_type&amp; in, vector_type&amp; out)</div></div><!-- fragment --> which returns true if successful. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">precon</td><td>is a functor that applies the preconditioner to a vector, i.e., it computes <img class="formulaInl" alt="$M^{-1}x$" src="form_27.png"/>. It must define an overload of operator() with the signature: <div class="fragment"><div class="line"><span class="keywordtype">bool</span> operator()(<span class="keyword">const</span> vector_type&amp; in, vector_type&amp; out)</div></div><!-- fragment --> which returns true if successful. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">b</td><td>The rhs of the linear system. </td></tr>
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">x</td><td>The initial guess on input and the solution on output </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">x</td><td>The initial guess on input. The solution on output. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">params</td><td>The input parameters for GMRES. </td></tr>
   </table>
   </dd>
@@ -189,8 +187,7 @@ template&lt;typename Matvec , typename Precon &gt; </div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classblitzdg_1_1GMRESSolver_afb23e4a48e6b92a1975f15dad37c2204_cgraph.svg" width="334" height="136"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
-</div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classblitzdg_1_1GMRESSolver_afb23e4a48e6b92a1975f15dad37c2204_cgraph.svg" width="334" height="136"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
