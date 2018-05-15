@@ -1,3 +1,4 @@
+*.token
 *.tar.gz
 bin/
 lib/

@@ -1,5 +1,11 @@
-// Copyright (C) 2017-2018  Derek Steinmoeller. 
-// See COPYING and LICENSE files at project root for more details. 
+// Copyright (C) 2017-2018  Waterloo Quantitative Consulting Group, Inc.
+// See COPYING and LICENSE files at project root for more details.
+
+/**
+ * @file MeshManager.hpp
+ * @brief Defines the MeshManager class that reads mesh input files and partitions
+ * meshes with metis. See http://glaros.dtc.umn.edu/gkhome/metis/metis/overview.
+ */
 
 #pragma once
 #include <blitz/array.h>

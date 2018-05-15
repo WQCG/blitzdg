@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['readelements',['readElements',['../classMeshManager.html#a947cfaa0fb765284196b98d5fbd8df94',1,'MeshManager']]],
-  ['readmesh',['readMesh',['../classMeshManager.html#a0648ad268511d72842d979d676fa42b6',1,'MeshManager']]],
-  ['readvertices',['readVertices',['../classMeshManager.html#aefe48f064f665e3c6eedbf1abcb0506e',1,'MeshManager']]]
+  ['nodes1dprovisioner',['Nodes1DProvisioner',['../classNodes1DProvisioner.html#a4612c529e497484ac088e0b5d83b8479',1,'Nodes1DProvisioner']]],
+  ['norm1',['norm1',['../LinAlgHelpers_8hpp.html#adef49510d6efa522d207b8c98cc8a65f',1,'blitzdg']]],
+  ['norm2',['norm2',['../LinAlgHelpers_8hpp.html#a1d922d2af405d2fcefc6199deacc3309',1,'blitzdg']]],
+  ['norminf',['normInf',['../LinAlgHelpers_8hpp.html#a51d517d6bcc17b305c77baac2c241e66',1,'blitzdg']]]
 ];

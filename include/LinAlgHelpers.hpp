@@ -1,33 +1,45 @@
+// Copyright (C) 2017-2018  Waterloo Quantitative Consulting Group, Inc. 
+// See COPYING and LICENSE files at project root for more details. 
+
+/**
+ * @file LinAlgHelpers.hpp
+ * @brief Implements a set functions for basic linear algebra operations.
+ */
 #include "Types.hpp"
 #include <cmath>
 
 namespace blitzdg {
     /**
-     * Given Cartesian coordinates (a,b), computes the
-     * parameters c, s of the associated Givens rotation.
+     * Given Cartesian coordinates \f$(a,b)\f$, computes the
+     * parameters \f$c,\,s\f$ of the associated Givens rotation.
      * 
-     * The Givens rotation G(c,s) is defined so that
-     *     c*a + s*b = r
-     *     c*b - s*a = 0
-     * @param[in,out] a real scalar
-     * @param[in,out] b real scalar
-     * @param[in,out] c real scalar
-     * @param[in,out] s real scalar
-     * On output:
-     *     a = r
-     *     b = 0
+     * The Givens rotation \f$G(c,s)\f$ is defined so that
+     * \f{eqnarray*}{
+     *     ca + sb &=& r\\
+     *     cb - sa &=& 0
+     * \f}
+     * @param[in,out] a On input the \f$x\f$-coordinate.
+     * @param[in,out] b On input the \f$y\f$-coordinate.
+     * @param[out] c A real scalar.
+     * @param[out] s A real scalar.
+     * 
+     * On output: \f$c,\,s\f$ are the Givens rotation parameters,
+     * \f$a = r\f$, and \f$b = 0\f$.
      */
     void DROTG(real_type& a, real_type& b, real_type& c, real_type& s);
 
     /**
-     * Applies a Givens rotation G(c,s) to the tuple (x,y).
-     * @param[in] c real scalar
-     * @param[in] s real scalar
-     * @param[in,out] x real scalar
-     * @param[in,out] y real scalar
+     * Applies a Givens rotation \f$G(c,s)\f$ to the tuple \f$(x,y)\f$.
+     * @param[in] c Givens rotation parameter.
+     * @param[in] s Givens rotation parameter.
+     * @param[in,out] x On input the \f$x\f$-coordinate.
+     * @param[in,out] y On input the \f$y\f$-coordinate.
+     * 
      * On output:
-     *     x = c*x + s*y
-     *     y = c*y - s*x
+     * \f{eqnarray*}{
+     *     x &=& cx + sy\\
+     *     y &=& cy - sx
+     * \f}
      */ 
     inline void applyGivens(real_type c, real_type s, real_type& x, real_type& y) {
         real_type tmp = c * x + s * y;
@@ -36,24 +48,21 @@ namespace blitzdg {
     }
 
     /**
-     * Vector 1-norm.
-     * @param[in] x real-valued vector
+     * Returns the one-norm of the input vector x.
      */
     inline real_type norm1(const vector_type& x) {
         return blitz::sum(blitz::abs(x));
     }
 
     /**
-     * Vector 2-norm.
-     * @param[in] x real-valued vector
+     * Returns the two-norm of the input vector x.
      */
     inline real_type norm2(const vector_type& x) {
         return std::sqrt(blitz::sum(x * x));
     }
 
     /**
-     * Vector infinity-norm.
-     * @param[in] x real-valued vector
+     * Returns the infinity-norm of the input vector x.
      */
     inline real_type normInf(const vector_type& x) {
         return blitz::max(blitz::abs(x));

@@ -52,7 +52,7 @@ If you add code, please write tests using the igloo testing framework that is in
 
 ## Documentation
 
-[Here](https://dsteinmo.github.io/blitzdg "blitzdg Documentation")
+[Here](https://wqcg.github.io/blitzdg "blitzdg Documentation")
 
 ## License
 
