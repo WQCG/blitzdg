@@ -15,8 +15,8 @@ namespace blitzdg {
      *     ca + sb &=& r\\
      *     cb - sa &=& 0
      * \f}
-     * @param[in,out] a The \f$x\f$-coordinate.
-     * @param[in,out] b The \f$y\f$-coordinate.
+     * @param[in,out] a On input the \f$x\f$-coordinate.
+     * @param[in,out] b On input the \f$y\f$-coordinate.
      * @param[out] c A real scalar.
      * @param[out] s A real scalar.
      * 
@@ -29,8 +29,8 @@ namespace blitzdg {
      * Applies a Givens rotation \f$G(c,s)\f$ to the tuple \f$(x,y)\f$.
      * @param[in] c Givens rotation parameter.
      * @param[in] s Givens rotation parameter.
-     * @param[in,out] x The \f$x\f$-coordinate.
-     * @param[in,out] y The \f$y\f$-coordinate.
+     * @param[in,out] x On input the \f$x\f$-coordinate.
+     * @param[in,out] y On input the \f$y\f$-coordinate.
      * 
      * On output:
      * \f{eqnarray*}{

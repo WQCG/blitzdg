@@ -23,18 +23,21 @@ namespace blitzdg {
          * triangular part of the \f$n\times n\f$ leading principal
          * submatrix of \f$A\f$.
          * @param[in] n The order of \f$U\f$.
-         * @param[in] A The dense matrix. Note: A must be stored in column-major format.
-         * @param[in,out] x The rhs on input. The solution on output.
+         * @param[in] A A dense matrix.
+         * @param[in,out] x On input the right-hand side. On output the solution.
+         * @note The matrix A must be stored in column-major format and be at least n-by-n.
+         * @note The upper triangular matrix \f$U\f$ must be nonsingular.
          */
         void backSolve(index_type n, matrix_type& A, vector_type& x);
 
         /**
          * Calls the BLAS function dgemv to compute the matrix-vector 
          * product \f$Ax\f$.
-         * @param[in] n The number of columns of A to use in the product.
-         * @param[in] A The dense matrix. Note: A must be stored in column-major format.
+         * @param[in] n The number of leading columns of A that are used in the product.
+         * @param[in] A A dense matrix.
          * @param[in] x A real-valued vector.
-         * @param[out] result The computed product \f$Ax\f$.
+         * @param[out] result The computed product.
+         * @note The matrix A must be stored in column-major format and have at least n columns.
          */
         void matTimesVec(index_type n, matrix_type& A, vector_type& x, vector_type& result);
 
@@ -51,16 +54,16 @@ namespace blitzdg {
      * An enum class representing convergence flags for GMRESSolver.
      */
     enum class ConvFlag { 
-        unconverged, /**< neither converged nor diverged */
-        success,     /**< converged with residual norm <= convTol */
-        diverged,    /**< diverged with residual norm >= divTol */    
-        maxits,      /**< maximum iterations reached */ 
-        stagnation,  /**< insufficient change in solution */      
-        breakdown,   /**< input matrix or preconditioner are (likely) singular */   
-        true_rnrm,   /**< true residual norm > convTol */   
-        inf_or_nan,  /**< residual norm is inf or nan */
-        precon_fail, /**< application of preconditioner failed */
-        matvec_fail  /**< matrix-vector product failed */
+        unconverged, ///< Neither converged nor diverged. 
+        success,     ///< Converged with residual norm <= convTol. 
+        diverged,    ///< Diverged with residual norm >= divTol. 
+        maxits,      ///< Maximum iterations reached. 
+        stagnation,  ///< Insufficient change in solution.    
+        breakdown,   ///< Input matrix or preconditioner are (likely) singular. 
+        true_rnrm,   ///< True residual norm > convTol. 
+        inf_or_nan,  ///< Residual norm is inf or nan. 
+        precon_fail, ///< Application of preconditioner failed. 
+        matvec_fail  ///< Matrix-vector product failed. 
     };
 
     /**
@@ -80,14 +83,14 @@ namespace blitzdg {
      * Input parameters for the GMRES solver.
      */
     struct GMRESParams {
-        bool verbose;        /**< if true, output convergence history to console */
-        bool testTrueRnrm;   /**< if true, check the true residual norm for convergence */
-        index_type kspaceSz; /**< max dimension of the Krylov subspace */
-        index_type maxits;   /**< max number of outer iterations */
-        real_type relTol;    /**< relative convergence tolerance */
-        real_type absTol;    /**< absolute convergence tolerance */
-        real_type divTol;    /**< divergence tolerance */
-        real_type stgTol;    /**< stagnation tolerance */
+        bool verbose;        /**< If true, output convergence history to console. Defaults to false. */
+        bool testTrueRnrm;   /**< If true, check the true residual norm for convergence. Defaults to true. */
+        index_type kspaceSz; /**< Max dimension of the Krylov subspace. Defaults to 30.  */
+        index_type maxits;   /**< Max number of outer iterations. Defaults to 100. */
+        real_type relTol;    /**< Relative convergence tolerance. Defaults to 1e-6. */
+        real_type absTol;    /**< Absolute convergence tolerance. Defaults to 1e-6. */
+        real_type divTol;    /**< Divergence tolerance. Defaults to 1e5. */
+        real_type stgTol;    /**< Stagnation tolerance. Defaults to 1e-12. */
         GMRESParams()
             : verbose{ false }, testTrueRnrm{ true }, 
             kspaceSz{ 30 }, maxits{ 100 }, relTol{ 1e-6 }, 
@@ -96,7 +99,7 @@ namespace blitzdg {
     };
 
     /**
-     * Checks the input parameters in GMRESParams and throws an 
+     * Checks the parameters in GMRESParams and throws an 
      * std::invalid_argument exception if any are out of range.
      */ 
     void checkGMRESParams(const GMRESParams& p);
@@ -105,11 +108,11 @@ namespace blitzdg {
      * GMRES output information.
      */
     struct GMRESOut {
-        ConvFlag flag;       /**< convergence flag */
-        index_type innerIts; /**< inner iteration number at which solution was computed */
-        index_type outerIts; /**< outer iteration number at which solution was computed */
-        real_type relres;    /**< relative residual norm of solution */
-        std::string msg;     /**< addtional output info */
+        ConvFlag flag;       /**< Convergence flag. See definition of ConvFlag. */
+        index_type innerIts; /**< Inner iteration number at which solution was computed. */
+        index_type outerIts; /**< Outer iteration number at which solution was computed. */
+        real_type relres;    /**< Relative residual norm of solution, i.e., \f$\|r\|/\|b\|\f$. */
+        std::string msg;     /**< Addtional output information. */
         GMRESOut()
             : flag{ ConvFlag::unconverged },
             innerIts{ 0 }, outerIts{ 0 }, relres{ real_type(0) },
@@ -118,7 +121,7 @@ namespace blitzdg {
     };
 
     /**
-     * Write a GMRES output to an output stream. 
+     * Write a GMRESOut object to an output stream. 
      */
     std::ostream& operator<<(std::ostream& strm, const GMRESOut& out);
 
@@ -150,14 +153,14 @@ namespace blitzdg {
      * The solver terminates with convergence flag ConvFlag::maxits.</li>
      * </ul>
      * 
-     * The norm \f$\|\cdot\|\f$ is always the vector 2-norm and \f$r_k\f$ is
+     * The norm \f$\|\cdot\|\f$ is always the vector two-norm and \f$r_k\f$ is
      * the unpreconditioned residual of the \f$k\f$th iterate \f$x_k\f$.
      * 
      * Various other factors may cause the solver to terminate. These include:
      * 
      * <ul>
      * <li> The input matrix or the preconditioner are singular. 
-     * The solver termintes with convergence flag ConvFlag::breakdown.</li>
+     * The solver terminates with convergence flag ConvFlag::breakdown.</li>
      * 
      * <li> The residual norm is inf or nan.
      * The solver terminates with convergence flag ConvFlag::inf_or_nan.</li>
@@ -187,8 +190,8 @@ namespace blitzdg {
          * bool operator()(const vector_type& in, vector_type& out)
          * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          * which returns true if successful.
-         * @param[in] b The rhs of the linear system.
-         * @param[in,out] x The initial guess on input. The solution on output.
+         * @param[in] b The right-hand side of the linear system.
+         * @param[in,out] x On input the initial guess. On output the computed solution.
          * @param[in] params The input parameters for GMRES.
          * @return The convergence information.
          */
