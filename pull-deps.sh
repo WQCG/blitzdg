@@ -1,4 +1,7 @@
 #!/bin/bash
+# Copyright (C) 2017-2018  Waterloo Quantitative Consulting Group, Inc.
+# See COPYING and LICENSE files at project root for more details.
+
 unameOut="$(uname -s)"
 echo "uname is: $unameOut"
 case "${unameOut}" in
