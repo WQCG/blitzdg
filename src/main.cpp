@@ -10,18 +10,18 @@
   * Click on 'Classes' to start familarizing yourself with the API
   */
 
-#include <iostream>
+#include "MeshManager.hpp"
+#include "Nodes1DProvisioner.hpp"
+#include "SparseMatrixConverter.hpp"
+#include "EigenSolver.hpp"
+#include "DirectSolver.hpp"
 #include <blitz/array.h>
-#include <MeshManager.hpp>
-#include <Nodes1DProvisioner.hpp>
-#include <SparseMatrixConverter.hpp>
-#include <EigenSolver.hpp>
-#include <DirectSolver.hpp>
-
-using namespace std;
-using namespace blitz;
+#include <iostream>
 
 int main(int argc, char **argv) {
+  using namespace std;
+  using namespace blitz;
+  using namespace blitzdg;
 	int N = 4;
 	int K = 10;
 	double xmin =-1.0;

@@ -3,62 +3,59 @@
 
 #pragma once
 #include <blitz/array.h>
-#include <boost/algorithm/string.hpp>
-#include <vector>
+#include <string>
 
-using namespace std;
-using namespace boost;
+namespace blitzdg {
+  class MeshManager {
+      double * Vert;
+      int * EToV;
+      int Dim;
+      int NumVerts;
+      int ElementType;
+      int NumElements;
+      std::string CsvDelimeters;
 
-class MeshManager {
-    double * Vert;
-    int * EToV;
-    int Dim;
-    int NumVerts;
-    int ElementType;
-    int NumElements;
-    string CsvDelimeters;
+      int * ElementPartitionMap;
+      int * VertexPartitionMap;
 
-    int * ElementPartitionMap;
-    int * VertexPartitionMap;
+      template<typename T>
+      void  readCsvFile(std::string csvFile, std::string delimiters, T * & result, int * & dims);
 
-    template<typename T>
-    void  readCsvFile(string csvFile, string delimiters, T * & result, int * & dims);
+      template<typename T>
+      void printArray(T * & arr, int numRows, int numCols);
 
-    template<typename T>
-    void printArray(T * & arr, int numRows, int numCols);
+    public:
+      MeshManager();
 
-  public:
-    MeshManager();
+      int get_Index(int row, int col, int numCols);
 
-    int get_Index(int row, int col, int numCols);
+      // Read gmsh .msh file.
+      void readMesh(std::string gmshInputFile);
+      
+      void readVertices(std::string vertFile);
 
-    // Read gmsh .msh file.
-    void readMesh(string gmshInputFile);
-    
-    void readVertices(string vertFile);
+      void readElements(std::string E2VFile);
 
-    void readElements(string E2VFile);
+      // Split up with metis.
+      void partitionMesh(int numPartitions);
 
-    // Split up with metis.
-    void partitionMesh(int numPartitions);
+      double * & get_Vertices();
 
-    double * & get_Vertices();
+      int get_Dim();
 
-    int get_Dim();
+      int get_NumVerts();
 
-    int get_NumVerts();
+      int * & get_Elements();
 
-    int * & get_Elements();
+      int get_NumElements();
+      int get_ElementType();
 
-    int get_NumElements();
-    int get_ElementType();
+      int * & get_ElementPartitionMap();
+      int * & get_VertexPartitionMap();
 
-    int * & get_ElementPartitionMap();
-    int * & get_VertexPartitionMap();
-
-    void printVertices();
-    void printElements();
-    
-    ~MeshManager();
-};
-
+      void printVertices();
+      void printElements();
+      
+      ~MeshManager();
+  };
+} // namespace blitzdg
