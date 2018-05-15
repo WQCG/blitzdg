@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['gmressolver_2ehpp',['GMRESSolver.hpp',['../GMRESSolver_8hpp.html',1,'']]]
+  ['directsolver_2ehpp',['DirectSolver.hpp',['../DirectSolver_8hpp.html',1,'']]]
 ];

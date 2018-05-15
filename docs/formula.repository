@@ -1,28 +1,29 @@
-\form#0:$(a,b)$
-\form#1:$c,\,s$
-\form#2:$G(c,s)$
-\form#3:\begin{eqnarray*} ca + sb &=& r\\ cb - sa &=& 0 \end{eqnarray*}
-\form#4:$x$
-\form#5:$y$
-\form#6:$a = r$
-\form#7:$b = 0$
-\form#8:$(x,y)$
-\form#9:\begin{eqnarray*} x &=& cx + sy\\ y &=& cy - sx \end{eqnarray*}
-\form#10:$AM^{-1}u = b$
-\form#11:$u = Mx$
-\form#12:$M$
-\form#13:$\|r_k\| \leq \max(\mathrm{relTol}\cdot\|b\|, \mathrm{absTol})$
-\form#14:$\|r_k\| \geq \mathrm{divTol}\cdot\|r_0\|$
-\form#15:$|x_{k+1}(i) - x_k(i)| \leq \mathrm{stgTol}\cdot|x_{k+1}(i)|~~\forall i$
-\form#16:$\mathrm{maxits}\cdot\mathrm{kspaceSz}$
-\form#17:$\|\cdot\|$
-\form#18:$r_k$
-\form#19:$k$
-\form#20:$x_k$
-\form#21:$Uy = x$
-\form#22:$U$
-\form#23:$n\times n$
-\form#24:$A$
-\form#25:$Ax$
-\form#26:$Ax = b$
-\form#27:$M^{-1}x$
+\form#0:$AM^{-1}u = b$
+\form#1:$u = Mx$
+\form#2:$M$
+\form#3:$\|r_k\| \leq \max(\mathrm{relTol}\cdot\|b\|, \mathrm{absTol})$
+\form#4:$\|r_k\| \geq \mathrm{divTol}\cdot\|r_0\|$
+\form#5:$|x_{k+1}(i) - x_k(i)| \leq \mathrm{stgTol}\cdot|x_{k+1}(i)|~~\forall i$
+\form#6:$\mathrm{maxits}\cdot\mathrm{kspaceSz}$
+\form#7:$\|\cdot\|$
+\form#8:$r_k$
+\form#9:$k$
+\form#10:$x_k$
+\form#11:$Uy = x$
+\form#12:$U$
+\form#13:$n\times n$
+\form#14:$A$
+\form#15:$Ax$
+\form#16:$\|r\|/\|b\|$
+\form#17:$Ax = b$
+\form#18:$M^{-1}x$
+\form#19:$(a,b)$
+\form#20:$c,\,s$
+\form#21:$G(c,s)$
+\form#22:\begin{eqnarray*} ca + sb &=& r\\ cb - sa &=& 0 \end{eqnarray*}
+\form#23:$x$
+\form#24:$y$
+\form#25:$a = r$
+\form#26:$b = 0$
+\form#27:$(x,y)$
+\form#28:\begin{eqnarray*} x &=& cx + sy\\ y &=& cy - sx \end{eqnarray*}

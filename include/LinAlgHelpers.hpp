@@ -1,3 +1,6 @@
+// Copyright (C) 2017-2018  Waterloo Quantitative Consulting Group, Inc. 
+// See COPYING and LICENSE files at project root for more details. 
+
 /**
  * @file LinAlgHelpers.hpp
  * @brief Implements a set functions for basic linear algebra operations.
