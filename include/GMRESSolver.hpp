@@ -52,18 +52,20 @@ namespace blitzdg {
 
     /**
      * An enum class representing convergence flags for GMRESSolver.
+     * 
+     * A detailed description of each convergence flag.
      */
     enum class ConvFlag { 
-        unconverged, ///< Neither converged nor diverged. 
-        success,     ///< Converged with residual norm <= convTol. 
-        diverged,    ///< Diverged with residual norm >= divTol. 
-        maxits,      ///< Maximum iterations reached. 
-        stagnation,  ///< Insufficient change in solution.    
-        breakdown,   ///< Input matrix or preconditioner are (likely) singular. 
-        true_rnrm,   ///< True residual norm > convTol. 
-        inf_or_nan,  ///< Residual norm is inf or nan. 
-        precon_fail, ///< Application of preconditioner failed. 
-        matvec_fail  ///< Matrix-vector product failed. 
+        unconverged, /**< Neither converged nor diverged. */
+        success,     /**< Converged with residual norm <= convTol. */
+        diverged,    /**< Diverged with residual norm >= divTol. */
+        maxits,      /**< Maximum iterations reached. */
+        stagnation,  /**< Insufficient change in solution. */ 
+        breakdown,   /**< Input matrix or preconditioner are (likely) singular. */
+        true_rnrm,   /**< True residual norm > convTol. */
+        inf_or_nan,  /**< Residual norm is inf or nan. */
+        precon_fail, /**< Application of preconditioner failed. */
+        matvec_fail  /**< Matrix-vector product failed. */
     };
 
     /**
@@ -171,6 +173,11 @@ namespace blitzdg {
      * <li> Application of the preconditioner fails.
      * The solver terminates with convergence flag ConvFlag::precon_fail.</li>
      * </ul>
+     * 
+     * @note If GMRESParams::testTrueRnrm is true, then the true residual norm of
+     * the final computed solution is tested for convergence. If this test fails,
+     * then the solver terminates with convergence flag ConvFlag::true_rnrm. This
+     * test may incur an additional matrix-vector product.
      */
     class GMRESSolver {
     public:
