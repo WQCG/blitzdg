@@ -30,6 +30,14 @@ firstIndex ii;
 secondIndex jj;
 thirdIndex kk;
 
+void printDisclaimer() {
+	cout << "blitzdg, version 0.1.0a" << endl;
+	cout << "Copyright (C) 2017-2018 Waterloo Quantitative Consulting Group, Inc." << endl;
+	cout << "This is free software; see the source code for copying conditions." << endl;
+	cout << "There is ABSOLUTELY NO WARRANTY; not even for MERCHANTABILITY or" << endl;
+	cout << "FITNESS FOR A PARTICULAR PURPOSE." << endl << endl;
+}
+
 void computeRHS(const matrix_type & u, const double c, Nodes1DProvisioner & nodes1D, matrix_type & RHS) {
 	matrix_type & Dr = nodes1D.get_Dr();
 	matrix_type & rx = nodes1D.get_rx();
@@ -128,6 +136,8 @@ int main(int argc, char **argv) {
 	matrix_type RHS(Np, K);
 
 	u = exp(-10*(x(ii,jj)*x(ii,jj)));
+
+	printDisclaimer();
 
 	index_type count = 0;
 	while (t < finalTime) {
