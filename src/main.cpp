@@ -15,17 +15,18 @@
 #include "SparseMatrixConverter.hpp"
 #include "EigenSolver.hpp"
 #include "DirectSolver.hpp"
-#include <blitz/array.h>
+#include "Types.hpp"
 #include <iostream>
 
+using std::cout;
+using std::endl;
+
 int main(int argc, char **argv) {
-  using namespace std;
-  using namespace blitz;
   using namespace blitzdg;
-	int N = 4;
-	int K = 10;
-	double xmin =-1.0;
-	double xmax = 1.0;
+	index_type N = 4;
+	index_type K = 10;
+	real_type xmin =-1.0;
+	real_type xmax = 1.0;
 
   SparseMatrixConverter matrixConverter;
   EigenSolver eigenSolver(matrixConverter);
@@ -36,21 +37,21 @@ int main(int argc, char **argv) {
   nodes1DProvisioner.buildNodes();
   nodes1DProvisioner.computeJacobian();
 
-  int Np = nodes1DProvisioner.get_NumLocalPoints();
+  index_type Np = nodes1DProvisioner.get_NumLocalPoints();
 
-  Array<double,1> rGrid = nodes1DProvisioner.get_rGrid();
+  vector_type rGrid = nodes1DProvisioner.get_rGrid();
   cout << rGrid << endl;
 
   cout << nodes1DProvisioner.get_V() << endl;
 
-  Array<double, 2> DVr(Np, Np);
+  matrix_type DVr(Np, Np);
 
   nodes1DProvisioner.computeGradVandermonde(DVr);
 
   cout << DVr << endl;
   cout << nodes1DProvisioner.get_Dr() << endl;
 
-  Array<double,2> x = nodes1DProvisioner.get_xGrid();
+  matrix_type x = nodes1DProvisioner.get_xGrid();
 
   cout << x << endl;
 

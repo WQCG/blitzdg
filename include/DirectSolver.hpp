@@ -2,20 +2,18 @@
 // See COPYING and LICENSE files at project root for more details. 
 
 #pragma once
-#include <blitz/array.h>
 #include "SparseMatrixConverter.hpp"
-
-using namespace blitz;
+#include "Types.hpp"
 
 namespace blitzdg {
   class DirectSolver {
-      int N;
+      index_type N;
       SparseMatrixConverter MatrixConverter;
 
     public:
       DirectSolver(SparseMatrixConverter const &);
 
-      void solve(const Array<double,2> & A, const Array<double, 2> & B, Array<double, 2> & X);
+      void solve(const matrix_type& A, const matrix_type& B, matrix_type& X);
       
       ~DirectSolver();
   };

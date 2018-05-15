@@ -2,10 +2,12 @@
 // See COPYING and LICENSE files at project root for more details. 
 
 #include "MeshManager.hpp"
+#include "Types.hpp"
 #include <igloo/igloo_alt.h>
 #include <boost/algorithm/string.hpp>
 #include <whereami.h>
 #include <string>
+#include <vector>
 
 using boost::algorithm::find_all;
 using boost::algorithm::join;
@@ -21,7 +23,7 @@ namespace blitzdg {
     namespace MeshManagerTests {
         using namespace igloo;
         Describe(MeshManager_Object) {
-            typedef vector< iterator_range<string::iterator> > find_vector_type;
+            using find_vector_type = vector<iterator_range<string::iterator>>;
 
             MeshManager * meshManager=nullptr;
             string *ExePath = nullptr;
@@ -30,12 +32,12 @@ namespace blitzdg {
                 meshManager = new MeshManager();
                 if (ExePath == nullptr) {
                     // Deal with paths to the test input files.
-                    int cap = 1024;
+                    index_type cap = 1024;
                     char * pathBuffer = new char[cap];
-                    int length = wai_getExecutablePath(pathBuffer, cap, NULL);
+                    index_type length = wai_getExecutablePath(pathBuffer, cap, NULL);
                     ExePath = new string();
 
-                    for(int i=0; i < length; i++) {
+                    for(index_type i=0; i < length; i++) {
                         *ExePath += pathBuffer[i]; 
                     }
                     trim_right(*ExePath);
@@ -55,7 +57,7 @@ namespace blitzdg {
                     replace_last(path, "\\bin\\test", "");
                 }
 
-                std::vector<std::string> pathVec;
+                vector<string> pathVec;
                 pathVec.push_back(path);
                 pathVec.push_back("input");
                 pathVec.push_back("2box.V");
@@ -76,7 +78,7 @@ namespace blitzdg {
                     replace_last(path, "\\bin\\test", "");
                 }
 
-                std::vector<std::string> pathVec;
+                vector<string> pathVec;
                 pathVec.push_back(path);
                 pathVec.push_back("input");
                 pathVec.push_back("2box.E2V");
@@ -96,7 +98,7 @@ namespace blitzdg {
                 Assert::That(mgr.get_NumVerts(), Equals(6));
                 Assert::That(mgr.get_Dim(), Equals(2));
 
-                double * verts = mgr.get_Vertices();
+                real_type* verts = mgr.get_Vertices();
 
                 Assert::That(verts[0], Equals(0.0));
                 Assert::That(verts[1], Equals(0.0));
@@ -129,7 +131,7 @@ namespace blitzdg {
                 Assert::That(mgr.get_NumElements(), Equals(2));
                 Assert::That(mgr.get_ElementType(), Equals(4));
 
-                int * elements = mgr.get_Elements();
+                index_type * elements = mgr.get_Elements();
 
                 Assert::That(elements[0], Equals(0));
                 Assert::That(elements[1], Equals(1));
@@ -181,11 +183,11 @@ namespace blitzdg {
                 cout << "Nv: " << mgr.get_NumVerts() << endl;
                 mgr.partitionMesh(2);
 
-                int * & epMap = mgr.get_ElementPartitionMap();
+                index_type * & epMap = mgr.get_ElementPartitionMap();
                 Assert::That(epMap[0], Equals(1));
                 Assert::That(epMap[1], Equals(0));
 
-                int * & vpMap = mgr.get_VertexPartitionMap();
+                index_type * & vpMap = mgr.get_VertexPartitionMap();
                 Assert::That(vpMap[0], IsGreaterThan(-1));
                 Assert::That(vpMap[1], IsGreaterThan(-1));
                 Assert::That(vpMap[2], IsGreaterThan(-1));

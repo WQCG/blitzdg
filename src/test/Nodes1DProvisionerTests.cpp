@@ -12,6 +12,8 @@
 #include <iostream>
 #include <limits>
 
+using blitz::firstIndex;
+using blitz::secondIndex;
 using std::cout;
 using std::endl;
 using std::numeric_limits;
@@ -19,9 +21,8 @@ using std::numeric_limits;
 namespace blitzdg {
     namespace Nodes1DProvisionerTests {
         using namespace igloo;
-        using namespace blitz;
-        const int N=5;
-        const double eps=10*numeric_limits<double>::epsilon();
+        const index_type N=5;
+        const real_type eps=10*numeric_limits<real_type>::epsilon();
         const float epsf = 5.7e-6;
 
         firstIndex ii;
@@ -35,10 +36,10 @@ namespace blitzdg {
 
         Describe(Nodes1DProvisioner_Object) {
             void SetUp() {
-                const int NOrder = 3;
-                const int NumElements = 5;
-                const double xmin = -1.0;
-                const double xmax = 1.0;
+                const index_type NOrder = 3;
+                const index_type NumElements = 5;
+                const real_type xmin = -1.0;
+                const real_type xmax = 1.0;
 
                 matrixConverter = new SparseMatrixConverter();
                 eigenSolver = new EigenSolver(*matrixConverter);
@@ -48,9 +49,9 @@ namespace blitzdg {
 
             It(Should_Generate_0th_Order_Legendre_Polynomial) {
                 cout << "Should_Generate_0th_Order_Legendre_Polynomial" << endl;
-                Array<double, 1> x(3);
+                vector_type x(3);
                 x = -1.,0.,1.;
-                Array<double, 1>  p(3);
+                vector_type  p(3);
 
                 Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
 
@@ -63,9 +64,9 @@ namespace blitzdg {
 
             It(Should_Generate_1st_Order_Legendre_Polynomial) {
                 cout << "Should_Generate_1st_Order_Legendre_Polynomial" << endl;
-                Array<double, 1> x(3);
+                vector_type x(3);
                 x = -1.,0.,1.;
-                Array<double, 1>  p(3);
+                vector_type  p(3);
 
                 Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
 
@@ -79,9 +80,9 @@ namespace blitzdg {
 
             It(Should_Generate_2nd_Order_Legendre_Polynomial) {
                 cout << "Should_Generate_2nd_Order_Legendre_Polynomial" << endl;
-                Array<double, 1> x(3);
+                vector_type x(3);
                 x = -1.,0.,1.;
-                Array<double, 1>  p(3);
+                vector_type  p(3);
 
                 Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
 
@@ -94,9 +95,9 @@ namespace blitzdg {
 
             It(Should_Generate_0th_Order_Legendre_Polynomial_4pt_Grid) {
                 cout << "Should_Generate_0th_Order_Legendre_Polynomial_4pt_Grid" << endl;
-                Array<double, 1> x(4);
+                vector_type x(4);
                 x = -1,-0.447214,0.447214,1;
-                Array<double, 1> p(4);
+                vector_type p(4);
 
                 Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
 
@@ -109,9 +110,9 @@ namespace blitzdg {
 
             It(Should_Generate_1st_Order_Legendre_Polynomial_4pt_Grid) {
                 cout << "Should_Generate_1st_Order_Legendre_Polynomial_4pt_Grid" << endl;
-                Array<double, 1> x(4);
+                vector_type x(4);
                 x = -1,-0.447214,0.447214,1;
-                Array<double, 1> p(4);
+                vector_type p(4);
 
                 Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
 
@@ -128,8 +129,8 @@ namespace blitzdg {
                 
                 Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
                 
-                Array<double, 1> x(5);
-                Array<double, 1> w(5);
+                vector_type x(5);
+                vector_type w(5);
 
                 nodes1D.computeJacobiQuadWeights(0., 0., 4, x, w);
 
@@ -151,8 +152,8 @@ namespace blitzdg {
                 
                 Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
                 
-                Array<double, 1> x(2);
-                Array<double, 1> w(2);
+                vector_type x(2);
+                vector_type w(2);
 
                 nodes1D.computeJacobiQuadWeights(0., 0., 1, x, w);
 
@@ -168,8 +169,8 @@ namespace blitzdg {
 
                 Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
 
-                Array<double, 1> xx(3);
-                Array<double, 1> ww(3);
+                vector_type xx(3);
+                vector_type ww(3);
 
                 nodes1D.computeJacobiQuadWeights(0., 0., 2, xx, ww);
 
@@ -186,7 +187,7 @@ namespace blitzdg {
                 cout << "Should_Generate_3rd_Order_Legendre_Gauss_Lobatto_Nodes" << endl;
                 Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
                 
-                Array<double, 1> x(4);
+                vector_type x(4);
                 nodes1D.computeGaussLobottoPoints(0., 0., 3, x);
 
                 Assert::That(abs(x(0) - -1), IsLessThan(eps));
@@ -201,15 +202,15 @@ namespace blitzdg {
 
                 nodes1D.buildNodes();
                 nodes1D.buildVandermondeMatrix();
-                Array<double, 2> & V = nodes1D.get_V();
+                matrix_type & V = nodes1D.get_V();
 
-                Array<double, 2> expectedV(4,4);
+                matrix_type expectedV(4,4);
                 expectedV = 0.70711,-1.22474, 1.58114,-1.87083,
                             0.70711,-0.54772,-0.31623, 0.83666,
                             0.70711, 0.54772,-0.31623,-0.83666,
                             0.70711, 1.22474, 1.58114, 1.87083;
 
-                Array<double, 2> res(4,4);
+                matrix_type res(4,4);
                 res  = V - expectedV;
                 Assert::That(sqrt(sum(res(ii)*res(ii))), IsLessThan(epsf));
             }
@@ -220,17 +221,17 @@ namespace blitzdg {
 
                 nodes1D.buildNodes();
 
-                Array<double, 2> DVr(5,5);
+                matrix_type DVr(5,5);
                 nodes1D.computeGradVandermonde(DVr);
 
-                Array<double, 2> expectedDVr(5,5);
+                matrix_type expectedDVr(5,5);
                 expectedDVr = 0.00000,1.22474,-4.74342,11.22497,-21.21320,
                             0.00000,1.22474,-3.10530, 3.20713, -0.00000,
                             0.00000,1.22474,-0.00000,-2.80624,  0.00000,
                             0.00000,1.22474, 3.10530, 3.20713,  0.00000,
                             0.00000,1.22474 ,4.74342,11.22497, 21.21320;
 
-                Array<double, 2> res(4,4);
+                matrix_type res(4,4);
                 res = DVr - expectedDVr;
                 Assert::That(sqrt(sum(res(ii)*res(ii))), IsLessThan(epsf));
             }
@@ -240,16 +241,16 @@ namespace blitzdg {
                 Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
                 nodes1D.buildNodes();
 
-                Array<double, 2> & Dr = nodes1D.get_Dr();
+                matrix_type & Dr = nodes1D.get_Dr();
 
-                Array<double, 2> expectedDr(4,4);
+                matrix_type expectedDr(4,4);
                 expectedDr = -3.0000e+00, 4.0451e+00,-1.5451e+00, 5.0000e-01,
                             -8.0902e-01,-4.0540e-16, 1.1180e+00,-3.0902e-01,
                             3.0902e-01,-1.1180e+00, 6.2804e-16, 8.0902e-01,
                             -5.0000e-01, 1.5451e+00,-4.0451e+00, 3.0000e+00; 
 
 
-                Array<double, 2> res(4,4);
+                matrix_type res(4,4);
                 res = Dr - expectedDr;
                 Assert::That(sqrt(sum(res(ii)*res(ii))), IsLessThan(epsf));
             }
@@ -261,15 +262,15 @@ namespace blitzdg {
 
                 nodes1D.buildNodes();
 
-                Array<double, 2> & x = nodes1D.get_xGrid();
+                matrix_type & x = nodes1D.get_xGrid();
 
-                Array<double,2> expectedx(4,5);
+                matrix_type expectedx(4,5);
                 expectedx = -1.000000,-0.600000,-0.200000,0.200000,0.600000,
                             -0.889443,-0.489443,-0.089443,0.310557,0.710557,
                             -0.710557,-0.310557, 0.089443,0.489443,0.889443,
                             -0.600000,-0.200000, 0.200000,0.600000,1.000000;
 
-                Array<double, 2> res(4,5);
+                matrix_type res(4,5);
                 res = x - expectedx;
                 Assert::That(sqrt(sum(res(ii)*res(ii))), IsLessThan(epsf));
             }
@@ -298,10 +299,10 @@ namespace blitzdg {
                 nodes1D.buildDr();
                 nodes1D.computeJacobian();
 
-                Array<double, 2> & J = nodes1D.get_J();
-                Array<double, 2> & rx = nodes1D.get_rx();
+                matrix_type & J = nodes1D.get_J();
+                matrix_type & rx = nodes1D.get_rx();
 
-                Array<double,2> expectedJ(4,5), expectedrx(4,5);
+                matrix_type expectedJ(4,5), expectedrx(4,5);
                 expectedJ = 0.20000,0.20000,0.20000,0.20000,0.20000,
                             0.20000,0.20000,0.20000,0.20000,0.20000,
                             0.20000,0.20000,0.20000,0.20000,0.20000,
@@ -312,7 +313,7 @@ namespace blitzdg {
                             5,5,5,5,5,
                             5,5,5,5,5;
 
-                Array<double,2> resJ(4,5), resrx(4,5);
+                matrix_type resJ(4,5), resrx(4,5);
                 resJ = J - expectedJ;
                 resrx = rx - expectedrx;
 
@@ -325,16 +326,16 @@ namespace blitzdg {
                 Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
 
                 nodes1D.buildNodes();
-                Array<double, 2> Lift = nodes1D.get_Lift();
+                matrix_type Lift = nodes1D.get_Lift();
 
-                Array<double, 2> expectedLift(4,2);
+                matrix_type expectedLift(4,2);
                 expectedLift =  8.00000,-2.00000,
                             -0.89443, 0.89443,
                                 0.89443,-0.89443,
                             -2.00000, 8.00000;
 
 
-                Array<double, 2> resLift(4,2);
+                matrix_type resLift(4,2);
 
                 resLift = Lift - expectedLift;
                 Assert::That(sqrt(sum(resLift*resLift)), IsLessThan(epsf));
@@ -345,24 +346,24 @@ namespace blitzdg {
                 Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
 
                 nodes1D.buildNodes();
-                Array<int, 2> & EToE = nodes1D.get_EToE();
-                Array<int, 2> & EToF = nodes1D.get_EToF();
+                index_matrix_type & EToE = nodes1D.get_EToE();
+                index_matrix_type & EToF = nodes1D.get_EToF();
 
-                Array<int, 2> expectedEToE(5,2);
+                index_matrix_type expectedEToE(5,2);
                 expectedEToE = 0,1,
                             0,2,
                             1,3,
                             2,4,
                             3,4;
 
-                Array<int, 2> expectedEToF(5,2);
+                index_matrix_type expectedEToF(5,2);
                 expectedEToF = 0,0,
                             1,0,
                             1,0,
                             1,0,
                             1,1;
 
-                Array<int, 2> resEToE(5,2), resEToF(5,2);
+                index_matrix_type resEToE(5,2), resEToF(5,2);
 
                 resEToE = EToE - expectedEToE;
                 resEToF = EToF - expectedEToF;
@@ -376,17 +377,17 @@ namespace blitzdg {
                 Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
                 nodes1D.buildNodes();
 
-                Array<int, 1> Fmask = nodes1D.get_Fmask();
-                Array<double, 2> Fx = nodes1D.get_Fx();
+                index_vector_type Fmask = nodes1D.get_Fmask();
+                matrix_type Fx = nodes1D.get_Fx();
 
                 Assert::That(Fmask(0), Equals(0));
                 Assert::That(Fmask(1), Equals(3));
 
-                Array<double, 2> expectedFx(2, 5);
+                matrix_type expectedFx(2, 5);
                 expectedFx = -1,-0.6,-0.2,0.2,0.6,
                             -0.6,-0.2,0.2,0.6,1;
 
-                Array<double, 2> resFx;
+                matrix_type resFx;
                 resFx = Fx - expectedFx;
 
                 Assert::That(sqrt(sum(resFx*resFx)), Equals(0));

@@ -2,32 +2,32 @@
 // See COPYING and LICENSE files at project root for more details. 
 
 #pragma once
-#include <blitz/array.h>
+#include "Types.hpp"
 #include <string>
 
 namespace blitzdg {
   class MeshManager {
-      double * Vert;
-      int * EToV;
-      int Dim;
-      int NumVerts;
-      int ElementType;
-      int NumElements;
+      real_type* Vert;
+      index_type* EToV;
+      index_type Dim;
+      index_type NumVerts;
+      index_type ElementType;
+      index_type NumElements;
       std::string CsvDelimeters;
 
-      int * ElementPartitionMap;
-      int * VertexPartitionMap;
+      index_type* ElementPartitionMap;
+      index_type* VertexPartitionMap;
 
       template<typename T>
-      void  readCsvFile(std::string csvFile, std::string delimiters, T * & result, int * & dims);
+      void  readCsvFile(std::string csvFile, std::string delimiters, T* & result, index_type* & dims);
 
       template<typename T>
-      void printArray(T * & arr, int numRows, int numCols);
+      void printArray(T* & arr, index_type numRows, index_type numCols);
 
     public:
       MeshManager();
 
-      int get_Index(int row, int col, int numCols);
+      index_type get_Index(index_type row, index_type col, index_type numCols);
 
       // Read gmsh .msh file.
       void readMesh(std::string gmshInputFile);
@@ -37,21 +37,21 @@ namespace blitzdg {
       void readElements(std::string E2VFile);
 
       // Split up with metis.
-      void partitionMesh(int numPartitions);
+      void partitionMesh(index_type numPartitions);
 
-      double * & get_Vertices();
+      real_type* & get_Vertices();
 
-      int get_Dim();
+      index_type get_Dim();
 
-      int get_NumVerts();
+      index_type get_NumVerts();
 
-      int * & get_Elements();
+      index_type* & get_Elements();
 
-      int get_NumElements();
-      int get_ElementType();
+      index_type get_NumElements();
+      index_type get_ElementType();
 
-      int * & get_ElementPartitionMap();
-      int * & get_VertexPartitionMap();
+      index_type* & get_ElementPartitionMap();
+      index_type* & get_VertexPartitionMap();
 
       void printVertices();
       void printElements();

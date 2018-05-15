@@ -4,15 +4,16 @@
 #include <suitesparse/umfpack.h>
 #include "LUSolver.hpp"
 #include <iostream>
-#include <math.h>
+#include <cmath>
 
-using namespace std;
+using std::cout;
+using std::endl;
 
 namespace blitzdg {
     /**
      * Constructor. Takes a pointer reference to a blitz 2D array (The matrix A to be used by the solver in Ax=b).
      */
-    LUSolver::LUSolver(Array<double, 2> * const & Ain, SparseMatrixConverter const & _matrixConverter) {
+    LUSolver::LUSolver(matrix_type* const & Ain, SparseMatrixConverter const & _matrixConverter) {
         A = Ain;
         MatrixConverter = _matrixConverter;
         Triplet.row = nullptr;
@@ -26,16 +27,15 @@ namespace blitzdg {
      * Factorize the matrix A with UMFPACK. Computes L,U factors and permutation matrices P,Q such that P*A*Q=LU.
      */
     void LUSolver::factorize() {
-        const Array<double, 2> & Aref = *A;
-        const int n_rows = Aref.rows();
-        const int n_cols = Aref.cols();
+        const matrix_type& Aref = *A;
+        const index_type n_rows = Aref.rows();
+        const index_type n_cols = Aref.cols();
+        const index_type nz = MatrixConverter.getNumNonZeros(*A);
 
-        const int nz = MatrixConverter.getNumNonZeros(*A);
-
-        Ap = new int[n_rows+1];
-        Ai = new int[nz];
-        Ax = new double[nz];
-        Map = new int[nz];
+        Ap = new index_type[n_rows+1];
+        Ai = new index_type[nz];
+        Ax = new real_type[nz];
+        Map = new index_type[nz];
 
         cout << "Computing LU factorization!" << endl;
 
@@ -51,21 +51,21 @@ namespace blitzdg {
      * Solve Ax=b using UMFPACK. Requires LUSolver.factorize() to be called first. 'x' is returned in 'soln' reference.
      * 'b' is specified by 'rhs' reference.
      */
-    void LUSolver::solve(Array<double, 1> const & rhs, Array<double,1> & soln) {
-        int n = rhs.length(0);
-        double * b = new double[n];
+    void LUSolver::solve(vector_type const & rhs, vector_type& soln) {
+        index_type n = rhs.length(0);
+        real_type* b = new real_type[n];
 
-        for(int i=0; i<n; i++) {
+        for(index_type i=0; i<n; i++) {
             b[i] = rhs(i);
         }
 
-        double * x = new double[n];
+        real_type* x = new real_type[n];
 
         cout << "Solving Ax = b.." << endl;
         umfpack_di_solve (UMFPACK_A, Ap, Ai, Ax, x, b, Numeric, (double *)NULL, (double  *)NULL);
         cout << "Done." << endl;
 
-        for(int i =0; i<n; i++) {
+        for(index_type i =0; i<n; i++) {
             soln(i) = x[i];
         }
     }
@@ -73,7 +73,7 @@ namespace blitzdg {
     /**
      * Returns a reference to the matrix A.
      */
-    Array<double, 2> & LUSolver::get_A() {
+    matrix_type& LUSolver::get_A() {
         return *A;
     }
 

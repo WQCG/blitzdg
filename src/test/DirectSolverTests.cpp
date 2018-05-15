@@ -4,11 +4,15 @@
 
 #include "DirectSolver.hpp"
 #include "SparseMatrixConverter.hpp"
+#include "Types.hpp"
 #include <igloo/igloo_alt.h>
 #include <blitz/array.h>
 #include <iostream>
 #include <limits>
 
+using blitz::firstIndex;
+using blitz::Range;
+using blitz::secondIndex;
 using std::cout;
 using std::endl;
 using std::numeric_limits;
@@ -16,9 +20,8 @@ using std::numeric_limits;
 namespace blitzdg {
     namespace DirectSolverTests {
         using namespace igloo;
-        using namespace blitz;
-        const int N=5;
-        const double eps=10*numeric_limits<double>::epsilon();
+        const index_type N=5;
+        const real_type eps=10*numeric_limits<real_type>::epsilon();
         const float epsf = 1.e-5;
 
         DirectSolver * directSolver = nullptr;
@@ -27,10 +30,9 @@ namespace blitzdg {
         firstIndex ii;
         secondIndex jj;
 
-        Array<double, 2> b(N,1), x(N,1);
-        Array<double, 2> A(N,N);
-        Array<double, 1> expectedx(N);
-
+        matrix_type b(N,1), x(N,1);
+        matrix_type A(N,N);
+        vector_type expectedx(N);
 
         Describe(DirectSolver_Object) {
             void SetUp() {

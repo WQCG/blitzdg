@@ -2,20 +2,18 @@
 // See COPYING and LICENSE files at project root for more details. 
 
 #pragma once
-#include <blitz/array.h>
 #include "SparseMatrixConverter.hpp"
-
-using namespace blitz;
+#include "Types.hpp"
 
 namespace blitzdg {
   class EigenSolver {
-      int N;
+      index_type N;
       SparseMatrixConverter MatrixConverter;
 
     public:
       EigenSolver(SparseMatrixConverter const &);
 
-      void solve(const Array<double,2> & A, Array<double,1> & eigenvalues, Array<double, 2> & eigenvectors);
+      void solve(const matrix_type& A, vector_type& eigenvalues, matrix_type& eigenvectors);
       
       ~EigenSolver();
   };

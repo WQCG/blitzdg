@@ -7,22 +7,20 @@
  */
 
 #pragma once
-#include <blitz/array.h>
 #include "SparseMatrixConverter.hpp"
-
-using namespace blitz;
+#include "Types.hpp"
 
 namespace blitzdg {
   class LUSolver {
-      int N;
-      Array<double, 2> * A;
+      index_type N;
+      matrix_type* A;
 
       // Umfpack-specific fields
-      int * Ap;
-      int * Ai;
-      double * Ax;
-      int * Map;
-      double * null;
+      index_type * Ap;
+      index_type * Ai;
+      real_type * Ax;
+      index_type * Map;
+      real_type * null;
 
       void * Symbolic;
       void * Numeric;
@@ -32,13 +30,13 @@ namespace blitzdg {
       SparseMatrixConverter MatrixConverter;
     
     public:
-      LUSolver(Array<double, 2> * const &, SparseMatrixConverter const &);
+      LUSolver(matrix_type* const &, SparseMatrixConverter const &);
       
-      Array<double, 2> & get_A();
+      matrix_type& get_A();
 
       void factorize();
 
-      void solve(Array<double, 1> const &, Array<double, 1> &);
+      void solve(vector_type const &, vector_type&);
 
       ~LUSolver();
   };

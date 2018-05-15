@@ -6,15 +6,18 @@
 #include "Types.hpp"
 #include <igloo/igloo_alt.h>
 #include <blitz/array.h>
+#include <iostream>
 #include <limits>
 
+using std::cout;
+using std::endl;
 using std::numeric_limits;
 
 namespace blitzdg {
     namespace LUSolverTests {
         using namespace igloo;
-        const int N=5;
-        const double eps=10*numeric_limits<double>::epsilon();
+        const index_type N=5;
+        const real_type eps=10*numeric_limits<real_type>::epsilon();
 
         vector_type b(N), x(N);
         matrix_type A(N,N);

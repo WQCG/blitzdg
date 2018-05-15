@@ -3,18 +3,24 @@
 
 #include "EigenSolver.hpp"
 #include "SparseMatrixConverter.hpp"
+#include "Types.hpp"
 #include <igloo/igloo_alt.h>
 #include <blitz/array.h>
+#include <iostream>
 #include <limits>
 
+using blitz::firstIndex;
+using blitz::secondIndex;
+using blitz::sum;
+using std::cout;
+using std::endl;
 using std::numeric_limits;
 
 namespace blitzdg {
     namespace EigenSolverTests {
         using namespace igloo;
-        using namespace blitz;
-        const int N=5;
-        const double eps=10*numeric_limits<double>::epsilon();
+        const index_type N=5;
+        const real_type eps=10*numeric_limits<double>::epsilon();
         const float epsf = 5.e-7;
 
         EigenSolver * eigenSolver = nullptr;
@@ -23,8 +29,8 @@ namespace blitzdg {
         firstIndex ii;
         secondIndex jj;
 
-        Array<double, 1> b(N), x(N);
-        Array<double, 2> Adiag(N, N), Asymmetric(N, N);
+        vector_type b(N), x(N);
+        matrix_type Adiag(N, N), Asymmetric(N, N);
 
         Describe(EigenSolver_Object) {
             void SetUp() {
@@ -59,9 +65,9 @@ namespace blitzdg {
                 eigenSolver = new EigenSolver(*matrixConverter);
                 EigenSolver & solver = *eigenSolver;
 
-                Array<double, 1> eigenvalues(5);
+                vector_type eigenvalues(5);
                 eigenvalues = 0,0,0,0,0;
-                Array<double, 2> eigenvectors(5,5);
+                matrix_type eigenvectors(5,5);
                 eigenvectors = 0,0,0,0,0,
                             0,0,0,0,0,
                             0,0,0,0,0,
@@ -70,7 +76,7 @@ namespace blitzdg {
 
                 solver.solve(Adiag, eigenvalues, eigenvectors);
                 
-                Array<double, 2> expectedEvecs(5,5);
+                matrix_type expectedEvecs(5,5);
                 
                 expectedEvecs = 1,0,0,0,0,
                                 0,1,0,0,0,
@@ -84,7 +90,7 @@ namespace blitzdg {
                 Assert::That(eigenvalues(3), Equals(4.));
                 Assert::That(eigenvalues(4), Equals(5.));
 
-                Array <double, 2> res(5,5);
+                matrix_type res(5,5);
                 res = eigenvectors - expectedEvecs;
                 Assert::That(sum(res(ii)*res(ii)), IsLessThan(eps));
             }
@@ -94,9 +100,9 @@ namespace blitzdg {
                 eigenSolver = new EigenSolver(*matrixConverter);
                 EigenSolver & solver = *eigenSolver;
 
-                Array<double, 1> eigenvalues(5);
+                vector_type eigenvalues(5);
                 eigenvalues = 0,0,0,0,0;
-                Array<double, 2> eigenvectors(5,5);
+                matrix_type eigenvectors(5,5);
                 eigenvectors = 0,0,0,0,0,
                             0,0,0,0,0,
                             0,0,0,0,0,
@@ -105,7 +111,7 @@ namespace blitzdg {
 
                 solver.solve(Asymmetric, eigenvalues, eigenvectors);
                 
-                Array<double, 2> expectedEvecs(5,5);
+                matrix_type expectedEvecs(5,5);
 
                 expectedEvecs = 0.344185,-0.540215,0.563165,-0.456254,0.253736,
                             -0.489198,0.456254,0.0711849,-0.540215,0.505587,
@@ -119,7 +125,7 @@ namespace blitzdg {
                 Assert::That(eigenvalues(3) - 0.538469,    IsLessThan(epsf));
                 Assert::That(eigenvalues(4) - 0.90618,     IsLessThan(epsf));
 
-                Array<double, 2> res(5,5);
+                matrix_type res(5,5);
                 res = eigenvectors - expectedEvecs;
                 Assert::That(sum(res(ii)*res(ii)), IsLessThan(epsf));
             }
