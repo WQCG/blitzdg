@@ -42,7 +42,7 @@
 </g>
 <!-- Node4 -->
 <g id="node4" class="node"><title>Node4</title>
-<g id="a_node4"><a xlink:href="Nodes1DProvisioner_8hpp_source.html" target="_top" xlink:title="include/Nodes1DProvisioner.hpp">
+<g id="a_node4"><a xlink:href="Nodes1DProvisioner_8hpp.html" target="_top" xlink:title="Class for computations relating to construction of one&#45;dimensional nodes, operators, and geometric factors. ">
 <polygon fill="white" stroke="black" points="185.5,-56.5 185.5,-75.5 344.5,-75.5 344.5,-56.5 185.5,-56.5"/>
 <text text-anchor="middle" x="265" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">include/Nodes1DProvisioner.hpp</text>
 </a>
