@@ -23,5 +23,7 @@ var searchData=
   ['get_5fvertices',['get_Vertices',['../classMeshManager.html#aff2029bb6ddd188d6ce09687c9a75209',1,'MeshManager']]],
   ['get_5fvmapm',['get_vmapM',['../classNodes1DProvisioner.html#adaade3dfb65b3f3b2bfd1857a7037b51',1,'Nodes1DProvisioner']]],
   ['get_5fvmapp',['get_vmapP',['../classNodes1DProvisioner.html#ab7ea5b42c2d8f67aa3a4b3b3d537e6ea',1,'Nodes1DProvisioner']]],
-  ['get_5fxgrid',['get_xGrid',['../classNodes1DProvisioner.html#a7e5aa3755720243efe195e8f8f76129b',1,'Nodes1DProvisioner']]]
+  ['get_5fxgrid',['get_xGrid',['../classNodes1DProvisioner.html#a7e5aa3755720243efe195e8f8f76129b',1,'Nodes1DProvisioner']]],
+  ['getexecutablepath',['getExecutablePath',['../whereami_8h.html#a1d7105bf3f056c5cf45b8d4bab266216',1,'whereami.h']]],
+  ['getmodulepath',['getModulePath',['../whereami_8h.html#a3e646ad33f266a102996d0e9c5155eca',1,'whereami.h']]]
 ];

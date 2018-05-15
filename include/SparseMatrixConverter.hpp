@@ -1,5 +1,11 @@
-// Copyright (C) 2017-2018  Derek Steinmoeller. 
-// See COPYING and LICENSE files at project root for more details. 
+// Copyright (C) 2017-2018  Waterloo Quantitative Consulting Group, Inc.
+// See COPYING and LICENSE files at project root for more details.
+
+/**
+ * @file SparseMatrixConverter.hpp
+ * @brief Defines the SparseMatrixConverter class converts between blitz++
+ * 2D arrays, sparse triplets, sparse compressed column formats, and contiguous C-style (POD) arrays.
+ */
 
 #pragma once
 #include <blitz/array.h>
