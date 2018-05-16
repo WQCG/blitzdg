@@ -21,6 +21,7 @@ if [ "$machine" == "Linux" ] ; then
     apt-get -y install libboost-dbg libboost-dev libboost-doc
 
 	# pull in doxygen (latest) for travis - should flag this on only for travis and not for all devs.
+	apt-get -y install cmake
 	git clone https://github.com/doxygen/doxygen.git
 	mkdir -p doxygen/build
 	cd doxygen/build
