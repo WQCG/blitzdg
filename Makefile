@@ -48,9 +48,6 @@ test: bin/test
 get-deps:
 	@sudo /bin/bash pull-deps.sh
 	@sudo apt-get -y install graphviz texlive-generic-recommended
-	@curl -fsL http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.14.linux.bin.tar.gz -o doxygen.tar.gz
-	@tar zxvf doxygen.tar.gz
-	@chmod +x doxygen-1.8.14/bin/doxygen
 
 docs:
 	@echo DOXYGEN VERSION:
