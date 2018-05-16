@@ -19,6 +19,15 @@ if [ "$machine" == "Linux" ] ; then
     ln -s /usr/lib/x86_64-linux-gnu/libumfpack.so.5.7.1 /usr/lib/x86_64-linux-gnu/libumfpack.so
     apt-get -y install libmetis-dev libmetis-doc
     apt-get -y install libboost-dbg libboost-dev libboost-doc
+
+	# pull in doxygen (latest) for travis - should flag this on only for travis and not for all devs.
+	git clone https://github.com/doxygen/doxygen.git
+	mkdir -p doxygen/build
+	cd doxygen/build
+	cmake -G "Unix Makefiles" ..
+	make
+	make install
+	cd ../..
 fi
 
 if [ "$machine" == "Mac" ] ; then
