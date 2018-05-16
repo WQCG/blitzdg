@@ -53,6 +53,8 @@ get-deps:
 	@chmod +x doxygen-1.8.14/bin/doxygen
 
 docs:
+	@echo DOXYGEN VERSION:
+	@doxygen-1.8.14/bin/doxygen -v
 	@doxygen-1.8.14/bin/doxygen doxygen.conf
 	@cp -r doxygen/html/* docs/.
 
