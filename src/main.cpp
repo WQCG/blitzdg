@@ -90,7 +90,20 @@ void computeRHS(const matrix_type & u, const double c, Nodes1DProvisioner & node
 
 	// Assumes PDE has been left-multiplied by local inverse mass matrix, so all we have left
 	// is the differentiation matrix contribution, and the surface integral
-	RHS =-c*rx*(sum(Dr(ii,kk)*u(kk,jj), kk)) + Lift*(Fscale*(du));;
+	RHS =-c*rx*sum(Dr(ii,kk)*u(kk,jj), kk) + Lift*Fscale*du;
+}
+
+void writeFieldToFile(const string fileName, const matrix_type & field ) {
+	ofstream outFile;
+	outFile.open(fileName);
+	for(index_type i=0; i < field.rows(); i++) {
+		for(index_type k=0; k < field.cols(); k++) {
+			real_type num = field(i, k);
+			outFile << num << " ";
+		}
+		outFile << endl;
+	}
+	outFile.close();
 }
 
 int main(int argc, char **argv) {
@@ -105,7 +118,7 @@ int main(int argc, char **argv) {
 
 	// Numerical parameters:
 	int N = 4;
-	int K = 20;
+	int K = 100;
 	double CFL = 0.05;
 
 	// Build dependencies.
@@ -124,7 +137,7 @@ int main(int argc, char **argv) {
 
 	double min_dx = x(1,0) - x(0,0);
 
-	double dt = CFL*min_dx/c;
+	double dt = CFL*min_dx/abs(c);
 
 	matrix_type u(Np, K);
 	matrix_type RHS(Np, K);
@@ -134,16 +147,16 @@ int main(int argc, char **argv) {
 	printDisclaimer();
 
 	index_type count = 0;
+
+	writeFieldToFile("x.dat", x);
+
 	while (t < finalTime) {
 		// Toy outputting for now.
 		if ((count % 10) == 0) {
-			ofstream outFile;
-
 			stringstream fileNameStrm;
-			fileNameStrm << "advec1d" << setfill('0') << setw(7) << count << ".dat";
-			outFile.open(fileNameStrm.str());
-			outFile << u;
-			outFile.close();
+			fileNameStrm << "u" << setfill('0') << setw(7) << count << ".dat";
+
+			writeFieldToFile(fileNameStrm.str(), u);
 		}
 
 		// Calculate Righ-hand side at current time-step.
