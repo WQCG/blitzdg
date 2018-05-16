@@ -25,6 +25,8 @@ if [ "$machine" == "Linux" ] ; then
 	git clone https://github.com/doxygen/doxygen.git
 	mkdir -p doxygen/build
 	cd doxygen/build
+	which gcc
+	export CC=/usr/bin/gcc
 	cmake -G "Unix Makefiles" ..
 	make
 	make install
