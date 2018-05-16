@@ -5,14 +5,15 @@
 #include "SparseTriplet.hpp"
 #include "Types.hpp"
 #include <blitz/array.h>
-#include <iostream>
 #include <cmath>
+#include <limits>
 
 using blitz::firstIndex;
 using blitz::Range;
 using blitz::secondIndex;
 using blitz::sum;
 using blitz::thirdIndex;
+using std::numeric_limits;
 
 namespace blitzdg {
     const index_type Nodes1DProvisioner::NumFacePoints = 1;
