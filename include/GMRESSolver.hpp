@@ -54,9 +54,11 @@ namespace blitzdg {
     } // namespace details
 
     /**
+     * \addtogroup blitzdg
+     * @{
+     */
+    /**
      * An enum class representing convergence flags for GMRESSolver.
-     * 
-     * A detailed description of each convergence flag.
      */
     enum class ConvFlag { 
         unconverged, /**< Neither converged nor diverged. */
@@ -70,6 +72,7 @@ namespace blitzdg {
         precon_fail, /**< Application of preconditioner failed. */
         matvec_fail  /**< Matrix-vector product failed. */
     };
+    /** @} */
 
     /**
      * Convert a ConvFlag to a string.
