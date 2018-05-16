@@ -301,8 +301,9 @@ namespace blitzdg {
 
                 matrix_type & J = nodes1D.get_J();
                 matrix_type & rx = nodes1D.get_rx();
+                const matrix_type & Fscale = nodes1D.get_Fscale();
 
-                matrix_type expectedJ(4,5), expectedrx(4,5);
+                matrix_type expectedJ(4,5), expectedrx(4,5), expectedFscale(2,5);
                 expectedJ = 0.20000,0.20000,0.20000,0.20000,0.20000,
                             0.20000,0.20000,0.20000,0.20000,0.20000,
                             0.20000,0.20000,0.20000,0.20000,0.20000,
@@ -312,13 +313,18 @@ namespace blitzdg {
                             5,5,5,5,5,
                             5,5,5,5,5,
                             5,5,5,5,5;
+                
+                expectedFscale = 5,5,5,5,5,
+                                 5,5,5,5,5;
 
-                matrix_type resJ(4,5), resrx(4,5);
+                matrix_type resJ(4,5), resrx(4,5), resFscale(2,5);
                 resJ = J - expectedJ;
                 resrx = rx - expectedrx;
+                resFscale = Fscale - expectedFscale;
 
                 Assert::That(sqrt(sum(resJ(ii)*resJ(ii))), IsLessThan(epsf));
                 Assert::That(sqrt(sum(resrx(ii)*resrx(ii))), IsLessThan(epsf));
+                Assert::That(sqrt(sum(resFscale(ii)*resFscale(ii))), IsLessThan(epsf));
             }
 
             It(Should_Build_1D_Lift_Operator) {
@@ -330,9 +336,9 @@ namespace blitzdg {
 
                 matrix_type expectedLift(4,2);
                 expectedLift =  8.00000,-2.00000,
-                            -0.89443, 0.89443,
+                               -0.89443, 0.89443,
                                 0.89443,-0.89443,
-                            -2.00000, 8.00000;
+                               -2.00000, 8.00000;
 
 
                 matrix_type resLift(4,2);
@@ -396,7 +402,6 @@ namespace blitzdg {
             It(Should_Build_Volume_Maps) {
                 Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
                 nodes1D.buildNodes();
-                nodes1D.buildMaps();
 
                 index_vector_type vmapM = nodes1D.get_vmapM();
                 index_vector_type vmapP = nodes1D.get_vmapP();
@@ -416,6 +421,24 @@ namespace blitzdg {
                 Assert::That(sqrt(sum(resVmapM*resVmapM)), Equals(0));
                 Assert::That(sqrt(sum(resVmapP*resVmapP)), Equals(0));
             }
+
+            It(Should_Build_Normals) {
+
+                Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+                nodes1D.buildNodes();
+
+                const matrix_type & nx = nodes1D.get_nx();
+
+                matrix_type expectednx(2,5);
+                expectednx = -1,-1,-1,-1,-1,
+                              1, 1, 1, 1, 1;
+
+                matrix_type resnx(2,5);
+
+                resnx = nx - expectednx;
+
+                Assert::That(sqrt(sum(resnx*resnx)), Equals(0));
+            }
         };
-    } // namespace Nodes1DProvisionerTests
+   } // namespace Nodes1DProvisionerTests
 } // namespace blitzdg

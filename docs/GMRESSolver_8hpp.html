@@ -130,7 +130,7 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
-<tr class="memitem:a9cbd374ae2a3a6c9e09432b6c5741e1a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9cbd374ae2a3a6c9e09432b6c5741e1a"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="GMRESSolver_8hpp.html#a9cbd374ae2a3a6c9e09432b6c5741e1a">blitzdg::ConvFlag</a> { <br />
+<tr class="memitem:a9cbd374ae2a3a6c9e09432b6c5741e1a"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="GMRESSolver_8hpp.html#a9cbd374ae2a3a6c9e09432b6c5741e1a">blitzdg::ConvFlag</a> { <br />
 &#160;&#160;<b>blitzdg::ConvFlag::unconverged</b>, 
 <b>blitzdg::ConvFlag::success</b>, 
 <b>blitzdg::ConvFlag::diverged</b>, 
@@ -144,7 +144,7 @@ Enumerations</h2></td></tr>
 &#160;&#160;<b>blitzdg::ConvFlag::precon_fail</b>, 
 <b>blitzdg::ConvFlag::matvec_fail</b>
 <br />
- }<tr class="memdesc:a9cbd374ae2a3a6c9e09432b6c5741e1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">An enum class representing convergence flags for GMRESSolver. <br /></td></tr>
+ }<tr class="memdesc:a9cbd374ae2a3a6c9e09432b6c5741e1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">An enum class representing convergence flags for GMRESSolver.  <a href="GMRESSolver_8hpp.html#a9cbd374ae2a3a6c9e09432b6c5741e1a">More...</a><br /></td></tr>
 </td></tr>
 <tr class="separator:a9cbd374ae2a3a6c9e09432b6c5741e1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -156,30 +156,49 @@ Functions</h2></td></tr>
 <tr class="memitem:a6f274deca2f46a57e1fefab015a1c1fa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="GMRESSolver_8hpp.html#a6f274deca2f46a57e1fefab015a1c1fa">blitzdg::details::matTimesVec</a> (index_type n, matrix_type &amp;A, vector_type &amp;x, vector_type &amp;result)</td></tr>
 <tr class="memdesc:a6f274deca2f46a57e1fefab015a1c1fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calls the BLAS function dgemv to compute the matrix-vector product <img class="formulaInl" alt="$Ax$" src="form_15.png"/>.  <a href="GMRESSolver_8hpp.html#a6f274deca2f46a57e1fefab015a1c1fa">More...</a><br /></td></tr>
 <tr class="separator:a6f274deca2f46a57e1fefab015a1c1fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a932140d3f58b7d649a68ed4fb354604b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a932140d3f58b7d649a68ed4fb354604b"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="GMRESSolver_8hpp.html#a932140d3f58b7d649a68ed4fb354604b">blitzdg::details::isNonzero</a> (const vector_type &amp;x)</td></tr>
-<tr class="memdesc:a932140d3f58b7d649a68ed4fb354604b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if the input array x is not uniquely zero. <br /></td></tr>
+<tr class="memitem:a932140d3f58b7d649a68ed4fb354604b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="GMRESSolver_8hpp.html#a932140d3f58b7d649a68ed4fb354604b">blitzdg::details::isNonzero</a> (const vector_type &amp;x)</td></tr>
+<tr class="memdesc:a932140d3f58b7d649a68ed4fb354604b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if the input array x is not uniquely zero.  <a href="GMRESSolver_8hpp.html#a932140d3f58b7d649a68ed4fb354604b">More...</a><br /></td></tr>
 <tr class="separator:a932140d3f58b7d649a68ed4fb354604b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac9147b6aee6fbf22e95b2fb3f68ed426"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac9147b6aee6fbf22e95b2fb3f68ed426"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="GMRESSolver_8hpp.html#ac9147b6aee6fbf22e95b2fb3f68ed426">blitzdg::ConvFlagToStr</a> (ConvFlag flag)</td></tr>
-<tr class="memdesc:ac9147b6aee6fbf22e95b2fb3f68ed426"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a ConvFlag to a string. <br /></td></tr>
+<tr class="memitem:ac9147b6aee6fbf22e95b2fb3f68ed426"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="GMRESSolver_8hpp.html#ac9147b6aee6fbf22e95b2fb3f68ed426">blitzdg::ConvFlagToStr</a> (ConvFlag flag)</td></tr>
+<tr class="memdesc:ac9147b6aee6fbf22e95b2fb3f68ed426"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a ConvFlag to a string.  <a href="GMRESSolver_8hpp.html#ac9147b6aee6fbf22e95b2fb3f68ed426">More...</a><br /></td></tr>
 <tr class="separator:ac9147b6aee6fbf22e95b2fb3f68ed426"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afcef465b1811e1a58461f319ff1c353c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afcef465b1811e1a58461f319ff1c353c"></a>
-std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="GMRESSolver_8hpp.html#afcef465b1811e1a58461f319ff1c353c">blitzdg::operator&lt;&lt;</a> (std::ostream &amp;strm, ConvFlag flag)</td></tr>
-<tr class="memdesc:afcef465b1811e1a58461f319ff1c353c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a ConvFlag to an output stream. <br /></td></tr>
+<tr class="memitem:afcef465b1811e1a58461f319ff1c353c"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="GMRESSolver_8hpp.html#afcef465b1811e1a58461f319ff1c353c">blitzdg::operator&lt;&lt;</a> (std::ostream &amp;strm, ConvFlag flag)</td></tr>
+<tr class="memdesc:afcef465b1811e1a58461f319ff1c353c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a ConvFlag to an output stream.  <a href="GMRESSolver_8hpp.html#afcef465b1811e1a58461f319ff1c353c">More...</a><br /></td></tr>
 <tr class="separator:afcef465b1811e1a58461f319ff1c353c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab70e5e5b582121c2bf78c1583d175773"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab70e5e5b582121c2bf78c1583d175773"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="GMRESSolver_8hpp.html#ab70e5e5b582121c2bf78c1583d175773">blitzdg::checkGMRESParams</a> (const GMRESParams &amp;p)</td></tr>
-<tr class="memdesc:ab70e5e5b582121c2bf78c1583d175773"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks the parameters in <a class="el" href="structblitzdg_1_1GMRESParams.html" title="Input parameters for the GMRES solver. ">GMRESParams</a> and throws an std::invalid_argument exception if any are out of range. <br /></td></tr>
+<tr class="memitem:ab70e5e5b582121c2bf78c1583d175773"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="GMRESSolver_8hpp.html#ab70e5e5b582121c2bf78c1583d175773">blitzdg::checkGMRESParams</a> (const GMRESParams &amp;p)</td></tr>
+<tr class="memdesc:ab70e5e5b582121c2bf78c1583d175773"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks the parameters in <a class="el" href="structblitzdg_1_1GMRESParams.html" title="Input parameters for the GMRES solver. ">GMRESParams</a> and throws an std::invalid_argument exception if any are out of range.  <a href="GMRESSolver_8hpp.html#ab70e5e5b582121c2bf78c1583d175773">More...</a><br /></td></tr>
 <tr class="separator:ab70e5e5b582121c2bf78c1583d175773"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0d95699cddba020429bb348745cf0775"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0d95699cddba020429bb348745cf0775"></a>
-std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="GMRESSolver_8hpp.html#a0d95699cddba020429bb348745cf0775">blitzdg::operator&lt;&lt;</a> (std::ostream &amp;strm, const GMRESOut &amp;out)</td></tr>
-<tr class="memdesc:a0d95699cddba020429bb348745cf0775"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a <a class="el" href="structblitzdg_1_1GMRESOut.html" title="GMRES output information. ">GMRESOut</a> object to an output stream. <br /></td></tr>
+<tr class="memitem:a0d95699cddba020429bb348745cf0775"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="GMRESSolver_8hpp.html#a0d95699cddba020429bb348745cf0775">blitzdg::operator&lt;&lt;</a> (std::ostream &amp;strm, const GMRESOut &amp;out)</td></tr>
+<tr class="memdesc:a0d95699cddba020429bb348745cf0775"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a <a class="el" href="structblitzdg_1_1GMRESOut.html" title="GMRES output information. ">GMRESOut</a> object to an output stream.  <a href="GMRESSolver_8hpp.html#a0d95699cddba020429bb348745cf0775">More...</a><br /></td></tr>
 <tr class="separator:a0d95699cddba020429bb348745cf0775"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Implements a right-preconditioned GMRES iterative method. </p>
-</div><h2 class="groupheader">Function Documentation</h2>
+</div><h2 class="groupheader">Enumeration Type Documentation</h2>
+<a class="anchor" id="file_a9cbd374ae2a3a6c9e09432b6c5741e1a"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="GMRESSolver_8hpp.html#a9cbd374ae2a3a6c9e09432b6c5741e1a">blitzdg::ConvFlag</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>An enum class representing convergence flags for <a class="el" href="classblitzdg_1_1GMRESSolver.html" title="Preconditioned, restarted GMRES with Modified Gram-Schmidt orthogonalization. ">GMRESSolver</a>. </p>
+<p>A detailed description of each convergence flag. </p>
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
 <a class="anchor" id="file_a444461a1f46f5ec50f95aea45d936be4"></a>
 <div class="memitem">
 <div class="memproto">
@@ -234,6 +253,116 @@ Here is the call graph for this function:</div>
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><iframe scrolling="no" frameborder="0" src="GMRESSolver_8hpp_a444461a1f46f5ec50f95aea45d936be4_icgraph.svg" width="186" height="62"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="file_ab70e5e5b582121c2bf78c1583d175773"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void blitzdg::checkGMRESParams </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structblitzdg_1_1GMRESParams.html">GMRESParams</a> &amp;&#160;</td>
+          <td class="paramname"><em>p</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Checks the parameters in <a class="el" href="structblitzdg_1_1GMRESParams.html" title="Input parameters for the GMRES solver. ">GMRESParams</a> and throws an std::invalid_argument exception if any are out of range. </p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="GMRESSolver_8hpp_ab70e5e5b582121c2bf78c1583d175773_cgraph.svg" width="387" height="62"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
+</p>
+
+<p><div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="GMRESSolver_8hpp_ab70e5e5b582121c2bf78c1583d175773_icgraph.svg" width="208" height="62"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="file_ac9147b6aee6fbf22e95b2fb3f68ed426"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">string blitzdg::ConvFlagToStr </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="GMRESSolver_8hpp.html#a9cbd374ae2a3a6c9e09432b6c5741e1a">ConvFlag</a>&#160;</td>
+          <td class="paramname"><em>flag</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Convert a ConvFlag to a string. </p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="GMRESSolver_8hpp_ac9147b6aee6fbf22e95b2fb3f68ed426_cgraph.svg" width="167" height="62"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
+</p>
+
+<p><div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="GMRESSolver_8hpp_ac9147b6aee6fbf22e95b2fb3f68ed426_icgraph.svg" width="167" height="62"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="file_a932140d3f58b7d649a68ed4fb354604b"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool blitzdg::details::isNonzero </td>
+          <td>(</td>
+          <td class="paramtype">const vector_type &amp;&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns true if the input array x is not uniquely zero. </p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="GMRESSolver_8hpp_a932140d3f58b7d649a68ed4fb354604b_cgraph.svg" width="184" height="62"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
+</p>
+
+<p><div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="GMRESSolver_8hpp_a932140d3f58b7d649a68ed4fb354604b_icgraph.svg" width="184" height="62"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 </div>
 </p>
 
@@ -300,6 +429,86 @@ Here is the caller graph for this function:</div>
 <div class="center"><iframe scrolling="no" frameborder="0" src="GMRESSolver_8hpp_a6f274deca2f46a57e1fefab015a1c1fa_icgraph.svg" width="206" height="62"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </p>
+
+</div>
+</div>
+<a class="anchor" id="file_afcef465b1811e1a58461f319ff1c353c"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream&amp; blitzdg::operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>strm</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="GMRESSolver_8hpp.html#a9cbd374ae2a3a6c9e09432b6c5741e1a">ConvFlag</a>&#160;</td>
+          <td class="paramname"><em>flag</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Write a ConvFlag to an output stream. </p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="GMRESSolver_8hpp_afcef465b1811e1a58461f319ff1c353c_cgraph.svg" width="142" height="62"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
+</p>
+
+<p><div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="GMRESSolver_8hpp_afcef465b1811e1a58461f319ff1c353c_icgraph.svg" width="387" height="62"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="file_a0d95699cddba020429bb348745cf0775"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream&amp; blitzdg::operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>strm</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structblitzdg_1_1GMRESOut.html">GMRESOut</a> &amp;&#160;</td>
+          <td class="paramname"><em>out</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Write a <a class="el" href="structblitzdg_1_1GMRESOut.html" title="GMRES output information. ">GMRESOut</a> object to an output stream. </p>
 
 </div>
 </div>

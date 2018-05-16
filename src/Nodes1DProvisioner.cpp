@@ -35,6 +35,10 @@ namespace blitzdg {
 
         // This is true in 1D only.
         NumLocalPoints = NOrder + 1;
+        mapI = 0;
+        mapO = NumFacePoints*NumFaces*NumElements - 1;
+        vmapI = 0;
+        vmapO = NumLocalPoints*NumElements - 1;
 
         rGrid = new vector_type(NumLocalPoints);
         xGrid = new matrix_type(NumLocalPoints, NumElements);
@@ -47,6 +51,8 @@ namespace blitzdg {
         EToF = new index_matrix_type(NumElements, NumFaces);
         Fmask = new index_vector_type (NumFacePoints*NumFaces);
         Fx = new matrix_type(NumFacePoints*NumFaces, NumElements);
+        Fscale = new matrix_type(NumFacePoints*NumFaces, NumElements);
+        nx = new matrix_type(NumFacePoints*NumFaces, NumElements);
 
         vmapM = new index_vector_type(NumFacePoints*NumFaces*NumElements);
         vmapP = new index_vector_type(NumFacePoints*NumFaces*NumElements);
@@ -85,6 +91,24 @@ namespace blitzdg {
 
         buildConnectivityMatrices();
         buildFaceMask();
+        buildMaps();
+        buildNormals();
+    }
+
+    /**
+     * Build unit normals at element faces. Trivial in 1D.
+     */
+    void Nodes1DProvisioner::buildNormals() {
+        matrix_type & nxref = *nx;
+
+        real_type mult = -1;
+
+        for (index_type k=0; k < NumElements; k++) {
+            for (index_type f=0; f < NumFaces*NumFacePoints; f++) {
+                nxref(f,k) = mult;
+                mult *= -1;
+            }
+        }
     }
 
     /**
@@ -171,7 +195,6 @@ namespace blitzdg {
      * based using EToV (Element-to-Vertex) matrix.
      */
     void Nodes1DProvisioner::buildConnectivityMatrices() {
-
         firstIndex ii;
         secondIndex jj;
         thirdIndex kk;
@@ -278,21 +301,29 @@ namespace blitzdg {
     }
 
     /**
-     * Compute Jacobian (determinant) J and geometric factor rx (dr/dx) using nodes and differentiation matrix.
+     * Compute Jacobian (determinant) J and geometric factor rx (dr/dx), and Fscale using nodes and differentiation matrix.
      */
     void Nodes1DProvisioner::computeJacobian() {
         firstIndex ii;
         secondIndex jj;
         thirdIndex kk;
 
+        matrix_type & x = get_xGrid();
+        matrix_type & Dr = get_Dr();
+        matrix_type & Jref = get_J();
+        matrix_type & rxref = get_rx();
 
-        matrix_type& x = get_xGrid();
-        matrix_type& Dr = get_Dr();
-        matrix_type& Jref = get_J();
-        matrix_type& rxref = get_rx();
+        matrix_type & Fscaleref = *Fscale;
+
+        // is Fmask not intiialized at this point?
+        index_vector_type & Fmsk = get_Fmask();
 
         Jref = sum(Dr(ii,kk)*x(kk,jj), kk);
         rxref = 1/Jref;
+
+        for(index_type f=0; f < NumFaces; f++) {
+            Fscaleref(f, Range::all()) = 1/Jref(Fmsk(f), Range::all());
+        }
     }
 
     /**
@@ -308,6 +339,13 @@ namespace blitzdg {
             computeJacobiPolynomial(*rGrid, 0.0, 0.0, j-1, p);
             Vref(Range::all(), j-1) = p;
         }
+    }
+
+    /**
+     * Get reference to 1D Lifting Operator.
+     */
+    matrix_type & Nodes1DProvisioner::get_Lift() {
+        return *Lift;
     }
 
     /**
@@ -342,12 +380,11 @@ namespace blitzdg {
         Drref = Drtrans(jj, ii);
     } 
 
-
     /**
-     * Get reference to 1D Lifting Operator.
+     * Get number of elements.
      */
-    matrix_type & Nodes1DProvisioner::get_Lift() {
-        return *Lift;
+    index_type Nodes1DProvisioner::get_NumElements() {
+        return NumElements;
     }
 
     /**
@@ -413,6 +450,13 @@ namespace blitzdg {
         return *rx;
     }
 
+    /**
+     * Get reference to normals array nx.
+     */
+    const matrix_type & Nodes1DProvisioner::get_nx() {
+        return *nx;
+    } 
+
     index_type Nodes1DProvisioner::get_NumLocalPoints() {
         return NumLocalPoints;
     }
@@ -422,6 +466,14 @@ namespace blitzdg {
      */
     matrix_type & Nodes1DProvisioner::get_Fx() {
         return *Fx;
+    }
+
+    /**
+     * Get the Face-scaling factor (Inverse of Jacobian at Face nodes).
+     */
+
+    const matrix_type & Nodes1DProvisioner::get_Fscale() {
+        return *Fscale;
     }
 
     /**
@@ -446,6 +498,25 @@ namespace blitzdg {
     }
 
     /**
+     * Get the surface index of the inflow boundary.
+     */
+    const index_type Nodes1DProvisioner::get_mapI() {
+        return mapI;
+    }
+
+    const index_type Nodes1DProvisioner::get_mapO() {
+        return mapO;
+    }
+
+    const index_type Nodes1DProvisioner::get_vmapI() {
+        return vmapI;
+    }
+
+    const index_type Nodes1DProvisioner::get_vmapO() {
+        return vmapO;
+    }
+
+    /**
      * Destructor.
      */
     Nodes1DProvisioner::~Nodes1DProvisioner() {
@@ -459,6 +530,8 @@ namespace blitzdg {
         delete EToF;
         delete Fmask;
         delete Fx;
+        delete Fscale;
+        delete nx;
         delete vmapM;
         delete vmapP;
     }
@@ -466,7 +539,7 @@ namespace blitzdg {
     /**  Compute the Nth Jacobi polynomial of type (alpha,beta) > -1 ( != -0.5)
      *   and weights, w, associated with the Jacobi polynomial at the points x.
      */
-    void Nodes1DProvisioner::computeJacobiPolynomial(vector_type const & x, const real_type alpha, const real_type beta, const index_type N, vector_type& p) {
+    void Nodes1DProvisioner::computeJacobiPolynomial(vector_type const & x, const real_type alpha, const real_type beta, const index_type N, vector_type & p) {
         Range all = Range::all();
         index_type Np = (x.length())(0);
 

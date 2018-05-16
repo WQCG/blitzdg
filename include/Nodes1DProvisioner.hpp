@@ -22,22 +22,30 @@ namespace blitzdg {
       index_type NumElements;
       index_type NOrder;
       index_type NumLocalPoints;
+
+      index_type mapI;
+      index_type mapO;
+      index_type vmapI;
+      index_type vmapO;
       
-      matrix_type* xGrid;
-      vector_type* rGrid;
+      matrix_type * xGrid;
+      vector_type * rGrid;
 
-      matrix_type* V;
-      matrix_type* Dr;
-      matrix_type* Lift;
-      matrix_type* J;
-      matrix_type* rx;
+      matrix_type * V;
+      matrix_type * Dr;
+      matrix_type * Lift;
+      matrix_type * J;
+      matrix_type * rx;
+      matrix_type * nx;
 
-      index_vector_type* Fmask;
-      matrix_type* Fx;
+      index_vector_type * Fmask;
+      matrix_type * Fx;
 
-      index_matrix_type* EToV;
-      index_matrix_type* EToE;
-      index_matrix_type* EToF;
+      matrix_type *Fscale;
+
+      index_matrix_type * EToV;
+      index_matrix_type * EToE;
+      index_matrix_type * EToF;
 
       index_vector_type * vmapM;
       index_vector_type * vmapP;
@@ -60,29 +68,38 @@ namespace blitzdg {
       void buildVandermondeMatrix();
       void buildLift();
       void buildMaps();
+      void buildNormals();
       void computeGradVandermonde(matrix_type& DVr);
       void computeJacobian();
       
-      matrix_type& get_xGrid();
-      vector_type& get_rGrid();
-      matrix_type& get_Dr();
-      matrix_type& get_V();
-      matrix_type& get_J();
-      matrix_type& get_rx();
+      matrix_type & get_xGrid();
+      vector_type & get_rGrid();
+      matrix_type & get_Dr();
+      matrix_type & get_V();
+      matrix_type & get_J();
+      matrix_type & get_rx();
+      const matrix_type & get_nx();
 
-      index_vector_type& get_Fmask();
-      matrix_type& get_Fx();
+      index_vector_type & get_Fmask();
+      matrix_type & get_Fx();
+      const matrix_type & get_Fscale();
 
-      index_matrix_type& get_EToV();
-      matrix_type& get_Lift();
+      index_matrix_type & get_EToV();
+      matrix_type & get_Lift();
     
-      index_matrix_type& get_EToE();
-      index_matrix_type& get_EToF();
+      index_matrix_type & get_EToE();
+      index_matrix_type & get_EToF();
 
       const index_vector_type & get_vmapM();
       const index_vector_type & get_vmapP();
 
+      const index_type get_mapI();
+      const index_type get_mapO();
+      const index_type get_vmapI();
+      const index_type get_vmapO();
+
       index_type get_NumLocalPoints();
+      index_type get_NumElements();
 
       // these can be moved to a helper (polynomials) class or made private within this class.
       void computeJacobiPolynomial(vector_type const & x, const real_type alpha, const real_type beta, const index_type N, vector_type & p);
