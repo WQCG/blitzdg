@@ -25,6 +25,11 @@ class Nodes1DProvisioner {
     int NumElements;
     int NOrder;
     int NumLocalPoints;
+
+    blitzdg::index_type mapI;
+    blitzdg::index_type mapO;
+    blitzdg::index_type vmapI;
+    blitzdg::index_type vmapO;
     
     Array<double, 2> * xGrid;
     Array<double, 1> * rGrid;
@@ -34,9 +39,12 @@ class Nodes1DProvisioner {
     Array<double, 2> * Lift;
     Array<double, 2> * J;
     Array<double, 2> * rx;
+    blitzdg::matrix_type * nx;
 
     Array<int, 1> * Fmask;
     Array<double, 2> * Fx;
+
+    blitzdg::matrix_type *Fscale;
 
     Array<int, 2> * EToV;
     Array<int, 2> * EToE;
@@ -63,6 +71,7 @@ class Nodes1DProvisioner {
     void buildVandermondeMatrix();
     void buildLift();
     void buildMaps();
+    void buildNormals();
     void computeGradVandermonde(Array<double,2> & DVr);
     void computeJacobian();
     
@@ -72,9 +81,11 @@ class Nodes1DProvisioner {
     Array<double, 2> & get_V();
     Array<double, 2> & get_J();
     Array<double, 2> & get_rx();
+    const blitzdg::matrix_type & get_nx();
 
     Array<int, 1> & get_Fmask();
     Array<double, 2> & get_Fx();
+    const blitzdg::matrix_type & get_Fscale();
 
     Array<int, 2> & get_EToV();
     Array<double, 2> & get_Lift();
@@ -85,7 +96,13 @@ class Nodes1DProvisioner {
     const blitzdg::index_vector_type & get_vmapM();
     const blitzdg::index_vector_type & get_vmapP();
 
+    const blitzdg::index_type get_mapI();
+    const blitzdg::index_type get_mapO();
+    const blitzdg::index_type get_vmapI();
+    const blitzdg::index_type get_vmapO();
+
     int get_NumLocalPoints();
+    int get_NumElements();
 
     // these can be moved to a helper (polynomials) class or made private within this class.
     void computeJacobiPolynomial(Array<double,1> const & x, const double alpha, const double beta, const int N, Array<double,1> & p);

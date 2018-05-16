@@ -30,6 +30,10 @@ Nodes1DProvisioner::Nodes1DProvisioner(int _NOrder, int _NumElements, double _xm
 
     // This is true in 1D only.
     NumLocalPoints = NOrder + 1;
+    mapI = 0;
+    mapO = NumFacePoints*NumFaces*NumElements - 1;
+    vmapI = 0;
+    vmapO = NumLocalPoints*NumElements - 1;
 
     rGrid = new Array<double, 1>(NumLocalPoints);
     xGrid = new Array<double, 2>(NumLocalPoints, NumElements);
@@ -42,6 +46,8 @@ Nodes1DProvisioner::Nodes1DProvisioner(int _NOrder, int _NumElements, double _xm
     EToF = new Array<int, 2>(NumElements, NumFaces);
     Fmask = new Array<int, 1> (NumFacePoints*NumFaces);
     Fx = new Array<double, 2>(NumFacePoints*NumFaces, NumElements);
+    Fscale = new matrix_type(NumFacePoints*NumFaces, NumElements);
+    nx = new matrix_type(NumFacePoints*NumFaces, NumElements);
 
     vmapM = new index_vector_type(NumFacePoints*NumFaces*NumElements);
     vmapP = new index_vector_type(NumFacePoints*NumFaces*NumElements);
@@ -80,6 +86,24 @@ void Nodes1DProvisioner::buildNodes() {
 
     buildConnectivityMatrices();
     buildFaceMask();
+	buildMaps();
+    buildNormals();
+}
+
+/**
+ * Build unit normals at element faces. Trivial in 1D.
+ */
+void Nodes1DProvisioner::buildNormals() {
+    matrix_type & nxref = *nx;
+
+    real_type mult = -1;
+
+    for (index_type k=0; k < NumElements; k++) {
+        for (index_type f=0; f < NumFaces*NumFacePoints; f++) {
+            nxref(f,k) = mult;
+            mult *= -1;
+        }
+    }
 }
 
 /**
@@ -160,6 +184,7 @@ void Nodes1DProvisioner::buildFaceMask() {
         }
     }
 }
+
 
 /**
  * Build global connectivity matrices (EToE, EToF) for 1D grid
@@ -273,21 +298,29 @@ void Nodes1DProvisioner::buildLift() {
 }
 
 /**
- * Compute Jacobian (determinant) J and geometric factor rx (dr/dx) using nodes and differentiation matrix.
+ * Compute Jacobian (determinant) J and geometric factor rx (dr/dx), and Fscale using nodes and differentiation matrix.
  */
 void Nodes1DProvisioner::computeJacobian() {
     firstIndex ii;
     secondIndex jj;
     thirdIndex kk;
 
-
     Array<double,2> & x = get_xGrid();
     Array<double,2> & Dr = get_Dr();
     Array<double,2> & Jref = get_J();
     Array<double,2> & rxref = get_rx();
 
+    matrix_type & Fscaleref = *Fscale;
+
+    // is Fmask not intiialized at this point?
+    index_vector_type & Fmsk = get_Fmask();
+
     Jref = sum(Dr(ii,kk)*x(kk,jj), kk);
     rxref = 1/Jref;
+
+    for(index_type f=0; f < NumFaces; f++) {
+        Fscaleref(f, Range::all()) = 1/Jref(Fmsk(f), Range::all());
+    }
 }
 
 /**
@@ -337,6 +370,12 @@ void Nodes1DProvisioner::buildDr() {
     Drref = Drtrans(jj, ii);
 } 
 
+/**
+ * Get number of elements.
+ */
+int Nodes1DProvisioner::get_NumElements() {
+    return NumElements;
+}
 
 /**
  * Get reference to 1D Lifting Operator.
@@ -408,6 +447,13 @@ Array<double, 2> & Nodes1DProvisioner::get_rx() {
     return *rx;
 }
 
+/**
+ * Get reference to normals array nx.
+ */
+const matrix_type & Nodes1DProvisioner::get_nx() {
+    return *nx;
+} 
+
 int Nodes1DProvisioner::get_NumLocalPoints() {
     return NumLocalPoints;
 }
@@ -417,6 +463,14 @@ int Nodes1DProvisioner::get_NumLocalPoints() {
  */
 Array<double, 2> & Nodes1DProvisioner::get_Fx() {
     return *Fx;
+}
+
+/**
+ * Get the Face-scaling factor (Inverse of Jacobian at Face nodes).
+ */
+
+const matrix_type & Nodes1DProvisioner::get_Fscale() {
+    return *Fscale;
 }
 
 /**
@@ -441,6 +495,25 @@ const index_vector_type & Nodes1DProvisioner::get_vmapP() {
 }
 
 /**
+ * Get the surface index of the inflow boundary.
+ */
+const index_type Nodes1DProvisioner::get_mapI() {
+    return mapI;
+}
+
+const index_type Nodes1DProvisioner::get_mapO() {
+    return mapO;
+}
+
+const index_type Nodes1DProvisioner::get_vmapI() {
+    return vmapI;
+}
+
+const index_type Nodes1DProvisioner::get_vmapO() {
+    return vmapO;
+}
+
+/**
  * Destructor.
  */
 Nodes1DProvisioner::~Nodes1DProvisioner() {
@@ -454,6 +527,8 @@ Nodes1DProvisioner::~Nodes1DProvisioner() {
     delete EToF;
     delete Fmask;
     delete Fx;
+    delete Fscale;
+    delete nx;
     delete vmapM;
     delete vmapP;
 }
