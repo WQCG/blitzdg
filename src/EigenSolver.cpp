@@ -1,67 +1,69 @@
 // Copyright (C) 2017-2018  Waterloo Quantitative Consulting Group, Inc.
 // See COPYING and LICENSE files at project root for more details.
 
-#include <EigenSolver.hpp>
+#include "EigenSolver.hpp"
 #include <blitz/array.h>
 
-using namespace blitz;
+using blitz::firstIndex;
+using blitz::secondIndex;
 
-/**
- * Constructor. Takes a reference to a SparseMatrixConverter.
- */
-EigenSolver::EigenSolver(SparseMatrixConverter const & _matrixConverter) {
-    MatrixConverter = _matrixConverter;
-}
+namespace blitzdg {
+    /**
+     * Constructor. Takes a reference to a SparseMatrixConverter.
+     */
+    EigenSolver::EigenSolver(SparseMatrixConverter const & _matrixConverter) {
+        MatrixConverter = _matrixConverter;
+    }
 
-extern "C" {
-    void dsyevd_( char* jobz, char* uplo, int* n, double* a, int* lda,
-                double* w, double* work, int* lwork, int* iwork, int* liwork, int* info );
-}
+    extern "C" {
+        void dsyevd_( char* jobz, char* uplo, int* n, double* a, int* lda,
+                    double* w, double* work, int* lwork, int* iwork, int* liwork, int* info );
+    }
 
-/**
- * Solve Ax=λx using LAPACK. Eigenvalues are stored in reference 'eigenvalues' and eigenvectors are stored column-wise
- * in reference 'eigenvectors.'
- */
-void EigenSolver::solve(const Array<double,2> & A, Array<double,1> & eigenvalues, Array<double, 2> & eigenvectors) {
+    /**
+     * Solve Ax=λx using LAPACK. Eigenvalues are stored in reference 'eigenvalues' and eigenvectors are stored column-wise
+     * in reference 'eigenvectors.'
+     */
+    void EigenSolver::solve(const matrix_type& A, vector_type& eigenvalues, matrix_type& eigenvectors) {
+        index_type sz = A.rows();
+        index_type lda = sz;
+        index_type iwkopt;
 
-    int sz = A.rows();
-    int lda = sz;
-    int iwkopt;
+        real_type ww[sz];
+        real_type wkopt;
+        index_type lwork = -1;
+        index_type liwork = -1;
+        index_type info;
 
-    double ww[sz];
-    double wkopt;
-    int lwork = -1;
-    int liwork = -1;
-    int info;
+        char JOBZ = 'V';
+        char UPLO[] = "UP";
 
-    char JOBZ = 'V';
-    char UPLO[] = "UP";
+        real_type* Apod = new real_type[sz*lda];
 
-    double * Apod = new double[sz*lda];
+        MatrixConverter.fullToPodArray(A, Apod);
 
-    MatrixConverter.fullToPodArray(A, Apod);
+        /* Determining optimal workspace parameters */
+        dsyevd_( &JOBZ, UPLO, &sz, Apod, &lda, ww, &wkopt, &lwork, &iwkopt, &liwork, &info );
 
-    /* Determining optimal workspace parameters */
-    dsyevd_( &JOBZ, UPLO, &sz, Apod, &lda, ww, &wkopt, &lwork, &iwkopt, &liwork, &info );
+        lwork = static_cast<index_type>(wkopt);
+        real_type* work = new real_type[lwork];
+        liwork = iwkopt;
+        index_type * iwork = new index_type[liwork];
 
-    lwork = (int)wkopt;
-    double * work = new double[lwork];
-    liwork = iwkopt;
-    int * iwork = new int[liwork];
+        /* Solve eigenproblem */
+        dsyevd_( &JOBZ, UPLO, &sz, Apod, &lda, ww, work, &lwork, iwork, &liwork, &info );
 
-    /* Solve eigenproblem */
-    dsyevd_( &JOBZ, UPLO, &sz, Apod, &lda, ww, work, &lwork, iwork, &liwork, &info );
+        MatrixConverter.podArrayToFull(Apod, eigenvectors);
 
-    MatrixConverter.podArrayToFull(Apod, eigenvectors);
+        for (index_type i=0; i < sz; i++)
+            eigenvalues(i) = ww[i];
 
-    for (int i=0; i < sz; i++)
-        eigenvalues(i) = ww[i];
+        firstIndex ii;
+        secondIndex jj;
+        eigenvectors = eigenvectors(jj,ii);
+    }
 
-    firstIndex ii;
-    secondIndex jj;
-    eigenvectors = eigenvectors(jj,ii);
-}
+    EigenSolver::~EigenSolver() {
 
-EigenSolver::~EigenSolver() {
-
-}
+    }
+} // namespace blitzdg

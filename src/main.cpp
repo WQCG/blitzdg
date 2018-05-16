@@ -10,61 +10,176 @@
   * Click on 'Classes' to start familarizing yourself with the API
   */
 
-#include <iostream>
+#include "MeshManager.hpp"
+#include "Nodes1DProvisioner.hpp"
+#include "SparseMatrixConverter.hpp"
+#include "EigenSolver.hpp"
+#include "DirectSolver.hpp"
+#include "Types.hpp"
+#include "Warning.hpp"
 #include <blitz/array.h>
-#include <MeshManager.hpp>
-#include <Nodes1DProvisioner.hpp>
-#include <SparseMatrixConverter.hpp>
-#include <EigenSolver.hpp>
-#include <DirectSolver.hpp>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <string>
 
-using namespace std;
-using namespace blitz;
+using blitz::ColumnMajorArray;
+using blitz::firstIndex;
+using blitz::secondIndex;
+using blitz::thirdIndex;
+using blitz::sum;
+using std::endl;
+using std::ofstream;
+using std::setfill;
+using std::setw;
+using std::string;
+using std::stringstream;
+
+namespace blitzdg {
+	void computeRHS(const matrix_type & u, const real_type c, Nodes1DProvisioner & nodes1D, matrix_type & RHS) {
+		// Blitz indices
+		firstIndex ii;
+		secondIndex jj;
+		thirdIndex kk;
+		matrix_type & Dr = nodes1D.get_Dr();
+		matrix_type & rx = nodes1D.get_rx();
+		matrix_type & Lift = nodes1D.get_Lift();
+		const matrix_type & Fscale = nodes1D.get_Fscale();
+		const matrix_type & nx = nodes1D.get_nx();
+
+		// Get volume to surface maps.
+		const index_vector_type& vmapM = nodes1D.get_vmapM();
+		const index_vector_type& vmapP = nodes1D.get_vmapP();
+
+		// boundary indices;
+		const index_type vmapI = nodes1D.get_vmapI();
+		const index_type mapO = nodes1D.get_mapO();
+		const index_type mapI = nodes1D.get_mapI();
+
+
+		index_type numFaces = nodes1D.NumFaces;
+		index_type Nfp = nodes1D.NumFacePoints;
+		index_type Np = nodes1D.get_NumLocalPoints();
+		index_type K = nodes1D.get_NumElements();
+
+		real_type alpha = 0;   // 1 == central flux, 0 == upwind flux.
+
+		matrix_type du(numFaces*Nfp, K);
+		du = 0.*jj;
+		matrix_type uM(numFaces*Nfp, K);
+
+		matrix_type uCol(Np, K, ColumnMajorArray<2>());
+		uCol = u; // is this gross?
+
+
+		// maybe this loop can be blitz-ified...
+		index_type count = 0;
+		for (index_type k1=0; k1 < K; k1++) {
+			for (index_type f1=0; f1 < numFaces; f1++) {
+				index_type vM = vmapM(count);
+				index_type vP = vmapP(count);
+
+				real_type uM = uCol(vM);
+				real_type uP = uCol(vP);
+
+				// Inflow BC:
+				if (count == mapI)
+					uP = uCol(vmapI);
+
+				// Outflow BC;
+				if (count == mapO)
+					uP = uM; // exit stage left.
+
+				// Compute jump in flux:
+				du(f1,k1) = (uM - uP)*0.5*(c*nx(f1,k1) - (1-alpha)*abs(c*nx(f1,k1))); 
+				count++;
+			}
+		}
+
+		// Assumes PDE has been left-multiplied by local inverse mass matrix, so all we have left
+		// is the differentiation matrix contribution, and the surface integral
+		RHS =-c*rx*sum(Dr(ii,kk)*u(kk,jj), kk) + Lift*Fscale*du;
+	}
+
+	void writeFieldToFile(const string fileName, const matrix_type & field ) {
+		ofstream outFile;
+		outFile.open(fileName);
+		for(index_type i=0; i < field.rows(); i++) {
+			for(index_type k=0; k < field.cols(); k++) {
+				real_type num = field(i, k);
+				outFile << num << " ";
+			}
+			outFile << endl;
+		}
+		outFile.close();
+	}
+} // namespace blitzdg
 
 int main(int argc, char **argv) {
-	int N = 4;
-	int K = 10;
-	double xmin =-1.0;
-	double xmax = 1.0;
+	using namespace blitzdg;
+	// Physical parameters
+	real_type xmin =-1.0;
+	real_type xmax = 1.0;
+	real_type c = 0.1;
 
-  SparseMatrixConverter matrixConverter;
-  EigenSolver eigenSolver(matrixConverter);
-  DirectSolver directSolver(matrixConverter);
+	const real_type finalTime = 10.0;
+	real_type t = 0.0;
 
+	// Numerical parameters:
+	index_type N = 4;
+	index_type K = 100;
+	real_type CFL = 0.05;
+
+	// Build dependencies.
+	SparseMatrixConverter matrixConverter;
+	EigenSolver eigenSolver(matrixConverter);
+	DirectSolver directSolver(matrixConverter);
 	Nodes1DProvisioner nodes1DProvisioner(N, K, xmin, xmax, matrixConverter, eigenSolver, directSolver);
 	
-  nodes1DProvisioner.buildNodes();
-  nodes1DProvisioner.computeJacobian();
+	// Pre-processing. Build grid, and get data we need for initialization.
+	nodes1DProvisioner.buildNodes();
+	nodes1DProvisioner.computeJacobian();
 
-  int Np = nodes1DProvisioner.get_NumLocalPoints();
+	index_type Np = nodes1DProvisioner.get_NumLocalPoints();
 
-  Array<double,1> rGrid = nodes1DProvisioner.get_rGrid();
-  cout << rGrid << endl;
+	matrix_type & x = nodes1DProvisioner.get_xGrid();
 
-  cout << nodes1DProvisioner.get_V() << endl;
+	real_type min_dx = x(1,0) - x(0,0);
 
-  Array<double, 2> DVr(Np, Np);
+	real_type dt = CFL*min_dx/abs(c);
 
-  nodes1DProvisioner.computeGradVandermonde(DVr);
+	matrix_type u(Np, K);
+	matrix_type RHS(Np, K);
 
-  cout << DVr << endl;
-  cout << nodes1DProvisioner.get_Dr() << endl;
+	firstIndex ii;
+	secondIndex jj;
+	u = exp(-10*(x(ii,jj)*x(ii,jj)));
 
-  Array<double,2> x = nodes1DProvisioner.get_xGrid();
+	printDisclaimer();
 
-  cout << x << endl;
+	index_type count = 0;
 
-  cout << "Can_Partition_A_Mesh" << endl;
-  MeshManager * manager = new MeshManager();
-  MeshManager & mgr = *manager;
-  mgr.readVertices("input/2box.V");
-  mgr.readElements("input/2box.E2V");
+	writeFieldToFile("x.dat", x);
 
-  mgr.partitionMesh(2);
+	while (t < finalTime) {
+		// Toy outputting for now.
+		if ((count % 10) == 0) {
+			stringstream fileNameStrm;
+			fileNameStrm << "u" << setfill('0') << setw(7) << count << ".dat";
 
-  //int * & epMap = mgr.get_ElementPartitionMap();
-  //int * & vpMap = mgr.get_VertexPartitionMap();
+			writeFieldToFile(fileNameStrm.str(), u);
+		}
 
-  delete manager;
-  return 0;
-}
+		// Calculate Righ-hand side at current time-step.
+		computeRHS(u, c, nodes1DProvisioner, RHS);
+
+		// Forward Euler time-step for now, to be replaced.
+		u += dt*RHS;
+
+		t += dt;
+		count++;
+	}
+
+	return 0;
+} // end main

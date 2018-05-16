@@ -7,9 +7,13 @@
  */
 
 #pragma once
-struct SparseTriplet {
-    int nz;
-    int *row;
-    int *col;
-    double *val;
-};
+#include "Types.hpp"
+
+namespace blitzdg {
+    struct SparseTriplet {
+        index_type nz;
+        index_type* row;
+        index_type* col;
+        real_type* val;
+    };
+} // namespace blitzdg

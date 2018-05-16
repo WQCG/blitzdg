@@ -10,88 +10,103 @@
  */
 
 #pragma once
-#include <blitz/array.h>
-#include <SparseMatrixConverter.hpp>
-#include <EigenSolver.hpp>
-#include <DirectSolver.hpp>
-#include <Types.hpp>
+#include "SparseMatrixConverter.hpp"
+#include "EigenSolver.hpp"
+#include "DirectSolver.hpp"
+#include "Types.hpp"
 
-using namespace std;
-using namespace blitz;
+namespace blitzdg {
+  class Nodes1DProvisioner {
+      real_type Min_x;
+      real_type Max_x;
+      index_type NumElements;
+      index_type NOrder;
+      index_type NumLocalPoints;
 
-class Nodes1DProvisioner {
-    double Min_x;
-    double Max_x;
-    int NumElements;
-    int NOrder;
-    int NumLocalPoints;
+      index_type mapI;
+      index_type mapO;
+      index_type vmapI;
+      index_type vmapO;
+      
+      matrix_type * xGrid;
+      vector_type * rGrid;
+
+      matrix_type * V;
+      matrix_type * Dr;
+      matrix_type * Lift;
+      matrix_type * J;
+      matrix_type * rx;
+      matrix_type * nx;
+
+      index_vector_type * Fmask;
+      matrix_type * Fx;
+
+      matrix_type *Fscale;
+
+      index_matrix_type * EToV;
+      index_matrix_type * EToE;
+      index_matrix_type * EToF;
+
+      index_vector_type * vmapM;
+      index_vector_type * vmapP;
+
+      SparseMatrixConverter * MatrixConverter;
+      EigenSolver * EigSolver;
+      DirectSolver * LinSolver;
+
+    public:
+      static const index_type NumFacePoints;
+      static const index_type NumFaces;
+      static const real_type NodeTol;
+
+      Nodes1DProvisioner(index_type NOrder, index_type NumElements, real_type xmin, real_type xmax, SparseMatrixConverter & converter, EigenSolver & eigenSolver, DirectSolver & directSolver);
+
+      void buildNodes();
+      void buildConnectivityMatrices();
+      void buildFaceMask();
+      void buildDr();
+      void buildVandermondeMatrix();
+      void buildLift();
+      void buildMaps();
+      void buildNormals();
+      void computeGradVandermonde(matrix_type& DVr);
+      void computeJacobian();
+      
+      matrix_type & get_xGrid();
+      vector_type & get_rGrid();
+      matrix_type & get_Dr();
+      matrix_type & get_V();
+      matrix_type & get_J();
+      matrix_type & get_rx();
+      const matrix_type & get_nx();
+
+      index_vector_type & get_Fmask();
+      matrix_type & get_Fx();
+      const matrix_type & get_Fscale();
+
+      index_matrix_type & get_EToV();
+      matrix_type & get_Lift();
     
-    Array<double, 2> * xGrid;
-    Array<double, 1> * rGrid;
+      index_matrix_type & get_EToE();
+      index_matrix_type & get_EToF();
 
-    Array<double, 2> * V;
-    Array<double, 2> * Dr;
-    Array<double, 2> * Lift;
-    Array<double, 2> * J;
-    Array<double, 2> * rx;
+      const index_vector_type & get_vmapM();
+      const index_vector_type & get_vmapP();
 
-    Array<int, 1> * Fmask;
-    Array<double, 2> * Fx;
+      const index_type get_mapI();
+      const index_type get_mapO();
+      const index_type get_vmapI();
+      const index_type get_vmapO();
 
-    Array<int, 2> * EToV;
-    Array<int, 2> * EToE;
-    Array<int, 2> * EToF;
+      index_type get_NumLocalPoints();
+      index_type get_NumElements();
 
-    blitzdg::index_vector_type * vmapM;
-    blitzdg::index_vector_type * vmapP;
+      // these can be moved to a helper (polynomials) class or made private within this class.
+      void computeJacobiPolynomial(vector_type const & x, const real_type alpha, const real_type beta, const index_type N, vector_type & p);
+      void computeJacobiQuadWeights(real_type alpha, real_type beta, index_type N, vector_type & x, vector_type & w);
+      void computeGaussLobottoPoints(real_type alpha, real_type beta, index_type N, vector_type & x);
+      void computeGradJacobi(vector_type const & x, const real_type alpha, const real_type beta, const index_type N, vector_type & dp);
 
-    SparseMatrixConverter * MatrixConverter;
-    EigenSolver * EigSolver;
-    DirectSolver * LinSolver;
-
-  public:
-    static const int NumFacePoints;
-    static const int NumFaces;
-    static const double NodeTol;
-
-    Nodes1DProvisioner(int NOrder, int NumElements, double xmin, double xmax, SparseMatrixConverter & converter, EigenSolver & eigenSolver, DirectSolver & directSolver);
-
-    void buildNodes();
-    void buildConnectivityMatrices();
-    void buildFaceMask();
-    void buildDr();
-    void buildVandermondeMatrix();
-    void buildLift();
-    void buildMaps();
-    void computeGradVandermonde(Array<double,2> & DVr);
-    void computeJacobian();
-    
-    Array<double, 2> & get_xGrid();
-    Array<double, 1> & get_rGrid();
-    Array<double, 2> & get_Dr();
-    Array<double, 2> & get_V();
-    Array<double, 2> & get_J();
-    Array<double, 2> & get_rx();
-
-    Array<int, 1> & get_Fmask();
-    Array<double, 2> & get_Fx();
-
-    Array<int, 2> & get_EToV();
-    Array<double, 2> & get_Lift();
-  
-    Array<int, 2> & get_EToE();
-    Array<int, 2> & get_EToF();
-
-    const blitzdg::index_vector_type & get_vmapM();
-    const blitzdg::index_vector_type & get_vmapP();
-
-    int get_NumLocalPoints();
-
-    // these can be moved to a helper (polynomials) class or made private within this class.
-    void computeJacobiPolynomial(Array<double,1> const & x, const double alpha, const double beta, const int N, Array<double,1> & p);
-    void computeJacobiQuadWeights(double alpha, double beta, int N, Array<double,1> & x, Array<double,1> & w);
-    void computeGaussLobottoPoints(double alpha, double beta, int N, Array<double,1> & x);
-    void computeGradJacobi(Array<double,1> const & x, const double alpha, const double beta, const int N, Array<double,1> & dp);
-
-    ~Nodes1DProvisioner();
-};
+      ~Nodes1DProvisioner();
+  };
+} // namespace blitzdg

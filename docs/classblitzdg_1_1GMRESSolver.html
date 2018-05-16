@@ -146,6 +146,7 @@ The maximum number of iterations <img class="formulaInl" alt="$\mathrm{maxits}\c
 <li>
 Application of the preconditioner fails. The solver terminates with convergence flag ConvFlag::precon_fail. </li>
 </ul>
+<dl class="section note"><dt>Note</dt><dd>If <a class="el" href="structblitzdg_1_1GMRESParams.html#a43a2be8fe6290a8cf5293df91b788be3" title="If true, check the true residual norm for convergence. ">GMRESParams::testTrueRnrm</a> is true, then the true residual norm of the final computed solution is tested for convergence. If this test fails, then the solver terminates with convergence flag ConvFlag::true_rnrm. This test may incur an additional matrix-vector product. </dd></dl>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="aabd205e2cc0fb1c969f1d5c7dbf272d4"></a>
 <div class="memitem">
