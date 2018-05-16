@@ -163,7 +163,7 @@ int main(int argc, char **argv) {
 		computeRHS(u, c, nodes1DProvisioner, RHS);
 
 		// Forward Euler time-step for now, to be replaced.
-		u = u + dt*RHS;
+		u += dt*RHS;
 
 		t += dt;
 		count++;

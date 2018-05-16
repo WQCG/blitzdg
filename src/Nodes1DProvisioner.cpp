@@ -96,11 +96,12 @@ void Nodes1DProvisioner::buildNodes() {
 void Nodes1DProvisioner::buildNormals() {
     matrix_type & nxref = *nx;
 
-    index_type count = 0;
+    real_type mult = -1;
+
     for (index_type k=0; k < NumElements; k++) {
         for (index_type f=0; f < NumFaces*NumFacePoints; f++) {
-            nxref(f,k) = pow(-1., count+1);
-            count++;
+            nxref(f,k) = mult;
+            mult *= -1;
         }
     }
 }
