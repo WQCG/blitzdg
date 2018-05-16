@@ -52,5 +52,6 @@ get-deps:
 docs:
 	@echo DOXYGEN VERSION:
 	@doxygen -v
+	@doxygen -u doxygen.conf
 	@doxygen doxygen.conf
 .PHONY: clean docs
