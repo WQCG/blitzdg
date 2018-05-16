@@ -8,28 +8,27 @@
  */
 
 #pragma once
-#include <blitz/array.h>
-#include <SparseTriplet.hpp>
-#include <suitesparse/umfpack.h>
+#include "SparseTriplet.hpp"
+#include "Types.hpp"
 
-using namespace blitz;
+namespace blitzdg {
+  class SparseMatrixConverter {
 
-class SparseMatrixConverter {
+    public:
+      SparseMatrixConverter();
 
-  public:
-    SparseMatrixConverter();
+      void fullToSparseTriplet(const matrix_type& A, SparseTriplet & triplet);
 
-    void fullToSparseTriplet(const Array<double, 2> & A, SparseTriplet & triplet);
+      void sparseTripletToCompressedColumn(const index_type numRows, const index_type numCols, const SparseTriplet & triplet, index_type * Aptr, index_type * Aind, real_type * Avalues);
 
-    void sparseTripletToCompressedColumn(const int numRows, const int numCols, const SparseTriplet & triplet, int * Aptr, int * Aind, double * Avalues);
+      void fullToCompressedColumn(const matrix_type& A, index_type * Aptr, index_type * Aind, real_type * Avalues);
 
-    void fullToCompressedColumn(const Array<double, 2> & A, int * Aptr, int * Aind, double * Avalues);
+      void fullToPodArray(const matrix_type& A, real_type * Apod);
 
-    void fullToPodArray(const Array<double, 2> & A, double * Apod);
+      void podArrayToFull(const real_type * Apod, matrix_type& A);
 
-    void podArrayToFull(const double * Apod, Array<double, 2> & A);
+      index_type getNumNonZeros(const matrix_type& A);
 
-    int getNumNonZeros(const Array<double, 2> & A);
-
-    ~SparseMatrixConverter();
-};
+      ~SparseMatrixConverter();
+  };
+} // namespace blitzdg

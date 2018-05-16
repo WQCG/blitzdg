@@ -10,116 +10,126 @@
   * Click on 'Classes' to start familarizing yourself with the API
   */
 
-#include <iostream>
-#include <iomanip>
-#include <fstream>
-
+#include "MeshManager.hpp"
+#include "Nodes1DProvisioner.hpp"
+#include "SparseMatrixConverter.hpp"
+#include "EigenSolver.hpp"
+#include "DirectSolver.hpp"
+#include "Types.hpp"
+#include "Warning.hpp"
 #include <blitz/array.h>
-#include <MeshManager.hpp>
-#include <Nodes1DProvisioner.hpp>
-#include <SparseMatrixConverter.hpp>
-#include <EigenSolver.hpp>
-#include <DirectSolver.hpp>
-#include <Warning.hpp>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <string>
 
-using namespace std;
-using namespace blitz;
-using namespace blitzdg;
-using namespace boost;
+using blitz::ColumnMajorArray;
+using blitz::firstIndex;
+using blitz::secondIndex;
+using blitz::thirdIndex;
+using blitz::sum;
+using std::endl;
+using std::ofstream;
+using std::setfill;
+using std::setw;
+using std::string;
+using std::stringstream;
 
-// Blitz indices
-firstIndex ii;
-secondIndex jj;
-thirdIndex kk;
+namespace blitzdg {
+	void computeRHS(const matrix_type & u, const real_type c, Nodes1DProvisioner & nodes1D, matrix_type & RHS) {
+		// Blitz indices
+		firstIndex ii;
+		secondIndex jj;
+		thirdIndex kk;
+		matrix_type & Dr = nodes1D.get_Dr();
+		matrix_type & rx = nodes1D.get_rx();
+		matrix_type & Lift = nodes1D.get_Lift();
+		const matrix_type & Fscale = nodes1D.get_Fscale();
+		const matrix_type & nx = nodes1D.get_nx();
 
-void computeRHS(const matrix_type & u, const double c, Nodes1DProvisioner & nodes1D, matrix_type & RHS) {
-	matrix_type & Dr = nodes1D.get_Dr();
-	matrix_type & rx = nodes1D.get_rx();
-	matrix_type & Lift = nodes1D.get_Lift();
-	const matrix_type & Fscale = nodes1D.get_Fscale();
-	const matrix_type & nx = nodes1D.get_nx();
+		// Get volume to surface maps.
+		const index_vector_type& vmapM = nodes1D.get_vmapM();
+		const index_vector_type& vmapP = nodes1D.get_vmapP();
 
-	// Get volume to surface maps.
-	const Array<int,1> & vmapM = nodes1D.get_vmapM();
-	const Array<int,1> & vmapP = nodes1D.get_vmapP();
-
-	// boundary indices;
-	const index_type vmapI = nodes1D.get_vmapI();
-	const index_type mapO = nodes1D.get_mapO();
-	const index_type mapI = nodes1D.get_mapI();
-
-
-	int numFaces = nodes1D.NumFaces;
-	int Nfp = nodes1D.NumFacePoints;
-	int Np = nodes1D.get_NumLocalPoints();
-	int K = nodes1D.get_NumElements();
-
-	double alpha = 0;   // 1 == central flux, 0 == upwind flux.
-
-	matrix_type du(numFaces*Nfp, K);
-	du = 0.*jj;
-	matrix_type uM(numFaces*Nfp, K);
-
-	matrix_type uCol(Np, K, ColumnMajorArray<2>());
-	uCol = u; // is this gross?
+		// boundary indices;
+		const index_type vmapI = nodes1D.get_vmapI();
+		const index_type mapO = nodes1D.get_mapO();
+		const index_type mapI = nodes1D.get_mapI();
 
 
-	// maybe this loop can be blitz-ified...
-	index_type count = 0;
-	for (index_type k1=0; k1 < K; k1++) {
-		for (index_type f1=0; f1 < numFaces; f1++) {
-			index_type vM = vmapM(count);
-			index_type vP = vmapP(count);
+		index_type numFaces = nodes1D.NumFaces;
+		index_type Nfp = nodes1D.NumFacePoints;
+		index_type Np = nodes1D.get_NumLocalPoints();
+		index_type K = nodes1D.get_NumElements();
 
-			double uM = uCol(vM);
-			double uP = uCol(vP);
+		real_type alpha = 0;   // 1 == central flux, 0 == upwind flux.
 
-			// Inflow BC:
-			if (count == mapI)
-				uP = uCol(vmapI);
+		matrix_type du(numFaces*Nfp, K);
+		du = 0.*jj;
+		matrix_type uM(numFaces*Nfp, K);
 
-			// Outflow BC;
-			if (count == mapO)
-				uP = uM; // exit stage left.
+		matrix_type uCol(Np, K, ColumnMajorArray<2>());
+		uCol = u; // is this gross?
 
-			// Compute jump in flux:
-			du(f1,k1) = (uM - uP)*0.5*(c*nx(f1,k1) - (1-alpha)*abs(c*nx(f1,k1))); 
-			count++;
+
+		// maybe this loop can be blitz-ified...
+		index_type count = 0;
+		for (index_type k1=0; k1 < K; k1++) {
+			for (index_type f1=0; f1 < numFaces; f1++) {
+				index_type vM = vmapM(count);
+				index_type vP = vmapP(count);
+
+				real_type uM = uCol(vM);
+				real_type uP = uCol(vP);
+
+				// Inflow BC:
+				if (count == mapI)
+					uP = uCol(vmapI);
+
+				// Outflow BC;
+				if (count == mapO)
+					uP = uM; // exit stage left.
+
+				// Compute jump in flux:
+				du(f1,k1) = (uM - uP)*0.5*(c*nx(f1,k1) - (1-alpha)*abs(c*nx(f1,k1))); 
+				count++;
+			}
 		}
+
+		// Assumes PDE has been left-multiplied by local inverse mass matrix, so all we have left
+		// is the differentiation matrix contribution, and the surface integral
+		RHS =-c*rx*sum(Dr(ii,kk)*u(kk,jj), kk) + Lift*Fscale*du;
 	}
 
-	// Assumes PDE has been left-multiplied by local inverse mass matrix, so all we have left
-	// is the differentiation matrix contribution, and the surface integral
-	RHS =-c*rx*sum(Dr(ii,kk)*u(kk,jj), kk) + Lift*Fscale*du;
-}
-
-void writeFieldToFile(const string fileName, const matrix_type & field ) {
-	ofstream outFile;
-	outFile.open(fileName);
-	for(index_type i=0; i < field.rows(); i++) {
-		for(index_type k=0; k < field.cols(); k++) {
-			real_type num = field(i, k);
-			outFile << num << " ";
+	void writeFieldToFile(const string fileName, const matrix_type & field ) {
+		ofstream outFile;
+		outFile.open(fileName);
+		for(index_type i=0; i < field.rows(); i++) {
+			for(index_type k=0; k < field.cols(); k++) {
+				real_type num = field(i, k);
+				outFile << num << " ";
+			}
+			outFile << endl;
 		}
-		outFile << endl;
+		outFile.close();
 	}
-	outFile.close();
-}
+} // namespace blitzdg
 
 int main(int argc, char **argv) {
-	
+	using namespace blitzdg;
 	// Physical parameters
-	double xmin =-1.0;
-	double xmax = 1.0;
-	double c = 0.1;
+	real_type xmin =-1.0;
+	real_type xmax = 1.0;
+	real_type c = 0.1;
 
-	const double finalTime = 10.0;
-	double t = 0.0;
+	const real_type finalTime = 10.0;
+	real_type t = 0.0;
 
 	// Numerical parameters:
-	int N = 4;
-	int K = 100;
-	double CFL = 0.05;
+	index_type N = 4;
+	index_type K = 100;
+	real_type CFL = 0.05;
 
 	// Build dependencies.
 	SparseMatrixConverter matrixConverter;
@@ -131,17 +141,19 @@ int main(int argc, char **argv) {
 	nodes1DProvisioner.buildNodes();
 	nodes1DProvisioner.computeJacobian();
 
-	int Np = nodes1DProvisioner.get_NumLocalPoints();
+	index_type Np = nodes1DProvisioner.get_NumLocalPoints();
 
 	matrix_type & x = nodes1DProvisioner.get_xGrid();
 
-	double min_dx = x(1,0) - x(0,0);
+	real_type min_dx = x(1,0) - x(0,0);
 
-	double dt = CFL*min_dx/abs(c);
+	real_type dt = CFL*min_dx/abs(c);
 
 	matrix_type u(Np, K);
 	matrix_type RHS(Np, K);
 
+	firstIndex ii;
+	secondIndex jj;
 	u = exp(-10*(x(ii,jj)*x(ii,jj)));
 
 	printDisclaimer();
@@ -170,4 +182,4 @@ int main(int argc, char **argv) {
 	}
 
 	return 0;
-}
+} // end main

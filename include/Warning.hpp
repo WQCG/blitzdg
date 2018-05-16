@@ -1,8 +1,8 @@
 // Copyright (C) 2017-2018  Waterloo Quantitative Consulting Group, Inc.
 // See COPYING and LICENSE files at project root for more details.
+#include <iostream>
 
 namespace blitzdg {
-
     /**
      * Prints product name, version information and standard GPL warning/disclaimer.
      */

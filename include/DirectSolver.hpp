@@ -8,20 +8,20 @@
  */
 
 #pragma once
-#include <blitz/array.h>
-#include <SparseMatrixConverter.hpp>
+#include "SparseMatrixConverter.hpp"
+#include "Types.hpp"
 
-using namespace blitz;
+namespace blitzdg {
+  class DirectSolver {
+      index_type N;
+      SparseMatrixConverter MatrixConverter;
 
-class DirectSolver {
-    int N;
-    SparseMatrixConverter MatrixConverter;
+    public:
+      DirectSolver(SparseMatrixConverter const &);
 
-  public:
-    DirectSolver(SparseMatrixConverter const &);
-
-    void solve(const Array<double,2> & A, const Array<double, 2> & B, Array<double, 2> & X);
-    
-    ~DirectSolver();
-};
+      void solve(const matrix_type& A, const matrix_type& B, matrix_type& X);
+      
+      ~DirectSolver();
+  };
+} // namespace blitzdg
 
