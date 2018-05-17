@@ -6,7 +6,7 @@ before_install:
   - pip install --user cpp-coveralls
 install: make get-deps
 after_success:
-  - make docs; cat docs/_formulas.log
+  - make docs
   - coveralls --exclude include/igloo --gcov-options '\-lp'
 sudo: required
 env:

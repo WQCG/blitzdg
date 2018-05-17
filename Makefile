@@ -48,14 +48,12 @@ test: bin/test
 get-deps:
 	@sudo /bin/bash pull-deps.sh
 	@sudo apt-get -y install graphviz texlive-generic-recommended
-	@curl -fsL http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.14.linux.bin.tar.gz -o doxygen.tar.gz
-	@tar zxvf doxygen.tar.gz
-	@chmod +x doxygen-1.8.14/bin/doxygen
 
 docs:
 	@echo DOXYGEN VERSION:
-	@doxygen-1.8.14/bin/doxygen -v
-	@doxygen-1.8.14/bin/doxygen doxygen.conf
-	@cp -r doxygen/html/* docs/.
-
+	@doxygen -v
+	@doxygen -u doxygen.conf
+	@sed -ir "s,DOT_PATH.*=,DOT_PATH               = $$(which dot)," doxygen.conf
+	@cat doxygen.conf | grep DOT_PATH
+	@doxygen doxygen.conf
 .PHONY: clean docs
