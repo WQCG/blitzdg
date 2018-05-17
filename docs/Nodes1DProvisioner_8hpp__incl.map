@@ -1,7 +1,0 @@
-<map id="include/Nodes1DProvisioner.hpp" name="include/Nodes1DProvisioner.hpp">
-<area shape="rect" id="node3" href="$SparseMatrixConverter_8hpp.html" title="Defines the SparseMatrixConverter class converts between blitz++ 2D arrays, sparse triplets..." alt="" coords="235,155,416,181"/>
-<area shape="rect" id="node6" href="$EigenSolver_8hpp.html" title="Defines the EigenSolver class that implements LAPACK solution routine DSYEVD. " alt="" coords="88,80,205,107"/>
-<area shape="rect" id="node7" href="$DirectSolver_8hpp.html" title="Defines the DirectSolver class that implements LAPACK direct solution routine DSGESV. " alt="" coords="229,80,347,107"/>
-<area shape="rect" id="node8" href="$Types_8hpp.html" title="Defines the basic types used throughout this project. " alt="" coords="27,155,109,181"/>
-<area shape="rect" id="node4" href="$SparseTriplet_8hpp.html" title="Defines the SparseTriplet struct for storing sparse matrices in a conceptually simple way..." alt="" coords="239,229,363,256"/>
-</map>
