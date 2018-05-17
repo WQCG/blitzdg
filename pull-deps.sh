@@ -22,15 +22,15 @@ if [ "$machine" == "Linux" ] ; then
 
 	# pull in doxygen (latest) for travis - should flag this on only for travis and not for all devs.
 	apt-get -y install cmake
-	git clone https://github.com/doxygen/doxygen.git
-	mkdir -p doxygen/build
-	cd doxygen/build
-	which gcc
+	git clone https://github.com/doxygen/doxygen.git doxrepo
+	mkdir -p doxrepo/build
+	cd doxrepo/build
 	export CC=/usr/bin/gcc
 	cmake -G "Unix Makefiles" ..
 	make
 	make install
 	cd ../..
+    rm -rf doxrepo/build
 fi
 
 if [ "$machine" == "Mac" ] ; then
