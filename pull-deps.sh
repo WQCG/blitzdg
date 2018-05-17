@@ -30,7 +30,7 @@ if [ "$machine" == "Linux" ] ; then
 	make
 	make install
 	cd ../..
-    rm -rf doxrepo/build
+    rm -rf doxrepo
 fi
 
 if [ "$machine" == "Mac" ] ; then
