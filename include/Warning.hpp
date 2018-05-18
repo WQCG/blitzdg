@@ -1,10 +1,14 @@
 // Copyright (C) 2017-2018  Waterloo Quantitative Consulting Group, Inc.
 // See COPYING and LICENSE files at project root for more details.
+
+/**
+ * @file Warning.hpp
+ */
 #include <iostream>
 
 namespace blitzdg {
     /**
-     * Prints product name, version information and standard GPL warning/disclaimer.
+     * Prints the product name, version information and standard GPL warning/disclaimer.
      */
     void printDisclaimer() {
         std::cout << "blitzdg, version 0.1.0a" << std::endl;

@@ -6,7 +6,6 @@
  * @brief Defines the DirectSolver class that implements LAPACK direct solution
  * routine DSGESV. Documentation at http://www.netlib.org/lapack/lapack-3.1.1/html/dsgesv.f.html.
  */
-
 #pragma once
 #include "SparseMatrixConverter.hpp"
 #include "Types.hpp"
@@ -15,13 +14,11 @@ namespace blitzdg {
   class DirectSolver {
       index_type N;
       SparseMatrixConverter MatrixConverter;
-
-    public:
+  
+  public:
       DirectSolver(SparseMatrixConverter const &);
 
       void solve(const matrix_type& A, const matrix_type& B, matrix_type& X);
-      
-      ~DirectSolver();
   };
 } // namespace blitzdg
 

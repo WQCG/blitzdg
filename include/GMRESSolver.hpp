@@ -3,7 +3,8 @@
 
 /**
  * @file GMRESSolver.hpp
- * @brief Implements a right-preconditioned GMRES iterative method.
+ * @brief Defines the GMRESSolver class that implements a right-preconditioned 
+ * GMRES iterative method with modified Gram-Schmidt orthogonalization.
  */
 #pragma once
 #include "LinAlgHelpers.hpp"

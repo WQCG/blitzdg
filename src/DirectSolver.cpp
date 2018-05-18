@@ -68,8 +68,4 @@ namespace blitzdg {
 
         X = Xtrans(jj,ii);
     }
-
-    DirectSolver::~DirectSolver() {
-
-    }
 } // namespace blitzdg

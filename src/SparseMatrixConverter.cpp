@@ -8,10 +8,6 @@
 using std::numeric_limits;
 
 namespace blitzdg {
-    SparseMatrixConverter::SparseMatrixConverter() {
-
-    }
-
     void SparseMatrixConverter::podArrayToFull(const real_type * Apod, matrix_type & A) {
         index_type ind = 0;
         for (index_type i=0; i<A.rows(); i++) {
@@ -101,9 +97,5 @@ namespace blitzdg {
         }
 
         return nz;
-    }
-
-    SparseMatrixConverter::~SparseMatrixConverter() {
-
     }
 } // namespace blitzdg
