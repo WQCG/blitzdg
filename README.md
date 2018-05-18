@@ -52,6 +52,11 @@ Interested developers should consult the [guidelines for contributing](https://g
 
 * [Derek Steinmoeller](https://github.com/dsteinmo)
 
+## Lead Developers
+
+* [Derek Steinmoeller](https://github.com/dsteinmo)
+* [Killian Miller](https://github.com/k7miller)
+
 ## Documentation
 
 [Here](https://wqcg.github.io/blitzdg "blitzdg Documentation")

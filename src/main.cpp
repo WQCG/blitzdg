@@ -37,25 +37,25 @@ using std::string;
 using std::stringstream;
 
 namespace blitzdg {
-	void computeRHS(const matrix_type & u, const real_type c, Nodes1DProvisioner & nodes1D, matrix_type & RHS) {
+	void computeRHS(const matrix_type & u, real_type c, Nodes1DProvisioner & nodes1D, matrix_type & RHS) {
 		// Blitz indices
 		firstIndex ii;
 		secondIndex jj;
 		thirdIndex kk;
-		matrix_type & Dr = nodes1D.get_Dr();
-		matrix_type & rx = nodes1D.get_rx();
-		matrix_type & Lift = nodes1D.get_Lift();
-		const matrix_type & Fscale = nodes1D.get_Fscale();
-		const matrix_type & nx = nodes1D.get_nx();
+		const matrix_type& Dr = nodes1D.get_Dr();
+		const matrix_type& rx = nodes1D.get_rx();
+		const matrix_type& Lift = nodes1D.get_Lift();
+		const matrix_type& Fscale = nodes1D.get_Fscale();
+		const matrix_type& nx = nodes1D.get_nx();
 
 		// Get volume to surface maps.
 		const index_vector_type& vmapM = nodes1D.get_vmapM();
 		const index_vector_type& vmapP = nodes1D.get_vmapP();
 
 		// boundary indices;
-		const index_type vmapI = nodes1D.get_vmapI();
-		const index_type mapO = nodes1D.get_mapO();
-		const index_type mapI = nodes1D.get_mapI();
+		index_type vmapI = nodes1D.get_vmapI();
+		index_type mapO = nodes1D.get_mapO();
+		index_type mapI = nodes1D.get_mapI();
 
 
 		index_type numFaces = nodes1D.NumFaces;
@@ -119,17 +119,17 @@ namespace blitzdg {
 int main(int argc, char **argv) {
 	using namespace blitzdg;
 	// Physical parameters
-	real_type xmin =-1.0;
-	real_type xmax = 1.0;
-	real_type c = 0.1;
+	const real_type xmin =-1.0;
+	const real_type xmax = 1.0;
+	const real_type c = 0.1;
 
 	const real_type finalTime = 10.0;
 	real_type t = 0.0;
 
 	// Numerical parameters:
-	index_type N = 4;
-	index_type K = 100;
-	real_type CFL = 0.05;
+	const index_type N = 4;
+	const index_type K = 100;
+	const real_type CFL = 0.05;
 
 	// Build dependencies.
 	SparseMatrixConverter matrixConverter;
@@ -143,7 +143,7 @@ int main(int argc, char **argv) {
 
 	index_type Np = nodes1DProvisioner.get_NumLocalPoints();
 
-	matrix_type & x = nodes1DProvisioner.get_xGrid();
+	const matrix_type & x = nodes1DProvisioner.get_xGrid();
 
 	real_type min_dx = x(1,0) - x(0,0);
 

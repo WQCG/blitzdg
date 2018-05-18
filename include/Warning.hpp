@@ -3,6 +3,7 @@
 
 /**
  * @file Warning.hpp
+ * @brief File containing standard GNU-style copyright and warranty notices.
  */
 #include <iostream>
 
