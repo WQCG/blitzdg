@@ -231,7 +231,7 @@ namespace blitzdg {
     /**
      * Returns a reference to the list of vertices, a contiguous block of type real_type.
      */
-    real_type* & MeshManager::get_Vertices() {
+    const real_type* MeshManager::get_Vertices() {
         return Vert;
     }
 
@@ -266,21 +266,21 @@ namespace blitzdg {
     /**
      * Returns a reference to the list of elements, a contiguous block of type index_type.
      */
-    index_type * & MeshManager::get_Elements() {
+    const index_type* MeshManager::get_Elements() {
         return EToV;
     }
 
     /**
      * Returns a reference to the element partition map, an array of type index_type.
      */
-    index_type * & MeshManager::get_ElementPartitionMap() {
+    const index_type* MeshManager::get_ElementPartitionMap() {
         return ElementPartitionMap;
     }
 
     /**
      * Returns a reference to the vertex partition map, an array of type index_type.
      */
-    index_type * & MeshManager::get_VertexPartitionMap() {
+    const index_type * MeshManager::get_VertexPartitionMap() {
         return VertexPartitionMap;
     }
 

@@ -73,7 +73,7 @@ namespace blitzdg {
     /**
      * Returns a reference to the matrix A.
      */
-    matrix_type& LUSolver::get_A() {
+    const matrix_type& LUSolver::get_A() {
         return *A;
     }
 
