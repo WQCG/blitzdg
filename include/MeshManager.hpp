@@ -45,19 +45,19 @@ namespace blitzdg {
       // Split up with metis.
       void partitionMesh(index_type numPartitions);
 
-      real_type* & get_Vertices();
+      const real_type* get_Vertices();
 
       index_type get_Dim();
 
       index_type get_NumVerts();
 
-      index_type* & get_Elements();
+      const index_type* get_Elements();
 
       index_type get_NumElements();
       index_type get_ElementType();
 
-      index_type* & get_ElementPartitionMap();
-      index_type* & get_VertexPartitionMap();
+      const index_type* get_ElementPartitionMap();
+      const index_type* get_VertexPartitionMap();
 
       void printVertices();
       void printElements();

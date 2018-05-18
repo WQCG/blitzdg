@@ -202,7 +202,7 @@ namespace blitzdg {
 
                 nodes1D.buildNodes();
                 nodes1D.buildVandermondeMatrix();
-                matrix_type & V = nodes1D.get_V();
+                const matrix_type & V = nodes1D.get_V();
 
                 matrix_type expectedV(4,4);
                 expectedV = 0.70711,-1.22474, 1.58114,-1.87083,
@@ -241,7 +241,7 @@ namespace blitzdg {
                 Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
                 nodes1D.buildNodes();
 
-                matrix_type & Dr = nodes1D.get_Dr();
+                const matrix_type & Dr = nodes1D.get_Dr();
 
                 matrix_type expectedDr(4,4);
                 expectedDr = -3.0000e+00, 4.0451e+00,-1.5451e+00, 5.0000e-01,
@@ -262,7 +262,7 @@ namespace blitzdg {
 
                 nodes1D.buildNodes();
 
-                matrix_type & x = nodes1D.get_xGrid();
+                const matrix_type & x = nodes1D.get_xGrid();
 
                 matrix_type expectedx(4,5);
                 expectedx = -1.000000,-0.600000,-0.200000,0.200000,0.600000,
@@ -299,8 +299,8 @@ namespace blitzdg {
                 nodes1D.buildDr();
                 nodes1D.computeJacobian();
 
-                matrix_type & J = nodes1D.get_J();
-                matrix_type & rx = nodes1D.get_rx();
+                const matrix_type & J = nodes1D.get_J();
+                const matrix_type & rx = nodes1D.get_rx();
                 const matrix_type & Fscale = nodes1D.get_Fscale();
 
                 matrix_type expectedJ(4,5), expectedrx(4,5), expectedFscale(2,5);
@@ -352,8 +352,8 @@ namespace blitzdg {
                 Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
 
                 nodes1D.buildNodes();
-                index_matrix_type & EToE = nodes1D.get_EToE();
-                index_matrix_type & EToF = nodes1D.get_EToF();
+                const index_matrix_type & EToE = nodes1D.get_EToE();
+                const index_matrix_type & EToF = nodes1D.get_EToF();
 
                 index_matrix_type expectedEToE(5,2);
                 expectedEToE = 0,1,

@@ -32,7 +32,7 @@ namespace blitzdg {
     public:
       LUSolver(matrix_type* const &, SparseMatrixConverter const &);
       
-      matrix_type& get_A();
+      const matrix_type& get_A();
 
       void factorize();
 

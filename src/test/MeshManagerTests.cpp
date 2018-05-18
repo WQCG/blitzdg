@@ -98,7 +98,7 @@ namespace blitzdg {
                 Assert::That(mgr.get_NumVerts(), Equals(6));
                 Assert::That(mgr.get_Dim(), Equals(2));
 
-                real_type* verts = mgr.get_Vertices();
+                const real_type* verts = mgr.get_Vertices();
 
                 Assert::That(verts[0], Equals(0.0));
                 Assert::That(verts[1], Equals(0.0));
@@ -131,7 +131,7 @@ namespace blitzdg {
                 Assert::That(mgr.get_NumElements(), Equals(2));
                 Assert::That(mgr.get_ElementType(), Equals(4));
 
-                index_type * elements = mgr.get_Elements();
+                const index_type* elements = mgr.get_Elements();
 
                 Assert::That(elements[0], Equals(0));
                 Assert::That(elements[1], Equals(1));
@@ -183,11 +183,11 @@ namespace blitzdg {
                 cout << "Nv: " << mgr.get_NumVerts() << endl;
                 mgr.partitionMesh(2);
 
-                index_type * & epMap = mgr.get_ElementPartitionMap();
+                const index_type * epMap = mgr.get_ElementPartitionMap();
                 Assert::That(epMap[0], Equals(1));
                 Assert::That(epMap[1], Equals(0));
 
-                index_type * & vpMap = mgr.get_VertexPartitionMap();
+                const index_type * vpMap = mgr.get_VertexPartitionMap();
                 Assert::That(vpMap[0], IsGreaterThan(-1));
                 Assert::That(vpMap[1], IsGreaterThan(-1));
                 Assert::That(vpMap[2], IsGreaterThan(-1));

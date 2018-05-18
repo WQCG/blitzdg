@@ -308,17 +308,16 @@ namespace blitzdg {
         secondIndex jj;
         thirdIndex kk;
 
-        matrix_type & x = get_xGrid();
-        matrix_type & Dr = get_Dr();
-        matrix_type & Jref = get_J();
-        matrix_type & rxref = get_rx();
+        matrix_type & x = *xGrid;
+        matrix_type & Drref = *Dr;
+        matrix_type & Jref = *J;
+        matrix_type & rxref = *rx;
 
         matrix_type & Fscaleref = *Fscale;
 
-        // is Fmask not intiialized at this point?
-        index_vector_type & Fmsk = get_Fmask();
+        index_vector_type & Fmsk = *Fmask;
 
-        Jref = sum(Dr(ii,kk)*x(kk,jj), kk);
+        Jref = sum(Drref(ii,kk)*x(kk,jj), kk);
         rxref = 1/Jref;
 
         for(index_type f=0; f < NumFaces; f++) {
@@ -344,7 +343,7 @@ namespace blitzdg {
     /**
      * Get reference to 1D Lifting Operator.
      */
-    matrix_type & Nodes1DProvisioner::get_Lift() {
+    const matrix_type & Nodes1DProvisioner::get_Lift() {
         return *Lift;
     }
 
@@ -390,63 +389,63 @@ namespace blitzdg {
     /**
      * Get reference to physical x-grid.
      */
-    matrix_type & Nodes1DProvisioner::get_xGrid() {
+    const matrix_type & Nodes1DProvisioner::get_xGrid() {
         return *xGrid;
     }
 
     /**
      * Get reference to r-grid on the standard element.
      */
-    vector_type & Nodes1DProvisioner::get_rGrid() {
+    const vector_type & Nodes1DProvisioner::get_rGrid() {
         return *rGrid;
     }
 
     /**
      * Get reference to Element-to-Vertex connectivity table.
      */
-    index_matrix_type & Nodes1DProvisioner::get_EToV() {
+    const index_matrix_type & Nodes1DProvisioner::get_EToV() {
         return *EToV;
     }
 
     /**
      * Get reference to Element-to-Element connectivity table.
      */
-    index_matrix_type & Nodes1DProvisioner::get_EToE() {
+    const index_matrix_type & Nodes1DProvisioner::get_EToE() {
         return *EToE;
     }
 
     /**
      * Get reference to Element-to-Face connectivity table.
      */
-    index_matrix_type & Nodes1DProvisioner::get_EToF() {
+    const index_matrix_type & Nodes1DProvisioner::get_EToF() {
         return *EToF;
     }
 
     /**
      * Get reference to differentiation matrix Dr on the standard element.
      */
-    matrix_type & Nodes1DProvisioner::get_Dr() {
+    const matrix_type & Nodes1DProvisioner::get_Dr() {
         return *Dr;
     }
 
     /**
      * Get reference to generalized Vandermonde matrix V.
      */
-    matrix_type & Nodes1DProvisioner::get_V() {
+    const matrix_type & Nodes1DProvisioner::get_V() {
         return *V;
     }
 
     /**
      * Get reference to Jacobian scaling array J.
      */
-    matrix_type & Nodes1DProvisioner::get_J() {
+    const matrix_type & Nodes1DProvisioner::get_J() {
         return *J;
     }
 
     /**
      * Get reference to geometric scaling array rx.
      */
-    matrix_type & Nodes1DProvisioner::get_rx() {
+    const matrix_type & Nodes1DProvisioner::get_rx() {
         return *rx;
     }
 
@@ -464,7 +463,7 @@ namespace blitzdg {
     /**
      * Get the faces-only x-grid.
      */
-    matrix_type & Nodes1DProvisioner::get_Fx() {
+    const matrix_type & Nodes1DProvisioner::get_Fx() {
         return *Fx;
     }
 
@@ -479,7 +478,7 @@ namespace blitzdg {
     /**
      * Get the index-mask for the face nodes.
      */
-    index_vector_type & Nodes1DProvisioner::get_Fmask() {
+    const index_vector_type & Nodes1DProvisioner::get_Fmask() {
         return *Fmask;
     }
 
@@ -504,14 +503,23 @@ namespace blitzdg {
         return mapI;
     }
 
+    /**
+     * Get the surface index of the outflow boundary.
+     */
     const index_type Nodes1DProvisioner::get_mapO() {
         return mapO;
     }
 
+    /**
+     * Get the volume index of the inflow boundary.
+     */
     const index_type Nodes1DProvisioner::get_vmapI() {
         return vmapI;
     }
 
+    /**
+     * Get the volume index of the outflow boundary.
+     */
     const index_type Nodes1DProvisioner::get_vmapO() {
         return vmapO;
     }
