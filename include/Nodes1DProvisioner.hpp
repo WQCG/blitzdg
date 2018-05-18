@@ -72,23 +72,23 @@ namespace blitzdg {
       void computeGradVandermonde(matrix_type& DVr);
       void computeJacobian();
       
-      matrix_type & get_xGrid();
-      vector_type & get_rGrid();
-      matrix_type & get_Dr();
-      matrix_type & get_V();
-      matrix_type & get_J();
-      matrix_type & get_rx();
+      const matrix_type & get_xGrid();
+      const vector_type & get_rGrid();
+      const matrix_type & get_Dr();
+      const matrix_type & get_V();
+      const matrix_type & get_J();
+      const matrix_type & get_rx();
       const matrix_type & get_nx();
 
-      index_vector_type & get_Fmask();
-      matrix_type & get_Fx();
+      const index_vector_type & get_Fmask();
+      const matrix_type & get_Fx();
       const matrix_type & get_Fscale();
 
-      index_matrix_type & get_EToV();
-      matrix_type & get_Lift();
+      const index_matrix_type & get_EToV();
+      const matrix_type & get_Lift();
     
-      index_matrix_type & get_EToE();
-      index_matrix_type & get_EToF();
+      const index_matrix_type & get_EToE();
+      const index_matrix_type & get_EToF();
 
       const index_vector_type & get_vmapM();
       const index_vector_type & get_vmapP();
