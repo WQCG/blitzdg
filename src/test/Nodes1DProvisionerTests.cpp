@@ -41,10 +41,7 @@ namespace blitzdg {
                 const real_type xmin = -1.0;
                 const real_type xmax = 1.0;
 
-                matrixConverter = new SparseMatrixConverter();
-                eigenSolver = new EigenSolver(*matrixConverter);
-                directSolver = new DirectSolver(*matrixConverter);
-                nodes1DProvisioner = new Nodes1DProvisioner(NOrder, NumElements, xmin, xmax, *matrixConverter, *eigenSolver, *directSolver);
+                nodes1DProvisioner = new Nodes1DProvisioner(NOrder, NumElements, xmin, xmax);
             }
 
             It(Should_Generate_0th_Order_Legendre_Polynomial) {

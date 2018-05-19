@@ -22,9 +22,6 @@ namespace blitzdg {
         const index_type N=5;
         const real_type eps=10*numeric_limits<real_type>::epsilon();
         const float epsf = 5.e-7;
-
-        EigenSolver * eigenSolver = nullptr;
-        SparseMatrixConverter * matrixConverter = nullptr;
         
         firstIndex ii;
         secondIndex jj;
@@ -57,13 +54,10 @@ namespace blitzdg {
                             0,0.516398,-0,0.507093,0,
                             0,0,0.507093,-0,0.503953,
                             0,0,0,0.503953,-0;
-
-                matrixConverter = new SparseMatrixConverter();
             }
 
             It(Should_Solve_Trivial_Symmetric_Eigenproblem) {
-                eigenSolver = new EigenSolver(*matrixConverter);
-                EigenSolver & solver = *eigenSolver;
+                EigenSolver solver;
 
                 vector_type eigenvalues(5);
                 eigenvalues = 0,0,0,0,0;
@@ -97,8 +91,7 @@ namespace blitzdg {
 
             It(Should_Solve_NonTrivial_Symmetric_Eigenproblem) {
                 cout << "EigenSolver" << endl;
-                eigenSolver = new EigenSolver(*matrixConverter);
-                EigenSolver & solver = *eigenSolver;
+                EigenSolver solver;
 
                 vector_type eigenvalues(5);
                 eigenvalues = 0,0,0,0,0;

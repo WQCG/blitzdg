@@ -8,7 +8,7 @@
 using std::numeric_limits;
 
 namespace blitzdg {
-    void SparseMatrixConverter::podArrayToFull(const real_type * Apod, matrix_type & A) {
+    void SparseMatrixConverter::podArrayToFull(const real_type * Apod, matrix_type & A) const {
         index_type ind = 0;
         for (index_type i=0; i<A.rows(); i++) {
             for (index_type j=0; j<A.cols(); j++) {
@@ -18,18 +18,17 @@ namespace blitzdg {
         }
     }
 
-    void SparseMatrixConverter::fullToPodArray(const matrix_type & A, real_type * Apod) {
+    void SparseMatrixConverter::fullToPodArray(const matrix_type & A, real_type * Apod) const {
         index_type ind = 0;
         for (index_type i =0; i< A.rows(); i++) {
-            for (index_type j=0; j< A.cols(); j++) {
-                Apod[ind] = A(i,j);
-                ind++;
-            }
+            for (index_type j=0; j< A.cols(); j++)
+                Apod[ind++] = A(i,j);
         }
     }
 
-    void SparseMatrixConverter::fullToCompressedColumn(const matrix_type & A,
-                                                    index_type * Aptr, index_type * Aind, real_type * Avalues) {
+    void SparseMatrixConverter::fullToCompressedColumn(
+        const matrix_type & A, index_type * Aptr, index_type * Aind, real_type * Avalues) const 
+    {
         SparseTriplet triplet;
 
         fullToSparseTriplet(A, triplet);
@@ -37,9 +36,10 @@ namespace blitzdg {
         sparseTripletToCompressedColumn(A.rows(), A.cols(), triplet, Aptr, Aind, Avalues);
     }
 
-    void SparseMatrixConverter::sparseTripletToCompressedColumn(const index_type numRows, const index_type numCols, const SparseTriplet & triplet,
-                                                            index_type * Aptr, index_type * Aind, real_type * Avalues) {
-
+    void SparseMatrixConverter::sparseTripletToCompressedColumn(
+        const index_type numRows, const index_type numCols, const SparseTriplet & triplet,
+        index_type * Aptr, index_type * Aind, real_type * Avalues) const
+    {
         const index_type nz = triplet.nz;
         index_type * map = new index_type[nz];
 
@@ -47,8 +47,7 @@ namespace blitzdg {
             triplet.val, Aptr, Aind, Avalues, map);
     }
 
-    void SparseMatrixConverter::fullToSparseTriplet(const matrix_type & A, SparseTriplet & triplet) {
-
+    void SparseMatrixConverter::fullToSparseTriplet(const matrix_type & A, SparseTriplet & triplet) const {
         const real_type eps = numeric_limits<real_type>::epsilon();
         const index_type n_rows = A.rows();
         const index_type n_cols = A.cols();
@@ -78,7 +77,7 @@ namespace blitzdg {
         triplet.nz = nz;
     }
 
-    index_type SparseMatrixConverter::getNumNonZeros(const matrix_type & A) {
+    index_type SparseMatrixConverter::getNumNonZeros(const matrix_type & A) const {
         const real_type eps = numeric_limits<real_type>::epsilon();
         const index_type n_rows = A.rows();
         const index_type n_cols = A.cols();
@@ -95,7 +94,6 @@ namespace blitzdg {
                 nz++;
             }
         }
-
         return nz;
     }
 } // namespace blitzdg

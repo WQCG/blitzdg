@@ -132,10 +132,7 @@ int main(int argc, char **argv) {
 	const real_type CFL = 0.05;
 
 	// Build dependencies.
-	SparseMatrixConverter matrixConverter;
-	EigenSolver eigenSolver(matrixConverter);
-	DirectSolver directSolver(matrixConverter);
-	Nodes1DProvisioner nodes1DProvisioner(N, K, xmin, xmax, matrixConverter, eigenSolver, directSolver);
+	Nodes1DProvisioner nodes1DProvisioner(N, K, xmin, xmax);
 	
 	// Pre-processing. Build grid, and get data we need for initialization.
 	nodes1DProvisioner.buildNodes();

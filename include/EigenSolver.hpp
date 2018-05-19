@@ -13,15 +13,14 @@
 
 namespace blitzdg {
   class EigenSolver {
-      index_type N;
       SparseMatrixConverter MatrixConverter;
 
-    public:
-      EigenSolver(SparseMatrixConverter const &);
+  public:
+      EigenSolver()
+        : MatrixConverter()
+      {}
 
-      void solve(const matrix_type& A, vector_type& eigenvalues, matrix_type& eigenvectors);
-      
-      ~EigenSolver();
+      void solve(const matrix_type& A, vector_type& eigenvalues, matrix_type& eigenvectors) const;      
   };
 } // namespace blitzdg
 

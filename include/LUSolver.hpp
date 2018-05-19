@@ -12,27 +12,23 @@
 
 namespace blitzdg {
   class LUSolver {
-      index_type N;
-      matrix_type* A;
+      const matrix_type* A;
 
       // Umfpack-specific fields
       index_type * Ap;
       index_type * Ai;
       real_type * Ax;
       index_type * Map;
-      real_type * null;
 
       void * Symbolic;
       void * Numeric;
-
-      SparseTriplet Triplet;
-
+      
       SparseMatrixConverter MatrixConverter;
     
     public:
-      LUSolver(matrix_type* const &, SparseMatrixConverter const &);
+      explicit LUSolver(const matrix_type* Ain);
       
-      const matrix_type& get_A();
+      const matrix_type& get_A() const;
 
       void factorize();
 
