@@ -50,16 +50,16 @@ namespace blitzdg {
       index_vector_type * vmapM;
       index_vector_type * vmapP;
 
-      SparseMatrixConverter * MatrixConverter;
-      EigenSolver * EigSolver;
-      DirectSolver * LinSolver;
+      SparseMatrixConverter MatrixConverter;
+      EigenSolver EigSolver;
+      DirectSolver LinSolver;
 
     public:
       static const index_type NumFacePoints;
       static const index_type NumFaces;
       static const real_type NodeTol;
 
-      Nodes1DProvisioner(index_type NOrder, index_type NumElements, real_type xmin, real_type xmax, SparseMatrixConverter & converter, EigenSolver & eigenSolver, DirectSolver & directSolver);
+      Nodes1DProvisioner(index_type NOrder, index_type NumElements, real_type xmin, real_type xmax);
 
       void buildNodes();
       void buildConnectivityMatrices();
@@ -69,44 +69,43 @@ namespace blitzdg {
       void buildLift();
       void buildMaps();
       void buildNormals();
-      void computeGradVandermonde(matrix_type& DVr);
+      void computeGradVandermonde(matrix_type& DVr) const;
       void computeJacobian();
       
-      const matrix_type & get_xGrid();
-      const vector_type & get_rGrid();
-      const matrix_type & get_Dr();
-      const matrix_type & get_V();
-      const matrix_type & get_J();
-      const matrix_type & get_rx();
-      const matrix_type & get_nx();
+      const matrix_type & get_xGrid() const;
+      const vector_type & get_rGrid() const;
+      const matrix_type & get_Dr() const;
+      const matrix_type & get_V() const;
+      const matrix_type & get_J() const;
+      const matrix_type & get_rx() const;
+      const matrix_type & get_nx() const;
 
-      const index_vector_type & get_Fmask();
-      const matrix_type & get_Fx();
-      const matrix_type & get_Fscale();
+      const index_vector_type & get_Fmask() const;
+      const matrix_type & get_Fx() const;
+      const matrix_type & get_Fscale() const;
 
-      const index_matrix_type & get_EToV();
-      const matrix_type & get_Lift();
+      const index_matrix_type & get_EToV() const;
+      const matrix_type & get_Lift() const;
     
-      const index_matrix_type & get_EToE();
-      const index_matrix_type & get_EToF();
+      const index_matrix_type & get_EToE() const;
+      const index_matrix_type & get_EToF() const;
 
-      const index_vector_type & get_vmapM();
-      const index_vector_type & get_vmapP();
+      const index_vector_type & get_vmapM() const;
+      const index_vector_type & get_vmapP() const;
 
-      const index_type get_mapI();
-      const index_type get_mapO();
-      const index_type get_vmapI();
-      const index_type get_vmapO();
+      index_type get_mapI() const;
+      index_type get_mapO() const;
+      index_type get_vmapI() const;
+      index_type get_vmapO() const;
 
-      index_type get_NumLocalPoints();
-      index_type get_NumElements();
+      index_type get_NumLocalPoints() const;
+      index_type get_NumElements() const;
 
-      // these can be moved to a helper (polynomials) class or made private within this class.
-      void computeJacobiPolynomial(vector_type const & x, const real_type alpha, const real_type beta, const index_type N, vector_type & p);
-      void computeJacobiQuadWeights(real_type alpha, real_type beta, index_type N, vector_type & x, vector_type & w);
-      void computeGaussLobottoPoints(real_type alpha, real_type beta, index_type N, vector_type & x);
-      void computeGradJacobi(vector_type const & x, const real_type alpha, const real_type beta, const index_type N, vector_type & dp);
-
+      void computeJacobiPolynomial(vector_type const & x, real_type alpha, real_type beta, index_type N, vector_type & p) const;
+      void computeJacobiQuadWeights(real_type alpha, real_type beta, index_type N, vector_type & x, vector_type & w) const;
+      void computeGaussLobottoPoints(real_type alpha, real_type beta, index_type N, vector_type & x) const;
+      void computeGradJacobi(vector_type const & x, real_type alpha, real_type beta, index_type N, vector_type & dp) const;
+      
       ~Nodes1DProvisioner();
   };
 } // namespace blitzdg

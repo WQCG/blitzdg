@@ -23,9 +23,6 @@ namespace blitzdg {
         const index_type N=5;
         const real_type eps=10*numeric_limits<real_type>::epsilon();
         const float epsf = 1.e-5;
-
-        DirectSolver * directSolver = nullptr;
-        SparseMatrixConverter * matrixConverter = nullptr;
         
         firstIndex ii;
         secondIndex jj;
@@ -54,17 +51,12 @@ namespace blitzdg {
                             -0.96358,
                             -0.33740,
                             0.82171;
-
-
-                matrixConverter = new SparseMatrixConverter();
             }
 
             It(Should_Solve_Random_Linear_System) {
                 cout << "It Should Solve Random Linear System" << endl;
-                directSolver = new DirectSolver(*matrixConverter);
-
-                DirectSolver & solver = *directSolver;
-
+                
+                DirectSolver solver;
                 solver.solve(A, b, x);
 
                 Assert::That(abs(x(0)-expectedx(0)), IsLessThan(epsf));
