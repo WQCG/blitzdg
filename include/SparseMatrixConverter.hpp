@@ -6,16 +6,20 @@
  * @brief Defines the SparseMatrixConverter class that converts between blitz++
  * 2D arrays, sparse triplet matrices, compressed sparse column (CSC) matrices, and contiguous 
  * C-style (POD) arrays.
- * @note When converting from a dense matrix to a sparse representation, an element \f$a_{ij}\f$ of
- * the dense matrix is considered nonzero if \f$|a_{ij}| \geq 2\varepsilon\f$, where \f$\varepsilon\f$
- * is machine precision for the type real_type. This approach is also employed when counting the
- * the number of nonzero elements in a dense matrix.
  */
 #pragma once
 #include "SparseTriplet.hpp"
 #include "Types.hpp"
 
 namespace blitzdg {
+  /**
+   * Converts between blitz++ 2D arrays, sparse triplet matrices, compressed sparse column (CSC) matrices, and contiguous 
+   * C-style (POD) arrays.
+   * @note When converting from a dense matrix to a sparse representation, an element \f$a_{ij}\f$ of
+   * the dense matrix is considered nonzero if \f$|a_{ij}| \geq 2\varepsilon\f$, where \f$\varepsilon\f$
+   * is machine precision for the type real_type. This approach is also employed when counting the
+   * the number of nonzero elements in a dense matrix.
+   */
   class SparseMatrixConverter {
   public:
       /**
