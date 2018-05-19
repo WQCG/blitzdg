@@ -23,7 +23,7 @@ namespace blitzdg {
        * @param[in] A Dense matrix.
        * @param[out] triplet Sparse triplet matrix.
        */
-      void fullToSparseTriplet(const matrix_type& A, SparseTriplet & triplet);
+      void fullToSparseTriplet(const matrix_type& A, SparseTriplet & triplet) const;
 
       /**
        * Converts a sparse triplet matrix to a compressed sparse column matrix with numRows rows and numCols columns.
@@ -34,7 +34,7 @@ namespace blitzdg {
        * @param[out] Aind Pointer to array of row indices of elements in Avalues.
        * @param[out] Avalues Pointer to array of nonzero elements.
        */
-      void sparseTripletToCompressedColumn(index_type numRows, index_type numCols, const SparseTriplet & triplet, index_type * Aptr, index_type * Aind, real_type * Avalues);
+      void sparseTripletToCompressedColumn(index_type numRows, index_type numCols, const SparseTriplet & triplet, index_type * Aptr, index_type * Aind, real_type * Avalues) const;
 
       /**
        * Converts a dense matrix to a compressed sparse column matrix.
@@ -43,7 +43,7 @@ namespace blitzdg {
        * @param[out] Aind Pointer to array of row indices of elements in Avalues.
        * @param[out] Avalues Pointer to array of nonzero elements.
        */
-      void fullToCompressedColumn(const matrix_type& A, index_type * Aptr, index_type * Aind, real_type * Avalues);
+      void fullToCompressedColumn(const matrix_type& A, index_type * Aptr, index_type * Aind, real_type * Avalues) const;
 
       /**
        * Vectorizes a dense matrix. The rows of A are stored contiguously and in ascending order of row index.
@@ -53,7 +53,7 @@ namespace blitzdg {
        * least m*n elements, where m is the the number of rows of A and n is 
        * the number of columns.
        */
-      void fullToPodArray(const matrix_type& A, real_type * Apod);
+      void fullToPodArray(const matrix_type& A, real_type * Apod) const;
 
       /**
        * Reshapes an array into a dense matrix. The dense matrix is filled 
@@ -63,13 +63,13 @@ namespace blitzdg {
        * @note The array pointed to by Apod must have at least m*n elements, 
        * where m is the the number of rows of A and n is the number of columns.
        */
-      void podArrayToFull(const real_type * Apod, matrix_type& A);
+      void podArrayToFull(const real_type * Apod, matrix_type& A) const;
 
       /**
        * Returns the number of nonzero elements in a dense matrix.
        * @param[in] A Dense matrix.
        * @return The number of nonzeros.
        */
-      index_type getNumNonZeros(const matrix_type& A);
+      index_type getNumNonZeros(const matrix_type& A) const;
   };
 } // namespace blitzdg

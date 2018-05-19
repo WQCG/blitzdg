@@ -2,7 +2,6 @@
 // See COPYING and LICENSE files at project root for more details.
 
 #include "Nodes1DProvisioner.hpp"
-#include "SparseTriplet.hpp"
 #include "Types.hpp"
 #include <blitz/array.h>
 #include <cmath>
@@ -24,39 +23,27 @@ namespace blitzdg {
      * Constructor. Takes order of polynomials, number of elements, and dimensions of the domain.
      * Assumes equally-spaced elements.
      */
-    Nodes1DProvisioner::Nodes1DProvisioner(index_type _NOrder, index_type _NumElements, real_type _xmin, real_type _xmax, SparseMatrixConverter & converter, EigenSolver & eigenSolver, DirectSolver & directSolver) {
-        NOrder = _NOrder;
-        NumElements = _NumElements;
-        Min_x = _xmin;
-        Max_x = _xmax;
-        MatrixConverter = &converter;
-        EigSolver = &eigenSolver;
-        LinSolver = &directSolver;
-
-        // This is true in 1D only.
-        NumLocalPoints = NOrder + 1;
-        mapI = 0;
-        mapO = NumFacePoints*NumFaces*NumElements - 1;
-        vmapI = 0;
-        vmapO = NumLocalPoints*NumElements - 1;
-
-        rGrid = new vector_type(NumLocalPoints);
-        xGrid = new matrix_type(NumLocalPoints, NumElements);
-        J =  new matrix_type(NumLocalPoints, NumElements);
-        rx = new matrix_type(NumLocalPoints, NumElements);
-
-        Lift = new matrix_type(NumLocalPoints, NumFacePoints*NumFaces);
-        EToV = new index_matrix_type(NumElements, NumFaces);
-        EToE = new index_matrix_type(NumElements, NumFaces);
-        EToF = new index_matrix_type(NumElements, NumFaces);
-        Fmask = new index_vector_type (NumFacePoints*NumFaces);
-        Fx = new matrix_type(NumFacePoints*NumFaces, NumElements);
-        Fscale = new matrix_type(NumFacePoints*NumFaces, NumElements);
-        nx = new matrix_type(NumFacePoints*NumFaces, NumElements);
-
-        vmapM = new index_vector_type(NumFacePoints*NumFaces*NumElements);
-        vmapP = new index_vector_type(NumFacePoints*NumFaces*NumElements);
-    }
+    Nodes1DProvisioner::Nodes1DProvisioner(index_type _NOrder, index_type _NumElements, real_type _xmin, real_type _xmax) 
+        : Min_x{ _xmin }, Max_x{ _xmax }, NumElements{ _NumElements }, NOrder{ _NOrder },
+        NumLocalPoints{ NOrder + 1 }, mapI{ 0 }, mapO{ NumFacePoints*NumFaces*NumElements - 1 },
+        vmapI{ 0 }, vmapO{ NumLocalPoints*NumElements - 1 },
+        xGrid{ new matrix_type(NumLocalPoints, NumElements) },
+        rGrid{ new vector_type(NumLocalPoints) },
+        V{ nullptr }, Dr{ nullptr }, 
+        Lift{ new matrix_type(NumLocalPoints, NumFacePoints*NumFaces) },
+        J{ new matrix_type(NumLocalPoints, NumElements) },
+        rx{ new matrix_type(NumLocalPoints, NumElements) },
+        nx{ new matrix_type(NumFacePoints*NumFaces, NumElements) },
+        Fmask{ new index_vector_type (NumFacePoints*NumFaces) },
+        Fx{ new matrix_type(NumFacePoints*NumFaces, NumElements) },
+        Fscale{ new matrix_type(NumFacePoints*NumFaces, NumElements) },
+        EToV{ new index_matrix_type(NumElements, NumFaces) },
+        EToE{ new index_matrix_type(NumElements, NumFaces) },
+        EToF{ new index_matrix_type(NumElements, NumFaces) },
+        vmapM{ new index_vector_type(NumFacePoints*NumFaces*NumElements) },
+        vmapP{ new index_vector_type(NumFacePoints*NumFaces*NumElements) },
+        MatrixConverter{}, EigSolver{}, LinSolver{}
+    {}
 
     /**
      * Build nodes and geometric factors for all elements.
@@ -119,9 +106,6 @@ namespace blitzdg {
         secondIndex jj;
 
         index_matrix_type nodeIds(NumLocalPoints, NumElements);
-
-        // Set up reference to the objects we need to interact with.
-        SparseMatrixConverter & matConverter = *MatrixConverter;
         
         index_vector_type & Fmsk = *Fmask;
         index_vector_type & vmM = *vmapM;
@@ -135,7 +119,7 @@ namespace blitzdg {
         xmatTrans = xmat(jj,ii);
 
         real_type * x = new real_type[NumElements*NumLocalPoints];
-        matConverter.fullToPodArray(xmatTrans, x);
+        MatrixConverter.fullToPodArray(xmatTrans, x);
 
         // Assemble global volume node numbering.
         nodeIds = ii + NumLocalPoints*jj;
@@ -340,12 +324,7 @@ namespace blitzdg {
         }
     }
 
-    /**
-     * Get reference to 1D Lifting Operator.
-     */
-    const matrix_type & Nodes1DProvisioner::get_Lift() {
-        return *Lift;
-    }
+    
 
     /**
      * Build differentiation matrix Dr on the standard element.
@@ -373,8 +352,7 @@ namespace blitzdg {
         Vtrans = Vref(jj, ii);
         DVrtrans = DVr(jj, ii);
 
-        DirectSolver & linSolver = *LinSolver;
-        linSolver.solve(Vtrans, DVrtrans,  Drtrans);
+        LinSolver.solve(Vtrans, DVrtrans,  Drtrans);
 
         Drref = Drtrans(jj, ii);
     } 
@@ -382,88 +360,95 @@ namespace blitzdg {
     /**
      * Get number of elements.
      */
-    index_type Nodes1DProvisioner::get_NumElements() {
+    index_type Nodes1DProvisioner::get_NumElements() const {
         return NumElements;
     }
 
     /**
      * Get reference to physical x-grid.
      */
-    const matrix_type & Nodes1DProvisioner::get_xGrid() {
+    const matrix_type & Nodes1DProvisioner::get_xGrid() const {
         return *xGrid;
     }
 
     /**
      * Get reference to r-grid on the standard element.
      */
-    const vector_type & Nodes1DProvisioner::get_rGrid() {
+    const vector_type & Nodes1DProvisioner::get_rGrid() const {
         return *rGrid;
     }
 
     /**
      * Get reference to Element-to-Vertex connectivity table.
      */
-    const index_matrix_type & Nodes1DProvisioner::get_EToV() {
+    const index_matrix_type & Nodes1DProvisioner::get_EToV() const {
         return *EToV;
+    }
+
+    /**
+     * Get reference to 1D Lifting Operator.
+     */
+    const matrix_type & Nodes1DProvisioner::get_Lift() const {
+        return *Lift;
     }
 
     /**
      * Get reference to Element-to-Element connectivity table.
      */
-    const index_matrix_type & Nodes1DProvisioner::get_EToE() {
+    const index_matrix_type & Nodes1DProvisioner::get_EToE() const {
         return *EToE;
     }
 
     /**
      * Get reference to Element-to-Face connectivity table.
      */
-    const index_matrix_type & Nodes1DProvisioner::get_EToF() {
+    const index_matrix_type & Nodes1DProvisioner::get_EToF() const {
         return *EToF;
     }
 
     /**
      * Get reference to differentiation matrix Dr on the standard element.
      */
-    const matrix_type & Nodes1DProvisioner::get_Dr() {
+    const matrix_type & Nodes1DProvisioner::get_Dr() const {
         return *Dr;
     }
 
     /**
      * Get reference to generalized Vandermonde matrix V.
      */
-    const matrix_type & Nodes1DProvisioner::get_V() {
+    const matrix_type & Nodes1DProvisioner::get_V() const {
         return *V;
     }
 
     /**
      * Get reference to Jacobian scaling array J.
      */
-    const matrix_type & Nodes1DProvisioner::get_J() {
+    const matrix_type & Nodes1DProvisioner::get_J() const {
         return *J;
     }
 
     /**
      * Get reference to geometric scaling array rx.
      */
-    const matrix_type & Nodes1DProvisioner::get_rx() {
+    const matrix_type & Nodes1DProvisioner::get_rx() const {
         return *rx;
     }
 
     /**
      * Get reference to normals array nx.
      */
-    const matrix_type & Nodes1DProvisioner::get_nx() {
+    const matrix_type & Nodes1DProvisioner::get_nx() const {
         return *nx;
     } 
 
-    index_type Nodes1DProvisioner::get_NumLocalPoints() {
+    index_type Nodes1DProvisioner::get_NumLocalPoints() const {
         return NumLocalPoints;
     }
 
     /**
      * Get the faces-only x-grid.
      */
-    const matrix_type & Nodes1DProvisioner::get_Fx() {
+    const matrix_type & Nodes1DProvisioner::get_Fx() const {
         return *Fx;
     }
 
@@ -471,56 +456,56 @@ namespace blitzdg {
      * Get the Face-scaling factor (Inverse of Jacobian at Face nodes).
      */
 
-    const matrix_type & Nodes1DProvisioner::get_Fscale() {
+    const matrix_type & Nodes1DProvisioner::get_Fscale() const {
         return *Fscale;
     }
 
     /**
      * Get the index-mask for the face nodes.
      */
-    const index_vector_type & Nodes1DProvisioner::get_Fmask() {
+    const index_vector_type & Nodes1DProvisioner::get_Fmask() const {
         return *Fmask;
     }
 
     /**
      * Get the volume to surface map, 'minus' traces.
      */
-    const index_vector_type & Nodes1DProvisioner::get_vmapM() {
+    const index_vector_type & Nodes1DProvisioner::get_vmapM() const {
         return *vmapM;
     }
 
     /**
      * Get the volume to surface map, 'plus' traces.
      */
-    const index_vector_type & Nodes1DProvisioner::get_vmapP() {
+    const index_vector_type & Nodes1DProvisioner::get_vmapP() const {
         return *vmapP;
     }
 
     /**
      * Get the surface index of the inflow boundary.
      */
-    const index_type Nodes1DProvisioner::get_mapI() {
+    index_type Nodes1DProvisioner::get_mapI() const {
         return mapI;
     }
 
     /**
      * Get the surface index of the outflow boundary.
      */
-    const index_type Nodes1DProvisioner::get_mapO() {
+    index_type Nodes1DProvisioner::get_mapO() const {
         return mapO;
     }
 
     /**
      * Get the volume index of the inflow boundary.
      */
-    const index_type Nodes1DProvisioner::get_vmapI() {
+    index_type Nodes1DProvisioner::get_vmapI() const {
         return vmapI;
     }
 
     /**
      * Get the volume index of the outflow boundary.
      */
-    const index_type Nodes1DProvisioner::get_vmapO() {
+    index_type Nodes1DProvisioner::get_vmapO() const {
         return vmapO;
     }
 
@@ -528,26 +513,28 @@ namespace blitzdg {
      * Destructor.
      */
     Nodes1DProvisioner::~Nodes1DProvisioner() {
-        delete rGrid;
-        delete xGrid;
-        delete J;
-        delete rx;
-        delete Lift;
-        delete EToV;
-        delete EToE;
-        delete EToF;
-        delete Fmask;
-        delete Fx;
-        delete Fscale;
-        delete nx;
-        delete vmapM;
-        delete vmapP;
+        delete V; V = nullptr;
+        delete Dr; Dr = nullptr;
+        delete rGrid; rGrid = nullptr;
+        delete xGrid; xGrid = nullptr;
+        delete J; J = nullptr;
+        delete rx; rx = nullptr;
+        delete Lift; Lift = nullptr;
+        delete EToV; EToV = nullptr;
+        delete EToE; EToE = nullptr;
+        delete EToF; EToF = nullptr;
+        delete Fmask; Fmask = nullptr;
+        delete Fx; Fx = nullptr;
+        delete Fscale; Fscale = nullptr;
+        delete nx; nx = nullptr;
+        delete vmapM; vmapM = nullptr;
+        delete vmapP; vmapP = nullptr;
     }
 
     /**  Compute the Nth Jacobi polynomial of type (alpha,beta) > -1 ( != -0.5)
      *   and weights, w, associated with the Jacobi polynomial at the points x.
      */
-    void Nodes1DProvisioner::computeJacobiPolynomial(vector_type const & x, const real_type alpha, const real_type beta, const index_type N, vector_type & p) {
+    void Nodes1DProvisioner::computeJacobiPolynomial(vector_type const & x, real_type alpha, real_type beta, index_type N, vector_type & p) const {
         Range all = Range::all();
         index_type Np = (x.length())(0);
 
@@ -585,7 +572,7 @@ namespace blitzdg {
     /**  Compute the Nth order Gauss quadrature points, x,
      *   and weights, w, associated with the Jacobi polynomial, of type (alpha,beta) > -1 ( != -0.5).
      */
-    void Nodes1DProvisioner::computeJacobiQuadWeights(real_type alpha, real_type beta, index_type N, vector_type& x, vector_type& w) {
+    void Nodes1DProvisioner::computeJacobiQuadWeights(real_type alpha, real_type beta, index_type N, vector_type& x, vector_type& w) const {
 
         if ( N == 0) {
             x(0) = -(alpha-beta)/(alpha+beta+2);
@@ -613,12 +600,10 @@ namespace blitzdg {
             J(0,0) = 0.0;
         }
         J = J(ii,jj) + J(jj,ii);
-
-        EigenSolver & eigSolver = *EigSolver;
         
         matrix_type eigenvectors(N+1, N+1);
 
-        eigSolver.solve(J, x, eigenvectors);
+        EigSolver.solve(J, x, eigenvectors);
 
         // The eigenvalues give the x points.
         
@@ -634,7 +619,7 @@ namespace blitzdg {
     /**  Compute the Nth order Gauss Lobatto quadrature points, x,
      *  associated with the Jacobi polynomial, of type (alpha,beta) > -1 ( != -0.5).
      */
-    void Nodes1DProvisioner::computeGaussLobottoPoints(real_type alpha, real_type beta, index_type N, vector_type& x) {
+    void Nodes1DProvisioner::computeGaussLobottoPoints(real_type alpha, real_type beta, index_type N, vector_type& x) const {
         if (N==1) {
             x(0) = -1.0;
             x(1) = 1.0;
@@ -653,7 +638,7 @@ namespace blitzdg {
             x(i) = xJG(i-1);
     }
 
-    void Nodes1DProvisioner::computeGradJacobi(vector_type const & x, const real_type alpha, const real_type beta, const index_type N, vector_type& dp) {
+    void Nodes1DProvisioner::computeGradJacobi(vector_type const & x, real_type alpha, real_type beta, index_type N, vector_type& dp) const {
         if (N == 0) {
             dp = 0.0;
             return;
@@ -665,11 +650,10 @@ namespace blitzdg {
         dp = sqrt(N*(N+alpha+beta+1))*p;
     }
 
-    void Nodes1DProvisioner::computeGradVandermonde(matrix_type & DVr) {
-
+    void Nodes1DProvisioner::computeGradVandermonde(matrix_type & DVr) const {
         firstIndex ii;
+        vector_type dp(NOrder+1);
         for (index_type i=0; i<=NOrder; i++) {
-            vector_type dp(NOrder+1);
             dp = 0.*ii;
             computeGradJacobi(*rGrid, 0.0, 0.0, i, dp);
             DVr(Range::all(), i) = dp;

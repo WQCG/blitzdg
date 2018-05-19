@@ -14,5 +14,28 @@ namespace blitzdg {
         index_type* row; /**< Pointer to array of row indices. */
         index_type* col; /**< Pointer to array of column indices. */
         real_type* val;  /**< Pointer to array of elements. */
+
+        /**
+         * Constructor.
+         * Creates a sparse triplet matrix with space for nz_ elements.
+         * @param nz_ Number of nonzero elements.
+         * @note If nz_ <= 0, then the empty matrix is created. The number of 
+         * nonzeros is set to zero and the pointers are set to null.
+         */
+        explicit SparseTriplet(index_type nz_ = 0)
+            : nz{ nz_ > 0 ? nz_ : 0 }, 
+            row{ nz_ > 0 ? new index_type[nz_] : nullptr }, 
+            col{ nz_ > 0 ? new index_type[nz_] : nullptr }, 
+            val{ nz_ > 0 ? new real_type[nz_]{0} : nullptr }
+        {}
+
+        /**
+         * Destructor.
+         */
+        ~SparseTriplet() {
+            delete[] row; row = nullptr;
+            delete[] col; col = nullptr;
+            delete[] val; val = nullptr;
+        }
     };
 } // namespace blitzdg

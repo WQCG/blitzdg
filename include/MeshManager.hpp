@@ -19,49 +19,44 @@ namespace blitzdg {
       index_type NumVerts;
       index_type ElementType;
       index_type NumElements;
-      std::string CsvDelimeters;
-
+      std::string CsvDelimiters;
       index_type* ElementPartitionMap;
       index_type* VertexPartitionMap;
-
-      template<typename T>
-      void  readCsvFile(std::string csvFile, std::string delimiters, T* & result, index_type* & dims);
-
-      template<typename T>
-      void printArray(T* & arr, index_type numRows, index_type numCols);
 
     public:
       MeshManager();
 
-      index_type get_Index(index_type row, index_type col, index_type numCols);
+      static index_type get_Index(index_type row, index_type col, index_type numCols);
 
       // Read gmsh .msh file.
-      void readMesh(std::string gmshInputFile);
+      void readMesh(const std::string& gmshInputFile);
       
-      void readVertices(std::string vertFile);
+      void readVertices(const std::string& vertFile);
 
-      void readElements(std::string E2VFile);
+      void readElements(const std::string& E2VFile);
 
       // Split up with metis.
       void partitionMesh(index_type numPartitions);
 
-      const real_type* get_Vertices();
+      const real_type* get_Vertices() const;
 
-      index_type get_Dim();
+      index_type get_Dim() const;
 
-      index_type get_NumVerts();
+      index_type get_NumVerts() const;
 
-      const index_type* get_Elements();
+      const index_type* get_Elements() const;
 
-      index_type get_NumElements();
-      index_type get_ElementType();
+      index_type get_NumElements() const;
+      index_type get_ElementType() const;
 
-      const index_type* get_ElementPartitionMap();
-      const index_type* get_VertexPartitionMap();
+      const index_type* get_ElementPartitionMap() const;
+      const index_type* get_VertexPartitionMap() const;
 
-      void printVertices();
-      void printElements();
+      void printVertices() const;
+      void printElements() const;
       
       ~MeshManager();
   };
+
+
 } // namespace blitzdg

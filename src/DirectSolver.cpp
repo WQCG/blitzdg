@@ -8,13 +8,6 @@ using blitz::firstIndex;
 using blitz::secondIndex;
 
 namespace blitzdg {
-    /**
-     * Constructor. Takes a reference to a SparseMatrixConverter.
-     */
-    DirectSolver::DirectSolver(SparseMatrixConverter const & _matrixConverter) {
-        MatrixConverter = _matrixConverter;
-    }
-
     extern "C" {
         void dsgesv_( int* n, int* nrhs, double* a, int* lda,
                     int* ipiv, double* b, int* ldb, double* x, int* ldx, 
@@ -24,7 +17,7 @@ namespace blitzdg {
     /**
      * Solve A*X=B using LAPACK. Here, B and X are allowed to have multiple columns.
      */
-    void DirectSolver::solve(const matrix_type& A, const matrix_type& B, matrix_type& X) {
+    void DirectSolver::solve(const matrix_type& A, const matrix_type& B, matrix_type& X) const {
 
         firstIndex ii;
         secondIndex jj;

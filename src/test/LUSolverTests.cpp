@@ -47,7 +47,7 @@ namespace blitzdg {
                     5;
 
                 matrixConverter = new SparseMatrixConverter();
-                luSolver = new LUSolver(&A, *matrixConverter);
+                luSolver = new LUSolver(&A);
             }
 
             It(Solves_Ax_equals_b)  {
