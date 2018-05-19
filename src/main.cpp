@@ -77,6 +77,8 @@ namespace blitzdg {
 		// boundary indices.
 		index_type mapO = nodes1D.get_mapO();
 		index_type mapI = nodes1D.get_mapI();
+		index_type vmapI = nodes1D.get_vmapI();
+
 
 		index_type numFaces = nodes1D.NumFaces;
 		index_type Nfp = nodes1D.NumFacePoints;
@@ -105,8 +107,8 @@ namespace blitzdg {
 		}
 
 		// BC's
-		uP(mapI) = uM(mapO);
-		uP(mapO) = uM(mapI);
+		uP(mapO) = uM(mapO);
+		uP(mapI) = -uM(mapI);
 				
 		// Compute jump in flux:
 		du = (uM - uP)*0.5*(c*nxCol - (1-alpha)*fabs(c*nxCol)); 
@@ -146,8 +148,8 @@ int main(int argc, char **argv) {
 
 	// Numerical parameters:
 	const index_type N = 4;
-	const index_type K = 200;
-	const real_type CFL = 0.8;
+	const index_type K = 150;
+	const real_type CFL = 0.25;
 
 	// Build dependencies.
 	Nodes1DProvisioner nodes1DProvisioner(N, K, xmin, xmax);
