@@ -113,13 +113,16 @@ namespace blitzdg {
 		// Compute jump in flux:
 		du = (uM - uP)*0.5*(c*nxCol - (1-alpha)*fabs(c*nxCol)); 
 
-		matrix_type duMat(Np, K, ColumnMajorArray<2>());
+		matrix_type duMat(Nfp*numFaces, K, ColumnMajorArray<2>());
 		duMat = du;
 
 		// Assumes PDE has been left-multiplied by local inverse mass matrix, so all we have left
 		// is the differentiation matrix contribution, and the surface integral
 		RHS =-c*rx*sum(Dr(ii,kk)*u(kk,jj), kk);
-		RHS += Lift*Fscale*duMat;
+
+		matrix_type surfaceRHS(Np, K);
+		surfaceRHS = Fscale*duMat;
+		RHS += sum(Lift(ii,kk)*surfaceRHS(kk,jj), kk);
 	}
 
 	void writeFieldToFile(const string fileName, const matrix_type & field ) {
