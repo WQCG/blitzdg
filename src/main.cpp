@@ -18,6 +18,7 @@
 #include "Types.hpp"
 #include "Warning.hpp"
 #include <blitz/array.h>
+#include <cmath>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -29,14 +30,35 @@ using blitz::firstIndex;
 using blitz::secondIndex;
 using blitz::thirdIndex;
 using blitz::sum;
+using blitz::Range;
 using std::endl;
 using std::ofstream;
 using std::setfill;
 using std::setw;
 using std::string;
 using std::stringstream;
+using std::cout;
 
 namespace blitzdg {
+	/**
+	 * Coefficients for Low-Storage Explicit Runge-Kutta 4th Order Time-Stepper.
+	 */
+	namespace LSERK4 {
+		const index_type numStages = 5;
+		const real_type rk4a[numStages] = { 0.0,
+											-567301805773.0/1357537059087.0,
+											-2404267990393.0/2016746695238.0,
+											-3550918686646.0/2091501179385.0,
+											-1275806237668.0/842570457699.0 };
+
+		const real_type rk4b[numStages] = { 1432997174477.0/9575080441755.0,
+											5161836677717.0/13612068292357.0,
+											1720146321549.0/2090206949498.0,
+											3134564353537.0/4481467310338.0,
+											2277821191437.0/14882151754819.0 };
+
+	} // end LSERK4
+
 	void computeRHS(const matrix_type & u, real_type c, Nodes1DProvisioner & nodes1D, matrix_type & RHS) {
 		// Blitz indices
 		firstIndex ii;
@@ -52,11 +74,9 @@ namespace blitzdg {
 		const index_vector_type& vmapM = nodes1D.get_vmapM();
 		const index_vector_type& vmapP = nodes1D.get_vmapP();
 
-		// boundary indices;
-		index_type vmapI = nodes1D.get_vmapI();
+		// boundary indices.
 		index_type mapO = nodes1D.get_mapO();
 		index_type mapI = nodes1D.get_mapI();
-
 
 		index_type numFaces = nodes1D.NumFaces;
 		index_type Nfp = nodes1D.NumFacePoints;
@@ -65,41 +85,39 @@ namespace blitzdg {
 
 		real_type alpha = 0;   // 1 == central flux, 0 == upwind flux.
 
-		matrix_type du(numFaces*Nfp, K);
-		du = 0.*jj;
-		matrix_type uM(numFaces*Nfp, K);
+		matrix_type du(numFaces*Nfp*K);
+		matrix_type uM(numFaces*Nfp*K);
+		matrix_type uP(numFaces*Nfp*K);
+
+		du = 0.*ii;
+		uM = 0.*ii;
+		uP = 0.*ii;
 
 		matrix_type uCol(Np, K, ColumnMajorArray<2>());
-		uCol = u; // is this gross?
+		uCol = u;
 
+		matrix_type nxCol(Np,K, ColumnMajorArray<2>());
+		nxCol = nx;
 
-		// maybe this loop can be blitz-ified...
-		index_type count = 0;
-		for (index_type k1=0; k1 < K; k1++) {
-			for (index_type f1=0; f1 < numFaces; f1++) {
-				index_type vM = vmapM(count);
-				index_type vP = vmapP(count);
-
-				real_type uM = uCol(vM);
-				real_type uP = uCol(vP);
-
-				// Inflow BC:
-				if (count == mapI)
-					uP = uCol(vmapI);
-
-				// Outflow BC;
-				if (count == mapO)
-					uP = uM; // exit stage left.
-
-				// Compute jump in flux:
-				du(f1,k1) = (uM - uP)*0.5*(c*nx(f1,k1) - (1-alpha)*abs(c*nx(f1,k1))); 
-				count++;
-			}
+		for (index_type i=0; i < numFaces*Nfp*K; i++)  {
+			uM(i) = uCol(vmapM(i));
+			uP(i) = uCol(vmapP(i));
 		}
+
+		// BC's
+		uP(mapI) = uM(mapO);
+		uP(mapO) = uM(mapI);
+				
+		// Compute jump in flux:
+		du = (uM - uP)*0.5*(c*nxCol - (1-alpha)*fabs(c*nxCol)); 
+
+		matrix_type duMat(Np, K, ColumnMajorArray<2>());
+		duMat = du;
 
 		// Assumes PDE has been left-multiplied by local inverse mass matrix, so all we have left
 		// is the differentiation matrix contribution, and the surface integral
-		RHS =-c*rx*sum(Dr(ii,kk)*u(kk,jj), kk) + Lift*Fscale*du;
+		RHS =-c*rx*sum(Dr(ii,kk)*u(kk,jj), kk);
+		RHS += Lift*Fscale*duMat;
 	}
 
 	void writeFieldToFile(const string fileName, const matrix_type & field ) {
@@ -128,8 +146,8 @@ int main(int argc, char **argv) {
 
 	// Numerical parameters:
 	const index_type N = 4;
-	const index_type K = 100;
-	const real_type CFL = 0.05;
+	const index_type K = 200;
+	const real_type CFL = 0.8;
 
 	// Build dependencies.
 	SparseMatrixConverter matrixConverter;
@@ -147,16 +165,22 @@ int main(int argc, char **argv) {
 
 	real_type min_dx = x(1,0) - x(0,0);
 
-	real_type dt = CFL*min_dx/abs(c);
+	real_type dt = CFL*min_dx/fabs(c);
 
 	matrix_type u(Np, K);
 	matrix_type RHS(Np, K);
+	matrix_type resRK(Np, K);
 
 	firstIndex ii;
 	secondIndex jj;
-	u = exp(-10*(x(ii,jj)*x(ii,jj)));
 
 	printDisclaimer();
+
+	// Intialize fields.
+	u = exp(-10*(x(ii,jj)*x(ii,jj)));
+	//u = sin(M_PI*x(ii,jj));
+	RHS = 0*jj;
+	resRK = 0*jj;
 
 	index_type count = 0;
 
@@ -171,11 +195,21 @@ int main(int argc, char **argv) {
 			writeFieldToFile(fileNameStrm.str(), u);
 		}
 
-		// Calculate Righ-hand side at current time-step.
-		computeRHS(u, c, nodes1DProvisioner, RHS);
+		for (index_type i=0; i < LSERK4::numStages;  i++ ) {
 
-		// Forward Euler time-step for now, to be replaced.
-		u += dt*RHS;
+			// Calculate Right-hand side.
+			computeRHS(u, c, nodes1DProvisioner, RHS);
+
+			// Compute Runge-Kutta Residual.
+			resRK = LSERK4::rk4a[i]*resRK + dt*RHS;
+
+			// Update solution.
+			u += LSERK4::rk4b[i]*resRK;
+		}
+
+		if ( fabs(max(u)) > 1e8  || fabs(max(u)) == (real_type)NAN ) {
+			throw("We done blew up!");
+		}
 
 		t += dt;
 		count++;
