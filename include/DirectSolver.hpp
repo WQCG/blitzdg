@@ -11,14 +11,15 @@
 #include "Types.hpp"
 
 namespace blitzdg {
-  class DirectSolver {
-      index_type N;
-      SparseMatrixConverter MatrixConverter;
+    class DirectSolver {
+        SparseMatrixConverter MatrixConverter;
   
-  public:
-      DirectSolver(SparseMatrixConverter const &);
+    public:
+        DirectSolver()
+        : MatrixConverter{}
+        {}
 
-      void solve(const matrix_type& A, const matrix_type& B, matrix_type& X);
+        void solve(const matrix_type& A, const matrix_type& B, matrix_type& X) const;
   };
 } // namespace blitzdg
 

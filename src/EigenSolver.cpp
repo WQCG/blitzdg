@@ -8,13 +8,6 @@ using blitz::firstIndex;
 using blitz::secondIndex;
 
 namespace blitzdg {
-    /**
-     * Constructor. Takes a reference to a SparseMatrixConverter.
-     */
-    EigenSolver::EigenSolver(SparseMatrixConverter const & _matrixConverter) {
-        MatrixConverter = _matrixConverter;
-    }
-
     extern "C" {
         void dsyevd_( char* jobz, char* uplo, int* n, double* a, int* lda,
                     double* w, double* work, int* lwork, int* iwork, int* liwork, int* info );
@@ -24,7 +17,7 @@ namespace blitzdg {
      * Solve Ax=λx using LAPACK. Eigenvalues are stored in reference 'eigenvalues' and eigenvectors are stored column-wise
      * in reference 'eigenvectors.'
      */
-    void EigenSolver::solve(const matrix_type& A, vector_type& eigenvalues, matrix_type& eigenvectors) {
+    void EigenSolver::solve(const matrix_type& A, vector_type& eigenvalues, matrix_type& eigenvectors) const {
         index_type sz = A.rows();
         index_type lda = sz;
         index_type iwkopt;
@@ -61,9 +54,5 @@ namespace blitzdg {
         firstIndex ii;
         secondIndex jj;
         eigenvectors = eigenvectors(jj,ii);
-    }
-
-    EigenSolver::~EigenSolver() {
-
     }
 } // namespace blitzdg
