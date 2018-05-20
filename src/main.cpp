@@ -24,6 +24,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <stdexcept>
 
 using blitz::ColumnMajorArray;
 using blitz::firstIndex;
