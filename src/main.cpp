@@ -165,7 +165,7 @@ int main(int argc, char **argv) {
 	// Numerical parameters:
 	const index_type N = 4;
 	const index_type K = 15;
-	const real_type CFL = 0.025;
+	const real_type CFL = 0.8;
 
 	// Build dependencies.
 	Nodes1DProvisioner nodes1DProvisioner(N, K, xmin, xmax);
@@ -223,7 +223,7 @@ int main(int argc, char **argv) {
 		}
 
 		if ( fabs(max(u)) > 1e8  || fabs(max(u)) == (real_type)NAN ) {
-			throw("We done blew up!");
+			throw std::runtime_error("We done blew up!");
 		}
 
 		t += dt;
