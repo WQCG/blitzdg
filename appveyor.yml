@@ -9,5 +9,8 @@ build_script:
     Expand-Archive -Path deps-win-mingw64.zip -DestinationPath .\lib\
     & C:\MinGW\msys\1.0\bin\bash -e -l -c "set && ls /mingw/lib/gcc/mingw32/5.3.0/ && cd /c/projects/blitzdg-vdg02 && make"
     if($LASTEXITCODE -ne 0) { exit 1 }
+test_script:
+  - dir bin&&c:\MinGW\msys\1.0\bin\bash -e -l -c "/c/projects/blitzdg-vdg02/bin/test.exe;  exit 0"
 artifacts:
   - path: bin
+
