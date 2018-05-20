@@ -21,6 +21,10 @@ if [ "$machine" == "Linux" ] ; then
     apt-get -y install libboost-dbg libboost-dev libboost-doc
 
 	# pull in doxygen (latest) for travis - should flag this on only for travis and not for all devs.
+    # get doxygen deps
+    apt-get -y install graphviz texlive-latex-base
+
+    # build and install doxygen from source.
 	apt-get -y install cmake
 	git clone https://github.com/doxygen/doxygen.git doxrepo
 	mkdir -p doxrepo/build
