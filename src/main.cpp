@@ -223,7 +223,7 @@ int main(int argc, char **argv) {
 			u += LSERK4::rk4b[i]*resRK;
 		}
 
-		if ( fabs(max(u)) > 1e8  || std::isnan(fabs(max(u))) ) {
+		if ( max(fabs(u)) > 1e8  || std::isnan(max(fabs(u))) ) {
 			throw std::runtime_error("We done blew up!");
 		}
 
