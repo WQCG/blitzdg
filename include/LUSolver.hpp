@@ -1,39 +1,43 @@
-// Copyright (C) 2017-2018  Derek Steinmoeller. 
+// Copyright (C) 2017-2018  Waterloo Quantitative Consulting Group, Inc. 
 // See COPYING and LICENSE files at project root for more details. 
 
+/**
+ * @file LUSolver.hpp
+ * @brief Defines the LUSolver class that implements UMFPACK LU factorization
+ * (umfpack_di_numeric, umfpack_di_solve) for spare matrices stored in compressed 
+ * sparse column (CSC) format. UMFPACK is part of the SuiteSparse package: 
+ * http://faculty.cse.tamu.edu/davis/suitesparse.html.
+ */
+
 #pragma once
-#include <blitz/array.h>
-#include <SparseMatrixConverter.hpp>
+#include "SparseMatrixConverter.hpp"
+#include "Types.hpp"
 
-using namespace blitz;
+namespace blitzdg {
+  class LUSolver {
+      const matrix_type* A;
 
-class LUSolver {
-    int N;
-    Array<double, 2> * A;
+      // Umfpack-specific fields
+      index_type * Ap;
+      index_type * Ai;
+      real_type * Ax;
+      index_type * Map;
 
-    // Umfpack-specific fields
-    int * Ap;
-    int * Ai;
-    double * Ax;
-    int * Map;
-    double * null;
-
-    void * Symbolic;
-    void * Numeric;
-
-    SparseTriplet Triplet;
-
-    SparseMatrixConverter MatrixConverter;
-  
-  public:
-    LUSolver(Array<double, 2> * const &, SparseMatrixConverter const &);
+      void * Symbolic;
+      void * Numeric;
+      
+      SparseMatrixConverter MatrixConverter;
     
-    Array<double, 2> & get_A();
+    public:
+      explicit LUSolver(const matrix_type* Ain);
+      
+      const matrix_type& get_A() const;
 
-    void factorize();
+      void factorize();
 
-    void solve(Array<double, 1> const &, Array<double, 1> &);
+      void solve(vector_type const &, vector_type&);
 
-    ~LUSolver();
-};
+      ~LUSolver();
+  };
+} // namespace blitzdg
 

@@ -1,85 +1,73 @@
-// Copyright (C) 2017-2018  Derek Steinmoeller. 
-// See COPYING and LICENSE files at project root for more details. 
+// Copyright (C) 2017-2018  Waterloo Quantitative Consulting Group, Inc.
+// See COPYING and LICENSE files at project root for more details.
 
 #include <suitesparse/umfpack.h>
-#include <LUSolver.hpp>
+#include "LUSolver.hpp"
 #include <iostream>
-#include <math.h>
+#include <cmath>
 
-using namespace std;
+using std::cout;
+using std::endl;
 
-/**
- * Constructor. Takes a pointer reference to a blitz 2D array (The matrix A to be used by the solver in Ax=b).
- */
-LUSolver::LUSolver(Array<double, 2> * const & Ain, SparseMatrixConverter const & _matrixConverter) {
-    A = Ain;
-    MatrixConverter = _matrixConverter;
-    Triplet.row = nullptr;
-    Triplet.col = nullptr;
-    Triplet.val = nullptr;
-    Numeric = nullptr;
-    Symbolic = nullptr;
-}
+namespace blitzdg {
+    /**
+     * Constructor. Takes a pointer reference to a blitz 2D array (The matrix A to be used by the solver in Ax=b).
+     */
+    LUSolver::LUSolver(const matrix_type* Ain) 
+        : A{ Ain }, Ap{ nullptr }, Ai{ nullptr }, Ax{ nullptr },
+        Map{ nullptr }, Symbolic{ nullptr }, Numeric{ nullptr },
+        MatrixConverter{}
+    {}
 
-/**
- * Factorize the matrix A with UMFPACK. Computes L,U factors and permutation matrices P,Q such that P*A*Q=LU.
- */
-void LUSolver::factorize() {
-    const Array<double, 2> & Aref = *A;
-    const int n_rows = Aref.rows();
-    const int n_cols = Aref.cols();
+    /**
+     * Factorize the matrix A with UMFPACK. Computes L,U factors and permutation matrices P,Q such that P*A*Q=LU.
+     */
+    void LUSolver::factorize() {
+        const matrix_type& Aref = *A;
+        const index_type n_rows = Aref.rows();
+        const index_type n_cols = Aref.cols();
+        const index_type nz = MatrixConverter.getNumNonZeros(*A);
 
-    const int nz = MatrixConverter.getNumNonZeros(*A);
+        Ap = new index_type[n_rows+1];
+        Ai = new index_type[nz];
+        Ax = new real_type[nz];
+        Map = new index_type[nz];
 
-    Ap = new int[n_rows+1];
-    Ai = new int[nz];
-    Ax = new double[nz];
-    Map = new int[nz];
+        cout << "Computing LU factorization!" << endl;
 
-    cout << "Computing LU factorization!" << endl;
+        // convert sparse Triplet to compressed column format
+        MatrixConverter.fullToCompressedColumn(*A, Ap, Ai, Ax);
 
-    // convert sparse Triplet to compressed column format
-    MatrixConverter.fullToCompressedColumn(*A, Ap, Ai, Ax);
-
-    umfpack_di_symbolic(n_rows, n_cols, Ap, Ai, Ax, &Symbolic, (double *) NULL, (double *) NULL);
-    umfpack_di_numeric (Ap, Ai, Ax, Symbolic, &Numeric, (double *) NULL, (double *) NULL) ;
-    cout << "Done!" << endl;
-}
-
-/**
- * Solve Ax=b using UMFPACK. Requires LUSolver.factorize() to be called first. 'x' is returned in 'soln' reference.
- * 'b' is specified by 'rhs' reference.
- */
-void LUSolver::solve(Array<double, 1> const & rhs, Array<double,1> & soln) {
-    int n = rhs.length(0);
-    double * b = new double[n];
-
-    for(int i=0; i<n; i++) {
-        b[i] = rhs(i);
+        umfpack_di_symbolic(n_rows, n_cols, Ap, Ai, Ax, &Symbolic, (double *) NULL, (double *) NULL);
+        umfpack_di_numeric (Ap, Ai, Ax, Symbolic, &Numeric, (double *) NULL, (double *) NULL) ;
+        cout << "Done!" << endl;
     }
 
-    double * x = new double[n];
-
-    cout << "Solving Ax = b.." << endl;
-    umfpack_di_solve (UMFPACK_A, Ap, Ai, Ax, x, b, Numeric, (double *)NULL, (double  *)NULL);
-    cout << "Done." << endl;
-
-    for(int i =0; i<n; i++) {
-        soln(i) = x[i];
+    /**
+     * Solve Ax=b using UMFPACK. Requires LUSolver.factorize() to be called first. 'x' is returned in 'soln' reference.
+     * 'b' is specified by 'rhs' reference.
+     */
+    void LUSolver::solve(vector_type const & rhs, vector_type& soln) {
+        cout << "Solving Ax = b.." << endl;
+        umfpack_di_solve (UMFPACK_A, Ap, Ai, Ax, soln.data(), rhs.data(), Numeric, (double *)NULL, (double  *)NULL);
+        cout << "Done." << endl;
     }
-}
 
-/**
- * Returns a reference to the matrix A.
- */
-Array<double, 2> & LUSolver::get_A() {
-    return *A;
-}
+    /**
+     * Returns a reference to the matrix A.
+     */
+    const matrix_type& LUSolver::get_A() const {
+        return *A;
+    }
 
-LUSolver::~LUSolver() {
-    if (Triplet.row != nullptr) delete[] Triplet.row;
-    if (Triplet.col != nullptr) delete[] Triplet.col;
-    if (Triplet.val != nullptr) delete[] Triplet.val;
-    if (Numeric != nullptr) umfpack_di_free_numeric (&Numeric);
-    if (Symbolic != nullptr) umfpack_di_free_symbolic (&Symbolic);
-}
+    LUSolver::~LUSolver() {
+        delete[] Ap; Ap = nullptr;
+        delete[] Ai; Ai = nullptr;
+        delete[] Ax; Ax = nullptr;
+        delete[] Map; Map = nullptr;
+        if (Numeric) umfpack_di_free_numeric (&Numeric); 
+        Numeric = nullptr;
+        if (Symbolic) umfpack_di_free_symbolic (&Symbolic);
+        Symbolic = nullptr;
+    }
+} // namespace blitzdg

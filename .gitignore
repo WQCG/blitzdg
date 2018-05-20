@@ -1,3 +1,5 @@
+*.dat
+*.token
 *.tar.gz
 bin/
 lib/
@@ -10,6 +12,7 @@ doxygen/
 *.ps.gz
 *.zip
 *.json
+*.stackdump
 /include/blitz
 /include/boost/
 /include/metis.h

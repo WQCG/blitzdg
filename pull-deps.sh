@@ -1,4 +1,7 @@
 #!/bin/bash
+# Copyright (C) 2017-2018  Waterloo Quantitative Consulting Group, Inc.
+# See COPYING and LICENSE files at project root for more details.
+
 unameOut="$(uname -s)"
 echo "uname is: $unameOut"
 case "${unameOut}" in
@@ -16,6 +19,22 @@ if [ "$machine" == "Linux" ] ; then
     ln -s /usr/lib/x86_64-linux-gnu/libumfpack.so.5.7.1 /usr/lib/x86_64-linux-gnu/libumfpack.so
     apt-get -y install libmetis-dev libmetis-doc
     apt-get -y install libboost-dbg libboost-dev libboost-doc
+
+	# pull in doxygen (latest) for travis - should flag this on only for travis and not for all devs.
+    # get doxygen deps
+    apt-get -y install graphviz texlive-latex-base ghostscript
+
+    # build and install doxygen from source.
+	apt-get -y install cmake
+	git clone https://github.com/doxygen/doxygen.git doxrepo
+	mkdir -p doxrepo/build
+	cd doxrepo/build
+	export CC=/usr/bin/gcc
+	cmake -G "Unix Makefiles" ..
+	make
+	make install
+	cd ../..
+    rm -rf doxrepo
 fi
 
 if [ "$machine" == "Mac" ] ; then

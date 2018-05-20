@@ -1,72 +1,61 @@
-// Copyright (C) 2017-2018  Derek Steinmoeller. 
-// See COPYING and LICENSE files at project root for more details.  
+// Copyright (C) 2017-2018  Waterloo Quantitative Consulting Group, Inc.
+// See COPYING and LICENSE files at project root for more details.
 
-#include <DirectSolver.hpp>
+#include "DirectSolver.hpp"
 #include <blitz/array.h>
 
-using namespace blitz;
+using blitz::firstIndex;
+using blitz::secondIndex;
 
-/**
- * Constructor. Takes a reference to a SparseMatrixConverter.
- */
-DirectSolver::DirectSolver(SparseMatrixConverter const & _matrixConverter) {
-    MatrixConverter = _matrixConverter;
-}
+namespace blitzdg {
+    extern "C" {
+        void dsgesv_( int* n, int* nrhs, double* a, int* lda,
+                    int* ipiv, double* b, int* ldb, double* x, int* ldx, 
+                    double* work, float* swork, int* iter, int* info );
+    }
 
-extern "C" {
-    void dsgesv_( int* n, int* nrhs, double* a, int* lda,
-                int* ipiv, double* b, int* ldb, double* x, int* ldx, 
-                double* work, float* swork, int* iter, int* info );
-}
+    void DirectSolver::solve(const matrix_type& A, const matrix_type& B, matrix_type& X) const {
 
-/**
- * Solve A*X=B using LAPACK. Here, B and X are allowed to have multiple columns.
- */
-void DirectSolver::solve(const Array<double,2> & A, const Array<double, 2> & B, Array<double, 2> & X) {
+        firstIndex ii;
+        secondIndex jj;
 
-    firstIndex ii;
-    secondIndex jj;
+        index_type sz = A.rows();
+        index_type Nrhs = B.cols();
 
-    int sz = A.rows();
-    int Nrhs = B.cols();
+        index_type dim = sz*Nrhs;
 
-    int dim = sz*Nrhs;
+        index_type lda = sz;
+        index_type ldb = sz; 
+        index_type ldx = sz;
 
-    int lda = sz;
-    int ldb = sz; 
-    int ldx = sz;
+        index_type ipiv[sz];
 
-    int ipiv[sz];
+        real_type work[sz*Nrhs];
+        float swork[sz*(sz+Nrhs)];
 
-    double work[sz*Nrhs];
-    float swork[sz*(sz+Nrhs)];
+        index_type info;
+        index_type iter;
 
-    int info;
-    int iter;
+        real_type Apod[sz*lda];
+        real_type Bpod[dim];
+        real_type Xpod[dim];
 
-    double Apod[sz*lda];
-    double Bpod[dim];
-    double Xpod[dim];
+        matrix_type Atrans(sz, sz);
+        matrix_type Btrans(Nrhs, sz);
+        matrix_type Xtrans(Nrhs, sz);
 
-    Array<double, 2> Atrans(sz, sz);
-    Array<double, 2> Btrans(Nrhs, sz);
-    Array<double, 2> Xtrans(Nrhs, sz);
+        Atrans = A(jj,ii);
+        Btrans = B(jj,ii);
 
-    Atrans = A(jj,ii);
-    Btrans = B(jj,ii);
+        MatrixConverter.fullToPodArray(Atrans, Apod);
+        MatrixConverter.fullToPodArray(Btrans, Bpod);
 
-    MatrixConverter.fullToPodArray(Atrans, Apod);
-    MatrixConverter.fullToPodArray(Btrans, Bpod);
+        dsgesv_(&sz, &Nrhs, Apod, &lda,
+                ipiv, Bpod, &ldb, Xpod, &ldx, 
+                work, swork, &iter, &info);
 
-    dsgesv_(&sz, &Nrhs, Apod, &lda,
-             ipiv, Bpod, &ldb, Xpod, &ldx, 
-             work, swork, &iter, &info);
+        MatrixConverter.podArrayToFull(Xpod, Xtrans);
 
-    MatrixConverter.podArrayToFull(Xpod, Xtrans);
-
-    X = Xtrans(jj,ii);
-}
-
-DirectSolver::~DirectSolver() {
-
-}
+        X = Xtrans(jj,ii);
+    }
+} // namespace blitzdg

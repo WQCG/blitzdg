@@ -4,7 +4,7 @@ blitzdg is an open-source project aiming to implement parallel discontinuous Gal
 
 [![Build Status](https://travis-ci.org/dsteinmo/blitzdg.svg?branch=master)](https://travis-ci.org/WQCG/blitzdg)  [![Coverage Status](https://coveralls.io/repos/github/WQCG/blitzdg/badge.svg?branch=master)](https://coveralls.io/github/WQCG/blitzdg?branch=master) [![Windows Build Status](https://ci.appveyor.com/api/projects/status/pmx725yhsrnq3thu?svg=true)](https://ci.appveyor.com/project/WQCG/blitzdg)
 
-## Running
+## Getting Started
 
 Build and development support has broadened from linux only to Mac OSX and Windows systems. Tested with GNU make (written to be cross-platform) and g++ on linux/MinGW64/Mac OSX Sierra.
 
@@ -46,13 +46,20 @@ We accept pull requests.
 
 If you add code, please write tests using the igloo testing framework that is included as a project dependency.
 
+Interested developers should consult the [guidelines for contributing](https://github.com/WQCG/blitzdg/blob/master/CONTRIBUTING.md "Contributing Markdown").
+
 ## Maintainer
 
 * [Derek Steinmoeller](https://github.com/dsteinmo)
 
+## Lead Developers
+
+* [Derek Steinmoeller](https://github.com/dsteinmo)
+* [Killian Miller](https://github.com/k7miller)
+
 ## Documentation
 
-[Here](https://dsteinmo.github.io/blitzdg "blitzdg Documentation")
+[Here](https://wqcg.github.io/blitzdg "blitzdg Documentation")
 
 ## License
 

@@ -47,9 +47,13 @@ test: bin/test
 
 get-deps:
 	@sudo /bin/bash pull-deps.sh
+	@sudo apt-get -y install graphviz texlive-generic-recommended
 
 docs:
+	@echo DOXYGEN VERSION:
+	@doxygen -v
+	@doxygen -u doxygen.conf
+	@sed -ir "s,DOT_PATH.*=,DOT_PATH               = $$(which dot)," doxygen.conf
+	@cat doxygen.conf | grep DOT_PATH
 	@doxygen doxygen.conf
-	@cp -r doxygen/html/* docs/.
-
 .PHONY: clean docs

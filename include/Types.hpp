@@ -1,3 +1,10 @@
+// Copyright (C) 2017-2018  Waterloo Quantitative Consulting Group, Inc.
+// See COPYING and LICENSE files at project root for more details.
+
+/**
+ * @file Types.hpp
+ * @brief Defines the basic types used throughout this project.
+ */
 #pragma once
 #include <blitz/array.h>
 

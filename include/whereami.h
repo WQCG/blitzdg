@@ -1,6 +1,12 @@
 // (‑●‑●)> released under the WTFPL v2 license, by Gregory Pakosz (@gpakosz)
 // https://github.com/gpakosz/whereami
 
+/**
+ * @file whereami.h
+ * @brief Off-the-shelf C library for determing the location of a C binary at runtime.
+ * See https://github.com/gpakosz/whereami for more information.
+ */
+
 #ifndef WHEREAMI_H
 #define WHEREAMI_H
 
