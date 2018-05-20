@@ -14,9 +14,6 @@ namespace blitzdg {
                     double* work, float* swork, int* iter, int* info );
     }
 
-    /**
-     * Solve A*X=B using LAPACK. Here, B and X are allowed to have multiple columns.
-     */
     void DirectSolver::solve(const matrix_type& A, const matrix_type& B, matrix_type& X) const {
 
         firstIndex ii;

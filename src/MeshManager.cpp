@@ -75,9 +75,6 @@ namespace blitzdg {
         }
     } // anonymous namespace
 
-    /**
-     * Constructor.
-     */
     MeshManager::MeshManager() 
         : Vert{ nullptr }, EToV{ nullptr }, Dim{ 0 },
         NumVerts{ 0 }, ElementType{}, NumElements{ 0 },
@@ -85,24 +82,10 @@ namespace blitzdg {
         VertexPartitionMap{ nullptr }
     {}
 
-    /**
-     * Convert (row,col) index to integer index into a contiguous block of memory.
-     */
-    index_type MeshManager::get_Index(index_type row, index_type col, index_type numCols) {
-        return col + row*numCols;
-    }
-
-    /**
-     * Read a .msh file that was generated with Gmsh.
-     */
     void MeshManager::readMesh(const string& gmshInputFile) {
         throw("Not implemented!");
     }
 
-    /**
-     * Partition a mesh into numPartitions partitions using METIS. Results can be obtained by calling
-     * MeshManager.get_ElementPartitionMap() and MeshManager.get_VertexPartitionMap().
-     */
     void MeshManager::partitionMesh(index_type numPartitions) {
         index_type * eind = EToV;
         index_type * eptr = new index_type[NumElements+1];
@@ -168,9 +151,6 @@ namespace blitzdg {
         delete[] metisOptions;
     }
 
-    /**
-     * Read a list of vertices from a file. x-, y-, (and z-) are coordinates delimited by spaces, e.g., 0.5 1.0.
-     */
     void MeshManager::readVertices(const string& vertFile) {
         index_type dims[2];
         readCsvFile<real_type>(vertFile, CsvDelimiters, &Vert, dims);
@@ -178,9 +158,6 @@ namespace blitzdg {
         Dim = dims[1];
     }
 
-    /**
-     * Read a list of elments from a file. Vertex numbers are written in a row and delimited by spaces, e.g., 1 2 3 4
-     */
     void MeshManager::readElements(const string& E2VFile) {
         index_type dims[2];
         readCsvFile<index_type>(E2VFile, CsvDelimiters, &EToV, dims);
@@ -188,72 +165,42 @@ namespace blitzdg {
         ElementType = dims[1];
     }
 
-    /**
-     * Print the list of vertices to stdout.
-     */
     void MeshManager::printVertices() const {
         printArray<real_type>(Vert, NumVerts, Dim);
     }
 
-    /**
-     * Print the list of elements to stdout.
-     */
     void MeshManager::printElements() const {
         printArray<index_type>(EToV, NumElements, ElementType);
     }
 
-    /**
-     * Returns a reference to the list of vertices, a contiguous block of type real_type.
-     */
     const real_type* MeshManager::get_Vertices() const {
         return Vert;
     }
 
-    /**
-     * Returns the dimension of the vertex data. Usuallly will be 2 or 3.
-     */
     index_type MeshManager::get_Dim() const {
         return Dim;
     }
 
-    /**
-     * Returns the number of vertices.
-     */
     index_type MeshManager::get_NumVerts() const {
         return NumVerts;
     }
 
-    /**
-     * Returns the number of elements.
-     */
     index_type MeshManager::get_NumElements() const {
         return NumElements;
     }
 
-    /**
-     * Returns the type of element. 3 => triangles, 4 => quadrilaterals, etc.
-     */
     index_type MeshManager::get_ElementType() const {
         return ElementType;
     }
 
-    /**
-     * Returns a reference to the list of elements, a contiguous block of type index_type.
-     */
     const index_type* MeshManager::get_Elements() const {
         return EToV;
     }
 
-    /**
-     * Returns a reference to the element partition map, an array of type index_type.
-     */
     const index_type* MeshManager::get_ElementPartitionMap() const {
         return ElementPartitionMap;
     }
 
-    /**
-     * Returns a reference to the vertex partition map, an array of type index_type.
-     */
     const index_type* MeshManager::get_VertexPartitionMap() const {
         return VertexPartitionMap;
     }

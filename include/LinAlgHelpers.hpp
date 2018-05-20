@@ -12,6 +12,7 @@ namespace blitzdg {
     /**
      * Given Cartesian coordinates \f$(a,b)\f$, computes the
      * parameters \f$c,\,s\f$ of the associated Givens rotation.
+     * Calls the BLAS routine DROTG.
      * 
      * The Givens rotation \f$G(c,s)\f$ is defined so that
      * \f{eqnarray*}{
@@ -26,7 +27,7 @@ namespace blitzdg {
      * On output: \f$c,\,s\f$ are the Givens rotation parameters,
      * \f$a = r\f$, and \f$b = 0\f$.
      */
-    void DROTG(real_type& a, real_type& b, real_type& c, real_type& s);
+    void drotg(real_type& a, real_type& b, real_type& c, real_type& s);
 
     /**
      * Applies a Givens rotation \f$G(c,s)\f$ to the tuple \f$(x,y)\f$.

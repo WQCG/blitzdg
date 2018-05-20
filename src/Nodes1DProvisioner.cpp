@@ -19,10 +19,6 @@ namespace blitzdg {
     const index_type Nodes1DProvisioner::NumFaces = 2;
     const real_type Nodes1DProvisioner::NodeTol = 1.e-5;
 
-    /**
-     * Constructor. Takes order of polynomials, number of elements, and dimensions of the domain.
-     * Assumes equally-spaced elements.
-     */
     Nodes1DProvisioner::Nodes1DProvisioner(index_type _NOrder, index_type _NumElements, real_type _xmin, real_type _xmax) 
         : Min_x{ _xmin }, Max_x{ _xmax }, NumElements{ _NumElements }, NOrder{ _NOrder },
         NumLocalPoints{ NOrder + 1 }, mapI{ 0 }, mapO{ NumFacePoints*NumFaces*NumElements - 1 },
@@ -45,9 +41,6 @@ namespace blitzdg {
         MatrixConverter{}, EigSolver{}, LinSolver{}
     {}
 
-    /**
-     * Build nodes and geometric factors for all elements.
-     */
     void Nodes1DProvisioner::buildNodes() {
         const real_type alpha = 0.0;
         const real_type beta = 0.0;
@@ -82,9 +75,6 @@ namespace blitzdg {
         buildNormals();
     }
 
-    /**
-     * Build unit normals at element faces. Trivial in 1D.
-     */
     void Nodes1DProvisioner::buildNormals() {
         matrix_type & nxref = *nx;
 
@@ -98,9 +88,6 @@ namespace blitzdg {
         }
     }
 
-    /**
-     * Build volume to surface maps.
-     */
     void Nodes1DProvisioner::buildMaps() {
         firstIndex ii;
         secondIndex jj;
@@ -157,9 +144,6 @@ namespace blitzdg {
         delete[] x;
     }
 
-    /**
-     *  Build Fmask. Mask that when applied to volume nodes gives the surface nodes.
-     */
     void Nodes1DProvisioner::buildFaceMask() {
         matrix_type & x = *xGrid;
         matrix_type & Fxref = *Fx;
@@ -174,10 +158,6 @@ namespace blitzdg {
         }
     }
 
-    /**
-     * Build global connectivity matrices (EToE, EToF) for 1D grid
-     * based using EToV (Element-to-Vertex) matrix.
-     */
     void Nodes1DProvisioner::buildConnectivityMatrices() {
         firstIndex ii;
         secondIndex jj;
@@ -284,9 +264,6 @@ namespace blitzdg {
         L = sum(Vref(ii,kk)*temp(kk,jj), kk);
     }
 
-    /**
-     * Compute Jacobian (determinant) J and geometric factor rx (dr/dx), and Fscale using nodes and differentiation matrix.
-     */
     void Nodes1DProvisioner::computeJacobian() {
         firstIndex ii;
         secondIndex jj;
@@ -309,26 +286,18 @@ namespace blitzdg {
         }
     }
 
-    /**
-     * Compute Vandermonde matrix which maps modal coefficients to nodal values.
-     */
     void Nodes1DProvisioner::buildVandermondeMatrix() {
         V = new matrix_type(NOrder+1, NOrder+1);
 
         matrix_type & Vref = *V;
 
-        for (index_type j=1; j <= NOrder+1; j++) {
-            vector_type p(NOrder+1);
-            computeJacobiPolynomial(*rGrid, 0.0, 0.0, j-1, p);
-            Vref(Range::all(), j-1) = p;
+        vector_type p(NOrder+1);
+        for (index_type j=0; j <= NOrder; j++) {
+            computeJacobiPolynomial(*rGrid, 0.0, 0.0, j, p);
+            Vref(Range::all(), j) = p;
         }
     }
 
-    
-
-    /**
-     * Build differentiation matrix Dr on the standard element.
-     */
     void Nodes1DProvisioner::buildDr() {
         firstIndex ii;
         secondIndex jj;
@@ -357,86 +326,50 @@ namespace blitzdg {
         Drref = Drtrans(jj, ii);
     } 
 
-    /**
-     * Get number of elements.
-     */
     index_type Nodes1DProvisioner::get_NumElements() const {
         return NumElements;
     }
 
-    /**
-     * Get reference to physical x-grid.
-     */
     const matrix_type & Nodes1DProvisioner::get_xGrid() const {
         return *xGrid;
     }
 
-    /**
-     * Get reference to r-grid on the standard element.
-     */
     const vector_type & Nodes1DProvisioner::get_rGrid() const {
         return *rGrid;
     }
 
-    /**
-     * Get reference to Element-to-Vertex connectivity table.
-     */
     const index_matrix_type & Nodes1DProvisioner::get_EToV() const {
         return *EToV;
     }
 
-    /**
-     * Get reference to 1D Lifting Operator.
-     */
     const matrix_type & Nodes1DProvisioner::get_Lift() const {
         return *Lift;
     }
 
-    /**
-     * Get reference to Element-to-Element connectivity table.
-     */
     const index_matrix_type & Nodes1DProvisioner::get_EToE() const {
         return *EToE;
     }
 
-    /**
-     * Get reference to Element-to-Face connectivity table.
-     */
     const index_matrix_type & Nodes1DProvisioner::get_EToF() const {
         return *EToF;
     }
 
-    /**
-     * Get reference to differentiation matrix Dr on the standard element.
-     */
     const matrix_type & Nodes1DProvisioner::get_Dr() const {
         return *Dr;
     }
 
-    /**
-     * Get reference to generalized Vandermonde matrix V.
-     */
     const matrix_type & Nodes1DProvisioner::get_V() const {
         return *V;
     }
 
-    /**
-     * Get reference to Jacobian scaling array J.
-     */
     const matrix_type & Nodes1DProvisioner::get_J() const {
         return *J;
     }
 
-    /**
-     * Get reference to geometric scaling array rx.
-     */
     const matrix_type & Nodes1DProvisioner::get_rx() const {
         return *rx;
     }
 
-    /**
-     * Get reference to normals array nx.
-     */
     const matrix_type & Nodes1DProvisioner::get_nx() const {
         return *nx;
     } 
@@ -445,73 +378,42 @@ namespace blitzdg {
         return NumLocalPoints;
     }
 
-    /**
-     * Get the faces-only x-grid.
-     */
     const matrix_type & Nodes1DProvisioner::get_Fx() const {
         return *Fx;
     }
-
-    /**
-     * Get the Face-scaling factor (Inverse of Jacobian at Face nodes).
-     */
 
     const matrix_type & Nodes1DProvisioner::get_Fscale() const {
         return *Fscale;
     }
 
-    /**
-     * Get the index-mask for the face nodes.
-     */
     const index_vector_type & Nodes1DProvisioner::get_Fmask() const {
         return *Fmask;
     }
 
-    /**
-     * Get the volume to surface map, 'minus' traces.
-     */
     const index_vector_type & Nodes1DProvisioner::get_vmapM() const {
         return *vmapM;
     }
 
-    /**
-     * Get the volume to surface map, 'plus' traces.
-     */
     const index_vector_type & Nodes1DProvisioner::get_vmapP() const {
         return *vmapP;
     }
 
-    /**
-     * Get the surface index of the inflow boundary.
-     */
     index_type Nodes1DProvisioner::get_mapI() const {
         return mapI;
     }
 
-    /**
-     * Get the surface index of the outflow boundary.
-     */
     index_type Nodes1DProvisioner::get_mapO() const {
         return mapO;
     }
 
-    /**
-     * Get the volume index of the inflow boundary.
-     */
     index_type Nodes1DProvisioner::get_vmapI() const {
         return vmapI;
     }
 
-    /**
-     * Get the volume index of the outflow boundary.
-     */
     index_type Nodes1DProvisioner::get_vmapO() const {
         return vmapO;
     }
 
-    /**
-     * Destructor.
-     */
     Nodes1DProvisioner::~Nodes1DProvisioner() {
         delete V; V = nullptr;
         delete Dr; Dr = nullptr;
@@ -531,9 +433,6 @@ namespace blitzdg {
         delete vmapP; vmapP = nullptr;
     }
 
-    /**  Compute the Nth Jacobi polynomial of type (alpha,beta) > -1 ( != -0.5)
-     *   and weights, w, associated with the Jacobi polynomial at the points x.
-     */
     void Nodes1DProvisioner::computeJacobiPolynomial(vector_type const & x, real_type alpha, real_type beta, index_type N, vector_type & p) const {
         Range all = Range::all();
         index_type Np = (x.length())(0);
@@ -569,9 +468,6 @@ namespace blitzdg {
         p = pStorage(N, all);
     }
 
-    /**  Compute the Nth order Gauss quadrature points, x,
-     *   and weights, w, associated with the Jacobi polynomial, of type (alpha,beta) > -1 ( != -0.5).
-     */
     void Nodes1DProvisioner::computeJacobiQuadWeights(real_type alpha, real_type beta, index_type N, vector_type& x, vector_type& w) const {
 
         if ( N == 0) {
@@ -616,9 +512,6 @@ namespace blitzdg {
         w = (v1*v1)*gamma0;
     }
 
-    /**  Compute the Nth order Gauss Lobatto quadrature points, x,
-     *  associated with the Jacobi polynomial, of type (alpha,beta) > -1 ( != -0.5).
-     */
     void Nodes1DProvisioner::computeGaussLobottoPoints(real_type alpha, real_type beta, index_type N, vector_type& x) const {
         if (N==1) {
             x(0) = -1.0;

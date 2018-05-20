@@ -13,10 +13,6 @@ namespace blitzdg {
                     double* w, double* work, int* lwork, int* iwork, int* liwork, int* info );
     }
 
-    /**
-     * Solve Ax=λx using LAPACK. Eigenvalues are stored in reference 'eigenvalues' and eigenvectors are stored column-wise
-     * in reference 'eigenvectors.'
-     */
     void EigenSolver::solve(const matrix_type& A, vector_type& eigenvalues, matrix_type& eigenvectors) const {
         index_type sz = A.rows();
         index_type lda = sz;

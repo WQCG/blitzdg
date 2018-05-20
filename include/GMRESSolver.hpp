@@ -322,7 +322,7 @@ namespace blitzdg {
                 }
                 
                 // compute the ith Givens rotation and apply it to column i of H
-                DROTG(H(i, i), H(i + 1, i), givens[i].first, givens[i].second);
+                drotg(H(i, i), H(i + 1, i), givens[i].first, givens[i].second);
                 
                 // check if H is singular, i.e., H(i,i) = 0
                 if (H(i, i) == real_type(0)) {
