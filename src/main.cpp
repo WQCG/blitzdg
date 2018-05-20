@@ -39,7 +39,6 @@ using std::setw;
 using std::string;
 using std::stringstream;
 using std::cout;
-using std::isnan;
 
 namespace blitzdg {
 	/**
@@ -224,7 +223,7 @@ int main(int argc, char **argv) {
 			u += LSERK4::rk4b[i]*resRK;
 		}
 
-		if ( fabs(max(u)) > 1e8  || isnan(fabs(max(u))) ) {
+		if ( fabs(max(u)) > 1e8  || std::isnan(fabs(max(u))) ) {
 			throw std::runtime_error("We done blew up!");
 		}
 
