@@ -77,8 +77,6 @@ namespace blitzdg {
 		// boundary indices.
 		index_type mapO = nodes1D.get_mapO();
 		index_type mapI = nodes1D.get_mapI();
-		index_type vmapI = nodes1D.get_vmapI();
-
 
 		index_type numFaces = nodes1D.NumFaces;
 		index_type Nfp = nodes1D.NumFacePoints;
@@ -87,34 +85,49 @@ namespace blitzdg {
 
 		real_type alpha = 0;   // 1 == central flux, 0 == upwind flux.
 
-		matrix_type du(numFaces*Nfp*K);
-		matrix_type uM(numFaces*Nfp*K);
-		matrix_type uP(numFaces*Nfp*K);
+		vector_type du(numFaces*Nfp*K);
+		vector_type uM(numFaces*Nfp*K);
+		vector_type uP(numFaces*Nfp*K);
+		vector_type nxVec(numFaces*Nfp*K);
 
 		du = 0.*ii;
 		uM = 0.*ii;
 		uP = 0.*ii;
+		nxVec = 0.*ii;
+
+
+		matrix_type nxCol(numFaces*Nfp,K, ColumnMajorArray<2>());
+		nxCol = nx;		
 
 		matrix_type uCol(Np, K, ColumnMajorArray<2>());
 		uCol = u;
 
-		matrix_type nxCol(Np,K, ColumnMajorArray<2>());
-		nxCol = nx;
-
-		for (index_type i=0; i < numFaces*Nfp*K; i++)  {
-			uM(i) = uCol(vmapM(i));
-			uP(i) = uCol(vmapP(i));
+		index_type count = 0;
+		for( index_type k=0; k < K; k++) {
+			for ( index_type f=0; f < Nfp*numFaces; f++) {
+				nxVec(count) = nxCol(f,k);
+				uM(count) = uCol(vmapM(count));
+				uP(count) = uCol(vmapP(count));
+				count++;
+			}
 		}
 
 		// BC's
-		uP(mapO) = uM(mapO);
-		uP(mapI) = -uM(mapI);
+		uP(mapO) = uM(mapO); // outflow - exit stage left.
+		uP(mapI) = 0;        // inflow - assumed 0 (or use exact solution at x=0).
 				
 		// Compute jump in flux:
-		du = (uM - uP)*0.5*(c*nxCol - (1-alpha)*fabs(c*nxCol)); 
+		du = (uM - uP)*0.5*(c*nxVec - (1-alpha)*fabs(c*nxVec)); 
 
-		matrix_type duMat(Nfp*numFaces, K, ColumnMajorArray<2>());
-		duMat = du;
+		matrix_type duMat(Nfp*numFaces, K);
+
+		count = 0;
+		for( index_type k=0; k < K; k++) {
+			for ( index_type f=0; f < Nfp*numFaces; f++) {
+				duMat(f,k) = du(count);
+				count++;
+			}
+		}
 
 		// Assumes PDE has been left-multiplied by local inverse mass matrix, so all we have left
 		// is the differentiation matrix contribution, and the surface integral
@@ -146,13 +159,13 @@ int main(int argc, char **argv) {
 	const real_type xmax = 1.0;
 	const real_type c = 0.1;
 
-	const real_type finalTime = 10.0;
+	const real_type finalTime = 20.0;
 	real_type t = 0.0;
 
 	// Numerical parameters:
 	const index_type N = 4;
-	const index_type K = 150;
-	const real_type CFL = 0.25;
+	const index_type K = 15;
+	const real_type CFL = 0.025;
 
 	// Build dependencies.
 	Nodes1DProvisioner nodes1DProvisioner(N, K, xmin, xmax);
