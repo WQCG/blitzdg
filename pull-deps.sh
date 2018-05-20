@@ -22,7 +22,7 @@ if [ "$machine" == "Linux" ] ; then
 
 	# pull in doxygen (latest) for travis - should flag this on only for travis and not for all devs.
     # get doxygen deps
-    apt-get -y install graphviz texlive-latex-base
+    apt-get -y install graphviz texlive-latex-base ghostscript
 
     # build and install doxygen from source.
 	apt-get -y install cmake
