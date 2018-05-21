@@ -2,15 +2,20 @@ CXX := $(or $(CXX), g++)
 SRCDIR := src
 BUILDDIR := build
 BINDIR := bin
+SRCEXT := cpp
 TARGET := $(BINDIR)/advec1d
 TESTTARGET := $(BINDIR)/test
 
-SRCEXT := cpp
-SOURCES := $(wildcard $(SRCDIR)/*.$(SRCEXT))
-SOURCES += $(wildcard $(SRCDIR)/**/*.$(SRCEXT))
-ALLOBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
-OBJECTS := $(patsubst build/test/tests.o,,$(ALLOBJECTS))
-TESTOBJECTS := $(patsubst build/advec1d/main.o,,$(ALLOBJECTS))
+TARGETS := $(patsubst src/,,$(patsubst src/%/,bin/%,$(sort $(dir $(wildcard src/**/)))))
+
+COMMONSOURCES := $(wildcard $(SRCDIR)/*.$(SRCEXT))
+COMMONOBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(COMMONSOURCES:.$(SRCEXT)=.o))
+
+SPECIFICSOURCES := $(wildcard $(SRCDIR)/**/*.$(SRCEXT))
+SPECIFICOBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SPECIFICSOURCES:.$(SRCEXT)=.o))
+
+ALLOBJECTS := $(COMMONOBJECTS)
+ALLOBJECTS += $(SPECIFICOBJECTS)
 
 CFLAGS := -g -Wall -std=c++0x -fprofile-arcs -ftest-coverage
 LINKERFLAGS := -fprofile-arcs
@@ -22,15 +27,12 @@ ifeq ($(OS), Windows_NT)
 	LIB += $(EXPLICITLIBS)
 endif
 
-$(TARGET): $(OBJECTS) $(TESTTARGET)
-	@mkdir -p bin
-	@echo " Linking main binary..."
-	@echo " $(CXX) $(LINKERFLAGS) $(OBJECTS) -o $(TARGET) $(LIB)"; $(CXX) $(LINKERFLAGS) $(OBJECTS) -o $(TARGET) $(LIB)
+all: $(TARGETS)
 
-$(TESTTARGET): $(TESTOBJECTS)
+$(TARGETS): $(ALLOBJECTS)
 	@mkdir -p bin
-	@echo " Linking tests..."
-	@echo " $(CXX) $(LINKERFLAGS) $(TESTOBJECTS) -o $(TESTTARGET) $(LIB)"; $(CXX) $(LINKERFLAGS) $(TESTOBJECTS) -o $(TESTTARGET) $(LIB)
+	@echo " Linking $@..."
+	@echo " $(CXX) $(LINKERFLAGS) $(COMMONOBJECTS) $(wildcard $(subst bin/,,build/$@/*.o)) -o $@ $(LIB)"; $(CXX) $(LINKERFLAGS) $(COMMONOBJECTS) $(wildcard $(subst bin/,,build/$@/*.o)) -o $@ $(LIB)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)/test
