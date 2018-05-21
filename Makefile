@@ -1,16 +1,21 @@
-CC := $(or $(CXX), g++)
-SRCDIR := ./src
+CXX := $(or $(CXX), g++)
+SRCDIR := src
 BUILDDIR := build
 BINDIR := bin
-TARGET := bin/blitzdg
-TESTTARGET := bin/test
-
 SRCEXT := cpp
-SOURCES := $(wildcard $(SRCDIR)/*.cpp)
-SOURCES += $(wildcard $(SRCDIR)/test/*.cpp)
-ALLOBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
-OBJECTS := $(patsubst build/test/tests.o,,$(ALLOBJECTS))
-TESTOBJECTS := $(patsubst build/main.o,,$(ALLOBJECTS)) 
+TARGET := $(BINDIR)/advec1d
+TESTTARGET := $(BINDIR)/test
+
+TARGETS := $(patsubst src/,,$(patsubst src/%/,bin/%,$(sort $(dir $(wildcard src/**/)))))
+
+COMMONSOURCES := $(wildcard $(SRCDIR)/*.$(SRCEXT))
+COMMONOBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(COMMONSOURCES:.$(SRCEXT)=.o))
+
+SPECIFICSOURCES := $(wildcard $(SRCDIR)/**/*.$(SRCEXT))
+SPECIFICOBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SPECIFICSOURCES:.$(SRCEXT)=.o))
+
+ALLOBJECTS := $(COMMONOBJECTS)
+ALLOBJECTS += $(SPECIFICOBJECTS)
 
 CFLAGS := -g -Wall -std=c++0x -fprofile-arcs -ftest-coverage
 LINKERFLAGS := -fprofile-arcs
@@ -22,21 +27,18 @@ ifeq ($(OS), Windows_NT)
 	LIB += $(EXPLICITLIBS)
 endif
 
-$(TARGET): $(OBJECTS) $(TESTTARGET)
-	@echo " Linking main binary..."
-	@mkdir -p bin
-	@echo " $(CC) $(LINKERFLAGS) $(OBJECTS) -o $(TARGET) $(LIB)"; $(CC) $(LINKERFLAGS) $(OBJECTS) -o $(TARGET) $(LIB)
+all: $(TARGETS)
 
-$(TESTTARGET): $(TESTOBJECTS)
+$(TARGETS): $(ALLOBJECTS)
 	@mkdir -p bin
-	@echo " Linking tests..."
-	@echo " $(CC) $(LINKERFLAGS) $(TESTOBJECTS) -o $(TESTTARGET) $(LIB)"; $(CC) $(LINKERFLAGS) $(TESTOBJECTS) -o $(TESTTARGET) $(LIB)
+	@echo " Linking $@..."
+	@echo " $(CXX) $(LINKERFLAGS) $(COMMONOBJECTS) $(wildcard $(subst bin/,,build/$@/*.o)) -o $@ $(LIB)"; $(CXX) $(LINKERFLAGS) $(COMMONOBJECTS) $(wildcard $(subst bin/,,build/$@/*.o)) -o $@ $(LIB)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
-	@mkdir -p $(BUILDDIR)
 	@mkdir -p $(BUILDDIR)/test
+	@mkdir -p $(BUILDDIR)/advec1d
 	@echo " Building...";
-	@echo " $(CC) $(CFLAGS) $(EXTRACFLAGS) $(INC) -c -o $@ $<"; $(CC) $(CFLAGS) $(EXTRACFLAGS) $(INC) -c -o $@ $<
+	@echo " $(CXX) $(CFLAGS) $(EXTRACFLAGS) $(INC) -c -o $@ $<"; $(CXX) $(CFLAGS) $(EXTRACFLAGS) $(INC) -c -o $@ $<
 
 clean:
 	@echo " Cleaning...";
