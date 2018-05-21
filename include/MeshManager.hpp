@@ -56,10 +56,10 @@ namespace blitzdg {
        * are delimited by spaces within a row. For example, the following
        * represents a valid file:
        * @verbatim
-       * 0.5 1.0
-       * 0.2 3.0
-       * 0.1 1.0
-       * @endverbatim
+         0.5 1.0
+         0.2 3.0
+         0.1 1.0
+         @endverbatim
        * @note All rows in the file must contain the same number of coordinates, 
        * either two or three.
        * @param[in] vertFile Full path to the vertex file.
@@ -73,10 +73,10 @@ namespace blitzdg {
        * defines an element by listing its vertex indices delimited by spaces.
        * For example, the following represents a valid file:
        * @verbatim
-       * 1 2 3 4
-       * 4 5 6 7
-       * 8 7 9 5
-       * @endverbatim
+         1 2 3 4
+         4 5 6 7
+         8 7 9 5
+         @endverbatim
        * @note The vertex indices of an element should index the vertices read
        * from the vertex file.
        * @see readVertices()
@@ -146,9 +146,8 @@ namespace blitzdg {
       /**
        * Returns a pointer to the underlying array that stores
        * the element partition map.
-       * 
-       * Has length equal to the number of elements. It contains 
-       * the processor rank of each element, which is used 
+       * The array has length equal to the number of elements. 
+       * It contains the processor rank of each element, which is used 
        * for distributed computing with MPI.
        */
       const index_type* get_ElementPartitionMap() const;
@@ -156,9 +155,8 @@ namespace blitzdg {
       /**
        * Returns a pointer to the underlying array that stores
        * the vertex partition map.
-       * 
-       * Has length equal to the number of vertices. It contains 
-       * the processor rank of each vertex, which is used 
+       * The array has length equal to the number of vertices. 
+       * It contains the processor rank of each vertex, which is used 
        * for distributed computing with MPI.
        */
       const index_type* get_VertexPartitionMap() const;

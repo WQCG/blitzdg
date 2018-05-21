@@ -35,7 +35,7 @@ namespace blitzdg {
          * @param[in] beta Jacobi polynomial parameter.
          * @param[in] N Order of the Jacobi polynomial.
          * @param[out] p Jacobi polynomial values at the points in x.
-         * @note Jacobi parameters must satisfy \f$alpha,\beta > -1\f$ and
+         * @note Jacobi parameters must satisfy \f$\alpha,\beta > -1\f$ and
          * \f$\alpha,\beta \neq -1/2\f$.
          */
         void computeJacobiPolynomial(const vector_type& x, real_type alpha, real_type beta, index_type N, vector_type& p) const;
@@ -48,7 +48,7 @@ namespace blitzdg {
          * @param[in] N Order of the quadrature rule.
          * @param[out] x Length N array of quadrature rule nodes.
          * @param[out] w Length N array of quadrature weights. 
-         * @note Jacobi parameters must satisfy \f$alpha,\beta > -1\f$ and
+         * @note Jacobi parameters must satisfy \f$\alpha,\beta > -1\f$ and
          * \f$\alpha,\beta \neq -1/2\f$.
          */
         void computeJacobiQuadWeights(real_type alpha, real_type beta, index_type N, vector_type & x, vector_type & w) const;
@@ -60,7 +60,7 @@ namespace blitzdg {
          * @param[in] beta Jacobi polynomial parameter.
          * @param[in] N Order of the quadrature rule.
          * @param[out] x Length N array of quadrature rule nodes.
-         * @note Jacobi parameters must satisfy \f$alpha,\beta > -1\f$ and
+         * @note Jacobi parameters must satisfy \f$\alpha,\beta > -1\f$ and
          * \f$\alpha,\beta \neq -1/2\f$.
          */
         void computeGaussLobottoPoints(real_type alpha, real_type beta, index_type N, vector_type & x) const;
@@ -73,7 +73,7 @@ namespace blitzdg {
          * @param[in] beta Jacobi polynomial parameter.
          * @param[in] N Order of the Jacobi polynomial.
          * @param[out] dp Jacobi polynomial first derivative values at the points in x.
-         * @note Jacobi parameters must satisfy \f$alpha,\beta > -1\f$ and
+         * @note Jacobi parameters must satisfy \f$\alpha,\beta > -1\f$ and
          * \f$\alpha,\beta \neq -1/2\f$.
          */
         void computeGradJacobi(const vector_type& x, real_type alpha, real_type beta, index_type N, vector_type& dp) const;
