@@ -1,4 +1,4 @@
-CC := $(or $(CXX), g++)
+CXX := $(or $(CXX), g++)
 SRCDIR := src
 BUILDDIR := build
 BINDIR := bin
@@ -6,8 +6,8 @@ TARGET := $(BINDIR)/advec1d
 TESTTARGET := $(BINDIR)/test
 
 SRCEXT := cpp
-SOURCES := $(wildcard $(SRCDIR)/*.cpp)
-SOURCES += $(wildcard $(SRCDIR)/**/*.cpp)
+SOURCES := $(wildcard $(SRCDIR)/*.$(SRCEXT))
+SOURCES += $(wildcard $(SRCDIR)/**/*.$(SRCEXT))
 ALLOBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 OBJECTS := $(patsubst build/test/tests.o,,$(ALLOBJECTS))
 TESTOBJECTS := $(patsubst build/advec1d/main.o,,$(ALLOBJECTS))
@@ -25,18 +25,18 @@ endif
 $(TARGET): $(OBJECTS) $(TESTTARGET)
 	@mkdir -p bin
 	@echo " Linking main binary..."
-	@echo " $(CC) $(LINKERFLAGS) $(OBJECTS) -o $(TARGET) $(LIB)"; $(CC) $(LINKERFLAGS) $(OBJECTS) -o $(TARGET) $(LIB)
+	@echo " $(CXX) $(LINKERFLAGS) $(OBJECTS) -o $(TARGET) $(LIB)"; $(CXX) $(LINKERFLAGS) $(OBJECTS) -o $(TARGET) $(LIB)
 
 $(TESTTARGET): $(TESTOBJECTS)
 	@mkdir -p bin
 	@echo " Linking tests..."
-	@echo " $(CC) $(LINKERFLAGS) $(TESTOBJECTS) -o $(TESTTARGET) $(LIB)"; $(CC) $(LINKERFLAGS) $(TESTOBJECTS) -o $(TESTTARGET) $(LIB)
+	@echo " $(CXX) $(LINKERFLAGS) $(TESTOBJECTS) -o $(TESTTARGET) $(LIB)"; $(CXX) $(LINKERFLAGS) $(TESTOBJECTS) -o $(TESTTARGET) $(LIB)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)/test
 	@mkdir -p $(BUILDDIR)/advec1d
 	@echo " Building...";
-	@echo " $(CC) $(CFLAGS) $(EXTRACFLAGS) $(INC) -c -o $@ $<"; $(CC) $(CFLAGS) $(EXTRACFLAGS) $(INC) -c -o $@ $<
+	@echo " $(CXX) $(CFLAGS) $(EXTRACFLAGS) $(INC) -c -o $@ $<"; $(CXX) $(CFLAGS) $(EXTRACFLAGS) $(INC) -c -o $@ $<
 
 clean:
 	@echo " Cleaning...";
