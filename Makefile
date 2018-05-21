@@ -1,16 +1,16 @@
 CC := $(or $(CXX), g++)
-SRCDIR := ./src
+SRCDIR := src
 BUILDDIR := build
 BINDIR := bin
-TARGET := bin/blitzdg
-TESTTARGET := bin/test
+TARGET := $(BINDIR)/advec1d
+TESTTARGET := $(BINDIR)/test
 
 SRCEXT := cpp
 SOURCES := $(wildcard $(SRCDIR)/*.cpp)
-SOURCES += $(wildcard $(SRCDIR)/test/*.cpp)
+SOURCES += $(wildcard $(SRCDIR)/**/*.cpp)
 ALLOBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 OBJECTS := $(patsubst build/test/tests.o,,$(ALLOBJECTS))
-TESTOBJECTS := $(patsubst build/main.o,,$(ALLOBJECTS)) 
+TESTOBJECTS := $(patsubst build/advec1d/main.o,,$(ALLOBJECTS))
 
 CFLAGS := -g -Wall -std=c++0x -fprofile-arcs -ftest-coverage
 LINKERFLAGS := -fprofile-arcs
@@ -23,8 +23,8 @@ ifeq ($(OS), Windows_NT)
 endif
 
 $(TARGET): $(OBJECTS) $(TESTTARGET)
-	@echo " Linking main binary..."
 	@mkdir -p bin
+	@echo " Linking main binary..."
 	@echo " $(CC) $(LINKERFLAGS) $(OBJECTS) -o $(TARGET) $(LIB)"; $(CC) $(LINKERFLAGS) $(OBJECTS) -o $(TARGET) $(LIB)
 
 $(TESTTARGET): $(TESTOBJECTS)
@@ -33,8 +33,8 @@ $(TESTTARGET): $(TESTOBJECTS)
 	@echo " $(CC) $(LINKERFLAGS) $(TESTOBJECTS) -o $(TESTTARGET) $(LIB)"; $(CC) $(LINKERFLAGS) $(TESTOBJECTS) -o $(TESTTARGET) $(LIB)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
-	@mkdir -p $(BUILDDIR)
 	@mkdir -p $(BUILDDIR)/test
+	@mkdir -p $(BUILDDIR)/advec1d
 	@echo " Building...";
 	@echo " $(CC) $(CFLAGS) $(EXTRACFLAGS) $(INC) -c -o $@ $<"; $(CC) $(CFLAGS) $(EXTRACFLAGS) $(INC) -c -o $@ $<
 
