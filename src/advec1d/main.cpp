@@ -10,21 +10,14 @@
   * Click on 'Classes' to start familarizing yourself with the API
   */
 
-#include "MeshManager.hpp"
 #include "Nodes1DProvisioner.hpp"
-#include "SparseMatrixConverter.hpp"
-#include "EigenSolver.hpp"
-#include "DirectSolver.hpp"
 #include "CsvOutputter.hpp"
 #include "Types.hpp"
 #include "Warning.hpp"
 #include "Advec1d.hpp"
+#include "LSERK4.hpp"
 #include <blitz/array.h>
 #include <cmath>
-#include <fstream>
-#include <iomanip>
-#include <iostream>
-#include <sstream>
 #include <string>
 #include <stdexcept>
 
