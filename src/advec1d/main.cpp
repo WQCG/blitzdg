@@ -15,6 +15,7 @@
 #include "SparseMatrixConverter.hpp"
 #include "EigenSolver.hpp"
 #include "DirectSolver.hpp"
+#include "CsvOutputter.hpp"
 #include "Types.hpp"
 #include "Warning.hpp"
 #include "Advec1d.hpp"
@@ -58,6 +59,7 @@ int main(int argc, char **argv) {
 
 	// Build dependencies.
 	Nodes1DProvisioner nodes1DProvisioner(N, K, xmin, xmax);
+	CsvOutputter outputter;
 
 	// Pre-processing. Build grid, and get data we need for initialization.
 	nodes1DProvisioner.buildNodes();
@@ -88,21 +90,19 @@ int main(int argc, char **argv) {
 
 	index_type count = 0;
 
-	writeFieldToFile("x.dat", x);
+	const char delim = ' ';
+	outputter.writeFieldToFile("x.dat", x, delim);
 
 	while (t < finalTime) {
-		// Toy outputting for now.
 		if ((count % 10) == 0) {
-			stringstream fileNameStrm;
-			fileNameStrm << "u" << setfill('0') << setw(7) << count << ".dat";
-
-			writeFieldToFile(fileNameStrm.str(), u);
-		}
+			string fileName = outputter.generateFileName("u", count);
+			outputter.writeFieldToFile(fileName, u, delim);
+		}	
 
 		for (index_type i=0; i < LSERK4::numStages;  i++ ) {
 
 			// Calculate Right-hand side.
-			computeRHS(u, c, nodes1DProvisioner, RHS);
+			advec1d::computeRHS(u, c, nodes1DProvisioner, RHS);
 
 			// Compute Runge-Kutta Residual.
 			resRK = LSERK4::rk4a[i]*resRK + dt*RHS;
@@ -111,8 +111,9 @@ int main(int argc, char **argv) {
 			u += LSERK4::rk4b[i]*resRK;
 		}
 
-		if ( max(fabs(u)) > 1e8  || std::isnan(max(fabs(u))) ) {
-			throw std::runtime_error("We done blew up!");
+		real_type u_inf = max(fabs(u));
+		if ( u_inf > 1e8  || std::isnan(u_inf) ) {
+			throw std::runtime_error("A numerical instability has occurred!");
 		}
 
 		t += dt;
@@ -123,94 +124,83 @@ int main(int argc, char **argv) {
 } // end main
 
 namespace blitzdg {
-	void computeRHS(const matrix_type & u, real_type c, Nodes1DProvisioner & nodes1D, matrix_type & RHS) {
-		// Blitz indices
-		firstIndex ii;
-		secondIndex jj;
-		thirdIndex kk;
-		const matrix_type& Dr = nodes1D.get_Dr();
-		const matrix_type& rx = nodes1D.get_rx();
-		const matrix_type& Lift = nodes1D.get_Lift();
-		const matrix_type& Fscale = nodes1D.get_Fscale();
-		const matrix_type& nx = nodes1D.get_nx();
+	namespace advec1d {
+		void computeRHS(const matrix_type & u, real_type c, Nodes1DProvisioner & nodes1D, matrix_type & RHS) {
+			// Blitz indices
+			firstIndex ii;
+			secondIndex jj;
+			thirdIndex kk;
+			const matrix_type& Dr = nodes1D.get_Dr();
+			const matrix_type& rx = nodes1D.get_rx();
+			const matrix_type& Lift = nodes1D.get_Lift();
+			const matrix_type& Fscale = nodes1D.get_Fscale();
+			const matrix_type& nx = nodes1D.get_nx();
 
-		// Get volume to surface maps.
-		const index_vector_type& vmapM = nodes1D.get_vmapM();
-		const index_vector_type& vmapP = nodes1D.get_vmapP();
+			// Get volume to surface maps.
+			const index_vector_type& vmapM = nodes1D.get_vmapM();
+			const index_vector_type& vmapP = nodes1D.get_vmapP();
 
-		// boundary indices.
-		index_type mapO = nodes1D.get_mapO();
-		index_type mapI = nodes1D.get_mapI();
+			// boundary indices.
+			index_type mapO = nodes1D.get_mapO();
+			index_type mapI = nodes1D.get_mapI();
 
-		index_type numFaces = nodes1D.NumFaces;
-		index_type Nfp = nodes1D.NumFacePoints;
-		index_type Np = nodes1D.get_NumLocalPoints();
-		index_type K = nodes1D.get_NumElements();
+			index_type numFaces = nodes1D.NumFaces;
+			index_type Nfp = nodes1D.NumFacePoints;
+			index_type Np = nodes1D.get_NumLocalPoints();
+			index_type K = nodes1D.get_NumElements();
 
-		real_type alpha = 0;   // 1 == central flux, 0 == upwind flux.
+			real_type alpha = 0;   // 1 == central flux, 0 == upwind flux.
 
-		vector_type du(numFaces*Nfp*K);
-		vector_type uM(numFaces*Nfp*K);
-		vector_type uP(numFaces*Nfp*K);
-		vector_type nxVec(numFaces*Nfp*K);
+			vector_type du(numFaces*Nfp*K);
+			vector_type uM(numFaces*Nfp*K);
+			vector_type uP(numFaces*Nfp*K);
+			vector_type nxVec(numFaces*Nfp*K);
 
-		du = 0.*ii;
-		uM = 0.*ii;
-		uP = 0.*ii;
-		nxVec = 0.*ii;
+			du = 0.*ii;
+			uM = 0.*ii;
+			uP = 0.*ii;
+			nxVec = 0.*ii;
 
-		matrix_type nxCol(numFaces*Nfp,K, ColumnMajorArray<2>());
-		nxCol = nx;		
+			matrix_type nxCol(numFaces*Nfp,K, ColumnMajorArray<2>());
+			nxCol = nx;		
 
-		matrix_type uCol(Np, K, ColumnMajorArray<2>());
-		uCol = u;
+			matrix_type uCol(Np, K, ColumnMajorArray<2>());
+			uCol = u;
 
-		index_type count = 0;
-		for( index_type k=0; k < K; k++) {
-			for ( index_type f=0; f < Nfp*numFaces; f++) {
-				nxVec(count) = nxCol(f,k);
-				uM(count) = uCol(vmapM(count));
-				uP(count) = uCol(vmapP(count));
-				count++;
+			index_type count = 0;
+			for( index_type k=0; k < K; k++) {
+				for ( index_type f=0; f < Nfp*numFaces; f++) {
+					nxVec(count) = nxCol(f,k);
+					uM(count) = uCol(vmapM(count));
+					uP(count) = uCol(vmapP(count));
+					count++;
+				}
 			}
-		}
 
-		// BC's
-		uP(mapO) = uM(mapO); // outflow - exit stage left.
-		uP(mapI) = 0;        // inflow - assumed 0 (or use exact solution at x=0).
-				
-		// Compute jump in flux:
-		du = (uM - uP)*0.5*(c*nxVec - (1-alpha)*fabs(c*nxVec)); 
+			// BC's
+			uP(mapO) = uM(mapO); // outflow - exit stage left.
+			uP(mapI) = 0;        // inflow - assumed 0 (or use exact solution at x=0).
+					
+			// Compute jump in flux:
+			du = (uM - uP)*0.5*(c*nxVec - (1-alpha)*fabs(c*nxVec)); 
 
-		matrix_type duMat(Nfp*numFaces, K);
+			matrix_type duMat(Nfp*numFaces, K);
 
-		count = 0;
-		for( index_type k=0; k < K; k++) {
-			for ( index_type f=0; f < Nfp*numFaces; f++) {
-				duMat(f,k) = du(count);
-				count++;
+			count = 0;
+			for( index_type k=0; k < K; k++) {
+				for ( index_type f=0; f < Nfp*numFaces; f++) {
+					duMat(f,k) = du(count);
+					count++;
+				}
 			}
-		}
 
-		// Assumes PDE has been left-multiplied by local inverse mass matrix, so all we have left
-		// is the differentiation matrix contribution, and the surface integral
-		RHS =-c*rx*sum(Dr(ii,kk)*u(kk,jj), kk);
+			// Assumes PDE has been left-multiplied by local inverse mass matrix, so all we have left
+			// is the differentiation matrix contribution, and the surface integral
+			RHS =-c*rx*sum(Dr(ii,kk)*u(kk,jj), kk);
 
-		matrix_type surfaceRHS(Np, K);
-		surfaceRHS = Fscale*duMat;
-		RHS += sum(Lift(ii,kk)*surfaceRHS(kk,jj), kk);
-	}
-
-	void writeFieldToFile(const string fileName, const matrix_type & field ) {
-		ofstream outFile;
-		outFile.open(fileName);
-		for(index_type i=0; i < field.rows(); i++) {
-			for(index_type k=0; k < field.cols(); k++) {
-				real_type num = field(i, k);
-				outFile << num << " ";
-			}
-			outFile << endl;
-		}
-		outFile.close();
-	}
+			matrix_type surfaceRHS(Np, K);
+			surfaceRHS = Fscale*duMat;
+			RHS += sum(Lift(ii,kk)*surfaceRHS(kk,jj), kk);
+		} // computeRHS
+	} // namespace advec1d
 } // namespace blitzdg

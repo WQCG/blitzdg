@@ -31,5 +31,8 @@ namespace blitzdg {
 	} // end LSERK4
 
 	void writeFieldToFile(const std::string fileName, const matrix_type & field );
-    void computeRHS(const matrix_type & u, real_type c, Nodes1DProvisioner & nodes1D, matrix_type & RHS);
+
+	namespace advec1d {
+		void computeRHS(const matrix_type & u, real_type c, Nodes1DProvisioner & nodes1D, matrix_type & RHS);
+	}
 }
