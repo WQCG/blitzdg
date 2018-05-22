@@ -16,6 +16,7 @@
 #include "Warning.hpp"
 #include "Advec1d.hpp"
 #include "LSERK4.hpp"
+#include "LinAlgHelpers.hpp"
 #include <blitz/array.h>
 #include <cmath>
 #include <string>
@@ -104,8 +105,8 @@ int main(int argc, char **argv) {
 			u += LSERK4::rk4b[i]*resRK;
 		}
 
-		real_type u_inf = max(fabs(u));
-		if ( u_inf > 1e8  || std::isnan(u_inf) ) {
+		real_type u_max = normMax(u);
+		if ( u_max > 1e8  || std::isnan(u_max) ) {
 			throw std::runtime_error("A numerical instability has occurred!");
 		}
 

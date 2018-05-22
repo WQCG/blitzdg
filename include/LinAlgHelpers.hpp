@@ -68,4 +68,11 @@ namespace blitzdg {
     inline real_type normInf(const vector_type& x) {
         return blitz::max(blitz::abs(x));
     }
+
+	/**
+	 * Returns the maximum absolute value of all entries of a matrix/firled.
+	 */
+	inline real_type normMax(const matrix_type& mat) {
+		return blitz::max(blitz::abs(mat));
+	}
 } // namespace blitzdg
