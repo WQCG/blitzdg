@@ -6,6 +6,7 @@
 #include <limits>
 
 using std::numeric_limits;
+using std::abs;
 
 namespace blitzdg {
     void SparseMatrixConverter::podArrayToFull(const real_type * Apod, matrix_type & A) const {

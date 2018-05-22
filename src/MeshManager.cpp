@@ -103,7 +103,7 @@ namespace blitzdg {
         metisOptions[METIS_OPTION_NCUTS] = 1;
         metisOptions[METIS_OPTION_NITER] = 10; // default
         metisOptions[METIS_OPTION_SEED] = -1; // random number seed.
-        metisOptions[METIS_OPTION_UFACTOR] = 1.030; // max load imbalance of 1.03
+        metisOptions[METIS_OPTION_UFACTOR] = 30; // max load imbalance of "30" -> 1.03
         metisOptions[METIS_OPTION_NUMBERING] = 0; // 0-based numbering.
         metisOptions[METIS_OPTION_DBGLVL] = METIS_DBG_INFO; //debug level='info'. 0 for nothing.
         metisOptions[METIS_OPTION_MINCONN] = 1;

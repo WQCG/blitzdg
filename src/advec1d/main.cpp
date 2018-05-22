@@ -28,6 +28,7 @@ using blitz::secondIndex;
 using blitz::thirdIndex;
 using blitz::sum;
 using blitz::Range;
+using std::abs;
 using std::endl;
 using std::ofstream;
 using std::setfill;
@@ -65,7 +66,7 @@ int main(int argc, char **argv) {
 
 	real_type min_dx = x(1,0) - x(0,0);
 
-	real_type dt = CFL*min_dx/fabs(c);
+	real_type dt = CFL*min_dx/abs(c);
 
 	matrix_type u(Np, K);
 	matrix_type RHS(Np, K);
