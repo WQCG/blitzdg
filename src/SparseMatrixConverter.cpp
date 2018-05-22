@@ -6,6 +6,7 @@
 #include <limits>
 
 using std::numeric_limits;
+using std::abs;
 
 namespace blitzdg {
     void SparseMatrixConverter::podArrayToFull(const real_type * Apod, matrix_type & A) const {
@@ -62,7 +63,7 @@ namespace blitzdg {
         for( index_type i=0; i < n_rows; i++ ) {
             for ( index_type j=0; j < n_cols; j++ ) {
                 real_type val = A(i,j);
-                if ( fabs(val) < 2*eps ) {
+                if ( abs(val) < 2*eps ) {
                     continue;
                 }
 
@@ -87,7 +88,7 @@ namespace blitzdg {
         for( index_type i=0; i < n_rows; i++ ) {
             for ( index_type j=0; j < n_cols; j++ ) {
                 real_type val = A(i,j);
-                if ( fabs(val) < 2*eps ) {
+                if ( abs(val) < 2*eps ) {
                     continue;
                 }
 

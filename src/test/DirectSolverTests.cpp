@@ -16,6 +16,7 @@ using blitz::secondIndex;
 using std::cout;
 using std::endl;
 using std::numeric_limits;
+using std::abs;
 
 namespace blitzdg {
     namespace DirectSolverTests {
@@ -59,11 +60,11 @@ namespace blitzdg {
                 DirectSolver solver;
                 solver.solve(A, b, x);
 
-                Assert::That(fabs(x(0)-expectedx(0)), IsLessThan(epsf));
-                Assert::That(fabs(x(1)-expectedx(1)), IsLessThan(epsf));
-                Assert::That(fabs(x(2)-expectedx(2)), IsLessThan(epsf));
-                Assert::That(fabs(x(3)-expectedx(3)), IsLessThan(epsf));
-                Assert::That(fabs(x(4)-expectedx(4)), IsLessThan(epsf));
+                Assert::That(abs(x(0)-expectedx(0)), IsLessThan(epsf));
+                Assert::That(abs(x(1)-expectedx(1)), IsLessThan(epsf));
+                Assert::That(abs(x(2)-expectedx(2)), IsLessThan(epsf));
+                Assert::That(abs(x(3)-expectedx(3)), IsLessThan(epsf));
+                Assert::That(abs(x(4)-expectedx(4)), IsLessThan(epsf));
             }
         };
     } // namespace DirectSolverTests
