@@ -22,7 +22,6 @@ namespace blitzdg {
     namespace DirectSolverTests {
         using namespace igloo;
         const index_type N=5;
-        const real_type eps=10*numeric_limits<real_type>::epsilon();
         const float epsf = 1.e-5;
         
         firstIndex ii;

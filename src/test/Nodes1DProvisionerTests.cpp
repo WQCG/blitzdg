@@ -21,8 +21,6 @@ using std::numeric_limits;
 namespace blitzdg {
     namespace Nodes1DProvisionerTests {
         using namespace igloo;
-        const index_type N=5;
-        const real_type eps=10*numeric_limits<real_type>::epsilon();
         const float epsf = 5.7e-6;
 
         firstIndex ii;
