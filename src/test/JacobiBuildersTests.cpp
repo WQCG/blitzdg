@@ -71,9 +71,9 @@ namespace blitzdg {
 
                 jacobi.computeJacobiPolynomial(x, 0.0, 0.0, 2, p);
 
-                Assert::That(abs(p(0)-sqrt(5./2.)), IsLessThan(eps));
-                Assert::That(abs(p(1)-(-sqrt(5./8.))), IsLessThan(eps));
-                Assert::That(abs(p(2)-sqrt(5./2.)), IsLessThan(eps));
+                Assert::That(fabs(p(0)-sqrt(5./2.)), IsLessThan(eps));
+                Assert::That(fabs(p(1)-(-sqrt(5./8.))), IsLessThan(eps));
+                Assert::That(fabs(p(2)-sqrt(5./2.)), IsLessThan(eps));
             }
 
             It(Should_Generate_0th_Order_Legendre_Polynomial_4pt_Grid) {
@@ -86,9 +86,9 @@ namespace blitzdg {
 
                 jacobi.computeJacobiPolynomial(x, 0.0, 0.0, 0, p);
 
-                Assert::That(abs(p(0)-sqrt(1./2.)), IsLessThan(eps));
-                Assert::That(abs(p(1)-sqrt(1./2.)), IsLessThan(eps));
-                Assert::That(abs(p(2)-sqrt(1./2.)), IsLessThan(eps));
+                Assert::That(fabs(p(0)-sqrt(1./2.)), IsLessThan(eps));
+                Assert::That(fabs(p(1)-sqrt(1./2.)), IsLessThan(eps));
+                Assert::That(fabs(p(2)-sqrt(1./2.)), IsLessThan(eps));
             } 
 
             It(Should_Generate_1st_Order_Legendre_Polynomial_4pt_Grid) {
@@ -101,10 +101,10 @@ namespace blitzdg {
 
                 jacobi.computeJacobiPolynomial(x, 0.0, 0.0, 1, p);
 
-                Assert::That(abs(p(0)- -1.224744871391589), IsLessThan(epsf));
-                Assert::That(abs(p(1)- -0.547722557505166), IsLessThan(epsf));
-                Assert::That(abs(p(2)-  0.547722557505166), IsLessThan(epsf));
-                Assert::That(abs(p(3)-  1.224744871391589), IsLessThan(epsf));
+                Assert::That(fabs(p(0)- -1.224744871391589), IsLessThan(epsf));
+                Assert::That(fabs(p(1)- -0.547722557505166), IsLessThan(epsf));
+                Assert::That(fabs(p(2)-  0.547722557505166), IsLessThan(epsf));
+                Assert::That(fabs(p(3)-  1.224744871391589), IsLessThan(epsf));
             } 
 
             It(Should_Generate_4th_Order_Quadrature_Points_and_Weights) {
@@ -117,17 +117,17 @@ namespace blitzdg {
 
                 jacobi.computeJacobiQuadWeights(0., 0., 4, x, w);
 
-                Assert::That(abs(x(0) - -9.06179845938664e-01), IsLessThan(eps));
-                Assert::That(abs(x(1) - -5.38469310105683e-01), IsLessThan(eps));
-                Assert::That(abs(x(2) - -9.62591786604533e-17), IsLessThan(eps));
-                Assert::That(abs(x(3) -  5.38469310105683e-01), IsLessThan(eps));
-                Assert::That(abs(x(4) -  9.06179845938664e-01), IsLessThan(eps));
+                Assert::That(fabs(x(0) - -9.06179845938664e-01), IsLessThan(eps));
+                Assert::That(fabs(x(1) - -5.38469310105683e-01), IsLessThan(eps));
+                Assert::That(fabs(x(2) - -9.62591786604533e-17), IsLessThan(eps));
+                Assert::That(fabs(x(3) -  5.38469310105683e-01), IsLessThan(eps));
+                Assert::That(fabs(x(4) -  9.06179845938664e-01), IsLessThan(eps));
 
-                Assert::That(abs(w(0) - 0.236926885056189), IsLessThan(eps));
-                Assert::That(abs(w(1) - 0.478628670499366), IsLessThan(eps));
-                Assert::That(abs(w(2) - 0.568888888888889), IsLessThan(eps));
-                Assert::That(abs(w(3) - 0.478628670499367), IsLessThan(eps));
-                Assert::That(abs(w(4) - 0.236926885056189), IsLessThan(eps));
+                Assert::That(fabs(w(0) - 0.236926885056189), IsLessThan(eps));
+                Assert::That(fabs(w(1) - 0.478628670499366), IsLessThan(eps));
+                Assert::That(fabs(w(2) - 0.568888888888889), IsLessThan(eps));
+                Assert::That(fabs(w(3) - 0.478628670499367), IsLessThan(eps));
+                Assert::That(fabs(w(4) - 0.236926885056189), IsLessThan(eps));
             }
 
             It(Should_Generate_1st_Order_Quadrature_Points_and_Weights) {
@@ -140,11 +140,11 @@ namespace blitzdg {
 
                 jacobi.computeJacobiQuadWeights(0., 0., 1, x, w);
 
-                Assert::That(abs(x(0) - -0.577350269189626), IsLessThan(eps));
-                Assert::That(abs(x(1) -  0.577350269189626), IsLessThan(eps));
+                Assert::That(fabs(x(0) - -0.577350269189626), IsLessThan(eps));
+                Assert::That(fabs(x(1) -  0.577350269189626), IsLessThan(eps));
 
-                Assert::That(abs(w(0) - 1.0), IsLessThan(eps));
-                Assert::That(abs(w(1) - 1.0), IsLessThan(eps));
+                Assert::That(fabs(w(0) - 1.0), IsLessThan(eps));
+                Assert::That(fabs(w(1) - 1.0), IsLessThan(eps));
             }
 
             It(Should_Compute_2nd_Order_Quadrature_Points_and_Weights) {
@@ -157,13 +157,13 @@ namespace blitzdg {
 
                 jacobi.computeJacobiQuadWeights(0., 0., 2, xx, ww);
 
-                Assert::That(abs(xx(0) - -7.74596669241483e-01), IsLessThan(eps));
-                Assert::That(abs(xx(1) -  0.0), IsLessThan(eps));
-                Assert::That(abs(xx(2) -  7.74596669241483e-01), IsLessThan(eps));
+                Assert::That(fabs(xx(0) - -7.74596669241483e-01), IsLessThan(eps));
+                Assert::That(fabs(xx(1) -  0.0), IsLessThan(eps));
+                Assert::That(fabs(xx(2) -  7.74596669241483e-01), IsLessThan(eps));
 
-                Assert::That(abs(ww(0) -  0.555555555555556), IsLessThan(eps));
-                Assert::That(abs(ww(1) -  0.888888888888889), IsLessThan(eps));
-                Assert::That(abs(ww(2) -  0.555555555555556), IsLessThan(eps));
+                Assert::That(fabs(ww(0) -  0.555555555555556), IsLessThan(eps));
+                Assert::That(fabs(ww(1) -  0.888888888888889), IsLessThan(eps));
+                Assert::That(fabs(ww(2) -  0.555555555555556), IsLessThan(eps));
             }
 
             It(Should_Generate_3rd_Order_Legendre_Gauss_Lobatto_Nodes) {
@@ -173,10 +173,10 @@ namespace blitzdg {
                 vector_type x(4);
                 jacobi.computeGaussLobottoPoints(0., 0., 3, x);
 
-                Assert::That(abs(x(0) - -1), IsLessThan(eps));
-                Assert::That(abs(x(1) - -0.447213595499958), IsLessThan(eps));
-                Assert::That(abs(x(2) -  0.447213595499958), IsLessThan(eps));
-                Assert::That(abs(x(3) -  1), IsLessThan(eps));
+                Assert::That(fabs(x(0) - -1), IsLessThan(eps));
+                Assert::That(fabs(x(1) - -0.447213595499958), IsLessThan(eps));
+                Assert::That(fabs(x(2) -  0.447213595499958), IsLessThan(eps));
+                Assert::That(fabs(x(3) -  1), IsLessThan(eps));
             }
         };
     }

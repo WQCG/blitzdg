@@ -59,11 +59,11 @@ namespace blitzdg {
                 solver.factorize();
                 solver.solve(b, soln);
 
-                Assert::That(abs(soln(0)-x(0)), IsLessThan(eps));
-                Assert::That(abs(soln(1)-x(1)), IsLessThan(eps));
-                Assert::That(abs(soln(2)-x(2)), IsLessThan(eps));
-                Assert::That(abs(soln(3)-x(3)), IsLessThan(eps));
-                Assert::That(abs(soln(4)-x(4)), IsLessThan(eps));
+                Assert::That(fabs(soln(0)-x(0)), IsLessThan(eps));
+                Assert::That(fabs(soln(1)-x(1)), IsLessThan(eps));
+                Assert::That(fabs(soln(2)-x(2)), IsLessThan(eps));
+                Assert::That(fabs(soln(3)-x(3)), IsLessThan(eps));
+                Assert::That(fabs(soln(4)-x(4)), IsLessThan(eps));
             }
 
             void TearDown() {
