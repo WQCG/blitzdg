@@ -13,7 +13,7 @@ namespace blitzdg {
     class CsvOutputter {
 
     public:
-        void writeFieldToFile(const std::string fileName, const matrix_type & field, const char delimeter);
-        std::string generateFileName(const std::string fieldName, const index_type fileNumber);
+        void writeFieldToFile(const std::string & fileName, const matrix_type & field, const char delimeter);
+        std::string generateFileName(const std::string & fieldName, const index_type fileNumber);
     };
 }

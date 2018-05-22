@@ -25,7 +25,7 @@ namespace blitzdg {
      * @param[in] field Two-dimensional blitz array to be written to the file. Usually a 'field' of the PDE (system) being solved.
      * @param[in] delimeter Character that will be used to separate columns. Rows are always separated by line-endings.
      */
-    void CsvOutputter::writeFieldToFile(const std::string fileName, const matrix_type & field, const char delimeter) {
+    void CsvOutputter::writeFieldToFile(const string & fileName, const matrix_type & field, const char delimeter) {
         ofstream outFile;
         outFile.open(fileName);
         for(index_type i=0; i < field.rows(); i++) {
@@ -43,7 +43,7 @@ namespace blitzdg {
      * @param[in] fieldName Name of field from the PDE (system), e.g., "u".
      * @param[in] fileNumber An integral intex indicating a logical ordering on the output files. It is usually related to time-level.
      */
-    string CsvOutputter::generateFileName(const string fieldName, const index_type fileNumber) {
+    string CsvOutputter::generateFileName(const string & fieldName, const index_type fileNumber) {
         stringstream fileNameStrm;
         fileNameStrm << "u" << setfill('0') << setw(7) << fileNumber << ".dat";
         return fileNameStrm.str();
