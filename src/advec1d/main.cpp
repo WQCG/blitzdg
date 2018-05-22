@@ -32,6 +32,7 @@ using blitz::secondIndex;
 using blitz::thirdIndex;
 using blitz::sum;
 using blitz::Range;
+using std::abs;
 using std::endl;
 using std::ofstream;
 using std::setfill;
@@ -118,7 +119,7 @@ namespace blitzdg {
 		uP(mapI) = 0;        // inflow - assumed 0 (or use exact solution at x=0).
 				
 		// Compute jump in flux:
-		du = (uM - uP)*0.5*(c*nxVec - (1-alpha)*fabs(c*nxVec)); 
+		du = (uM - uP)*0.5*(c*nxVec - (1-alpha)*abs(c*nxVec)); 
 
 		matrix_type duMat(Nfp*numFaces, K);
 
@@ -181,7 +182,7 @@ int main(int argc, char **argv) {
 
 	real_type min_dx = x(1,0) - x(0,0);
 
-	real_type dt = CFL*min_dx/fabs(c);
+	real_type dt = CFL*min_dx/abs(c);
 
 	matrix_type u(Np, K);
 	matrix_type RHS(Np, K);
@@ -223,7 +224,7 @@ int main(int argc, char **argv) {
 			u += LSERK4::rk4b[i]*resRK;
 		}
 
-		if ( max(fabs(u)) > 1e8  || std::isnan(max(fabs(u))) ) {
+		if ( max(abs(u)) > 1e8  || std::isnan(max(abs(u))) ) {
 			throw std::runtime_error("We done blew up!");
 		}
 

@@ -16,6 +16,7 @@ using blitz::secondIndex;
 using std::cout;
 using std::endl;
 using std::numeric_limits;
+using std::abs;
 
 namespace blitzdg {
     namespace DirectSolverTests {
