@@ -4,5 +4,4 @@
 make
 make test
 ./bin/test
-./bin/blitzdg
-
+./bin/advec1d
