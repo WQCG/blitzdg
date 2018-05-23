@@ -5,6 +5,7 @@ BINDIR := bin
 SRCEXT := cpp
 
 TARGETS := $(patsubst src/,,$(patsubst src/%/,bin/%,$(sort $(dir $(wildcard src/**/)))))
+BUILDDIRS := $(subst bin,build,$(TARGETS))
 
 COMMONSOURCES := $(wildcard $(SRCDIR)/*.$(SRCEXT))
 COMMONOBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(COMMONSOURCES:.$(SRCEXT)=.o))
@@ -25,18 +26,20 @@ ifeq ($(OS), Windows_NT)
 	LIB += $(EXPLICITLIBS)
 endif
 
-all: $(TARGETS)
+all: builddirs $(TARGETS)
 
 $(TARGETS): $(ALLOBJECTS)
-	@mkdir -p bin
+	@mkdir -p $(BINDIR)
 	@echo " Linking $@..."
 	@echo " $(CXX) $(LINKERFLAGS) $(COMMONOBJECTS) $(wildcard $(subst bin/,,build/$@/*.o)) -o $@ $(LIB)"; $(CXX) $(LINKERFLAGS) $(COMMONOBJECTS) $(wildcard $(subst bin/,,build/$@/*.o)) -o $@ $(LIB)
 
-$(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
-	@mkdir -p $(BUILDDIR)/test
-	@mkdir -p $(BUILDDIR)/advec1d
-	@echo " Building...";
+$(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT) builddirs
 	@echo " $(CXX) $(CFLAGS) $(EXTRACFLAGS) $(INC) -c -o $@ $<"; $(CXX) $(CFLAGS) $(EXTRACFLAGS) $(INC) -c -o $@ $<
+
+builddirs:
+	@mkdir -p $(BUILDDIRS)
+
+builddirs:
 
 clean:
 	@echo " Cleaning...";
