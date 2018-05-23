@@ -3,8 +3,6 @@ SRCDIR := src
 BUILDDIR := build
 BINDIR := bin
 SRCEXT := cpp
-TARGET := $(BINDIR)/advec1d
-TESTTARGET := $(BINDIR)/test
 
 TARGETS := $(patsubst src/,,$(patsubst src/%/,bin/%,$(sort $(dir $(wildcard src/**/)))))
 
