@@ -50,7 +50,6 @@ test: bin/test
 
 get-deps:
 	@sudo /bin/bash pull-deps.sh
-	@sudo apt-get -y install graphviz texlive-generic-recommended
 
 docs:
 	@echo DOXYGEN VERSION:
