@@ -1,12 +1,14 @@
+# Copyright (C) 2017-2018  Waterloo Quantitative Consulting Group, Inc.
+# See COPYING and LICENSE files at project root for more details.
+
 CXX := $(or $(CXX), g++)
 SRCDIR := src
 BUILDDIR := build
 BINDIR := bin
 SRCEXT := cpp
-TARGET := $(BINDIR)/advec1d
-TESTTARGET := $(BINDIR)/test
 
 TARGETS := $(patsubst src/,,$(patsubst src/%/,bin/%,$(sort $(dir $(wildcard src/**/)))))
+BUILDDIRS := $(subst bin,build,$(TARGETS))
 
 COMMONSOURCES := $(wildcard $(SRCDIR)/*.$(SRCEXT))
 COMMONOBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(COMMONSOURCES:.$(SRCEXT)=.o))
@@ -27,18 +29,20 @@ ifeq ($(OS), Windows_NT)
 	LIB += $(EXPLICITLIBS)
 endif
 
-all: $(TARGETS)
+all: builddirs $(TARGETS)
 
 $(TARGETS): $(ALLOBJECTS)
-	@mkdir -p bin
+	@mkdir -p $(BINDIR)
 	@echo " Linking $@..."
 	@echo " $(CXX) $(LINKERFLAGS) $(COMMONOBJECTS) $(wildcard $(subst bin/,,build/$@/*.o)) -o $@ $(LIB)"; $(CXX) $(LINKERFLAGS) $(COMMONOBJECTS) $(wildcard $(subst bin/,,build/$@/*.o)) -o $@ $(LIB)
 
-$(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
-	@mkdir -p $(BUILDDIR)/test
-	@mkdir -p $(BUILDDIR)/advec1d
-	@echo " Building...";
+$(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT) builddirs
 	@echo " $(CXX) $(CFLAGS) $(EXTRACFLAGS) $(INC) -c -o $@ $<"; $(CXX) $(CFLAGS) $(EXTRACFLAGS) $(INC) -c -o $@ $<
+
+builddirs:
+	@mkdir -p $(BUILDDIRS)
+
+builddirs:
 
 clean:
 	@echo " Cleaning...";
@@ -49,13 +53,11 @@ test: bin/test
 
 get-deps:
 	@sudo /bin/bash pull-deps.sh
-	@sudo apt-get -y install graphviz texlive-generic-recommended
 
 docs:
 	@echo DOXYGEN VERSION:
 	@doxygen -v
 	@doxygen -u doxygen.conf
-	@sed -ir "s,DOT_PATH.*=,DOT_PATH               = $$(which dot)," doxygen.conf
-	@cat doxygen.conf | grep DOT_PATH
 	@doxygen doxygen.conf
+
 .PHONY: clean docs
