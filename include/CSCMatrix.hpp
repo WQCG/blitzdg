@@ -8,12 +8,12 @@
 namespace blitzdg {
     /**
      * Implements a compressed sparse column (CSC) matrix class
-     * that wraps a CXSparse CSC matrix.
+     * that wraps a CXSparse cs_di object.
      */
 	class CSCMat {
         /**
          * Custom deleter used by std::unique_ptr for
-         * objects of type cs_di created by cs_spalloc.
+         * objects of type cs_di created by cs_di_spalloc.
          */
 		struct deleter {
 			void operator()(cs_di* ptr) const {
@@ -63,11 +63,10 @@ namespace blitzdg {
 		
         /**
          * Constructor that creates a matrix from a cs_di object
-         * that is owned by a cs_di_smart_ptr. Note that mat must
-         * be moved into the constructor via std::move().
+         * that is owned by a cs_di_smart_ptr. 
          * 
          * This constructor implies a transfer of ownership from
-         * the input pointer mat to the CSCMat object. Note that
+         * the smart pointer mat to the CSCMat object. Note that
          * the cs_di object must have its values attribute set to
          * true, otherwise an std::runtime_error exception is thrown.
          * @param[in] mat Smart pointer to cs_di object.
