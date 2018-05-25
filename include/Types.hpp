@@ -8,6 +8,10 @@
 #pragma once
 #include <blitz/array.h>
 
+#ifndef M_PI
+#define M_PI (3.141592653589793238)
+#endif
+
 namespace blitzdg {
     using index_type = int;
     using real_type = double;
