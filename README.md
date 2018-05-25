@@ -10,7 +10,7 @@ Build and development support has broadened from linux only to Mac OSX and Windo
 
 1. `git clone https://github.com/dsteinmo/blitzdg.git`
 2. `cd blitzdg && ./pull-deps.sh`
-3. `make && ./bin/blitzdg` (The binary currently doesn't do much).
+3. `make && ./bin/advec1d` (This binary is a 1D advection equation solver.).
 4. Run unit tests with `make test`.
 
 ### Running with Docker
