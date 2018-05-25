@@ -27,14 +27,8 @@ using blitz::firstIndex;
 using blitz::secondIndex;
 using blitz::thirdIndex;
 using blitz::sum;
-using blitz::Range;
 using std::abs;
-using std::endl;
-using std::ofstream;
-using std::setfill;
-using std::setw;
 using std::string;
-using std::stringstream;
 using std::cout;
 
 int main(int argc, char **argv) {
