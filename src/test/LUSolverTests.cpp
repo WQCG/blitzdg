@@ -43,14 +43,14 @@ namespace blitzdg {
                     5;
                 cout << "LUSolver" << endl;
                 CSCMat csc(A);
-                LUSolver solver(csc);
+                LUSolver solver;
                 cout << "Done building LUSolver" << endl;
                 vector_type soln(N);
 
                 // Compute LU factors.
                 try {
                     cout << "Starting factorization" << endl;
-                    solver.factorize();
+                    solver.factorize(csc);
                     cout << "Factorization successful" << endl;
                     solver.solve(b, soln);
                     cout << "Solve successful" << endl;

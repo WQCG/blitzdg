@@ -9,14 +9,14 @@ using std::runtime_error;
 
 namespace blitzdg {
     bool LUSolver::symbolicFactorize() {
-        index_type flag = umfpack_di_symbolic(mat_.rows(), mat_.cols(), mat_.colPtrs(), 
-            mat_.rowInds(), mat_.elems(), &symbolic_, (double*)NULL, (double*)NULL);
+        index_type flag = umfpack_di_symbolic(mat_->rows(), mat_->cols(), mat_->colPtrs(), 
+            mat_->rowInds(), mat_->elems(), &symbolic_, (double*)NULL, (double*)NULL);
         return flag == UMFPACK_OK;
     }
 
     bool LUSolver::numericFactorize() {
-        index_type flag = umfpack_di_numeric(mat_.colPtrs(), mat_.rowInds(), mat_.elems(), 
-                symbolic_, &numeric_, (double*)NULL, (double*)NULL);
+        index_type flag = umfpack_di_numeric(mat_->colPtrs(), mat_->rowInds(), 
+            mat_->elems(), symbolic_, &numeric_, (double*)NULL, (double*)NULL);
         return flag == UMFPACK_OK;
     }
 
@@ -31,12 +31,15 @@ namespace blitzdg {
         }
     }
 
-    void LUSolver::factorize() {
-        if (numeric_) // check if factorize was already called
-            return;
+    void LUSolver::factorize(const CSCMat& mat) {
+        if (mat.rows() != mat.cols())
+            throw runtime_error("LUSolver::factorize: input matrix is not square");
+        order_ = mat.rows();
+        mat_ = &mat;
+        freeMem(); // free any existing memory
         if (!symbolicFactorize())
             throw runtime_error("LUSolver::factorize: symbolic factorization failed");
-        else if(!numericFactorize())
+        else if (!numericFactorize())
             throw runtime_error("LUSolver::factorize: numeric factorization failed");
         // delete the symbolic factorization since we don't need it any longer
         umfpack_di_free_symbolic(&symbolic_);
@@ -45,8 +48,12 @@ namespace blitzdg {
     void LUSolver::solve(const vector_type& rhs, vector_type& soln) const {
         if (!numeric_) // check that factorize has been called
             throw runtime_error("LUSolver::solve: must call factorize before calling solve");
-        index_type flag = umfpack_di_solve (UMFPACK_A, mat_.colPtrs(), mat_.rowInds(), 
-            mat_.elems(), soln.data(), rhs.data(), numeric_, (double*)NULL, (double*)NULL);
+        if (rhs.length(0) < order_) // check length of rhs
+            throw runtime_error("LUSolver::solve: rhs length is less than matrix order");
+        if (soln.length(0) < order_) // check length of soln
+            throw runtime_error("LUSolver::solve: soln length is less than matrix order");
+        index_type flag = umfpack_di_solve (UMFPACK_A, mat_->colPtrs(), mat_->rowInds(), 
+            mat_->elems(), soln.data(), rhs.data(), numeric_, (double*)NULL, (double*)NULL);
         if (flag != UMFPACK_OK)
             throw runtime_error("LUSolver::solve: failed");
     }

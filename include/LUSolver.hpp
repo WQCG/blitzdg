@@ -22,24 +22,19 @@ namespace blitzdg {
   class LUSolver {   
   public:
     /**
-     * Constructor that builds an LUSolver from a CSC matrix.
-     * @param[in] mat The CSC matrix to be factorized.
+     * Default constructor.
      */
-    explicit LUSolver(const CSCMat& mat)
-      : mat_{ mat }, symbolic_{ nullptr }, numeric_{ nullptr }
+    LUSolver()
+      : order_{ 0 }, mat_{ nullptr }, 
+      symbolic_{ nullptr }, numeric_{ nullptr }
     {}
 
     /**
-     * Returns a reference to the underlying CSC matrix.
+     * Computes an LU factorization of the input CSC matrix.
+     * Overwrites any existing factorization.
+     * @param[in] mat The CSC matrix.
      */
-    const CSCMat& getMatrix() const {
-      return mat_;
-    }
-
-    /**
-     * Computes an LU factorization of the CSC matrix.
-     */
-    void factorize();
+    void factorize(const CSCMat& mat);
 
     /**
      * Solves the linear system A*soln = rhs.
@@ -55,9 +50,10 @@ namespace blitzdg {
       freeMem();
     }
   private:
-    const CSCMat& mat_;
-    void* symbolic_;
-    void* numeric_;
+    index_type order_; // order of the current linear system
+    const CSCMat* mat_; // non-owning pointer to input matrix
+    void* symbolic_; // pointer to symbolic factorization structure
+    void* numeric_; // pointer to numeric factorization structure
 
     /**
      * Computes the symbolic factorization and
