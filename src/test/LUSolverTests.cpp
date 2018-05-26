@@ -19,13 +19,11 @@ namespace blitzdg {
         const index_type N=5;
         const real_type eps=10*numeric_limits<real_type>::epsilon();
 
-        vector_type b(N), x(N);
-        matrix_type A(N,N);
-
         Describe(LUSolver_Object) {
-            void SetUp() {
-
-                A = 2,3,0,0,0,
+            It(Solves_Ax_equals_b)  {
+                vector_type b(N), x(N);
+                matrix_type A(N,N);
+                 A = 2,3,0,0,0,
                         3,0,4,0,6,
                         0,-1,-3,2,0,
                         0,0,1,0,0,
@@ -42,9 +40,6 @@ namespace blitzdg {
                     3,
                     4,
                     5;
-            }
-
-            It(Solves_Ax_equals_b)  {
                 cout << "LUSolver" << endl;
                 CSCMat csc(A);
                 LUSolver solver(csc);
@@ -52,7 +47,9 @@ namespace blitzdg {
 
                 // Compute LU factors.
                 solver.factorize();
+                cout << "Factorization successful" << endl;
                 solver.solve(b, soln);
+                cout << "Solve successful" << endl;
 
                 Assert::That(abs(soln(0)-x(0)), IsLessThan(eps));
                 Assert::That(abs(soln(1)-x(1)), IsLessThan(eps));
