@@ -50,5 +50,10 @@ namespace blitzdg {
         firstIndex ii;
         secondIndex jj;
         eigenvectors = eigenvectors(jj,ii);
+
+        delete [] Apod;
+        delete [] work;
+        delete [] iwork;
     }
 } // namespace blitzdg
+
