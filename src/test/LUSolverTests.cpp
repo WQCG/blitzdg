@@ -7,20 +7,21 @@
 #include <blitz/array.h>
 #include <iostream>
 #include <limits>
+#include <stdexcept>
 
 using std::cout;
 using std::endl;
+using std::exception;
 using std::numeric_limits;
 using std::abs;
 
 namespace blitzdg {
     namespace LUSolverTests {
         using namespace igloo;
-        const index_type N=5;
-        const real_type eps=10*numeric_limits<real_type>::epsilon();
-
         Describe(LUSolver_Object) {
             It(Solves_Ax_equals_b)  {
+                const real_type eps=10*numeric_limits<real_type>::epsilon();
+                const index_type N=5;
                 vector_type b(N), x(N);
                 matrix_type A(N,N);
                  A = 2,3,0,0,0,
@@ -43,13 +44,20 @@ namespace blitzdg {
                 cout << "LUSolver" << endl;
                 CSCMat csc(A);
                 LUSolver solver(csc);
+                cout << "Done building LUSolver" << endl;
                 vector_type soln(N);
 
                 // Compute LU factors.
-                solver.factorize();
-                cout << "Factorization successful" << endl;
-                solver.solve(b, soln);
-                cout << "Solve successful" << endl;
+                try {
+                    cout << "Starting factorization" << endl;
+                    solver.factorize();
+                    cout << "Factorization successful" << endl;
+                    solver.solve(b, soln);
+                    cout << "Solve successful" << endl;
+                }
+                catch (exception& e) {
+                    cout << "Excpetion caught: " << e.what() << endl;
+                }
 
                 Assert::That(abs(soln(0)-x(0)), IsLessThan(eps));
                 Assert::That(abs(soln(1)-x(1)), IsLessThan(eps));
