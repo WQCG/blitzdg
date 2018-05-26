@@ -29,20 +29,16 @@ ifeq ($(OS), Windows_NT)
 	LIB += $(EXPLICITLIBS)
 endif
 
-all: builddirs $(TARGETS)
+all: $(TARGETS)
 
 $(TARGETS): $(ALLOBJECTS)
 	@mkdir -p $(BINDIR)
 	@echo " Linking $@..."
 	@echo " $(CXX) $(LINKERFLAGS) $(COMMONOBJECTS) $(wildcard $(subst bin/,,build/$@/*.o)) -o $@ $(LIB)"; $(CXX) $(LINKERFLAGS) $(COMMONOBJECTS) $(wildcard $(subst bin/,,build/$@/*.o)) -o $@ $(LIB)
 
-$(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT) builddirs
-	@echo " $(CXX) $(CFLAGS) $(EXTRACFLAGS) $(INC) -c -o $@ $<"; $(CXX) $(CFLAGS) $(EXTRACFLAGS) $(INC) -c -o $@ $<
-
-builddirs:
+$(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIRS)
-
-builddirs:
+	@echo " $(CXX) $(CFLAGS) $(EXTRACFLAGS) $(INC) -c -o $@ $<"; $(CXX) $(CFLAGS) $(EXTRACFLAGS) $(INC) -c -o $@ $<
 
 clean:
 	@echo " Cleaning...";
