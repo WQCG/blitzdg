@@ -12,14 +12,14 @@ namespace blitzdg {
      * Returns true if the matrix use row-major storage.
      */
     inline bool isRowMajor(const matrix_type& mat) {
-        return mat.isMajorRank(1);
+        return mat.isMajorRank(0);
     }
 
     /**
      * Returns true if the matrix uses column-major storage.
      */
     inline bool isColumnMajor(const matrix_type& mat) {
-        return mat.isMajorRank(2);
+        return mat.isMajorRank(1);
     }
 
     /**
