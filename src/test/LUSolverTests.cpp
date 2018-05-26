@@ -2,7 +2,6 @@
 // See COPYING and LICENSE files at project root for more details.
 
 #include "LUSolver.hpp"
-#include "SparseMatrixConverter.hpp"
 #include "Types.hpp"
 #include <igloo/igloo_alt.h>
 #include <blitz/array.h>
@@ -22,9 +21,6 @@ namespace blitzdg {
 
         vector_type b(N), x(N);
         matrix_type A(N,N);
-
-        SparseMatrixConverter * matrixConverter = nullptr;
-        LUSolver * luSolver = nullptr;
 
         Describe(LUSolver_Object) {
             void SetUp() {
@@ -46,14 +42,12 @@ namespace blitzdg {
                     3,
                     4,
                     5;
-
-                matrixConverter = new SparseMatrixConverter();
-                luSolver = new LUSolver(&A);
             }
 
             It(Solves_Ax_equals_b)  {
                 cout << "LUSolver" << endl;
-                LUSolver & solver = *luSolver;
+                CSCMat csc(A);
+                LUSolver solver(csc);
                 vector_type soln(N);
 
                 // Compute LU factors.
@@ -65,11 +59,6 @@ namespace blitzdg {
                 Assert::That(abs(soln(2)-x(2)), IsLessThan(eps));
                 Assert::That(abs(soln(3)-x(3)), IsLessThan(eps));
                 Assert::That(abs(soln(4)-x(4)), IsLessThan(eps));
-            }
-
-            void TearDown() {
-                delete luSolver;
-                delete matrixConverter;
             }
         };
     } // namespace LUSolverTests

@@ -7,7 +7,6 @@
  * routine DSGESV. Documentation at http://www.netlib.org/lapack/lapack-3.1.1/html/dsgesv.f.html.
  */
 #pragma once
-#include "SparseMatrixConverter.hpp"
 #include "Types.hpp"
 
 namespace blitzdg {
@@ -15,17 +14,8 @@ namespace blitzdg {
      * Implements the direct solution of a linear system via the LAPACK routine DSGESV,
      * which employs LU factorization with row pivoting and iterative refinement.
      */
-    class DirectSolver {
-        SparseMatrixConverter MatrixConverter;
-  
+    class DirectSolver {  
     public:
-        /**
-         * Default constructor.
-         */
-        DirectSolver()
-        : MatrixConverter{}
-        {}
-
         /**
          * Solves the linear system \f$AX = B\f$.
          * @param[in] A The \f$n\times n\f$ coefficient matrix.

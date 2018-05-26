@@ -2,6 +2,7 @@
 // See COPYING and LICENSE files at project root for more details.
 
 #include "DirectSolver.hpp"
+#include "DenseMatrixHelpers.hpp"
 #include <blitz/array.h>
 
 using blitz::firstIndex;
@@ -47,14 +48,15 @@ namespace blitzdg {
         Atrans = A(jj,ii);
         Btrans = B(jj,ii);
 
-        MatrixConverter.fullToPodArray(Atrans, Apod);
-        MatrixConverter.fullToPodArray(Btrans, Bpod);
+
+        fullToPodArray(Atrans, Apod);
+        fullToPodArray(Btrans, Bpod);
 
         dsgesv_(&sz, &Nrhs, Apod, &lda,
                 ipiv, Bpod, &ldb, Xpod, &ldx, 
                 work, swork, &iter, &info);
 
-        MatrixConverter.podArrayToFull(Xpod, Xtrans);
+        podArrayToFull(Xpod, Xtrans);
 
         X = Xtrans(jj,ii);
     }

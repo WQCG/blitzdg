@@ -1,6 +1,8 @@
+// Copyright (C) 2017-2018  Waterloo Quantitative Consulting Group, Inc.
+// See COPYING and LICENSE files at project root for more details.
+
 #include "CSCMatrix.hpp"
 #include "LinAlgHelpers.hpp"
-#include "SparseMatrixConverter.hpp"
 #include <blitz/array.h>
 #include <igloo/igloo_alt.h>
 #include <iostream>
@@ -54,10 +56,8 @@ namespace blitzdg {
                        0, 5, 0, 0, 0,
                        0, 2, 0, 0, 4,
                        1, 1, 1, 0, 0;
-                SparseTriplet trip;
-                SparseMatrixConverter conv;
-                conv.fullToSparseTriplet(full, trip);
-                CSCMat csc(5, 5, trip);
+                SparseTriplet trip(full);
+                CSCMat csc(trip);
                 matrix_type ret(5,5);
                 ret = cscToFull(csc);
                 ret -= full;
@@ -118,14 +118,12 @@ namespace blitzdg {
                        0, 5, 0, 0, 0,
                        0, 2, 0, 0, 4,
                        1, 1, 1, 0, 0;
-                SparseTriplet trip;
-                SparseMatrixConverter conv;
-                conv.fullToSparseTriplet(full, trip);
-                trip.row[0] = 0; trip.col[0] = 0; trip.val[0] = 1;
-                trip.row[1] = 0; trip.col[1] = 0; trip.val[1] = 2;
-                trip.row[5] = 0; trip.col[5] = 0; trip.val[5] = 3;
-                trip.row[9] = 0; trip.col[9] = 0; trip.val[9] = 4;
-                CSCMat csc(5, 5, trip);
+                SparseTriplet trip(full);
+                trip.row(0) = 0; trip.col(0) = 0; trip.elem(0) = 1;
+                trip.row(1) = 0; trip.col(1) = 0; trip.elem(1) = 2;
+                trip.row(5) = 0; trip.col(5) = 0; trip.elem(5) = 3;
+                trip.row(9) = 0; trip.col(9) = 0; trip.elem(9) = 4;
+                CSCMat csc(trip);
                 csc.removeDuplicates();
                 matrix_type ret(5,5);
                 ret = cscToFull(csc);

@@ -1,4 +1,5 @@
 #include "CSCMatrix.hpp"
+#include "DenseMatrixHelpers.hpp"
 #include <cmath>
 #include <iomanip>
 #include <limits>
@@ -13,17 +14,6 @@ using std::setw;
 
 namespace blitzdg {
     namespace {
-        index_type countNonzeros(const matrix_type& mat, real_type dropTol) {
-            real_type nnz = 0;
-            for (matrix_type::const_iterator itr = mat.begin(); itr != mat.end(); ++itr) {
-                if (abs(*itr) > dropTol)
-                    ++nnz;
-            }
-            if (nnz > numeric_limits<index_type>::max())
-                throw runtime_error("countNonzeros: number of nonzero elements exceeds maximum allowable");
-            return static_cast<index_type>(nnz);
-        }
-
         index_type numDigits(index_type n) {
             if (n == 0) return 1;
             index_type ret = 0;
@@ -49,15 +39,15 @@ namespace blitzdg {
         }
 	}
 
-    CSCMat::CSCMat(index_type rows, index_type cols, const SparseTriplet& triplet) 
+    CSCMat::CSCMat(const SparseTriplet& triplet) 
         : mat_{ nullptr }
     {
         // create a CXSparse triplet that is a copy of triplet
-        cs_di* tmp = cs_di_spalloc(rows, cols, triplet.nz, 1, 1);
+        cs_di* tmp = cs_di_spalloc(triplet.rows(), triplet.cols(), triplet.nnz(), 1, 1);
         if (!tmp)
             throw runtime_error("CSCMat::CSCMat: unable to create matrix from sparse triplet");
-        for (index_type k = 0; k < triplet.nz; ++k) {
-            if (!cs_di_entry(tmp, triplet.row[k], triplet.col[k], triplet.val[k])) {
+        for (index_type k = 0; k < triplet.nnz(); ++k) {
+            if (!cs_di_entry(tmp, triplet.row(k), triplet.col(k), triplet.elem(k))) {
                 cs_di_spfree(tmp);
                 throw runtime_error("CSCMat::CSCMat: unable to create matrix from sparse triplet");
             }

@@ -1,11 +1,7 @@
 // Copyright (C) 2017-2018  Waterloo Quantitative Consulting Group, Inc.
 // See COPYING and LICENSE files at project root for more details.
 
-#include "DirectSolver.hpp"
-#include "EigenSolver.hpp"
-#include "LUSolver.hpp"
 #include "Nodes1DProvisioner.hpp"
-#include "SparseMatrixConverter.hpp"
 #include "Types.hpp"
 #include <igloo/igloo_alt.h>
 #include <blitz/array.h>
@@ -26,11 +22,7 @@ namespace blitzdg {
         firstIndex ii;
         secondIndex jj;
 
-        LUSolver * luSolver = nullptr;
-        SparseMatrixConverter * matrixConverter = nullptr;
         Nodes1DProvisioner * nodes1DProvisioner = nullptr;
-        EigenSolver * eigenSolver = nullptr;
-        DirectSolver * directSolver = nullptr;
 
         Describe(Nodes1DProvisioner_Object) {
             void SetUp() {

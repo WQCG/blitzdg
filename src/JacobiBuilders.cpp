@@ -2,11 +2,16 @@
 // See COPYING and LICENSE files at project root for more details.
 
 #include "JacobiBuilders.hpp"
-#include "EigenSolver.hpp"
-#include "Types.hpp"
+#include <cmath>
+#include <limits>
 
-
-using namespace blitz;
+using blitz::firstIndex;
+using blitz::Range;
+using blitz::secondIndex;
+using std::numeric_limits;
+using std::pow;
+using std::sqrt;
+using std::tgamma;
 
 namespace blitzdg {
 

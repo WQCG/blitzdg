@@ -9,21 +9,11 @@
  */
 
 #pragma once
-#include "SparseMatrixConverter.hpp"
 #include "Types.hpp"
 
 namespace blitzdg {
   class EigenSolver {
-      SparseMatrixConverter MatrixConverter;
-
   public:
-      /**
-       * Default constructor.
-       */
-      EigenSolver()
-        : MatrixConverter()
-      {}
-
       /**
        * Computes the eigenvalues and eigenvectors of the symmetric matrix \f$A\f$.
        * @param[in] A The \f$n\times n\f$ symmetric coefficient matrix.

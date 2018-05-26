@@ -1,3 +1,10 @@
+// Copyright (C) 2017-2018  Waterloo Quantitative Consulting Group, Inc.
+// See COPYING and LICENSE files at project root for more details.
+
+/**
+ * @file CSCMatrix.hpp
+ * Defines a compressed sparse column matrix class.
+ */
 #pragma once
 #include "SparseTriplet.hpp"
 #include "Types.hpp"
@@ -45,12 +52,10 @@ namespace blitzdg {
 		CSCMat(index_type rows, index_type cols, index_type nnz);
 
         /**
-         * Constructor that creates a rows x cols CSC matrix from a sparse triplet.
-         * @param[in] rows The number of rows.
-         * @param[in] cols The number of columns.
+         * Constructor that creates a CSC matrix from a sparse triplet.
          * @param[in] triplet The sparse triplet matrix.
          */
-        CSCMat(index_type rows, index_type cols, const SparseTriplet& triplet);
+        explicit CSCMat(const SparseTriplet& triplet);
 
         /**
          * Constructor that creates a CSC matrix from a dense matrix.
@@ -181,7 +186,7 @@ namespace blitzdg {
 		}
 		
         /**
-         * Returns a const pointer to the underlying 
+         * Returns a const pointer to the  
          * array of row indices.
          */
 		const index_type* rowInds() const {
@@ -189,7 +194,7 @@ namespace blitzdg {
 		}
 		
         /**
-         * Returns a const pointer to the underlying
+         * Returns a const pointer to the 
          * array that stores the locations of 
          * the start of each column.
          */
@@ -198,7 +203,7 @@ namespace blitzdg {
 		}
 		
         /**
-         * Returns a const pointer to the underlying array
+         * Returns a const pointer to the array
          * of values.
          */
 		const real_type* elems() const {
@@ -232,8 +237,8 @@ namespace blitzdg {
 	};
 
     /**
-     * Writes the CSC matrix in coordinate format (i, j, elem) to the
-     * output stream.
+     * Writes the CSC matrix to the output stream 
+     * in coordinate format (i, j, elem).
      */
     std::ostream& operator<<(std::ostream& strm, const CSCMat& mat);
 	

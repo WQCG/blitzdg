@@ -2,6 +2,7 @@
 // See COPYING and LICENSE files at project root for more details.
 
 #include "EigenSolver.hpp"
+#include "DenseMatrixHelpers.hpp"
 #include <blitz/array.h>
 
 using blitz::firstIndex;
@@ -29,7 +30,7 @@ namespace blitzdg {
 
         real_type* Apod = new real_type[sz*lda];
 
-        MatrixConverter.fullToPodArray(A, Apod);
+        fullToPodArray(A, Apod);
 
         /* Determining optimal workspace parameters */
         dsyevd_( &JOBZ, UPLO, &sz, Apod, &lda, ww, &wkopt, &lwork, &iwkopt, &liwork, &info );
@@ -42,7 +43,7 @@ namespace blitzdg {
         /* Solve eigenproblem */
         dsyevd_( &JOBZ, UPLO, &sz, Apod, &lda, ww, work, &lwork, iwork, &liwork, &info );
 
-        MatrixConverter.podArrayToFull(Apod, eigenvectors);
+        podArrayToFull(Apod, eigenvectors);
 
         for (index_type i=0; i < sz; i++)
             eigenvalues(i) = ww[i];
