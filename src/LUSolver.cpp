@@ -6,18 +6,9 @@
 #include <stdexcept>
 
 using std::runtime_error;
-using std::cout;
-using std::endl;
 
 namespace blitzdg {
     bool LUSolver::symbolicFactorize() {
-        cout << "rows: " << mat_.rows() << endl;
-        cout << "cols: " << mat_.cols() << endl;
-        cout << "colPtrs: " << mat_.colPtrs() << endl;
-        cout << "rowInds: " << mat_.rowInds() << endl;
-        cout << "elems: " << mat_.elems() << endl;
-        cout << "symbolic: " << symbolic_ << endl;
-        
         index_type flag = umfpack_di_symbolic(mat_.rows(), mat_.cols(), mat_.colPtrs(), 
             mat_.rowInds(), mat_.elems(), &symbolic_, (double*)NULL, (double*)NULL);
         return flag == UMFPACK_OK;
