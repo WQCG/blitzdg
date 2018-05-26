@@ -41,13 +41,13 @@ namespace blitzdg {
             throw runtime_error("LUSolver::factorize: symbolic factorization failed");
         else if (!numericFactorize())
             throw runtime_error("LUSolver::factorize: numeric factorization failed");
-        // delete the symbolic factorization since we don't need it any longer
+        // free the symbolic factorization since we don't need it any longer
         umfpack_di_free_symbolic(&symbolic_);
     }
 
     void LUSolver::solve(const vector_type& rhs, vector_type& soln) const {
-        if (!numeric_) // check that factorize has been called
-            throw runtime_error("LUSolver::solve: must call factorize before calling solve");
+        if (!numeric_ || !mat_) // check that factorize has been called
+            throw runtime_error("LUSolver::solve: call factorize before calling solve");
         if (rhs.length(0) < order_) // check length of rhs
             throw runtime_error("LUSolver::solve: rhs length is less than matrix order");
         if (soln.length(0) < order_) // check length of soln
