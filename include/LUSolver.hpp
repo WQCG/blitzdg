@@ -26,10 +26,8 @@ namespace blitzdg {
      * @param[in] mat The CSC matrix to be factorized.
      */
     explicit LUSolver(const CSCMat& mat)
-      : symbolic_{ nullptr }, numeric_{ nullptr }
-    {
-      mat_ = mat;
-    }
+      : mat_ { mat }, symbolic_{ nullptr }, numeric_{ nullptr }
+    {}
 
     /**
      * Returns a reference to the underlying CSC matrix.
