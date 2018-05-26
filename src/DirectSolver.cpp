@@ -3,9 +3,14 @@
 
 #include "DirectSolver.hpp"
 #include <blitz/array.h>
+#include <string>
+#include <stdexcept>
+#include <iomanip>
 
 using blitz::firstIndex;
 using blitz::secondIndex;
+using std::runtime_error;
+using std::stringstream;
 
 namespace blitzdg {
     extern "C" {
@@ -53,6 +58,15 @@ namespace blitzdg {
         dsgesv_(&sz, &Nrhs, Apod, &lda,
                 ipiv, Bpod, &ldb, Xpod, &ldx, 
                 work, swork, &iter, &info);
+
+        if (info < 0) {
+            stringstream strm;
+            strm << "Error calling DSGESV. Error was in Argument " << info*(-1);
+            throw runtime_error(strm.str());
+        } else if (info > 0) {
+            throw runtime_error("Factor U contains a diagonal element that is exactly zero" );
+        }
+
 
         MatrixConverter.podArrayToFull(Xpod, Xtrans);
 
