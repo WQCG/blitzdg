@@ -55,7 +55,7 @@ namespace blitzdg {
       freeMem();
     }
   private:
-    CSCMat mat_;
+    const CSCMat mat_;
     void* symbolic_;
     void* numeric_;
 
