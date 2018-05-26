@@ -42,7 +42,7 @@ namespace blitzdg {
                     4,
                     5;
                 cout << "LUSolver" << endl;
-                CSCMat csc(A);
+                CSCMat csc(A, 2*numeric_limits<real_type>::epsilon());
                 LUSolver solver(csc);
                 cout << "Done building LUSolver" << endl;
                 vector_type soln(N);
