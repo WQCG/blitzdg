@@ -8,9 +8,9 @@ using std::numeric_limits;
 using std::runtime_error;
 
 namespace blitzdg {
-    index_type countNonzeros(const matrix_type& mat, real_type dropTol) {
+    index_type countNonzeros(const real_matrix_type& mat, real_type dropTol) {
         real_type nnz = 0;
-        for (matrix_type::const_iterator itr = mat.begin(); itr != mat.end(); ++itr) {
+        for (real_matrix_type::const_iterator itr = mat.begin(); itr != mat.end(); ++itr) {
             if (abs(*itr) > dropTol)
                 ++nnz;
         }
@@ -19,7 +19,7 @@ namespace blitzdg {
         return static_cast<index_type>(nnz);
     }
 
-    void fullToPodArray(const matrix_type& mat, real_type* arr, bool byRows) {
+    void fullToPodArray(const real_matrix_type& mat, real_type* arr, bool byRows) {
         index_type nnz = 0;
         if (byRows) {
             for (index_type i = 0; i < mat.rows(); ++i) {
@@ -35,7 +35,7 @@ namespace blitzdg {
         }
     }
 
-    void podArrayToFull(const real_type* arr, matrix_type& mat, bool byRows) {
+    void podArrayToFull(const real_type* arr, real_matrix_type& mat, bool byRows) {
         index_type nnz = 0;
         if (byRows) {
             for (index_type i = 0; i < mat.rows(); ++i) {

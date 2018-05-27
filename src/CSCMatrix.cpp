@@ -60,7 +60,7 @@ namespace blitzdg {
             throw runtime_error("CSCMat::CSCMat: unable to create matrix from sparse triplet");
     }
 
-    CSCMat::CSCMat(const matrix_type& mat, real_type dropTol) 
+    CSCMat::CSCMat(const real_matrix_type& mat, real_type dropTol) 
         : mat_{ nullptr }
     {
         // allocate memory

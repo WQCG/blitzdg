@@ -20,8 +20,8 @@ namespace blitzdg {
     namespace SparseTripletTests {
         using namespace igloo;
 
-        matrix_type tripToFull(const SparseTriplet& trip) {
-            matrix_type ret(trip.rows(), trip.cols());
+        real_matrix_type tripToFull(const SparseTriplet& trip) {
+            real_matrix_type ret(trip.rows(), trip.cols());
             ret = real_type(0);
             for (index_type k = 0; k < trip.nnz(); ++k) {
                 ret(trip.row(k), trip.col(k)) = trip.elem(k);
@@ -31,14 +31,14 @@ namespace blitzdg {
 
         Describe(SparseTriplet_Object) {
             It(Should_Build_From_A_Dense_Matrix) {
-                matrix_type full(5,5);
+                real_matrix_type full(5,5);
                 full = 1, 0, 0, 3, 2,
                        0, 0, 1, 1, 0,
                        0, 5, 0, 0, 0,
                        0, 2, 0, 0, 4,
                        1, 1, 1, 0, 0;
                 SparseTriplet trip(full);
-                matrix_type ret = tripToFull(trip);
+                real_matrix_type ret = tripToFull(trip);
                 ret -= full;
                 real_type diff = normMax(ret);
                 cout << "SparseTriplet: build from full matrix" << endl;
@@ -51,7 +51,7 @@ namespace blitzdg {
             }
 
             It(Should_Build_By_Inserting_Elements) {
-                matrix_type full(5,5);
+                real_matrix_type full(5,5);
                 full = 1, 0, 0, 3, 2,
                        0, 0, 1, 1, 0,
                        0, 5, 0, 0, 0,
@@ -74,26 +74,26 @@ namespace blitzdg {
                 Assert::That(trip.nzmax(), Equals(13));
                 trip.insert(4, 2, 1);
                 Assert::That(trip.nnz(), Equals(11));
-                matrix_type ret = tripToFull(trip);
+                real_matrix_type ret = tripToFull(trip);
                 ret -= full;
                 real_type diff = normMax(ret);
                 Assert::That(diff, Equals(0.0));
             }
 
             It(Should_Build_From_Array_Input) {
-                matrix_type full(5,5);
+                real_matrix_type full(5,5);
                 full = 1, 0, 0, 3, 2,
                        0, 0, 1, 1, 0,
                        0, 5, 0, 0, 0,
                        0, 2, 0, 0, 4,
                        1, 1, 1, 0, 0;
                 index_vector_type r(11), c(11);
-                vector_type e(11);
+                real_vector_type e(11);
                 r = 0, 0, 0, 1, 1, 2, 3, 3, 4, 4, 4;
                 c = 0, 3, 4, 2, 3, 1, 1, 4, 0, 1, 2;
                 e = 1, 3, 2, 1, 1, 5, 2, 4, 1, 1, 1;
                 SparseTriplet trip(11, r.data(), c.data(), e.data());
-                matrix_type ret = tripToFull(trip);
+                real_matrix_type ret = tripToFull(trip);
                 ret -= full;
                 real_type diff = normMax(ret);
                 cout << "SparseTriplet: build from arrays" << endl;
@@ -114,7 +114,7 @@ namespace blitzdg {
             }
 
             It(Should_Clear_All_Its_Elements) {
-                matrix_type full(5,5);
+                real_matrix_type full(5,5);
                 full = 1, 0, 0, 3, 2,
                        0, 0, 1, 1, 0,
                        0, 5, 0, 0, 0,
@@ -122,7 +122,7 @@ namespace blitzdg {
                        1, 1, 1, 0, 0;
                 SparseTriplet trip(full);
                 trip.clear();
-                matrix_type ret = tripToFull(trip);
+                real_matrix_type ret = tripToFull(trip);
                 real_type diff = normMax(ret);
                 cout << "SparseTriplet: clear all elements" << endl;
                 Assert::That(trip.nnz(), Equals(0));
@@ -131,7 +131,7 @@ namespace blitzdg {
             }
 
             It(Should_Swap_Two_Matrices) {
-                matrix_type full(5,5), dens(3,3);
+                real_matrix_type full(5,5), dens(3,3);
                 full = 1, 0, 0, 3, 2,
                        0, 0, 1, 1, 0,
                        0, 5, 0, 0, 0,
@@ -143,7 +143,7 @@ namespace blitzdg {
                 SparseTriplet t1(full), t2(dens);
                 using std::swap;
                 swap(t1, t2);
-                matrix_type ret1(3,3), ret2(5,5);
+                real_matrix_type ret1(3,3), ret2(5,5);
                 ret1 = tripToFull(t1);
                 ret2 = tripToFull(t2);
                 ret1 -= dens;
@@ -154,7 +154,7 @@ namespace blitzdg {
             }
 
             It(Should_Print_To_An_Output_Stream) {
-                matrix_type full(2,2);
+                real_matrix_type full(2,2);
                 full = 1,2,
                        3,4;
                 string s = "rows = 2, cols = 2, nnz = 4\n\n0 0 1\n0 1 2\n1 0 3\n1 1 4\n";

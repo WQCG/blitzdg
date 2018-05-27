@@ -22,8 +22,8 @@ namespace blitzdg {
             It(Solves_Ax_equals_b)  {
                 const real_type eps=10*numeric_limits<real_type>::epsilon();
                 const index_type N=5;
-                vector_type b(N), x(N);
-                matrix_type A(N,N);
+                real_vector_type b(N), x(N);
+                real_matrix_type A(N,N);
                  A = 2,3,0,0,0,
                         3,0,4,0,6,
                         0,-1,-3,2,0,
@@ -45,7 +45,7 @@ namespace blitzdg {
                 CSCMat csc(A);
                 LUSolver solver;
                 cout << "Done building LUSolver" << endl;
-                vector_type soln(N);
+                real_vector_type soln(N);
 
                 // Compute LU factors.
                 cout << "Starting factorization" << endl;

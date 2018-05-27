@@ -41,7 +41,7 @@ namespace blitzdg {
      * @param[in] rhs The right-hand side.
      * @param[out] soln The solution of the linear system.
      */
-    void solve(const vector_type& rhs, vector_type& soln) const;
+    void solve(const real_vector_type& rhs, real_vector_type& soln) const;
 
     /**
      * Destructor.

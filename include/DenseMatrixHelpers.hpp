@@ -11,14 +11,14 @@ namespace blitzdg {
     /**
      * Returns true if the matrix use row-major storage.
      */
-    inline bool isRowMajor(const matrix_type& mat) {
+    inline bool isRowMajor(const real_matrix_type& mat) {
         return mat.isMajorRank(0);
     }
 
     /**
      * Returns true if the matrix uses column-major storage.
      */
-    inline bool isColumnMajor(const matrix_type& mat) {
+    inline bool isColumnMajor(const real_matrix_type& mat) {
         return mat.isMajorRank(1);
     }
 
@@ -29,7 +29,7 @@ namespace blitzdg {
      * @note An element \f$a_{ij}\f$ of the input matrix is considered
      * nonzero if \f$|a_{ij}| > \mathrm{dropTol}\f$. 
      */
-    index_type countNonzeros(const matrix_type& mat, real_type dropTol = real_type(0));
+    index_type countNonzeros(const real_matrix_type& mat, real_type dropTol = real_type(0));
 
     /**
      * Vectorizes a dense matrix. 
@@ -40,7 +40,7 @@ namespace blitzdg {
      * least m*n elements, where m is the the number of rows of mat and n is 
      * the number of columns. 
      */
-    void fullToPodArray(const matrix_type& mat, real_type* arr, bool byRows = true);
+    void fullToPodArray(const real_matrix_type& mat, real_type* arr, bool byRows = true);
 
     /**
      * Reshapes an array to a dense matrix.
@@ -51,5 +51,5 @@ namespace blitzdg {
      * least m*n elements, where m is the the number of rows of mat and n is 
      * the number of columns. 
      */
-    void podArrayToFull(const real_type* arr, matrix_type& mat, bool byRows = true);
+    void podArrayToFull(const real_type* arr, real_matrix_type& mat, bool byRows = true);
 } // namespace blitzdg

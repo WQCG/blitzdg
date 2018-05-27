@@ -32,7 +32,7 @@ namespace blitzdg {
          * @note The matrix A must be stored in column-major format and be at least n-by-n.
          * @note The upper triangular matrix \f$U\f$ must be nonsingular.
          */
-        void backSolve(index_type n, matrix_type& A, vector_type& x);
+        void backSolve(index_type n, real_matrix_type& A, real_vector_type& x);
 
         /**
          * Calls the BLAS function dgemv to compute the matrix-vector 
@@ -43,12 +43,12 @@ namespace blitzdg {
          * @param[out] result The computed product.
          * @note The matrix A must be stored in column-major format and have at least n columns.
          */
-        void matTimesVec(index_type n, matrix_type& A, vector_type& x, vector_type& result);
+        void matTimesVec(index_type n, real_matrix_type& A, real_vector_type& x, real_vector_type& result);
 
         /**
          * Returns true if the input array x is not uniquely zero.
          */ 
-        inline bool isNonzero(const vector_type& x) {
+        inline bool isNonzero(const real_vector_type& x) {
             return std::any_of(x.begin(), x.end(),
                 [](real_type val) { return val != real_type(0); });
         }
@@ -194,14 +194,14 @@ namespace blitzdg {
          * i.e., it computes \f$Ax\f$. It must define an overload of operator() 
          * with the signature:
          * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         * bool operator()(const vector_type& in, vector_type& out)
+         * bool operator()(const real_vector_type& in, real_vector_type& out)
          * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          * which returns true if successful.
          * @param[in] precon is a functor that applies the preconditioner
          * to a vector, i.e., it computes \f$M^{-1}x\f$.
          * It must define an overload of operator() with the signature:
          * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         * bool operator()(const vector_type& in, vector_type& out)
+         * bool operator()(const real_vector_type& in, real_vector_type& out)
          * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          * which returns true if successful.
          * @param[in] b The right-hand side of the linear system.
@@ -210,20 +210,20 @@ namespace blitzdg {
          * @return The convergence information.
          */
         template <typename Matvec, typename Precon>
-        GMRESOut solve(Matvec mvec, Precon precon, const vector_type& b,
-            vector_type& x, const GMRESParams& params = GMRESParams()) const;
+        GMRESOut solve(Matvec mvec, Precon precon, const real_vector_type& b,
+            real_vector_type& x, const GMRESParams& params = GMRESParams()) const;
     };
 
     template <typename Matvec, typename Precon>
-    GMRESOut GMRESSolver::solve(Matvec mvec, Precon precon, const vector_type& b,
-            vector_type& x, const GMRESParams& params) const
+    GMRESOut GMRESSolver::solve(Matvec mvec, Precon precon, const real_vector_type& b,
+            real_vector_type& x, const GMRESParams& params) const
     {
         checkGMRESParams(params); // check for any errors in input parameters
         const index_type N = x.size();
         const index_type kspaceSz = std::min(N, params.kspaceSz);
-        vector_type r(N), w(N), pv(N), s(kspaceSz + 1);
-        matrix_type H(kspaceSz + 1, kspaceSz, blitz::ColumnMajorArray<2>());
-        matrix_type V(N, kspaceSz + 1, blitz::ColumnMajorArray<2>());
+        real_vector_type r(N), w(N), pv(N), s(kspaceSz + 1);
+        real_matrix_type H(kspaceSz + 1, kspaceSz, blitz::ColumnMajorArray<2>());
+        real_matrix_type V(N, kspaceSz + 1, blitz::ColumnMajorArray<2>());
         std::vector<std::pair<real_type, real_type>> givens(kspaceSz);
         GMRESOut ret;
         r = b;
@@ -287,7 +287,7 @@ namespace blitzdg {
             for (index_type i = 0; i < kspaceSz; ++i) {
                 ret.innerIts = i;
                 real_type rnrmold = rnrm;
-                vector_type viref = V(blitz::Range::all(), i); // ref to slice
+                real_vector_type viref = V(blitz::Range::all(), i); // ref to slice
                 if (!precon(viref, pv)) { // pv = M^{-1}*V(:,i)
                     ret.flag = ConvFlag::precon_fail;
                     ret.msg = "preconditioner application in inner loop failed";

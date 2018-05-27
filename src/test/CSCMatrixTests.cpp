@@ -22,8 +22,8 @@ namespace blitzdg {
     namespace CSCMatrixTests {
         using namespace igloo;
 
-        matrix_type cscToFull(const CSCMat& mat) {
-            matrix_type ret(mat.rows(), mat.cols(), ColumnMajorArray<2>());
+        real_matrix_type cscToFull(const CSCMat& mat) {
+            real_matrix_type ret(mat.rows(), mat.cols(), ColumnMajorArray<2>());
             ret = real_type(0);
             for (index_type j = 0; j < mat.cols(); ++j) {
                 for (index_type k = mat.colPtrs(j); k < mat.colPtrs(j + 1); ++k)
@@ -34,14 +34,14 @@ namespace blitzdg {
 
         Describe(CSCMat_Object) {
             It(Should_Build_From_A_Dense_Matrix) {
-                matrix_type full(5,5);
+                real_matrix_type full(5,5);
                 full = 1, 0, 0, 3, 2,
                        0, 0, 1, 1, 0,
                        0, 5, 0, 0, 0,
                        0, 2, 0, 0, 4,
                        1, 1, 1, 0, 0;
                 CSCMat csc(full);
-                matrix_type ret(5,5);
+                real_matrix_type ret(5,5);
                 ret = cscToFull(csc);
                 ret -= full;
                 real_type diff = normMax(ret);
@@ -54,7 +54,7 @@ namespace blitzdg {
             }
 
             It(Should_Build_From_A_Sparse_Triplet) {
-                matrix_type full(5,5);
+                real_matrix_type full(5,5);
                 full = 1, 0, 0, 3, 2,
                        0, 0, 1, 1, 0,
                        0, 5, 0, 0, 0,
@@ -62,7 +62,7 @@ namespace blitzdg {
                        1, 1, 1, 0, 0;
                 SparseTriplet trip(full);
                 CSCMat csc(trip);
-                matrix_type ret(5,5);
+                real_matrix_type ret(5,5);
                 ret = cscToFull(csc);
                 ret -= full;
                 real_type diff = normMax(ret);
@@ -84,7 +84,7 @@ namespace blitzdg {
                 tmp->nz = -1;
                 CSCMat::cs_di_smart_ptr ptr(tmp);
                 CSCMat csc(move(ptr));
-                matrix_type full(5,5), ret(5,5);
+                real_matrix_type full(5,5), ret(5,5);
                 full = 1,1,1,1,1,
                        1,1,1,1,1,
                        1,1,1,1,1,
@@ -98,7 +98,7 @@ namespace blitzdg {
             }
 
             It(Should_Prune_Any_Explicit_Zeros) {
-                matrix_type full(5,5);
+                real_matrix_type full(5,5);
                 full = 1, 0, 0, 3, 2,
                        0, 0, 1, 1, 0,
                        0, 5, 0, 0, 0,
@@ -107,7 +107,7 @@ namespace blitzdg {
                 CSCMat csc(full, -1);
                 Assert::That(csc.nnz(), Equals(25));
                 csc.prune(-1);
-                matrix_type ret(5,5);
+                real_matrix_type ret(5,5);
                 ret = cscToFull(csc);
                 ret -= full;
                 real_type diff = normMax(ret);
@@ -116,7 +116,7 @@ namespace blitzdg {
             }
 
             It(Should_Remove_Duplicate_Elements) {
-                matrix_type full(5,5);
+                real_matrix_type full(5,5);
                 full = 1, 0, 0, 3, 2,
                        0, 0, 1, 1, 0,
                        0, 5, 0, 0, 0,
@@ -129,7 +129,7 @@ namespace blitzdg {
                 trip.row(9) = 0; trip.col(9) = 0; trip.elem(9) = 4;
                 CSCMat csc(trip);
                 csc.removeDuplicates();
-                matrix_type ret(5,5);
+                real_matrix_type ret(5,5);
                 ret = cscToFull(csc);
                 cout << "CSCMat: remove duplicate elements from matrix" << endl;
                 Assert::That(csc.nnz(), Equals(8));
@@ -137,7 +137,7 @@ namespace blitzdg {
             }
 
             It(Should_Compute_The_Transpose) {
-                matrix_type full(5,5);
+                real_matrix_type full(5,5);
                 full = 1, 0, 0, 3, 2,
                        0, 0, 1, 1, 0,
                        0, 5, 0, 0, 0,
@@ -147,9 +147,9 @@ namespace blitzdg {
                 CSCMat csct = transpose(csc);
                 firstIndex ii;
                 secondIndex jj;
-                matrix_type trans(5,5);
+                real_matrix_type trans(5,5);
                 trans = full(jj,ii);
-                matrix_type ret(5,5);
+                real_matrix_type ret(5,5);
                 ret = cscToFull(csct);
                 ret -= trans;
                 real_type diff = normMax(ret);
@@ -163,7 +163,7 @@ namespace blitzdg {
             }
 
             It(Should_Multiply_Two_Matrices) {
-                matrix_type full(5,5), fullp(5,5);
+                real_matrix_type full(5,5), fullp(5,5);
                 full = 1, 0, 0, 3, 2,
                        0, 0, 1, 1, 0,
                        0, 5, 0, 0, 0,
@@ -177,7 +177,7 @@ namespace blitzdg {
                 CSCMat csc(full);
                 CSCMat csct = transpose(csc);
                 CSCMat prod = multiply(csct, csc);
-                matrix_type ret(5,5);
+                real_matrix_type ret(5,5);
                 ret = cscToFull(prod);
                 ret -= fullp;
                 real_type diff = normMax(ret);
@@ -186,7 +186,7 @@ namespace blitzdg {
             }
 
             It(Should_Copy_Construct) {
-                matrix_type full(5,5);
+                real_matrix_type full(5,5);
                 full = 1, 0, 0, 3, 2,
                        0, 0, 1, 1, 0,
                        0, 5, 0, 0, 0,
@@ -194,7 +194,7 @@ namespace blitzdg {
                        1, 1, 1, 0, 0;
                 CSCMat csc(full);
                 CSCMat cscnew = csc;
-                matrix_type ret(5,5);
+                real_matrix_type ret(5,5);
                 ret = cscToFull(cscnew);
                 ret -= full;
                 real_type diff = normMax(ret);
@@ -203,7 +203,7 @@ namespace blitzdg {
             }
 
             It(Should_Copy_Assign) {
-                matrix_type full(5,5), dens(3,3);
+                real_matrix_type full(5,5), dens(3,3);
                 full = 1, 0, 0, 3, 2,
                        0, 0, 1, 1, 0,
                        0, 5, 0, 0, 0,
@@ -215,7 +215,7 @@ namespace blitzdg {
                 CSCMat cscf(full);
                 CSCMat cscd(dens);
                 cscf = cscd;
-                matrix_type ret(3,3);
+                real_matrix_type ret(3,3);
                 ret = cscToFull(cscf);
                 ret -= dens;
                 real_type diff = normMax(ret);
@@ -224,7 +224,7 @@ namespace blitzdg {
             }
 
             It(Should_Swap_Two_Matrices) {
-                matrix_type full(5,5), dens(3,3);
+                real_matrix_type full(5,5), dens(3,3);
                 full = 1, 0, 0, 3, 2,
                        0, 0, 1, 1, 0,
                        0, 5, 0, 0, 0,
@@ -236,7 +236,7 @@ namespace blitzdg {
                 CSCMat csc1(full), csc2(dens);
                 using std::swap;
                 swap(csc1, csc2);
-                matrix_type ret1(3,3), ret2(5,5);
+                real_matrix_type ret1(3,3), ret2(5,5);
                 ret1 = cscToFull(csc1);
                 ret2 = cscToFull(csc2);
                 ret1 -= dens;
@@ -247,7 +247,7 @@ namespace blitzdg {
             }
 
             It(Should_Print_To_An_Output_Stream) {
-                matrix_type full(2,2);
+                real_matrix_type full(2,2);
                 full = 1,2,
                        3,4;
                 string s = "rows = 2, cols = 2, nnz = 4\n\n0 0 1\n1 0 3\n0 1 2\n1 1 4\n";
