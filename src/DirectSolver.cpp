@@ -11,6 +11,7 @@ using blitz::firstIndex;
 using blitz::secondIndex;
 using std::runtime_error;
 using std::stringstream;
+using std::endl;
 
 namespace blitzdg {
     extern "C" {
@@ -59,14 +60,14 @@ namespace blitzdg {
                 ipiv, Bpod, &ldb, Xpod, &ldx, 
                 work, swork, &iter, &info);
 
+        stringstream strm;
         if (info < 0) {
-            stringstream strm;
-            strm << "Error calling DSGESV. Error was in Argument " << info*(-1);
+            strm << "Error calling DSGESV. Error was in Argument " << info*(-1) << "." << endl;
             throw runtime_error(strm.str());
         } else if (info > 0) {
-            throw runtime_error("Factor U contains a diagonal element that is exactly zero" );
+            strm << "Solution is singular. Factor U contains a diagonal element U(i,i) that is exactly zero, with i=" << info << "." << endl;
+            throw runtime_error(strm.str());
         }
-
 
         MatrixConverter.podArrayToFull(Xpod, Xtrans);
 
