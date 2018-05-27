@@ -175,7 +175,8 @@ namespace blitzdg {
                 index_type vGlobal = E2V(k, v);
                 FToVtrans.colPtrs(globalFaceNum) = globalFaceNum;
                 FToVtrans.rowInds(globalFaceNum) = vGlobal;
-                FToVtrans.elems(globalFaceNum++) = 1.0;
+                FToVtrans.elems(globalFaceNum) = 1.0;
+                ++globalFaceNum;
             }
         }
         FToVtrans.colPtrs(totalFaces) = globalFaceNum;
@@ -192,7 +193,8 @@ namespace blitzdg {
                 index_type i = FToF.rowInds(k);
                 if (i != j && FToF.elems(k) == 1.0) {
                     f1(connectionsCount) = i;
-                    f2(connectionsCount++) = j;
+                    f2(connectionsCount) = j;
+                    ++connectionsCount;
                 }
             }
         }
