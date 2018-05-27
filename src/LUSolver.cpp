@@ -46,7 +46,7 @@ namespace blitzdg {
         symbolic_ = nullptr;
     }
 
-    void LUSolver::solve(const vector_type& rhs, vector_type& soln) const {
+    void LUSolver::solve(const real_vector_type& rhs, real_vector_type& soln) const {
         if (!numeric_ || !mat_) // check that factorize has been called
             throw runtime_error("LUSolver::solve: call factorize before calling solve");
         if (rhs.length(0) < order_) // check length of rhs

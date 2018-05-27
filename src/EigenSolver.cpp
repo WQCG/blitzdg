@@ -14,7 +14,7 @@ namespace blitzdg {
                     double* w, double* work, int* lwork, int* iwork, int* liwork, int* info );
     }
 
-    void EigenSolver::solve(const matrix_type& A, vector_type& eigenvalues, matrix_type& eigenvectors) const {
+    void EigenSolver::solve(const real_matrix_type& A, real_vector_type& eigenvalues, real_matrix_type& eigenvectors) const {
         index_type sz = A.rows();
         index_type lda = sz;
         index_type iwkopt;

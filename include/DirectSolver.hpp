@@ -24,7 +24,7 @@ namespace blitzdg {
          * @note We assume that the matrix \f$A\f$ uses the default rowwise storage order
          * of blitz++ 2D arrays.
          */
-        void solve(const matrix_type& A, const matrix_type& B, matrix_type& X) const;
+        void solve(const real_matrix_type& A, const real_matrix_type& B, real_matrix_type& X) const;
   };
 } // namespace blitzdg
 

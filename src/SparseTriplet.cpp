@@ -40,10 +40,10 @@ namespace blitzdg {
 		nzmax_ = nzmax_new;
 	}
 
-	SparseTriplet::SparseTriplet(const matrix_type& mat, real_type dropTol) 
+	SparseTriplet::SparseTriplet(const real_matrix_type& mat, real_type dropTol) 
 		: SparseTriplet(mat.rows(), mat.cols(), countNonzeros(mat, dropTol))
 	{
-		for (matrix_type::const_iterator itr = mat.begin(); itr != mat.end(); ++itr) {
+		for (real_matrix_type::const_iterator itr = mat.begin(); itr != mat.end(); ++itr) {
 			if (abs(*itr) > dropTol) {
 				row_[nnz_] = itr.position()[0];
 				col_[nnz_] = itr.position()[1];

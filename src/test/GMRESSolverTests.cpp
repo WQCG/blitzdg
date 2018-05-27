@@ -15,13 +15,13 @@ namespace blitzdg {
     namespace GMRESSolverTests {
         using namespace igloo;
         class Matvec {
-            matrix_type mat_;
+            real_matrix_type mat_;
         public:
-            explicit Matvec(const matrix_type& mat)
+            explicit Matvec(const real_matrix_type& mat)
                 : mat_{ mat }
             {}
 
-            bool operator()(const vector_type& in, vector_type& out) const {
+            bool operator()(const real_vector_type& in, real_vector_type& out) const {
                 firstIndex i;
                 secondIndex j;
                 out = sum(mat_(i, j) * in(j), j);
@@ -30,10 +30,10 @@ namespace blitzdg {
         };
 
         class MatvecNonsingular {
-            matrix_type * A;
+            real_matrix_type * A;
         public:
             MatvecNonsingular() {
-                A = new matrix_type(5,5);
+                A = new real_matrix_type(5,5);
                 
                 *A = 2.,3.,0.,0.,0.,
                     3.,0.,4.,0.,6.,
@@ -42,10 +42,10 @@ namespace blitzdg {
                     0.,4.,2.,0.,1.;
             }
 
-            bool operator()(const vector_type& in, vector_type& out) const {
+            bool operator()(const real_vector_type& in, real_vector_type& out) const {
                 firstIndex i;
                 secondIndex j;
-                matrix_type & Aref = *A;
+                real_matrix_type & Aref = *A;
                 out = sum(Aref(i, j) * in(j), j);
                 return true;
             }
@@ -56,10 +56,10 @@ namespace blitzdg {
         };
 
         class MatvecSingular {
-            matrix_type * A;
+            real_matrix_type * A;
         public:
             MatvecSingular() {
-                A = new matrix_type(5,5);
+                A = new real_matrix_type(5,5);
                 
                 *A = 2.,3.,0.,0.,2.,
                     3.,0.,4.,0.,3.,
@@ -68,10 +68,10 @@ namespace blitzdg {
                     0.,4.,2.,0.,0.;
             }
 
-            bool operator()(const vector_type& in, vector_type& out) const {
+            bool operator()(const real_vector_type& in, real_vector_type& out) const {
                 firstIndex i;
                 secondIndex j;
-                matrix_type & Aref = *A;
+                real_matrix_type & Aref = *A;
                 out = sum(Aref(i, j) * in(j), j);
                 return true;
             }
@@ -84,7 +84,7 @@ namespace blitzdg {
         // identity preconditioner
         class Precon {
         public:
-            bool operator()(const vector_type& in, vector_type& out) const {
+            bool operator()(const real_vector_type& in, real_vector_type& out) const {
                 out = in;
                 return true;
             }
@@ -93,8 +93,8 @@ namespace blitzdg {
         Describe(GMRESSolver_Object) {
             It(Solve_Ax_equals_b) {
                 index_type N = 5;
-                vector_type b(N), x(N);
-                matrix_type A(N, N);
+                real_vector_type b(N), x(N);
+                real_matrix_type A(N, N);
                 
                 A = 2.,3.,0.,0.,0.,
                     3.,0.,4.,0.,6.,
@@ -116,7 +116,7 @@ namespace blitzdg {
 
                 cout << "GMRESSolver: nonsingular system\n";
                 GMRESSolver gmres;
-                vector_type soln(N);
+                real_vector_type soln(N);
                 for (index_type i = 0; i < N; ++i)
                     soln(i) = rand() / (real_type(1) + RAND_MAX);
                 GMRESParams params;
@@ -129,8 +129,8 @@ namespace blitzdg {
 
             It(Solve_singular_linear_system) {
                 index_type N = 5;
-                vector_type b(N);
-                matrix_type A(N, N);
+                real_vector_type b(N);
+                real_matrix_type A(N, N);
 
                 A = 2.,3.,0.,0.,2.,
                     3.,0.,4.,0.,3.,
@@ -146,7 +146,7 @@ namespace blitzdg {
 
                 cout << "GMRESSolver: singular system\n";
                 GMRESSolver gmres;
-                vector_type soln(N);
+                real_vector_type soln(N);
                 for (index_type i = 0; i < N; ++i)
                     soln(i) = rand() / (real_type(1) + RAND_MAX);
                 GMRESOut result = gmres.solve(Matvec(A), Precon(), b, soln);

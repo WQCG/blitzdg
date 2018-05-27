@@ -64,7 +64,7 @@ namespace blitzdg {
          * @note An element \f$a_{ij}\f$ of mat is considered nonzero if
          * \f$|a_{ij}| > \mathrm{dropTol}\f$.
          */
-        explicit CSCMat(const matrix_type& mat, real_type dropTol = real_type(0));
+        explicit CSCMat(const real_matrix_type& mat, real_type dropTol = real_type(0));
 		
         /**
          * Constructor that creates a matrix from a cs_di object

@@ -26,9 +26,9 @@ namespace blitzdg {
         firstIndex ii;
         secondIndex jj;
 
-        matrix_type b(N,1), x(N,1);
-        matrix_type A(N,N);
-        vector_type expectedx(N);
+        real_matrix_type b(N,1), x(N,1);
+        real_matrix_type A(N,N);
+        real_vector_type expectedx(N);
 
         Describe(DirectSolver_Object) {
             void SetUp() {
