@@ -25,7 +25,7 @@ namespace blitzdg {
      * @param[in] field Two-dimensional blitz array to be written to the file. Usually a 'field' of the PDE (system) being solved.
      * @param[in] delimeter Character that will be used to separate columns. Rows are always separated by line-endings.
      */
-    void CsvOutputter::writeFieldToFile(const string & fileName, const matrix_type & field, const char delimeter) {
+    void CsvOutputter::writeFieldToFile(const string & fileName, const real_matrix_type & field, const char delimeter) {
         ofstream outFile;
         outFile.open(fileName);
         for(index_type i=0; i < field.rows(); i++) {

@@ -51,28 +51,28 @@ namespace blitzdg {
     /**
      * Returns the one-norm of the input vector x.
      */
-    inline real_type norm1(const vector_type& x) {
+    inline real_type norm1(const real_vector_type& x) {
         return blitz::sum(blitz::abs(x));
     }
 
     /**
      * Returns the two-norm of the input vector x.
      */
-    inline real_type norm2(const vector_type& x) {
+    inline real_type norm2(const real_vector_type& x) {
         return std::sqrt(blitz::sum(x * x));
     }
 
     /**
      * Returns the infinity-norm of the input vector x.
      */
-    inline real_type normInf(const vector_type& x) {
+    inline real_type normInf(const real_vector_type& x) {
         return blitz::max(blitz::abs(x));
     }
 
 	/**
 	 * Returns the maximum absolute value of all entries of a matrix/firled.
 	 */
-	inline real_type normMax(const matrix_type& mat) {
+	inline real_type normMax(const real_matrix_type& mat) {
 		return blitz::max(blitz::abs(mat));
 	}
 } // namespace blitzdg

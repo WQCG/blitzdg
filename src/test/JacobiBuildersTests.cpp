@@ -33,9 +33,9 @@ namespace blitzdg {
 
             It(Should_Generate_0th_Order_Legendre_Polynomial) {
                 cout << "Should_Generate_0th_Order_Legendre_Polynomial" << endl;
-                vector_type x(3);
+                real_vector_type x(3);
                 x = -1.,0.,1.;
-                vector_type  p(3);
+                real_vector_type  p(3);
 
                 const JacobiBuilders & jacobi = *Jacobi;
 
@@ -48,9 +48,9 @@ namespace blitzdg {
 
             It(Should_Generate_1st_Order_Legendre_Polynomial) {
                 cout << "Should_Generate_1st_Order_Legendre_Polynomial" << endl;
-                vector_type x(3);
+                real_vector_type x(3);
                 x = -1.,0.,1.;
-                vector_type  p(3);
+                real_vector_type  p(3);
 
                 JacobiBuilders & jacobi = *Jacobi;
 
@@ -64,9 +64,9 @@ namespace blitzdg {
 
             It(Should_Generate_2nd_Order_Legendre_Polynomial) {
                 cout << "Should_Generate_2nd_Order_Legendre_Polynomial" << endl;
-                vector_type x(3);
+                real_vector_type x(3);
                 x = -1.,0.,1.;
-                vector_type  p(3);
+                real_vector_type  p(3);
 
                 JacobiBuilders & jacobi = *Jacobi;
 
@@ -79,9 +79,9 @@ namespace blitzdg {
 
             It(Should_Generate_0th_Order_Legendre_Polynomial_4pt_Grid) {
                 cout << "Should_Generate_0th_Order_Legendre_Polynomial_4pt_Grid" << endl;
-                vector_type x(4);
+                real_vector_type x(4);
                 x = -1,-0.447214,0.447214,1;
-                vector_type p(4);
+                real_vector_type p(4);
 
                 JacobiBuilders & jacobi = *Jacobi;
 
@@ -94,9 +94,9 @@ namespace blitzdg {
 
             It(Should_Generate_1st_Order_Legendre_Polynomial_4pt_Grid) {
                 cout << "Should_Generate_1st_Order_Legendre_Polynomial_4pt_Grid" << endl;
-                vector_type x(4);
+                real_vector_type x(4);
                 x = -1,-0.447214,0.447214,1;
-                vector_type p(4);
+                real_vector_type p(4);
 
                 JacobiBuilders & jacobi = *Jacobi;
 
@@ -113,8 +113,8 @@ namespace blitzdg {
                 
                 JacobiBuilders & jacobi = *Jacobi;
                 
-                vector_type x(5);
-                vector_type w(5);
+                real_vector_type x(5);
+                real_vector_type w(5);
 
                 jacobi.computeJacobiQuadWeights(0., 0., 4, x, w);
 
@@ -136,8 +136,8 @@ namespace blitzdg {
                 
                 JacobiBuilders & jacobi = *Jacobi;
                 
-                vector_type x(2);
-                vector_type w(2);
+                real_vector_type x(2);
+                real_vector_type w(2);
 
                 jacobi.computeJacobiQuadWeights(0., 0., 1, x, w);
 
@@ -153,8 +153,8 @@ namespace blitzdg {
 
                 JacobiBuilders & jacobi = *Jacobi;
 
-                vector_type xx(3);
-                vector_type ww(3);
+                real_vector_type xx(3);
+                real_vector_type ww(3);
 
                 jacobi.computeJacobiQuadWeights(0., 0., 2, xx, ww);
 
@@ -171,7 +171,7 @@ namespace blitzdg {
                 cout << "Should_Generate_3rd_Order_Legendre_Gauss_Lobatto_Nodes" << endl;
                 JacobiBuilders & jacobi = *Jacobi;
                 
-                vector_type x(4);
+                real_vector_type x(4);
                 jacobi.computeGaussLobottoPoints(0., 0., 3, x);
 
                 Assert::That(abs(x(0) - -1), IsLessThan(eps));

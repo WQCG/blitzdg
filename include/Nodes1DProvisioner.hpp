@@ -10,9 +10,8 @@
  */
 
 #pragma once
-#include "SparseMatrixConverter.hpp"
-#include "EigenSolver.hpp"
 #include "DirectSolver.hpp"
+#include "EigenSolver.hpp"
 #include "JacobiBuilders.hpp"
 #include "Types.hpp"
 
@@ -45,20 +44,20 @@ namespace blitzdg {
       index_type vmapI;
       index_type vmapO;
       
-      matrix_type* xGrid;
-      vector_type* rGrid;
+      real_matrix_type* xGrid;
+      real_vector_type* rGrid;
 
-      matrix_type* V;
-      matrix_type* Dr;
-      matrix_type* Lift;
-      matrix_type* J;
-      matrix_type* rx;
-      matrix_type* nx;
+      real_matrix_type* V;
+      real_matrix_type* Dr;
+      real_matrix_type* Lift;
+      real_matrix_type* J;
+      real_matrix_type* rx;
+      real_matrix_type* nx;
 
       index_vector_type* Fmask;
-      matrix_type* Fx;
+      real_matrix_type* Fx;
 
-      matrix_type* Fscale;
+      real_matrix_type* Fscale;
 
       index_matrix_type* EToV;
       index_matrix_type* EToE;
@@ -67,7 +66,6 @@ namespace blitzdg {
       index_vector_type* vmapM;
       index_vector_type* vmapP;
 
-      SparseMatrixConverter MatrixConverter;
       EigenSolver EigSolver;
       DirectSolver LinSolver;
       JacobiBuilders Jacobi;
@@ -153,7 +151,7 @@ namespace blitzdg {
        * Builds the elementwise derivative of the Vandermonde matrix.
        * @param[out] DVr Elementwise derivative of Vandermonde matrix.
        */
-      void computeGradVandermonde(matrix_type& DVr) const;
+      void computeGradVandermonde(real_matrix_type& DVr) const;
 
      /**
       * Computes the Jacobian (determinant), the geometric factor rx (dr/dx), 
@@ -165,41 +163,41 @@ namespace blitzdg {
        * Returns a reference to a matrix whose jth column contains the
        * local grid points for the jth element.
        */
-      const matrix_type & get_xGrid() const;
+      const real_matrix_type & get_xGrid() const;
 
       /**
        * Returns a reference to a vector that contains the 
        * Gauss-Jacobi-Lobotto points on the standard element,
        * i.e., on the interval [-1,1].
        */
-      const vector_type & get_rGrid() const;
+      const real_vector_type & get_rGrid() const;
 
       /**
        * Returns a reference to the differentiation matrix on the
        * the standard element, i.e., the interval [-1,1].
        */
-      const matrix_type & get_Dr() const;
+      const real_matrix_type & get_Dr() const;
 
       /**
        * Returns a reference to the generalized Vandermonde matrix.
        */
-      const matrix_type & get_V() const;
+      const real_matrix_type & get_V() const;
 
       /**
        * Returns a reference to the Jacobian scaling matrix.
        */
-      const matrix_type & get_J() const;
+      const real_matrix_type & get_J() const;
 
       /**
        * Returns a reference to the geometric scaling matrix.
        */
-      const matrix_type & get_rx() const;
+      const real_matrix_type & get_rx() const;
 
       /**
        * Returns a reference to a matrix whose jth column contains the
        * the x-coordinate of the unit normal vectors for each face point.
        */
-      const matrix_type & get_nx() const;
+      const real_matrix_type & get_nx() const;
 
       /**
        * Returns a reference to the index-mask for the face nodes.
@@ -209,17 +207,17 @@ namespace blitzdg {
       /**
        * Returns a reference to the faces only x-grid.
        */
-      const matrix_type & get_Fx() const;
+      const real_matrix_type & get_Fx() const;
 
       /**
        * Returns a reference to the Face-scaling factor (inverse of Jacobian at face nodes).
        */
-      const matrix_type & get_Fscale() const;
+      const real_matrix_type & get_Fscale() const;
 
       /**
        * Returns a reference to the 1D lifting operator.
        */
-      const matrix_type & get_Lift() const;
+      const real_matrix_type & get_Lift() const;
 
       /**
        * Returns a reference to the Element-To-Vertex connectivity table.

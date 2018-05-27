@@ -2,6 +2,7 @@
 // See COPYING and LICENSE files at project root for more details.
 
 #include "DirectSolver.hpp"
+#include "DenseMatrixHelpers.hpp"
 #include <blitz/array.h>
 #include <string>
 #include <stdexcept>
@@ -20,7 +21,7 @@ namespace blitzdg {
                     double* work, float* swork, int* iter, int* info );
     }
 
-    void DirectSolver::solve(const matrix_type& A, const matrix_type& B, matrix_type& X) const {
+    void DirectSolver::solve(const real_matrix_type& A, const real_matrix_type& B, real_matrix_type& X) const {
 
         firstIndex ii;
         secondIndex jj;
@@ -46,15 +47,16 @@ namespace blitzdg {
         real_type Bpod[dim];
         real_type Xpod[dim];
 
-        matrix_type Atrans(sz, sz);
-        matrix_type Btrans(Nrhs, sz);
-        matrix_type Xtrans(Nrhs, sz);
+        real_matrix_type Atrans(sz, sz);
+        real_matrix_type Btrans(Nrhs, sz);
+        real_matrix_type Xtrans(Nrhs, sz);
 
         Atrans = A(jj,ii);
         Btrans = B(jj,ii);
 
-        MatrixConverter.fullToPodArray(Atrans, Apod);
-        MatrixConverter.fullToPodArray(Btrans, Bpod);
+
+        fullToPodArray(Atrans, Apod);
+        fullToPodArray(Btrans, Bpod);
 
         dsgesv_(&sz, &Nrhs, Apod, &lda,
                 ipiv, Bpod, &ldb, Xpod, &ldx, 
