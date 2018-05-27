@@ -48,16 +48,11 @@ namespace blitzdg {
                 vector_type soln(N);
 
                 // Compute LU factors.
-                try {
-                    cout << "Starting factorization" << endl;
-                    solver.factorize(csc);
-                    cout << "Factorization successful" << endl;
-                    solver.solve(b, soln);
-                    cout << "Solve successful" << endl;
-                }
-                catch (exception& e) {
-                    cout << "Excpetion caught: " << e.what() << endl;
-                }
+                cout << "Starting factorization" << endl;
+                solver.factorize(csc);
+                cout << "Factorization successful" << endl;
+                solver.solve(b, soln);
+                cout << "Solve successful" << endl;
 
                 Assert::That(abs(soln(0)-x(0)), IsLessThan(eps));
                 Assert::That(abs(soln(1)-x(1)), IsLessThan(eps));

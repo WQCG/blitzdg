@@ -1,9 +1,12 @@
 #include "DenseMatrixHelpers.hpp"
 #include "LinAlgHelpers.hpp"
 #include "Types.hpp"
+#include <blitz/array.h>
 #include <igloo/igloo_alt.h>
 #include <iostream>
 
+using blitz::firstIndex;
+using blitz::secondIndex;
 using blitz::ColumnMajorArray;
 using std::cout;
 using std::endl;
@@ -34,32 +37,44 @@ namespace blitzdg {
 
             It(Should_Convert_Full_Matrix_To_POD) {
                 matrix_type mat(5, 5);
-                mat =   2,3,0,0,0,
-                        3,0,4,0,6,
+                mat =   2, 3, 0,0,0,
+                        3, 0, 4,0,6,
                         0,-1,-3,2,0,
-                        0,0,1,0,0,
-                        0,4,2,0,1;
+                        0, 0, 1,0,0,
+                        0, 4, 2,0,1;
                 vector_type pod(25);
-                vector_type podTrue(25);
-                podTrue = 2, 3, 0, 0, 0, 
+                vector_type podRow(25), podCol(25);
+                podRow = 2, 3, 0, 0, 0, 
                 3, 0, 4, 0, 6,
                 0, -1, -3, 2, 0,
                 0, 0, 1, 0, 0,
                 0, 4, 2, 0, 1;
+                podCol = 2,3,0,0,0,3,0,-1,0,4,0,4,-3,1,2,0,0,2,0,0,0,6,0,0,1;
                 fullToPodArray(mat, pod.data());
-                podTrue -= pod;
-                cout << "DenseMatrixHelpers: full to pod" << endl;
-                real_type diff = normInf(podTrue);
+                podRow -= pod;
+                cout << "DenseMatrixHelpers: full to pod (rowwise)" << endl;
+                real_type diff = normInf(podRow);
+                Assert::That(diff, Equals(0.0));
+
+                fullToPodArray(mat, pod.data(), false);
+                podCol -= pod;
+                cout << "DenseMatrixHelpers: full to pod (colwise)" << endl;
+                diff = normInf(podCol);
                 Assert::That(diff, Equals(0.0));
             }
 
             It(Should_Convert_POD_To_Full_Matrix) {
-                matrix_type mat(5, 5);
+                matrix_type mat(5, 5), matT(5,5);
                 mat =   2,3,0,0,0,
                         3,0,4,0,6,
                         0,-1,-3,2,0,
                         0,0,1,0,0,
                         0,4,2,0,1;
+                matT = 2,3,0,0,0,
+                       3,0,-1,0,4,
+                       0,4,-3,1,2,
+                       0,0,2,0,0,
+                       0,6,0,0,1;
                 vector_type pod(25);
                 pod = 2, 3, 0, 0, 0, 
                 3, 0, 4, 0, 6,
@@ -69,8 +84,15 @@ namespace blitzdg {
                 matrix_type ret(5,5);
                 podArrayToFull(pod.data(), ret);
                 mat -= ret;
-                cout << "DenseMatrixHelpers: pod to full" << endl;
+                cout << "DenseMatrixHelpers: pod to full (rowwise)" << endl;
                 real_type diff = normMax(mat);
+                Assert::That(diff, Equals(0.0));
+
+                podArrayToFull(pod.data(), ret, false);
+                
+                matT -= ret;
+                cout << "DenseMatrixHelpers: pod to full (colwise)" << endl;
+                diff = normMax(matT);
                 Assert::That(diff, Equals(0.0));
             }
         };

@@ -43,6 +43,7 @@ namespace blitzdg {
             throw runtime_error("LUSolver::factorize: numeric factorization failed");
         // free the symbolic factorization since we don't need it any longer
         umfpack_di_free_symbolic(&symbolic_);
+        symbolic_ = nullptr;
     }
 
     void LUSolver::solve(const vector_type& rhs, vector_type& soln) const {

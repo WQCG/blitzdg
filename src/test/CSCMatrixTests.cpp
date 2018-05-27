@@ -6,6 +6,8 @@
 #include <blitz/array.h>
 #include <igloo/igloo_alt.h>
 #include <iostream>
+#include <sstream>
+#include <string>
 
 using blitz::firstIndex;
 using blitz::secondIndex;
@@ -13,6 +15,8 @@ using blitz::ColumnMajorArray;
 using std::cout;
 using std::endl;
 using std::move;
+using std::ostringstream;
+using std::string;
 
 namespace blitzdg {
     namespace CSCMatrixTests {
@@ -217,6 +221,40 @@ namespace blitzdg {
                 real_type diff = normMax(ret);
                 cout << "CSCMat: copy assignment" << endl;
                 Assert::That(diff, Equals(0.0));
+            }
+
+            It(Should_Swap_Two_Matrices) {
+                matrix_type full(5,5), dens(3,3);
+                full = 1, 0, 0, 3, 2,
+                       0, 0, 1, 1, 0,
+                       0, 5, 0, 0, 0,
+                       0, 2, 0, 0, 4,
+                       1, 1, 1, 0, 0;
+                dens = 1, 2, 3,
+                       4, 5, 6,
+                       7, 8, 9;
+                CSCMat csc1(full), csc2(dens);
+                using std::swap;
+                swap(csc1, csc2);
+                matrix_type ret1(3,3), ret2(5,5);
+                ret1 = cscToFull(csc1);
+                ret2 = cscToFull(csc2);
+                ret1 -= dens;
+                ret2 -= full;
+                cout << "CSCMat: swap" << endl;
+                Assert::That(normMax(ret1), Equals(0.0));
+                Assert::That(normMax(ret2), Equals(0.0));
+            }
+
+            It(Should_Print_To_An_Output_Stream) {
+                matrix_type full(2,2);
+                full = 1,2,
+                       3,4;
+                string s = "rows = 2, cols = 2, nnz = 4\n\n0 0 1\n1 0 3\n0 1 2\n1 1 4\n";
+                CSCMat csc(full);
+                ostringstream oss;
+                oss << csc;
+                Assert::That((oss && oss.str() == s), Equals(true)); 
             }
         };
     } // namespace CSCMatrixTests

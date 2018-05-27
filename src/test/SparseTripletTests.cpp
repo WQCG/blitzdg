@@ -6,11 +6,15 @@
 #include <blitz/array.h>
 #include <igloo/igloo_alt.h>
 #include <iostream>
+#include <sstream>
+#include <string>
 
 using blitz::firstIndex;
 using blitz::secondIndex;
 using std::cout;
 using std::endl;
+using std::ostringstream;
+using std::string;
 
 namespace blitzdg {
     namespace SparseTripletTests {
@@ -124,6 +128,40 @@ namespace blitzdg {
                 Assert::That(trip.nnz(), Equals(0));
                 Assert::That(trip.nzmax(), Equals(11));
                 Assert::That(diff, Equals(0.0));
+            }
+
+            It(Should_Swap_Two_Matrices) {
+                matrix_type full(5,5), dens(3,3);
+                full = 1, 0, 0, 3, 2,
+                       0, 0, 1, 1, 0,
+                       0, 5, 0, 0, 0,
+                       0, 2, 0, 0, 4,
+                       1, 1, 1, 0, 0;
+                dens = 1, 2, 3,
+                       4, 5, 6,
+                       7, 8, 9;
+                SparseTriplet t1(full), t2(dens);
+                using std::swap;
+                swap(t1, t2);
+                matrix_type ret1(3,3), ret2(5,5);
+                ret1 = tripToFull(t1);
+                ret2 = tripToFull(t2);
+                ret1 -= dens;
+                ret2 -= full;
+                cout << "SpasreTriplet: swap" << endl;
+                Assert::That(normMax(ret1), Equals(0.0));
+                Assert::That(normMax(ret2), Equals(0.0));
+            }
+
+            It(Should_Print_To_An_Output_Stream) {
+                matrix_type full(2,2);
+                full = 1,2,
+                       3,4;
+                string s = "rows = 2, cols = 2, nnz = 4\n\n0 0 1\n0 1 2\n1 0 3\n1 1 4\n";
+                SparseTriplet t(full);
+                ostringstream oss;
+                oss << t;
+                Assert::That((oss && oss.str() == s), Equals(true));
             }
         };
     } // namespace SparseTripletTests

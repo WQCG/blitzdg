@@ -233,6 +233,8 @@ namespace blitzdg {
          */
 		friend void swap(CSCMat& lhs, CSCMat& rhs);	
 	private:
+        // The cs_di object is wrapped in a unique_ptr
+        // that manages the lifetime of the object.
 		cs_di_smart_ptr mat_;
 	};
 
