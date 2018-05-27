@@ -3,13 +3,11 @@
 
 #include "DirectSolver.hpp"
 #include "DenseMatrixHelpers.hpp"
-#include <blitz/array.h>
+#include "Types.hpp"
 #include <string>
 #include <stdexcept>
 #include <iomanip>
 
-using blitz::firstIndex;
-using blitz::secondIndex;
 using std::runtime_error;
 using std::stringstream;
 using std::endl;
@@ -22,12 +20,17 @@ namespace blitzdg {
     }
 
     void DirectSolver::solve(const real_matrix_type& A, const real_matrix_type& B, real_matrix_type& X) const {
+    
+        real_matrix_type Acol = real_matrix_type(A.rows(), A.cols(), ColumnMajorOrder());
+        real_matrix_type Bcol = real_matrix_type(B.rows(), B.cols(), ColumnMajorOrder());
+        real_matrix_type Xcol = real_matrix_type(X.rows(), X.cols(), ColumnMajorOrder());
+        
+        Acol = A;
+        Bcol = B;
+        Xcol = X;
 
-        firstIndex ii;
-        secondIndex jj;
-
-        index_type sz = A.rows();
-        index_type Nrhs = B.cols();
+        index_type sz = Acol.rows();
+        index_type Nrhs = Bcol.cols();
 
         index_type dim = sz*Nrhs;
 
@@ -47,16 +50,8 @@ namespace blitzdg {
         real_type Bpod[dim];
         real_type Xpod[dim];
 
-        real_matrix_type Atrans(sz, sz);
-        real_matrix_type Btrans(Nrhs, sz);
-        real_matrix_type Xtrans(Nrhs, sz);
-
-        Atrans = A(jj,ii);
-        Btrans = B(jj,ii);
-
-
-        fullToPodArray(Atrans, Apod);
-        fullToPodArray(Btrans, Bpod);
+        fullToPodArray(Acol, Apod, false);
+        fullToPodArray(Bcol, Bpod, false);
 
         dsgesv_(&sz, &Nrhs, Apod, &lda,
                 ipiv, Bpod, &ldb, Xpod, &ldx, 
@@ -71,8 +66,8 @@ namespace blitzdg {
             throw runtime_error(strm.str());
         }
 
-        podArrayToFull(Xpod, Xtrans);
+        podArrayToFull(Xpod, Xcol, false);
 
-        X = Xtrans(jj,ii);
+        X = Xcol;
     }
 } // namespace blitzdg
