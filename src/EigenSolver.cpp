@@ -2,6 +2,7 @@
 // See COPYING and LICENSE files at project root for more details.
 
 #include "EigenSolver.hpp"
+#include "DenseMatrixHelpers.hpp"
 #include <blitz/array.h>
 
 using blitz::firstIndex;
@@ -13,7 +14,7 @@ namespace blitzdg {
                     double* w, double* work, int* lwork, int* iwork, int* liwork, int* info );
     }
 
-    void EigenSolver::solve(const matrix_type& A, vector_type& eigenvalues, matrix_type& eigenvectors) const {
+    void EigenSolver::solve(const real_matrix_type& A, real_vector_type& eigenvalues, real_matrix_type& eigenvectors) const {
         index_type sz = A.rows();
         index_type lda = sz;
         index_type iwkopt;
@@ -29,7 +30,7 @@ namespace blitzdg {
 
         real_type* Apod = new real_type[sz*lda];
 
-        MatrixConverter.fullToPodArray(A, Apod);
+        fullToPodArray(A, Apod);
 
         /* Determining optimal workspace parameters */
         dsyevd_( &JOBZ, UPLO, &sz, Apod, &lda, ww, &wkopt, &lwork, &iwkopt, &liwork, &info );
@@ -42,7 +43,7 @@ namespace blitzdg {
         /* Solve eigenproblem */
         dsyevd_( &JOBZ, UPLO, &sz, Apod, &lda, ww, work, &lwork, iwork, &liwork, &info );
 
-        MatrixConverter.podArrayToFull(Apod, eigenvectors);
+        podArrayToFull(Apod, eigenvectors);
 
         for (index_type i=0; i < sz; i++)
             eigenvalues(i) = ww[i];
@@ -50,5 +51,10 @@ namespace blitzdg {
         firstIndex ii;
         secondIndex jj;
         eigenvectors = eigenvectors(jj,ii);
+
+        delete [] Apod;
+        delete [] work;
+        delete [] iwork;
     }
 } // namespace blitzdg
+
