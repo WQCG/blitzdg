@@ -35,6 +35,9 @@ if [ "$machine" == "Linux" ] ; then
 	make install
 	cd ../..
     rm -rf doxrepo
+
+    # pull in valgrind
+    apt-get -y install valgrind valgrind-dbg
 fi
 
 if [ "$machine" == "Mac" ] ; then
