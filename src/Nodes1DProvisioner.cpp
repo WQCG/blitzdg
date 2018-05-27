@@ -2,6 +2,7 @@
 // See COPYING and LICENSE files at project root for more details.
 
 #include "Nodes1DProvisioner.hpp"
+#include "CSCMatrix.hpp"
 #include "DenseMatrixHelpers.hpp"
 #include <blitz/array.h>
 #include <cmath>
@@ -159,61 +160,43 @@ namespace blitzdg {
     }
 
     void Nodes1DProvisioner::buildConnectivityMatrices() {
-        firstIndex ii;
-        secondIndex jj;
-        thirdIndex kk;
-
-        index_type totalFaces = NumFaces*NumElements;
+        index_type totalFaces = NumFaces * NumElements;
         index_type numVertices = NumElements + 1;
+        index_type localVertNum[2] = {0, 1};
 
-        index_type localVertNum[2];
-        localVertNum[0] = 0; localVertNum[1] = 1;
-
-        // Build global face-to-vertex array. (should be sparse matrix in 2D/3D).
-        real_matrix_type FToV(totalFaces, numVertices);
-        FToV = 0*jj;
-
-        index_matrix_type & E2V = *EToV;
-
+        // Build global face-to-vertex array. Note: we actually
+        // build its transpose for easy column access.
+        CSCMat FToVtrans(numVertices, totalFaces, totalFaces);
+        const index_matrix_type& E2V = *EToV;
         index_type globalFaceNum = 0;
-        for (index_type k=0; k < NumElements; k++) {
-            for (index_type f=0; f < NumFaces; f++) {
+        for (index_type k = 0; k < NumElements; ++k) {
+            for (index_type f = 0; f < NumFaces; ++f) {
                 index_type v = localVertNum[f];
-                index_type vGlobal = E2V(k,v);
-                FToV(globalFaceNum, vGlobal) = 1;
-                globalFaceNum++;
+                index_type vGlobal = E2V(k, v);
+                FToVtrans.colPtrs(globalFaceNum) = globalFaceNum;
+                FToVtrans.rowInds(globalFaceNum) = vGlobal;
+                FToVtrans.elems(globalFaceNum++) = 1.0;
             }
         }
-
-        real_matrix_type FToF(totalFaces, totalFaces);
-        real_matrix_type I(totalFaces, totalFaces);
-
-        FToF = 0*jj;
-        I = 0*jj;
-
-        for (index_type f=0; f < totalFaces; f++)
-            I(f,f) = 1;
-
-        // Global Face-to-Face connectivity matrix.
-        FToF = sum(FToV(ii,kk)*FToV(jj,kk), kk) - I;
-
+        FToVtrans.colPtrs(totalFaces) = globalFaceNum;
+        CSCMat FToF = multiply(transpose(FToVtrans), FToVtrans);
+        
         index_vector_type f1(totalFaces - 2); // '- 2' => for physical boundaries.
         index_vector_type f2(totalFaces - 2);
-
-        f1 = 0*ii;
-        f2 = 0*ii;
-
+        f1 = 0;
+        f2 = 0;
+        
         index_type connectionsCount = 0;
-        for (index_type i=0; i < totalFaces; i++) {
-            for (index_type j=0; j < totalFaces; j++) {
-                if (FToF(i,j) == 1) {
+        for (index_type j = 0; j < totalFaces; ++j) {
+            for (index_type k = FToF.colPtrs(j); k < FToF.colPtrs(j + 1); ++k) {
+                index_type i = FToF.rowInds(k);
+                if (i != j && FToF.elems(k) == 1.0) {
                     f1(connectionsCount) = i;
-                    f2(connectionsCount) = j;
-                    connectionsCount++;
+                    f2(connectionsCount++) = j;
                 }
             }
         }
-
+	
         index_vector_type e1(totalFaces - 2);
         index_vector_type e2(totalFaces - 2);
 
@@ -224,16 +207,16 @@ namespace blitzdg {
         f2 = (f2 % NumFaces);
 
         // Build connectivity matrices.
-        index_matrix_type & E2E = *EToE;
-        index_matrix_type & E2F = *EToF;
-        for (index_type k = 0; k < NumElements; k++) {
-            for (index_type f = 0; f < NumFaces; f++) {
+        index_matrix_type& E2E = *EToE;
+        index_matrix_type& E2F = *EToF;
+        for (index_type k = 0; k < NumElements; ++k) {
+            for (index_type f = 0; f < NumFaces; ++f) {
                 E2E(k, f) = k;
                 E2F(k, f) = f;
             }
         }
 
-        for (index_type i=0; i < totalFaces - 2; i++) {
+        for (index_type i = 0; i < totalFaces - 2; ++i) {
             index_type ee1 = e1(i);
             index_type ee2 = e2(i);
             index_type ff1 = f1(i);
