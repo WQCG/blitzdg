@@ -9,10 +9,16 @@
 #include <blitz/array.h>
 
 namespace blitzdg {
+    template <typename T>
+    using vector_type = blitz::Array<T, 1>;
+
+    template <typename T>
+    using matrix_type = blitz::Array<T, 2>;
+
     using index_type = int;
     using real_type = double;
-    using vector_type = blitz::Array<double, 1>;
-    using matrix_type = blitz::Array<double, 2>;
-    using index_vector_type = blitz::Array<int, 1>;
-    using index_matrix_type = blitz::Array<int, 2>;
+    using real_vector_type = vector_type<double>;
+    using real_matrix_type = matrix_type<double>;
+    using index_vector_type = vector_type<int>;
+    using index_matrix_type = matrix_type<int>;
 }

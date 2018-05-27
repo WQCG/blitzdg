@@ -2,7 +2,7 @@
 // See COPYING and LICENSE files at project root for more details.
 
 #include "Nodes1DProvisioner.hpp"
-#include "Types.hpp"
+#include "DenseMatrixHelpers.hpp"
 #include <blitz/array.h>
 #include <cmath>
 #include <limits>
@@ -23,29 +23,29 @@ namespace blitzdg {
         : Min_x{ _xmin }, Max_x{ _xmax }, NumElements{ _NumElements }, NOrder{ _NOrder },
         NumLocalPoints{ NOrder + 1 }, mapI{ 0 }, mapO{ NumFacePoints*NumFaces*NumElements - 1 },
         vmapI{ 0 }, vmapO{ NumLocalPoints*NumElements - 1 },
-        xGrid{ new matrix_type(NumLocalPoints, NumElements) },
-        rGrid{ new vector_type(NumLocalPoints) },
+        xGrid{ new real_matrix_type(NumLocalPoints, NumElements) },
+        rGrid{ new real_vector_type(NumLocalPoints) },
         V{ nullptr }, Dr{ nullptr }, 
-        Lift{ new matrix_type(NumLocalPoints, NumFacePoints*NumFaces) },
-        J{ new matrix_type(NumLocalPoints, NumElements) },
-        rx{ new matrix_type(NumLocalPoints, NumElements) },
-        nx{ new matrix_type(NumFacePoints*NumFaces, NumElements) },
+        Lift{ new real_matrix_type(NumLocalPoints, NumFacePoints*NumFaces) },
+        J{ new real_matrix_type(NumLocalPoints, NumElements) },
+        rx{ new real_matrix_type(NumLocalPoints, NumElements) },
+        nx{ new real_matrix_type(NumFacePoints*NumFaces, NumElements) },
         Fmask{ new index_vector_type (NumFacePoints*NumFaces) },
-        Fx{ new matrix_type(NumFacePoints*NumFaces, NumElements) },
-        Fscale{ new matrix_type(NumFacePoints*NumFaces, NumElements) },
+        Fx{ new real_matrix_type(NumFacePoints*NumFaces, NumElements) },
+        Fscale{ new real_matrix_type(NumFacePoints*NumFaces, NumElements) },
         EToV{ new index_matrix_type(NumElements, NumFaces) },
         EToE{ new index_matrix_type(NumElements, NumFaces) },
         EToF{ new index_matrix_type(NumElements, NumFaces) },
         vmapM{ new index_vector_type(NumFacePoints*NumFaces*NumElements) },
         vmapP{ new index_vector_type(NumFacePoints*NumFaces*NumElements) },
-        MatrixConverter{}, EigSolver{}, LinSolver{}, Jacobi{}
+        EigSolver{}, LinSolver{}, Jacobi{}
     {}
 
     void Nodes1DProvisioner::buildNodes() {
         const real_type alpha = 0.0;
         const real_type beta = 0.0;
 
-        vector_type& r = *rGrid;
+        real_vector_type& r = *rGrid;
 
         Jacobi.computeGaussLobottoPoints(alpha, beta, NOrder, r);
         
@@ -56,7 +56,7 @@ namespace blitzdg {
         real_type L = Max_x - Min_x;
         real_type width = L / NumElements;
 
-        matrix_type & x = *xGrid;
+        real_matrix_type & x = *xGrid;
         for (index_type k=0; k < NumElements; k++) {
             x(Range::all(), k) = Min_x + width*(k + 0.5*(r+1.));
         }
@@ -76,7 +76,7 @@ namespace blitzdg {
     }
 
     void Nodes1DProvisioner::buildNormals() {
-        matrix_type & nxref = *nx;
+        real_matrix_type & nxref = *nx;
 
         real_type mult = -1;
 
@@ -100,13 +100,13 @@ namespace blitzdg {
 
         index_matrix_type & E2E = *EToE;
         index_matrix_type & E2F = *EToF;
-        matrix_type & xmat = *xGrid;
+        real_matrix_type & xmat = *xGrid;
 
-        matrix_type xmatTrans(NumElements, NumLocalPoints);
+        real_matrix_type xmatTrans(NumElements, NumLocalPoints);
         xmatTrans = xmat(jj,ii);
 
         real_type * x = new real_type[NumElements*NumLocalPoints];
-        MatrixConverter.fullToPodArray(xmatTrans, x);
+        fullToPodArray(xmatTrans, x);
 
         // Assemble global volume node numbering.
         nodeIds = ii + NumLocalPoints*jj;
@@ -145,8 +145,8 @@ namespace blitzdg {
     }
 
     void Nodes1DProvisioner::buildFaceMask() {
-        matrix_type & x = *xGrid;
-        matrix_type & Fxref = *Fx;
+        real_matrix_type & x = *xGrid;
+        real_matrix_type & Fxref = *Fx;
         index_vector_type & Fmaskref = *Fmask;
 
         Fmaskref = 0, (NumLocalPoints - 1);
@@ -170,7 +170,7 @@ namespace blitzdg {
         localVertNum[0] = 0; localVertNum[1] = 1;
 
         // Build global face-to-vertex array. (should be sparse matrix in 2D/3D).
-        matrix_type FToV(totalFaces, numVertices);
+        real_matrix_type FToV(totalFaces, numVertices);
         FToV = 0*jj;
 
         index_matrix_type & E2V = *EToV;
@@ -185,8 +185,8 @@ namespace blitzdg {
             }
         }
 
-        matrix_type FToF(totalFaces, totalFaces);
-        matrix_type I(totalFaces, totalFaces);
+        real_matrix_type FToF(totalFaces, totalFaces);
+        real_matrix_type I(totalFaces, totalFaces);
 
         FToF = 0*jj;
         I = 0*jj;
@@ -249,17 +249,17 @@ namespace blitzdg {
         secondIndex jj;
         thirdIndex kk;
 
-        matrix_type E(Np, NumFaces*NumFacePoints);
+        real_matrix_type E(Np, NumFaces*NumFacePoints);
         E = 0*jj;
         E(0, 0)  = 1.;
         E(Np-1, 1) = 1.;
 
-        matrix_type & Vref = *V;
-        matrix_type & L = *Lift;
+        real_matrix_type & Vref = *V;
+        real_matrix_type & L = *Lift;
 
-        matrix_type Vtrans(Np, Np);
+        real_matrix_type Vtrans(Np, Np);
         Vtrans = Vref(jj,ii);
-        matrix_type temp(Np, NumFaces*NumFacePoints);
+        real_matrix_type temp(Np, NumFaces*NumFacePoints);
         temp = sum(Vtrans(ii,kk)*E(kk,jj), kk);
         L = sum(Vref(ii,kk)*temp(kk,jj), kk);
     }
@@ -269,12 +269,12 @@ namespace blitzdg {
         secondIndex jj;
         thirdIndex kk;
 
-        matrix_type & x = *xGrid;
-        matrix_type & Drref = *Dr;
-        matrix_type & Jref = *J;
-        matrix_type & rxref = *rx;
+        real_matrix_type & x = *xGrid;
+        real_matrix_type & Drref = *Dr;
+        real_matrix_type & Jref = *J;
+        real_matrix_type & rxref = *rx;
 
-        matrix_type & Fscaleref = *Fscale;
+        real_matrix_type & Fscaleref = *Fscale;
 
         index_vector_type & Fmsk = *Fmask;
 
@@ -287,11 +287,11 @@ namespace blitzdg {
     }
 
     void Nodes1DProvisioner::buildVandermondeMatrix() {
-        V = new matrix_type(NOrder+1, NOrder+1);
+        V = new real_matrix_type(NOrder+1, NOrder+1);
 
-        matrix_type & Vref = *V;
+        real_matrix_type & Vref = *V;
 
-        vector_type p(NOrder+1);
+        real_vector_type p(NOrder+1);
         for (index_type j=0; j <= NOrder; j++) {
             Jacobi.computeJacobiPolynomial(*rGrid, 0.0, 0.0, j, p);
             Vref(Range::all(), j) = p;
@@ -302,21 +302,21 @@ namespace blitzdg {
         firstIndex ii;
         secondIndex jj;
 
-        Dr = new matrix_type(NOrder+1, NOrder+1);
+        Dr = new real_matrix_type(NOrder+1, NOrder+1);
 
-        matrix_type & Vref = *V;
-        matrix_type & Drref = *Dr;
+        real_matrix_type & Vref = *V;
+        real_matrix_type & Drref = *Dr;
 
-        matrix_type DVr(NOrder+1, NOrder+1);
+        real_matrix_type DVr(NOrder+1, NOrder+1);
         DVr = 0.*jj;
 
         computeGradVandermonde(DVr);
 
         // Dr = DVr / V;
 
-        matrix_type Vtrans(NOrder+1, NOrder+1);
-        matrix_type DVrtrans(NOrder+1, NOrder+1);
-        matrix_type Drtrans(NOrder+1, NOrder+1);
+        real_matrix_type Vtrans(NOrder+1, NOrder+1);
+        real_matrix_type DVrtrans(NOrder+1, NOrder+1);
+        real_matrix_type Drtrans(NOrder+1, NOrder+1);
 
         Vtrans = Vref(jj, ii);
         DVrtrans = DVr(jj, ii);
@@ -330,11 +330,11 @@ namespace blitzdg {
         return NumElements;
     }
 
-    const matrix_type & Nodes1DProvisioner::get_xGrid() const {
+    const real_matrix_type & Nodes1DProvisioner::get_xGrid() const {
         return *xGrid;
     }
 
-    const vector_type & Nodes1DProvisioner::get_rGrid() const {
+    const real_vector_type & Nodes1DProvisioner::get_rGrid() const {
         return *rGrid;
     }
 
@@ -342,7 +342,7 @@ namespace blitzdg {
         return *EToV;
     }
 
-    const matrix_type & Nodes1DProvisioner::get_Lift() const {
+    const real_matrix_type & Nodes1DProvisioner::get_Lift() const {
         return *Lift;
     }
 
@@ -354,23 +354,23 @@ namespace blitzdg {
         return *EToF;
     }
 
-    const matrix_type & Nodes1DProvisioner::get_Dr() const {
+    const real_matrix_type & Nodes1DProvisioner::get_Dr() const {
         return *Dr;
     }
 
-    const matrix_type & Nodes1DProvisioner::get_V() const {
+    const real_matrix_type & Nodes1DProvisioner::get_V() const {
         return *V;
     }
 
-    const matrix_type & Nodes1DProvisioner::get_J() const {
+    const real_matrix_type & Nodes1DProvisioner::get_J() const {
         return *J;
     }
 
-    const matrix_type & Nodes1DProvisioner::get_rx() const {
+    const real_matrix_type & Nodes1DProvisioner::get_rx() const {
         return *rx;
     }
 
-    const matrix_type & Nodes1DProvisioner::get_nx() const {
+    const real_matrix_type & Nodes1DProvisioner::get_nx() const {
         return *nx;
     } 
 
@@ -378,11 +378,11 @@ namespace blitzdg {
         return NumLocalPoints;
     }
 
-    const matrix_type & Nodes1DProvisioner::get_Fx() const {
+    const real_matrix_type & Nodes1DProvisioner::get_Fx() const {
         return *Fx;
     }
 
-    const matrix_type & Nodes1DProvisioner::get_Fscale() const {
+    const real_matrix_type & Nodes1DProvisioner::get_Fscale() const {
         return *Fscale;
     }
 
@@ -434,9 +434,9 @@ namespace blitzdg {
     }
 
 
-    void Nodes1DProvisioner::computeGradVandermonde(matrix_type & DVr) const {
+    void Nodes1DProvisioner::computeGradVandermonde(real_matrix_type & DVr) const {
         firstIndex ii;
-        vector_type dp(NOrder+1);
+        real_vector_type dp(NOrder+1);
         for (index_type i=0; i<=NOrder; i++) {
             dp = 0.*ii;
             Jacobi.computeGradJacobi(*rGrid, 0.0, 0.0, i, dp);

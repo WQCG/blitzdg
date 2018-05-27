@@ -2,19 +2,24 @@
 // See COPYING and LICENSE files at project root for more details.
 
 #include "JacobiBuilders.hpp"
-#include "EigenSolver.hpp"
-#include "Types.hpp"
+#include <cmath>
+#include <limits>
 
-
-using namespace blitz;
+using blitz::firstIndex;
+using blitz::Range;
+using blitz::secondIndex;
+using std::numeric_limits;
+using std::pow;
+using std::sqrt;
+using std::tgamma;
 
 namespace blitzdg {
 
-    void JacobiBuilders::computeJacobiPolynomial(vector_type const & x, real_type alpha, real_type beta, index_type N, vector_type & p) const {
+    void JacobiBuilders::computeJacobiPolynomial(real_vector_type const & x, real_type alpha, real_type beta, index_type N, real_vector_type & p) const {
         Range all = Range::all();
         index_type Np = (x.length())(0);
 
-        matrix_type pStorage(N+1, Np);
+        real_matrix_type pStorage(N+1, Np);
 
         real_type gamma0 = pow(2,(alpha+beta+1))/(alpha+beta+1)*tgamma(alpha+1)*tgamma(beta+1)/tgamma(alpha+beta+1);
 
@@ -45,7 +50,7 @@ namespace blitzdg {
         p = pStorage(N, all);
     }
 
-    void JacobiBuilders::computeJacobiQuadWeights(real_type alpha, real_type beta, index_type N, vector_type& x, vector_type& w) const {
+    void JacobiBuilders::computeJacobiQuadWeights(real_type alpha, real_type beta, index_type N, real_vector_type& x, real_vector_type& w) const {
 
         if ( N == 0) {
             x(0) = -(alpha-beta)/(alpha+beta+2);
@@ -59,7 +64,7 @@ namespace blitzdg {
         secondIndex jj;
 
         // Form symmetric matrix.
-        matrix_type J(N+1,N+1);
+        real_matrix_type J(N+1,N+1);
         J = 0.;
         for (index_type i=0; i < N+1; i++) {
             real_type h1 = 2.*i+alpha+beta;
@@ -74,14 +79,14 @@ namespace blitzdg {
         }
         J = J(ii,jj) + J(jj,ii);
         
-        matrix_type eigenvectors(N+1, N+1);
+        real_matrix_type eigenvectors(N+1, N+1);
 
         EigSolver.solve(J, x, eigenvectors);
 
         // The eigenvalues give the x points.
         
         // The weights are given by:
-        vector_type v1(N+1);
+        real_vector_type v1(N+1);
         v1 = eigenvectors( 0, Range::all() ); 
 
         real_type gamma0 = pow(2,(alpha+beta+1))/(alpha+beta+1)*tgamma(alpha+1)*tgamma(beta+1)/tgamma(alpha+beta+1);
@@ -89,7 +94,7 @@ namespace blitzdg {
         w = (v1*v1)*gamma0;
     }
 
-    void JacobiBuilders::computeGaussLobottoPoints(real_type alpha, real_type beta, index_type N, vector_type& x) const {
+    void JacobiBuilders::computeGaussLobottoPoints(real_type alpha, real_type beta, index_type N, real_vector_type& x) const {
         if (N==1) {
             x(0) = -1.0;
             x(1) = 1.0;
@@ -99,8 +104,8 @@ namespace blitzdg {
         x(0) = -1.0;
         x(N) = 1.0;
 
-        vector_type xJG(N-1);
-        vector_type w(N-1);
+        real_vector_type xJG(N-1);
+        real_vector_type w(N-1);
 
         computeJacobiQuadWeights(alpha+1., beta+1., N-2, xJG, w);
         
@@ -108,13 +113,13 @@ namespace blitzdg {
             x(i) = xJG(i-1);
     }
 
-    void JacobiBuilders::computeGradJacobi(vector_type const & x, real_type alpha, real_type beta, index_type N, vector_type& dp) const {
+    void JacobiBuilders::computeGradJacobi(real_vector_type const & x, real_type alpha, real_type beta, index_type N, real_vector_type& dp) const {
         if (N == 0) {
             dp = 0.0;
             return;
         }
 
-        vector_type p(x.length());
+        real_vector_type p(x.length());
 
         computeJacobiPolynomial(x, alpha+1, beta+1, N-1, p);
         dp = sqrt(N*(N+alpha+beta+1))*p;
