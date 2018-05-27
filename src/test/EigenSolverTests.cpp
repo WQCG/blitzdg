@@ -2,7 +2,6 @@
 // See COPYING and LICENSE files at project root for more details.
 
 #include "EigenSolver.hpp"
-#include "SparseMatrixConverter.hpp"
 #include "Types.hpp"
 #include <igloo/igloo_alt.h>
 #include <blitz/array.h>

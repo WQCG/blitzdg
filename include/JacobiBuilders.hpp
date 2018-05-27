@@ -7,11 +7,8 @@
  * derivatives, and associated quadrature points. This class is also responsible for
  * constructing the Jacobi(Legendre)-Gauss-Lobotto nodes.
  */
-
 #pragma once
-#include "SparseMatrixConverter.hpp"
 #include "EigenSolver.hpp"
-#include "DirectSolver.hpp"
 #include "Types.hpp"
 
 namespace blitzdg {

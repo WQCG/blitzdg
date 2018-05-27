@@ -4,40 +4,74 @@
 /**
  * @file LUSolver.hpp
  * @brief Defines the LUSolver class that implements UMFPACK LU factorization
- * (umfpack_di_numeric, umfpack_di_solve) for spare matrices stored in compressed 
+ * (umfpack_di_numeric, umfpack_di_solve) for sparse matrices stored in compressed 
  * sparse column (CSC) format. UMFPACK is part of the SuiteSparse package: 
  * http://faculty.cse.tamu.edu/davis/suitesparse.html.
  */
 
 #pragma once
-#include "SparseMatrixConverter.hpp"
+#include "CSCMatrix.hpp"
 #include "Types.hpp"
 
 namespace blitzdg {
-  class LUSolver {
-      const matrix_type* A;
+  /**
+   * Implements a class for solving linear systems via LU factorization
+   * in which the coefficient matrix is stored as a compressed sparse
+   * column (CSC) matrix.
+   */
+  class LUSolver {   
+  public:
+    /**
+     * Default constructor.
+     */
+    LUSolver()
+      : order_{ 0 }, mat_{ nullptr }, 
+      symbolic_{ nullptr }, numeric_{ nullptr }
+    {}
 
-      // Umfpack-specific fields
-      index_type * Ap;
-      index_type * Ai;
-      real_type * Ax;
-      index_type * Map;
+    /**
+     * Computes an LU factorization of the input CSC matrix.
+     * Overwrites any existing factorization.
+     * @param[in] mat The CSC matrix.
+     */
+    void factorize(const CSCMat& mat);
 
-      void * Symbolic;
-      void * Numeric;
-      
-      SparseMatrixConverter MatrixConverter;
-    
-    public:
-      explicit LUSolver(const matrix_type* Ain);
-      
-      const matrix_type& get_A() const;
+    /**
+     * Solves the linear system A*soln = rhs.
+     * @param[in] rhs The right-hand side.
+     * @param[out] soln The solution of the linear system.
+     */
+    void solve(const vector_type& rhs, vector_type& soln) const;
 
-      void factorize();
+    /**
+     * Destructor.
+     */
+    ~LUSolver() {
+      freeMem();
+    }
+  private:
+    index_type order_; // order of the current linear system
+    const CSCMat* mat_; // non-owning pointer to input matrix
+    void* symbolic_; // pointer to symbolic factorization structure
+    void* numeric_; // pointer to numeric factorization structure
 
-      void solve(vector_type const &, vector_type&);
+    /**
+     * Computes the symbolic factorization and
+     * returns true if successful. 
+     */
+    bool symbolicFactorize();
 
-      ~LUSolver();
+    /**
+     * Computes the numeric factorization and
+     * returns true if successful.
+     */
+    bool numericFactorize();
+
+    /**
+     * Frees any memory allocated for either the symbolic
+     * or numeric factorization.
+     */
+    void freeMem();
   };
 } // namespace blitzdg
 

@@ -2,7 +2,7 @@
 // See COPYING and LICENSE files at project root for more details.
 
 #include "Nodes1DProvisioner.hpp"
-#include "Types.hpp"
+#include "DenseMatrixHelpers.hpp"
 #include <blitz/array.h>
 #include <cmath>
 #include <limits>
@@ -38,7 +38,7 @@ namespace blitzdg {
         EToF{ new index_matrix_type(NumElements, NumFaces) },
         vmapM{ new index_vector_type(NumFacePoints*NumFaces*NumElements) },
         vmapP{ new index_vector_type(NumFacePoints*NumFaces*NumElements) },
-        MatrixConverter{}, EigSolver{}, LinSolver{}, Jacobi{}
+        EigSolver{}, LinSolver{}, Jacobi{}
     {}
 
     void Nodes1DProvisioner::buildNodes() {
@@ -106,7 +106,7 @@ namespace blitzdg {
         xmatTrans = xmat(jj,ii);
 
         real_type * x = new real_type[NumElements*NumLocalPoints];
-        MatrixConverter.fullToPodArray(xmatTrans, x);
+        fullToPodArray(xmatTrans, x);
 
         // Assemble global volume node numbering.
         nodeIds = ii + NumLocalPoints*jj;

@@ -3,7 +3,6 @@
 
 
 #include "DirectSolver.hpp"
-#include "SparseMatrixConverter.hpp"
 #include "Types.hpp"
 #include <igloo/igloo_alt.h>
 #include <blitz/array.h>
