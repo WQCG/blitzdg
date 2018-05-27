@@ -71,7 +71,7 @@ namespace blitzdg {
             throw runtime_error(strm.str());
         }
 
-        MatrixConverter.podArrayToFull(Xpod, Xtrans);
+        podArrayToFull(Xpod, Xtrans);
 
         X = Xtrans(jj,ii);
     }
