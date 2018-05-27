@@ -4,9 +4,14 @@
 #include "EigenSolver.hpp"
 #include "DenseMatrixHelpers.hpp"
 #include <blitz/array.h>
+#include <iomanip>
+#include <stdexcept>
 
 using blitz::firstIndex;
 using blitz::secondIndex;
+using std::stringstream;
+using std::endl;
+using std::runtime_error;
 
 namespace blitzdg {
     extern "C" {
@@ -34,6 +39,14 @@ namespace blitzdg {
 
         /* Determining optimal workspace parameters */
         dsyevd_( &JOBZ, UPLO, &sz, Apod, &lda, ww, &wkopt, &lwork, &iwkopt, &liwork, &info );
+        stringstream strm;
+        if (info < 0) {
+            strm << "Error calling DSYEVD to determine workspace parameters. Error was in Argument " << info*(-1) << "." << endl;
+            throw runtime_error(strm.str());
+        } else if (info  > 0) {
+            strm << "Error calling DSYEVD to determine workspace parameters. Error code: " << info << "." << endl;
+            throw runtime_error(strm.str());
+        }
 
         lwork = static_cast<index_type>(wkopt);
         real_type* work = new real_type[lwork];
@@ -42,6 +55,13 @@ namespace blitzdg {
 
         /* Solve eigenproblem */
         dsyevd_( &JOBZ, UPLO, &sz, Apod, &lda, ww, work, &lwork, iwork, &liwork, &info );
+        if (info < 0) {
+            strm << "Error calling DSYEVD. Error was in Argument " << info*(-1) << "." << endl;
+            throw runtime_error(strm.str());
+        } else if (info > 0) {
+            strm << "The algorithm failed to converge; i off-diagonal elements of an intermediate tridiagonal form did not converge to zero. i=" << info << "." << endl;
+            throw runtime_error(strm.str());
+        }
 
         podArrayToFull(Apod, eigenvectors);
 
