@@ -20,17 +20,12 @@ namespace blitzdg {
     }
 
     void DirectSolver::solve(const real_matrix_type& A, const real_matrix_type& B, real_matrix_type& X) const {
-    
-        real_matrix_type Acol = real_matrix_type(A.rows(), A.cols(), ColumnMajorOrder());
-        real_matrix_type Bcol = real_matrix_type(B.rows(), B.cols(), ColumnMajorOrder());
-        real_matrix_type Xcol = real_matrix_type(X.rows(), X.cols(), ColumnMajorOrder());
-        
-        Acol = A;
-        Bcol = B;
-        Xcol = X;
 
-        index_type sz = Acol.rows();
-        index_type Nrhs = Bcol.cols();
+        if ( !(isRowMajor(A) == isRowMajor(B) ) )
+            throw runtime_error("Matrices A and B must have same storage order!");
+
+        index_type sz = A.rows();
+        index_type Nrhs = B.cols();
 
         index_type dim = sz*Nrhs;
 
@@ -50,8 +45,8 @@ namespace blitzdg {
         real_type Bpod[dim];
         real_type Xpod[dim];
 
-        fullToPodArray(Acol, Apod, false);
-        fullToPodArray(Bcol, Bpod, false);
+        fullToPodArray(A, Apod, false);
+        fullToPodArray(B, Bpod, false);
 
         dsgesv_(&sz, &Nrhs, Apod, &lda,
                 ipiv, Bpod, &ldb, Xpod, &ldx, 
@@ -66,8 +61,6 @@ namespace blitzdg {
             throw runtime_error(strm.str());
         }
 
-        podArrayToFull(Xpod, Xcol, false);
-
-        X = Xcol;
+        podArrayToFull(Xpod, X, false);
     }
 } // namespace blitzdg
