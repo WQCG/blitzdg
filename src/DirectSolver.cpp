@@ -4,9 +4,14 @@
 #include "DirectSolver.hpp"
 #include "DenseMatrixHelpers.hpp"
 #include <blitz/array.h>
+#include <string>
+#include <stdexcept>
+#include <iomanip>
 
 using blitz::firstIndex;
 using blitz::secondIndex;
+using std::runtime_error;
+using std::stringstream;
 
 namespace blitzdg {
     extern "C" {
