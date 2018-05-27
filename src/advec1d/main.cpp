@@ -193,7 +193,7 @@ namespace blitzdg {
 			// is the differentiation matrix contribution, and the surface integral
 			RHS =-c*rx*sum(Dr(ii,kk)*u(kk,jj), kk);
 
-			matrix_type surfaceRHS(Np, K);
+			matrix_type surfaceRHS(Nfp*numFaces, K);
 			surfaceRHS = Fscale*duMat;
 			RHS += sum(Lift(ii,kk)*surfaceRHS(kk,jj), kk);
 		} // computeRHS
