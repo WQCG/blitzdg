@@ -106,7 +106,7 @@ namespace blitzdg {
         real_matrix_type xmatCol(xmat.rows(), xmat.cols(), ColumnMajorOrder());
         xmatCol = xmat;
 
-        real_type * x = new real_type[NumElements*NumLocalPoints];
+        real_type x[NumElements*NumLocalPoints];
         fullToPodArray(xmatCol, x, false);
 
         // Assemble global volume node numbering.
@@ -141,8 +141,6 @@ namespace blitzdg {
                 count++;
             }
         }
-
-        delete[] x;
     }
 
     void Nodes1DProvisioner::buildFaceMask() {
