@@ -5,7 +5,7 @@ addons:
 before_install:
   - pip install --user cpp-coveralls
 install: make get-deps && ./configure
-script: make && make test && valgrind bin/test
+script: make && make test && valgrind --error-exitcode=1 bin/test
 after_success:
   - make docs
   - coveralls --exclude include/igloo --gcov-options '\-lp'
