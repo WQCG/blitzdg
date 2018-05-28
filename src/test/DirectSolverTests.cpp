@@ -5,7 +5,7 @@
 #include "DirectSolver.hpp"
 #include "Types.hpp"
 #include <igloo/igloo_alt.h>
-#include <blitz/array.h>
+#include <DenseMatrixHelpers.hpp>
 #include <iostream>
 #include <limits>
 
@@ -28,6 +28,9 @@ namespace blitzdg {
 
         real_matrix_type b(N,1), x(N,1);
         real_matrix_type A(N,N);
+        real_matrix_type Acol(N,N, ColumnMajorOrder());
+        real_matrix_type bcol(N,1, ColumnMajorOrder());
+
         real_vector_type expectedx(N);
 
         Describe(DirectSolver_Object) {
@@ -40,11 +43,16 @@ namespace blitzdg {
                 0.825662,-1.416542,0.246512,-0.884317,1.672087,
                 0.014445,1.065063,0.151608,1.221347,-0.280884;
 
-                b(Range::all(), 0) = 2.36882,
-                                    0.29768,
-                                    0.35453,
-                                    0.88904,
-                                    -1.22226;
+                Acol = A;
+
+                b = 2.36882,
+                    0.29768,
+                    0.35453,
+                    0.88904,
+                    -1.22226;
+
+                bcol = b;
+
                 expectedx = -1.32806,
                             -0.38880,
                             -0.96358,
@@ -57,6 +65,19 @@ namespace blitzdg {
                 
                 DirectSolver solver;
                 solver.solve(A, b, x);
+
+                Assert::That(abs(x(0)-expectedx(0)), IsLessThan(epsf));
+                Assert::That(abs(x(1)-expectedx(1)), IsLessThan(epsf));
+                Assert::That(abs(x(2)-expectedx(2)), IsLessThan(epsf));
+                Assert::That(abs(x(3)-expectedx(3)), IsLessThan(epsf));
+                Assert::That(abs(x(4)-expectedx(4)), IsLessThan(epsf));
+            }
+
+            It(Should_Solve_Linear_System_Column_Major) {
+                cout << "It Should Solve Column Major Random Linear System" << endl;
+
+                DirectSolver solver;
+                solver.solve(Acol, bcol, x);
 
                 Assert::That(abs(x(0)-expectedx(0)), IsLessThan(epsf));
                 Assert::That(abs(x(1)-expectedx(1)), IsLessThan(epsf));
