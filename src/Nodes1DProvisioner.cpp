@@ -4,6 +4,7 @@
 #include "Nodes1DProvisioner.hpp"
 #include "CSCMatrix.hpp"
 #include "DenseMatrixHelpers.hpp"
+#include "Types.hpp"
 #include <blitz/array.h>
 #include <cmath>
 #include <limits>
@@ -41,7 +42,7 @@ namespace blitzdg {
         EToF{ new index_matrix_type(NumElements, NumFaces) },
         vmapM{ new index_vector_type(NumFacePoints*NumFaces*NumElements) },
         vmapP{ new index_vector_type(NumFacePoints*NumFaces*NumElements) },
-        EigSolver{}, LinSolver{}, Jacobi{}
+        LinSolver{}, Jacobi{}
     {}
 
     void Nodes1DProvisioner::buildNodes() {
@@ -296,8 +297,7 @@ namespace blitzdg {
 
         computeGradVandermonde(DVr);
 
-        // Dr = DVr / V;
-
+		// Note: this is not a column major ordering trick. We need these transposes.
         real_matrix_type Vtrans(NOrder+1, NOrder+1);
         real_matrix_type DVrtrans(NOrder+1, NOrder+1);
         real_matrix_type Drtrans(NOrder+1, NOrder+1);
@@ -305,6 +305,7 @@ namespace blitzdg {
         Vtrans = Vref(jj, ii);
         DVrtrans = DVr(jj, ii);
 
+        // Dr = DVr / V;
         LinSolver.solve(Vtrans, DVrtrans,  Drtrans);
 
         Drref = Drtrans(jj, ii);
