@@ -5,4 +5,3 @@ make
 make test
 ./bin/test
 ./bin/advec1d
-
