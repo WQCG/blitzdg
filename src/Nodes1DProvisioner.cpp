@@ -14,6 +14,7 @@ using blitz::secondIndex;
 using blitz::sum;
 using blitz::thirdIndex;
 using std::numeric_limits;
+using std::unique_ptr;
 
 namespace blitzdg {
     const index_type Nodes1DProvisioner::NumFacePoints = 1;
@@ -106,8 +107,8 @@ namespace blitzdg {
         real_matrix_type xmatCol(xmat.rows(), xmat.cols(), ColumnMajorOrder());
         xmatCol = xmat;
 
-        real_type x[NumElements*NumLocalPoints];
-        fullToPodArray(xmatCol, x, false);
+        unique_ptr<real_type[]> x(new real_type[NumElements*NumLocalPoints]());
+        fullToPodArray(xmatCol, x.get(), false);
 
         // Assemble global volume node numbering.
         nodeIds = ii + NumLocalPoints*jj;
