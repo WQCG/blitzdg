@@ -41,7 +41,12 @@ namespace blitzdg {
                         *ExePath += pathBuffer[i]; 
                     }
                     trim_right(*ExePath);
+                    delete [] pathBuffer;
                 }
+            }
+            void TearDown() {
+                delete ExePath;
+                delete meshManager;
             }
 
             void get_VertexFilePath(string & vertFile) {    
@@ -198,3 +203,4 @@ namespace blitzdg {
         };
     } // namespace MeshManagerTests
 } // namespace blitzdg
+

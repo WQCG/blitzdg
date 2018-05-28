@@ -45,7 +45,6 @@ namespace blitzdg {
                 Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
 
                 nodes1D.buildNodes();
-                nodes1D.buildVandermondeMatrix();
                 const real_matrix_type & V = nodes1D.get_V();
 
                 real_matrix_type expectedV(NOrder+1,NOrder+1);
