@@ -21,7 +21,7 @@ namespace blitzdg {
                 double* beta, double* y, int* incy);
         }
 
-        void backSolve(index_type n, matrix_type& A, vector_type& x) {
+        void backSolve(index_type n, real_matrix_type& A, real_vector_type& x) {
             char uplo = 'U';
             char trans = 'N';
             char diag = 'N';
@@ -32,7 +32,7 @@ namespace blitzdg {
             dtrsv_(&uplo, &trans, &diag, &n, Aptr, &lda, xptr, &incx);
         }
 
-        void matTimesVec(index_type n, matrix_type& A, vector_type& x, vector_type& result) {
+        void matTimesVec(index_type n, real_matrix_type& A, real_vector_type& x, real_vector_type& result) {
             char trans = 'N';
             index_type m = A.rows();
             index_type lda = A.rows();

@@ -2,10 +2,18 @@
 // See COPYING and LICENSE files at project root for more details.
 
 #include "EigenSolver.hpp"
+#include "DenseMatrixHelpers.hpp"
 #include <blitz/array.h>
+#include <iomanip>
+#include <stdexcept>
+#include <memory>
 
 using blitz::firstIndex;
 using blitz::secondIndex;
+using std::stringstream;
+using std::endl;
+using std::runtime_error;
+using std::unique_ptr;
 
 namespace blitzdg {
     extern "C" {
@@ -13,7 +21,7 @@ namespace blitzdg {
                     double* w, double* work, int* lwork, int* iwork, int* liwork, int* info );
     }
 
-    void EigenSolver::solve(const matrix_type& A, vector_type& eigenvalues, matrix_type& eigenvectors) const {
+    void EigenSolver::solve(const real_matrix_type& A, real_vector_type& eigenvalues, real_matrix_type& eigenvectors) const {
         index_type sz = A.rows();
         index_type lda = sz;
         index_type iwkopt;
@@ -27,28 +35,41 @@ namespace blitzdg {
         char JOBZ = 'V';
         char UPLO[] = "UP";
 
-        real_type* Apod = new real_type[sz*lda];
+        unique_ptr<real_type[]> Apod(new real_type[sz*lda]());
 
-        MatrixConverter.fullToPodArray(A, Apod);
+        fullToPodArray(A, Apod.get());
 
         /* Determining optimal workspace parameters */
-        dsyevd_( &JOBZ, UPLO, &sz, Apod, &lda, ww, &wkopt, &lwork, &iwkopt, &liwork, &info );
+        dsyevd_( &JOBZ, UPLO, &sz, Apod.get(), &lda, ww, &wkopt, &lwork, &iwkopt, &liwork, &info );
+        stringstream strm;
+        if (info < 0) {
+            strm << "Error calling DSYEVD to determine workspace parameters. Error was in Argument " << info*(-1) << "." << endl;
+            throw runtime_error(strm.str());
+        } else if (info  > 0) {
+            strm << "Error calling DSYEVD to determine workspace parameters. Error code: " << info << "." << endl;
+            throw runtime_error(strm.str());
+        }
 
         lwork = static_cast<index_type>(wkopt);
-        real_type* work = new real_type[lwork];
+        unique_ptr<real_type[]> work(new real_type[lwork]());
         liwork = iwkopt;
-        index_type * iwork = new index_type[liwork];
+        unique_ptr<index_type[]> iwork(new index_type[liwork]());
 
         /* Solve eigenproblem */
-        dsyevd_( &JOBZ, UPLO, &sz, Apod, &lda, ww, work, &lwork, iwork, &liwork, &info );
+        dsyevd_( &JOBZ, UPLO, &sz, Apod.get(), &lda, ww, work.get(), &lwork, iwork.get(), &liwork, &info );
+        if (info < 0) {
+            strm << "Error calling DSYEVD. Error was in Argument " << info*(-1) << "." << endl;
+            throw runtime_error(strm.str());
+        } else if (info > 0) {
+            strm << "The algorithm failed to converge; i off-diagonal elements of an intermediate tridiagonal form did not converge to zero. i=" << info << "." << endl;
+            throw runtime_error(strm.str());
+        }
 
-        MatrixConverter.podArrayToFull(Apod, eigenvectors);
+        podArrayToFull(Apod.get(), eigenvectors, false);
 
         for (index_type i=0; i < sz; i++)
             eigenvalues(i) = ww[i];
 
-        firstIndex ii;
-        secondIndex jj;
-        eigenvectors = eigenvectors(jj,ii);
     }
 } // namespace blitzdg
+

@@ -2,7 +2,6 @@
 // See COPYING and LICENSE files at project root for more details.
 
 #include "EigenSolver.hpp"
-#include "SparseMatrixConverter.hpp"
 #include "Types.hpp"
 #include <igloo/igloo_alt.h>
 #include <blitz/array.h>
@@ -26,8 +25,8 @@ namespace blitzdg {
         firstIndex ii;
         secondIndex jj;
 
-        vector_type b(N), x(N);
-        matrix_type Adiag(N, N), Asymmetric(N, N);
+        real_vector_type b(N), x(N);
+        real_matrix_type Adiag(N, N), Asymmetric(N, N);
 
         Describe(EigenSolver_Object) {
             void SetUp() {
@@ -59,9 +58,9 @@ namespace blitzdg {
             It(Should_Solve_Trivial_Symmetric_Eigenproblem) {
                 EigenSolver solver;
 
-                vector_type eigenvalues(5);
+                real_vector_type eigenvalues(5);
                 eigenvalues = 0,0,0,0,0;
-                matrix_type eigenvectors(5,5);
+                real_matrix_type eigenvectors(5,5);
                 eigenvectors = 0,0,0,0,0,
                             0,0,0,0,0,
                             0,0,0,0,0,
@@ -70,7 +69,7 @@ namespace blitzdg {
 
                 solver.solve(Adiag, eigenvalues, eigenvectors);
                 
-                matrix_type expectedEvecs(5,5);
+                real_matrix_type expectedEvecs(5,5);
                 
                 expectedEvecs = 1,0,0,0,0,
                                 0,1,0,0,0,
@@ -84,7 +83,7 @@ namespace blitzdg {
                 Assert::That(eigenvalues(3), Equals(4.));
                 Assert::That(eigenvalues(4), Equals(5.));
 
-                matrix_type res(5,5);
+                real_matrix_type res(5,5);
                 res = eigenvectors - expectedEvecs;
                 Assert::That(sum(res(ii)*res(ii)), IsLessThan(eps));
             }
@@ -93,9 +92,9 @@ namespace blitzdg {
                 cout << "EigenSolver" << endl;
                 EigenSolver solver;
 
-                vector_type eigenvalues(5);
+                real_vector_type eigenvalues(5);
                 eigenvalues = 0,0,0,0,0;
-                matrix_type eigenvectors(5,5);
+                real_matrix_type eigenvectors(5,5);
                 eigenvectors = 0,0,0,0,0,
                             0,0,0,0,0,
                             0,0,0,0,0,
@@ -104,7 +103,7 @@ namespace blitzdg {
 
                 solver.solve(Asymmetric, eigenvalues, eigenvectors);
                 
-                matrix_type expectedEvecs(5,5);
+                real_matrix_type expectedEvecs(5,5);
 
                 expectedEvecs = 0.344185,-0.540215,0.563165,-0.456254,0.253736,
                             -0.489198,0.456254,0.0711849,-0.540215,0.505587,
@@ -118,7 +117,7 @@ namespace blitzdg {
                 Assert::That(eigenvalues(3) - 0.538469,    IsLessThan(epsf));
                 Assert::That(eigenvalues(4) - 0.90618,     IsLessThan(epsf));
 
-                matrix_type res(5,5);
+                real_matrix_type res(5,5);
                 res = eigenvectors - expectedEvecs;
                 Assert::That(sum(res(ii)*res(ii)), IsLessThan(epsf));
             }

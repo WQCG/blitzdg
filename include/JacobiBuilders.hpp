@@ -7,11 +7,8 @@
  * derivatives, and associated quadrature points. This class is also responsible for
  * constructing the Jacobi(Legendre)-Gauss-Lobotto nodes.
  */
-
 #pragma once
-#include "SparseMatrixConverter.hpp"
 #include "EigenSolver.hpp"
-#include "DirectSolver.hpp"
 #include "Types.hpp"
 
 namespace blitzdg {
@@ -38,7 +35,7 @@ namespace blitzdg {
          * @note Jacobi parameters must satisfy \f$\alpha,\beta > -1\f$ and
          * \f$\alpha,\beta \neq -1/2\f$.
          */
-        void computeJacobiPolynomial(const vector_type& x, real_type alpha, real_type beta, index_type N, vector_type& p) const;
+        void computeJacobiPolynomial(const real_vector_type& x, real_type alpha, real_type beta, index_type N, real_vector_type& p) const;
         
         /**
          * Computes the nodes and weights of the Nth order Gauss-Jacobi-Lobotto quadrature rule
@@ -51,7 +48,7 @@ namespace blitzdg {
          * @note Jacobi parameters must satisfy \f$\alpha,\beta > -1\f$ and
          * \f$\alpha,\beta \neq -1/2\f$.
          */
-        void computeJacobiQuadWeights(real_type alpha, real_type beta, index_type N, vector_type & x, vector_type & w) const;
+        void computeJacobiQuadWeights(real_type alpha, real_type beta, index_type N, real_vector_type & x, real_vector_type & w) const;
         
         /**
          * Computes the nodes of the Nth order Gauss-Jacobi-Lobotto quadrature rule
@@ -63,7 +60,7 @@ namespace blitzdg {
          * @note Jacobi parameters must satisfy \f$\alpha,\beta > -1\f$ and
          * \f$\alpha,\beta \neq -1/2\f$.
          */
-        void computeGaussLobottoPoints(real_type alpha, real_type beta, index_type N, vector_type & x) const;
+        void computeGaussLobottoPoints(real_type alpha, real_type beta, index_type N, real_vector_type & x) const;
         
         /**
          * Computes the first derivative of the Nth order Jacobi polynomial with parameters
@@ -76,6 +73,6 @@ namespace blitzdg {
          * @note Jacobi parameters must satisfy \f$\alpha,\beta > -1\f$ and
          * \f$\alpha,\beta \neq -1/2\f$.
          */
-        void computeGradJacobi(const vector_type& x, real_type alpha, real_type beta, index_type N, vector_type& dp) const;
+        void computeGradJacobi(const real_vector_type& x, real_type alpha, real_type beta, index_type N, real_vector_type& dp) const;
     }; // class JacobiBuilders
 } // namespace blitzdg

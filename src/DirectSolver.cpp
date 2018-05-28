@@ -2,10 +2,17 @@
 // See COPYING and LICENSE files at project root for more details.
 
 #include "DirectSolver.hpp"
-#include <blitz/array.h>
+#include "DenseMatrixHelpers.hpp"
+#include "Types.hpp"
+#include <string>
+#include <stdexcept>
+#include <iomanip>
+#include <memory>
 
-using blitz::firstIndex;
-using blitz::secondIndex;
+using std::runtime_error;
+using std::stringstream;
+using std::endl;
+using std::unique_ptr;
 
 namespace blitzdg {
     extern "C" {
@@ -14,10 +21,7 @@ namespace blitzdg {
                     double* work, float* swork, int* iter, int* info );
     }
 
-    void DirectSolver::solve(const matrix_type& A, const matrix_type& B, matrix_type& X) const {
-
-        firstIndex ii;
-        secondIndex jj;
+    void DirectSolver::solve(const real_matrix_type& A, const real_matrix_type& B, real_matrix_type& X) const {
 
         index_type sz = A.rows();
         index_type Nrhs = B.cols();
@@ -28,34 +32,33 @@ namespace blitzdg {
         index_type ldb = sz; 
         index_type ldx = sz;
 
-        index_type ipiv[sz];
+        unique_ptr<index_type[]> ipiv(new index_type[sz]());
+        unique_ptr<real_type[]> work(new real_type[sz*Nrhs]());
+        unique_ptr<float> swork(new float[sz*(sz+Nrhs)]());
 
-        real_type work[sz*Nrhs];
-        float swork[sz*(sz+Nrhs)];
+        unique_ptr<real_type[]> Apod(new real_type[sz*lda]());
+        unique_ptr<real_type[]> Bpod(new real_type[dim]());
+        unique_ptr<real_type[]> Xpod(new real_type[dim]());
 
         index_type info;
         index_type iter;
 
-        real_type Apod[sz*lda];
-        real_type Bpod[dim];
-        real_type Xpod[dim];
+        fullToPodArray(A, Apod.get(), false);
+        fullToPodArray(B, Bpod.get(), false);
 
-        matrix_type Atrans(sz, sz);
-        matrix_type Btrans(Nrhs, sz);
-        matrix_type Xtrans(Nrhs, sz);
+        dsgesv_(&sz, &Nrhs, Apod.get(), &lda,
+                ipiv.get(), Bpod.get(), &ldb, Xpod.get(), &ldx, 
+                work.get(), swork.get(), &iter, &info);
 
-        Atrans = A(jj,ii);
-        Btrans = B(jj,ii);
+        stringstream strm;
+        if (info < 0) {
+            strm << "Error calling DSGESV. Error was in Argument " << info*(-1) << "." << endl;
+            throw runtime_error(strm.str());
+        } else if (info > 0) {
+            strm << "Solution is singular. Factor U contains a diagonal element U(i,i) that is exactly zero, with i=" << info << "." << endl;
+            throw runtime_error(strm.str());
+        }
 
-        MatrixConverter.fullToPodArray(Atrans, Apod);
-        MatrixConverter.fullToPodArray(Btrans, Bpod);
-
-        dsgesv_(&sz, &Nrhs, Apod, &lda,
-                ipiv, Bpod, &ldb, Xpod, &ldx, 
-                work, swork, &iter, &info);
-
-        MatrixConverter.podArrayToFull(Xpod, Xtrans);
-
-        X = Xtrans(jj,ii);
+        podArrayToFull(Xpod.get(), X, false);
     }
 } // namespace blitzdg

@@ -9,21 +9,11 @@
  */
 
 #pragma once
-#include "SparseMatrixConverter.hpp"
 #include "Types.hpp"
 
 namespace blitzdg {
   class EigenSolver {
-      SparseMatrixConverter MatrixConverter;
-
   public:
-      /**
-       * Default constructor.
-       */
-      EigenSolver()
-        : MatrixConverter()
-      {}
-
       /**
        * Computes the eigenvalues and eigenvectors of the symmetric matrix \f$A\f$.
        * @param[in] A The \f$n\times n\f$ symmetric coefficient matrix.
@@ -32,7 +22,7 @@ namespace blitzdg {
        * @note We assume that the matrix \f$A\f$ uses the default rowwise storage order
        * of blitz++ 2D arrays.
        */
-      void solve(const matrix_type& A, vector_type& eigenvalues, matrix_type& eigenvectors) const;      
+      void solve(const real_matrix_type& A, real_vector_type& eigenvalues, real_matrix_type& eigenvectors) const;      
   };
 } // namespace blitzdg
 

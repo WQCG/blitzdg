@@ -1,11 +1,7 @@
 // Copyright (C) 2017-2018  Waterloo Quantitative Consulting Group, Inc.
 // See COPYING and LICENSE files at project root for more details.
 
-#include "DirectSolver.hpp"
-#include "EigenSolver.hpp"
-#include "LUSolver.hpp"
 #include "Nodes1DProvisioner.hpp"
-#include "SparseMatrixConverter.hpp"
 #include "Types.hpp"
 #include <igloo/igloo_alt.h>
 #include <blitz/array.h>
@@ -26,11 +22,7 @@ namespace blitzdg {
         firstIndex ii;
         secondIndex jj;
 
-        LUSolver * luSolver = nullptr;
-        SparseMatrixConverter * matrixConverter = nullptr;
         Nodes1DProvisioner * nodes1DProvisioner = nullptr;
-        EigenSolver * eigenSolver = nullptr;
-        DirectSolver * directSolver = nullptr;
 
         Describe(Nodes1DProvisioner_Object) {
             void SetUp() {
@@ -48,15 +40,15 @@ namespace blitzdg {
 
                 nodes1D.buildNodes();
                 nodes1D.buildVandermondeMatrix();
-                const matrix_type & V = nodes1D.get_V();
+                const real_matrix_type & V = nodes1D.get_V();
 
-                matrix_type expectedV(4,4);
+                real_matrix_type expectedV(4,4);
                 expectedV = 0.70711,-1.22474, 1.58114,-1.87083,
                             0.70711,-0.54772,-0.31623, 0.83666,
                             0.70711, 0.54772,-0.31623,-0.83666,
                             0.70711, 1.22474, 1.58114, 1.87083;
 
-                matrix_type res(4,4);
+                real_matrix_type res(4,4);
                 res  = V - expectedV;
                 Assert::That(sqrt(sum(res(ii)*res(ii))), IsLessThan(epsf));
             }
@@ -67,17 +59,17 @@ namespace blitzdg {
 
                 nodes1D.buildNodes();
 
-                matrix_type DVr(5,5);
+                real_matrix_type DVr(5,5);
                 nodes1D.computeGradVandermonde(DVr);
 
-                matrix_type expectedDVr(5,5);
+                real_matrix_type expectedDVr(5,5);
                 expectedDVr = 0.00000,1.22474,-4.74342,11.22497,-21.21320,
                             0.00000,1.22474,-3.10530, 3.20713, -0.00000,
                             0.00000,1.22474,-0.00000,-2.80624,  0.00000,
                             0.00000,1.22474, 3.10530, 3.20713,  0.00000,
                             0.00000,1.22474 ,4.74342,11.22497, 21.21320;
 
-                matrix_type res(4,4);
+                real_matrix_type res(4,4);
                 res = DVr - expectedDVr;
                 Assert::That(sqrt(sum(res(ii)*res(ii))), IsLessThan(epsf));
             }
@@ -87,16 +79,16 @@ namespace blitzdg {
                 Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
                 nodes1D.buildNodes();
 
-                const matrix_type & Dr = nodes1D.get_Dr();
+                const real_matrix_type & Dr = nodes1D.get_Dr();
 
-                matrix_type expectedDr(4,4);
+                real_matrix_type expectedDr(4,4);
                 expectedDr = -3.0000e+00, 4.0451e+00,-1.5451e+00, 5.0000e-01,
                             -8.0902e-01,-4.0540e-16, 1.1180e+00,-3.0902e-01,
                             3.0902e-01,-1.1180e+00, 6.2804e-16, 8.0902e-01,
                             -5.0000e-01, 1.5451e+00,-4.0451e+00, 3.0000e+00; 
 
 
-                matrix_type res(4,4);
+                real_matrix_type res(4,4);
                 res = Dr - expectedDr;
                 Assert::That(sqrt(sum(res(ii)*res(ii))), IsLessThan(epsf));
             }
@@ -108,15 +100,15 @@ namespace blitzdg {
 
                 nodes1D.buildNodes();
 
-                const matrix_type & x = nodes1D.get_xGrid();
+                const real_matrix_type & x = nodes1D.get_xGrid();
 
-                matrix_type expectedx(4,5);
+                real_matrix_type expectedx(4,5);
                 expectedx = -1.000000,-0.600000,-0.200000,0.200000,0.600000,
                             -0.889443,-0.489443,-0.089443,0.310557,0.710557,
                             -0.710557,-0.310557, 0.089443,0.489443,0.889443,
                             -0.600000,-0.200000, 0.200000,0.600000,1.000000;
 
-                matrix_type res(4,5);
+                real_matrix_type res(4,5);
                 res = x - expectedx;
                 Assert::That(sqrt(sum(res(ii)*res(ii))), IsLessThan(epsf));
             }
@@ -145,11 +137,11 @@ namespace blitzdg {
                 nodes1D.buildDr();
                 nodes1D.computeJacobian();
 
-                const matrix_type & J = nodes1D.get_J();
-                const matrix_type & rx = nodes1D.get_rx();
-                const matrix_type & Fscale = nodes1D.get_Fscale();
+                const real_matrix_type & J = nodes1D.get_J();
+                const real_matrix_type & rx = nodes1D.get_rx();
+                const real_matrix_type & Fscale = nodes1D.get_Fscale();
 
-                matrix_type expectedJ(4,5), expectedrx(4,5), expectedFscale(2,5);
+                real_matrix_type expectedJ(4,5), expectedrx(4,5), expectedFscale(2,5);
                 expectedJ = 0.20000,0.20000,0.20000,0.20000,0.20000,
                             0.20000,0.20000,0.20000,0.20000,0.20000,
                             0.20000,0.20000,0.20000,0.20000,0.20000,
@@ -163,7 +155,7 @@ namespace blitzdg {
                 expectedFscale = 5,5,5,5,5,
                                  5,5,5,5,5;
 
-                matrix_type resJ(4,5), resrx(4,5), resFscale(2,5);
+                real_matrix_type resJ(4,5), resrx(4,5), resFscale(2,5);
                 resJ = J - expectedJ;
                 resrx = rx - expectedrx;
                 resFscale = Fscale - expectedFscale;
@@ -178,16 +170,16 @@ namespace blitzdg {
                 Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
 
                 nodes1D.buildNodes();
-                matrix_type Lift = nodes1D.get_Lift();
+                real_matrix_type Lift = nodes1D.get_Lift();
 
-                matrix_type expectedLift(4,2);
+                real_matrix_type expectedLift(4,2);
                 expectedLift =  8.00000,-2.00000,
                                -0.89443, 0.89443,
                                 0.89443,-0.89443,
                                -2.00000, 8.00000;
 
 
-                matrix_type resLift(4,2);
+                real_matrix_type resLift(4,2);
 
                 resLift = Lift - expectedLift;
                 Assert::That(sqrt(sum(resLift*resLift)), IsLessThan(epsf));
@@ -230,16 +222,16 @@ namespace blitzdg {
                 nodes1D.buildNodes();
 
                 index_vector_type Fmask = nodes1D.get_Fmask();
-                matrix_type Fx = nodes1D.get_Fx();
+                real_matrix_type Fx = nodes1D.get_Fx();
 
                 Assert::That(Fmask(0), Equals(0));
                 Assert::That(Fmask(1), Equals(3));
 
-                matrix_type expectedFx(2, 5);
+                real_matrix_type expectedFx(2, 5);
                 expectedFx = -1,-0.6,-0.2,0.2,0.6,
                             -0.6,-0.2,0.2,0.6,1;
 
-                matrix_type resFx;
+                real_matrix_type resFx;
                 resFx = Fx - expectedFx;
 
                 Assert::That(sqrt(sum(resFx*resFx)), Equals(0));
@@ -273,13 +265,13 @@ namespace blitzdg {
                 Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
                 nodes1D.buildNodes();
 
-                const matrix_type & nx = nodes1D.get_nx();
+                const real_matrix_type & nx = nodes1D.get_nx();
 
-                matrix_type expectednx(2,5);
+                real_matrix_type expectednx(2,5);
                 expectednx = -1,-1,-1,-1,-1,
                               1, 1, 1, 1, 1;
 
-                matrix_type resnx(2,5);
+                real_matrix_type resnx(2,5);
 
                 resnx = nx - expectednx;
 

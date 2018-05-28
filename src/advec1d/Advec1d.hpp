@@ -12,6 +12,6 @@
 
 namespace blitzdg {
 	namespace advec1d {
-		void computeRHS(const matrix_type & u, real_type c, Nodes1DProvisioner & nodes1D, matrix_type & RHS);
+		void computeRHS(const real_matrix_type & u, real_type c, Nodes1DProvisioner & nodes1D, real_matrix_type & RHS);
 	}
 }
