@@ -7,6 +7,7 @@
 #include <blitz/array.h>
 #include <cmath>
 #include <limits>
+#include <memory>
 
 using blitz::firstIndex;
 using blitz::Range;
@@ -14,6 +15,7 @@ using blitz::secondIndex;
 using blitz::sum;
 using blitz::thirdIndex;
 using std::numeric_limits;
+using std::unique_ptr;
 
 namespace blitzdg {
     const index_type Nodes1DProvisioner::NumFacePoints = 1;
@@ -101,13 +103,12 @@ namespace blitzdg {
 
         index_matrix_type & E2E = *EToE;
         index_matrix_type & E2F = *EToF;
-        real_matrix_type & xmat = *xGrid;
 
-        real_matrix_type xmatTrans(NumElements, NumLocalPoints);
-        xmatTrans = xmat(jj,ii);
+        real_matrix_type xmat(NumLocalPoints, NumElements, ColumnMajorOrder());
+        xmat = *xGrid;
 
-        real_type * x = new real_type[NumElements*NumLocalPoints];
-        fullToPodArray(xmatTrans, x);
+        unique_ptr<real_type[]> x(new real_type[NumElements*NumLocalPoints]());
+        fullToPodArray(xmat, x.get(), false);
 
         // Assemble global volume node numbering.
         nodeIds = ii + NumLocalPoints*jj;
@@ -141,8 +142,6 @@ namespace blitzdg {
                 count++;
             }
         }
-
-        delete[] x;
     }
 
     void Nodes1DProvisioner::buildFaceMask() {
