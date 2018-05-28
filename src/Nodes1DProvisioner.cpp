@@ -102,13 +102,12 @@ namespace blitzdg {
 
         index_matrix_type & E2E = *EToE;
         index_matrix_type & E2F = *EToF;
-        real_matrix_type & xmat = *xGrid;
 
-        real_matrix_type xmatCol(xmat.rows(), xmat.cols(), ColumnMajorOrder());
-        xmatCol = xmat;
+        real_matrix_type xmat(NumLocalPoints, NumElements, ColumnMajorOrder());
+        xmat = *xGrid;
 
         unique_ptr<real_type[]> x(new real_type[NumElements*NumLocalPoints]());
-        fullToPodArray(xmatCol, x.get(), false);
+        fullToPodArray(xmat, x.get(), false);
 
         // Assemble global volume node numbering.
         nodeIds = ii + NumLocalPoints*jj;
