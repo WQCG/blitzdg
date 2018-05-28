@@ -11,7 +11,6 @@
 
 #pragma once
 #include "DirectSolver.hpp"
-#include "EigenSolver.hpp"
 #include "JacobiBuilders.hpp"
 #include "Types.hpp"
 
@@ -66,7 +65,6 @@ namespace blitzdg {
       index_vector_type* vmapM;
       index_vector_type* vmapP;
 
-      EigenSolver EigSolver;
       DirectSolver LinSolver;
       JacobiBuilders Jacobi;
 

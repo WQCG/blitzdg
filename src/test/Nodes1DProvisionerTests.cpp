@@ -118,7 +118,6 @@ namespace blitzdg {
 
                 nodes1D.buildNodes();
 
-                nodes1D.buildDr();
                 nodes1D.computeJacobian();
 
                 const real_matrix_type & J = nodes1D.get_J();
