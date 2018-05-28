@@ -148,7 +148,7 @@ namespace blitzdg {
                 ret2 = tripToFull(t2);
                 ret1 -= dens;
                 ret2 -= full;
-                cout << "SpasreTriplet: swap" << endl;
+                cout << "SparseTriplet: swap" << endl;
                 Assert::That(normMax(ret1), Equals(0.0));
                 Assert::That(normMax(ret2), Equals(0.0));
             }

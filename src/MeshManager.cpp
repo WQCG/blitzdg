@@ -94,7 +94,9 @@ namespace blitzdg {
         index_type NV = NumVerts;
 
         // set up mesh partitioning options
-        index_type * metisOptions = new index_type[METIS_NOPTIONS];
+        idx_t metisOptions[METIS_NOPTIONS];
+        METIS_SetDefaultOptions(metisOptions);
+
         metisOptions[METIS_OPTION_PTYPE] = METIS_PTYPE_KWAY;
         metisOptions[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_CUT; // total communication volume minimization.
         metisOptions[METIS_OPTION_CTYPE] = METIS_CTYPE_SHEM;
@@ -148,7 +150,6 @@ namespace blitzdg {
         VertexPartitionMap = npart;
 
         delete[] eptr;
-        delete[] metisOptions;
     }
 
     void MeshManager::readVertices(const string& vertFile) {

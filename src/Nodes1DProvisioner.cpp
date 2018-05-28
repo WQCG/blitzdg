@@ -4,9 +4,11 @@
 #include "Nodes1DProvisioner.hpp"
 #include "CSCMatrix.hpp"
 #include "DenseMatrixHelpers.hpp"
+#include "Types.hpp"
 #include <blitz/array.h>
 #include <cmath>
 #include <limits>
+#include <memory>
 
 using blitz::firstIndex;
 using blitz::Range;
@@ -14,6 +16,7 @@ using blitz::secondIndex;
 using blitz::sum;
 using blitz::thirdIndex;
 using std::numeric_limits;
+using std::unique_ptr;
 
 namespace blitzdg {
     const index_type Nodes1DProvisioner::NumFacePoints = 1;
@@ -39,7 +42,7 @@ namespace blitzdg {
         EToF{ new index_matrix_type(NumElements, NumFaces) },
         vmapM{ new index_vector_type(NumFacePoints*NumFaces*NumElements) },
         vmapP{ new index_vector_type(NumFacePoints*NumFaces*NumElements) },
-        EigSolver{}, LinSolver{}, Jacobi{}
+        LinSolver{}, Jacobi{}
     {}
 
     void Nodes1DProvisioner::buildNodes() {
@@ -101,13 +104,12 @@ namespace blitzdg {
 
         index_matrix_type & E2E = *EToE;
         index_matrix_type & E2F = *EToF;
-        real_matrix_type & xmat = *xGrid;
 
-        real_matrix_type xmatTrans(NumElements, NumLocalPoints);
-        xmatTrans = xmat(jj,ii);
+        real_matrix_type xmat(NumLocalPoints, NumElements, ColumnMajorOrder());
+        xmat = *xGrid;
 
-        real_type * x = new real_type[NumElements*NumLocalPoints];
-        fullToPodArray(xmatTrans, x);
+        unique_ptr<real_type[]> x(new real_type[NumElements*NumLocalPoints]());
+        fullToPodArray(xmat, x.get(), false);
 
         // Assemble global volume node numbering.
         nodeIds = ii + NumLocalPoints*jj;
@@ -141,8 +143,6 @@ namespace blitzdg {
                 count++;
             }
         }
-
-        delete[] x;
     }
 
     void Nodes1DProvisioner::buildFaceMask() {
@@ -297,8 +297,7 @@ namespace blitzdg {
 
         computeGradVandermonde(DVr);
 
-        // Dr = DVr / V;
-
+		// Note: this is not a column major ordering trick. We need these transposes.
         real_matrix_type Vtrans(NOrder+1, NOrder+1);
         real_matrix_type DVrtrans(NOrder+1, NOrder+1);
         real_matrix_type Drtrans(NOrder+1, NOrder+1);
@@ -306,6 +305,7 @@ namespace blitzdg {
         Vtrans = Vref(jj, ii);
         DVrtrans = DVr(jj, ii);
 
+        // Dr = DVr / V;
         LinSolver.solve(Vtrans, DVrtrans,  Drtrans);
 
         Drref = Drtrans(jj, ii);
