@@ -23,9 +23,6 @@ namespace blitzdg {
 
     void DirectSolver::solve(const real_matrix_type& A, const real_matrix_type& B, real_matrix_type& X) const {
 
-        if ( !(isRowMajor(A) == isRowMajor(B) ) )
-            throw runtime_error("Matrices A and B must have same storage order!");
-
         index_type sz = A.rows();
         index_type Nrhs = B.cols();
 
