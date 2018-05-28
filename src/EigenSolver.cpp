@@ -12,6 +12,7 @@ using blitz::secondIndex;
 using std::stringstream;
 using std::endl;
 using std::runtime_error;
+using std::unique_ptr;
 
 namespace blitzdg {
     extern "C" {
@@ -33,12 +34,12 @@ namespace blitzdg {
         char JOBZ = 'V';
         char UPLO[] = "UP";
 
-        real_type* Apod = new real_type[sz*lda];
+        unique_ptr<real_type[]> Apod(new real_type[sz*lda]());
 
-        fullToPodArray(A, Apod);
+        fullToPodArray(A, Apod.get());
 
         /* Determining optimal workspace parameters */
-        dsyevd_( &JOBZ, UPLO, &sz, Apod, &lda, ww, &wkopt, &lwork, &iwkopt, &liwork, &info );
+        dsyevd_( &JOBZ, UPLO, &sz, Apod.get(), &lda, ww, &wkopt, &lwork, &iwkopt, &liwork, &info );
         stringstream strm;
         if (info < 0) {
             strm << "Error calling DSYEVD to determine workspace parameters. Error was in Argument " << info*(-1) << "." << endl;
@@ -49,12 +50,12 @@ namespace blitzdg {
         }
 
         lwork = static_cast<index_type>(wkopt);
-        real_type* work = new real_type[lwork];
+        unique_ptr<real_type[]> work(new real_type[lwork]());
         liwork = iwkopt;
-        index_type * iwork = new index_type[liwork];
+        unique_ptr<index_type[]> iwork(new index_type[liwork]());
 
         /* Solve eigenproblem */
-        dsyevd_( &JOBZ, UPLO, &sz, Apod, &lda, ww, work, &lwork, iwork, &liwork, &info );
+        dsyevd_( &JOBZ, UPLO, &sz, Apod.get(), &lda, ww, work.get(), &lwork, iwork.get(), &liwork, &info );
         if (info < 0) {
             strm << "Error calling DSYEVD. Error was in Argument " << info*(-1) << "." << endl;
             throw runtime_error(strm.str());
@@ -63,18 +64,11 @@ namespace blitzdg {
             throw runtime_error(strm.str());
         }
 
-        podArrayToFull(Apod, eigenvectors);
+        podArrayToFull(Apod.get(), eigenvectors, false);
 
         for (index_type i=0; i < sz; i++)
             eigenvalues(i) = ww[i];
 
-        firstIndex ii;
-        secondIndex jj;
-        eigenvectors = eigenvectors(jj,ii);
-
-        delete [] Apod;
-        delete [] work;
-        delete [] iwork;
     }
 } // namespace blitzdg
 
