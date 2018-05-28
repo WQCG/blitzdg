@@ -7,6 +7,7 @@
 #include <string>
 #include <stdexcept>
 #include <iomanip>
+#include <memory>
 
 using std::runtime_error;
 using std::stringstream;

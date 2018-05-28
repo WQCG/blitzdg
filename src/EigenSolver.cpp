@@ -6,6 +6,7 @@
 #include <blitz/array.h>
 #include <iomanip>
 #include <stdexcept>
+#include <memory>
 
 using blitz::firstIndex;
 using blitz::secondIndex;

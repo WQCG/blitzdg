@@ -7,6 +7,7 @@
 #include <blitz/array.h>
 #include <cmath>
 #include <limits>
+#include <memory>
 
 using blitz::firstIndex;
 using blitz::Range;
