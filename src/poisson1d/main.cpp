@@ -87,6 +87,7 @@ namespace blitzdg {
 			const real_matrix_type& Lift = nodes1D.get_Lift();
 			const real_matrix_type& Fscale = nodes1D.get_Fscale();
 			const real_matrix_type& nx = nodes1D.get_nx();
+			const real_matrix_type& Vinv = nodes1D.get_Vinv();
 
 			// Get volume to surface maps.
 			const index_vector_type& vmapM = nodes1D.get_vmapM();
@@ -100,6 +101,10 @@ namespace blitzdg {
 			index_type Nfp = nodes1D.NumFacePoints;
 			index_type Np = nodes1D.get_NumLocalPoints();
 			index_type K = nodes1D.get_NumElements();
+
+			real_matrix_type VinvTrans(Np, Np);
+			VinvTrans = Vinv(jj,ii);
+
 
 			real_vector_type du(numFaces*Nfp*K);
 			real_vector_type uM(numFaces*Nfp*K);
@@ -130,12 +135,15 @@ namespace blitzdg {
 				}
 			}
 
-			// BC's
-			uP(mapO) = uM(mapO);
-			uP(mapI) = 0;
-					
+			// impose boundary condition -- Dirichlet BC's
+			real_type uin  = -uM(mapI);
+			real_type uout = -uM(mapO);
+
+			uP(mapI) = uin;
+			uP(mapO) = uout;
+
 			// Compute jump in flux:
-			du = (uM - uP); 
+			du = (uM - uP);
 
 			real_matrix_type duMat(Nfp*numFaces, K);
 
