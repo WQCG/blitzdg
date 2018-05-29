@@ -9,8 +9,10 @@
 #include <blitz/array.h>
 #include <cmath>
 #include <cstddef>
+#include <iterator>
 #include <limits>
 #include <stdexcept>
+#include <type_traits>
 
 namespace blitzdg {
     /**
@@ -83,6 +85,11 @@ namespace blitzdg {
      */
     template <typename T, typename OutputItr>
     void fullToPodArray(const matrix_type<T>& mat, OutputItr arrItr, bool byRows = true) {
+        // Fail at compile time if the type T is not
+        // the same as the value type of OutputItr.
+        static_assert(std::is_same<T, 
+        typename std::iterator_traits<OutputItr>::value_type>::value,
+        "Matrix value type differs from array value type");
         if (byRows) {
             for (index_type i = 0; i < mat.rows(); ++i) {
                 for (index_type j = 0; j < mat.cols(); ++j)
@@ -108,6 +115,11 @@ namespace blitzdg {
      */
     template <typename T, typename InputItr>
     void podArrayToFull(InputItr arrItr, matrix_type<T>& mat, bool byRows = true) {
+        // Fail at compile time if the type T is not
+        // the same as the value type of InputItr.
+        static_assert(std::is_same<T, 
+        typename std::iterator_traits<InputItr>::value_type>::value,
+        "Matrix value type differs from array value type");
         if (byRows) {
             for (index_type i = 0; i < mat.rows(); ++i) {
                 for (index_type j = 0; j < mat.cols(); ++j)
