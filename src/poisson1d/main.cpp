@@ -105,6 +105,9 @@ namespace blitzdg {
 			real_matrix_type VinvTrans(Np, Np);
 			VinvTrans = Vinv(jj,ii);
 
+			// Construct mass matrix (On Standard element - No Jacobian scaling).
+			real_matrix_type MassMatrix(Np,Np);
+			MassMatrix = Vinv(ii,kk)*Vinv(jj,kk);
 
 			real_vector_type du(numFaces*Nfp*K);
 			real_vector_type uM(numFaces*Nfp*K);
@@ -125,6 +128,7 @@ namespace blitzdg {
 			real_matrix_type uxCol(Np, K, ColumnMajorArray<2>());
 			uxCol = rx*sum(Dr(ii,kk)*u(kk,jj), kk);
 
+			// Get + and - traces at element interfaces
 			index_type count = 0;
 			for( index_type k=0; k < K; k++) {
 				for ( index_type f=0; f < Nfp*numFaces; f++) {
@@ -155,9 +159,25 @@ namespace blitzdg {
 				}
 			}
 
+			// Auxiliary variable to hold first derivative.
+			real_matrix_type q(Np, K);
+			q = rx*sum(Dr(ii,kk)*u(kk,jj), kk);
+
 			real_matrix_type surfaceRHS(Nfp*numFaces, K);
 			surfaceRHS = Fscale*duMat;
-			result = sum(Lift(ii,kk)*surfaceRHS(kk,jj), kk);
+			q -= sum(Lift(ii,kk)*surfaceRHS(kk,jj), kk);
+
+			// Get + and - traces at element interfaces
+			index_type count = 0;
+			for( index_type k=0; k < K; k++) {
+				for ( index_type f=0; f < Nfp*numFaces; f++) {
+					nxVec(count) = nxCol(f,k);
+					uM(count) = uCol(vmapM(count));
+					uP(count) = uCol(vmapP(count));
+					count++;
+				}
+			}
+
 		} // computeRHS
 	} // namespace poisson1d
 } // namespace blitzdg
