@@ -285,8 +285,6 @@ namespace blitzdg {
         }
 
         Inverter.computeInverse(Vref, Vinv);
-        std::cout << Vinv << std::endl;
-        std::cout << Vref << std::endl;
     }
 
     void Nodes1DProvisioner::buildDr() {
