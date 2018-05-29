@@ -4,6 +4,7 @@
 #include "Nodes1DProvisioner.hpp"
 #include "CSCMatrix.hpp"
 #include "DenseMatrixHelpers.hpp"
+#include "DenseMatrixInverter.hpp"
 #include <blitz/array.h>
 #include <cmath>
 #include <limits>
@@ -28,11 +29,12 @@ namespace blitzdg {
         vmapI{ 0 }, vmapO{ NumLocalPoints*NumElements - 1 },
         xGrid{ new real_matrix_type(NumLocalPoints, NumElements) },
         rGrid{ new real_vector_type(NumLocalPoints) },
-        V{ nullptr }, Dr{ nullptr }, 
+        V{ nullptr }, Dr{ nullptr },
         Lift{ new real_matrix_type(NumLocalPoints, NumFacePoints*NumFaces) },
         J{ new real_matrix_type(NumLocalPoints, NumElements) },
         rx{ new real_matrix_type(NumLocalPoints, NumElements) },
         nx{ new real_matrix_type(NumFacePoints*NumFaces, NumElements) },
+        Vinv(NumLocalPoints, NumLocalPoints),
         Fmask{ new index_vector_type (NumFacePoints*NumFaces) },
         Fx{ new real_matrix_type(NumFacePoints*NumFaces, NumElements) },
         Fscale{ new real_matrix_type(NumFacePoints*NumFaces, NumElements) },
@@ -41,7 +43,7 @@ namespace blitzdg {
         EToF{ new index_matrix_type(NumElements, NumFaces) },
         vmapM{ new index_vector_type(NumFacePoints*NumFaces*NumElements) },
         vmapP{ new index_vector_type(NumFacePoints*NumFaces*NumElements) },
-        EigSolver{}, LinSolver{}, Jacobi{}
+        EigSolver{}, LinSolver{}, Jacobi{}, Inverter{}
     {}
 
     void Nodes1DProvisioner::buildNodes() {
@@ -280,6 +282,10 @@ namespace blitzdg {
             Jacobi.computeJacobiPolynomial(*rGrid, 0.0, 0.0, j, p);
             Vref(Range::all(), j) = p;
         }
+
+        Inverter.computeInverse(Vref, Vinv);
+        std::cout << Vinv << std::endl;
+        std::cout << Vref << std::endl;
     }
 
     void Nodes1DProvisioner::buildDr() {
@@ -344,6 +350,10 @@ namespace blitzdg {
 
     const real_matrix_type & Nodes1DProvisioner::get_V() const {
         return *V;
+    }
+
+    const real_matrix_type & Nodes1DProvisioner::get_Vinv() const {
+        return Vinv;
     }
 
     const real_matrix_type & Nodes1DProvisioner::get_J() const {
