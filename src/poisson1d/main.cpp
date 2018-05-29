@@ -48,13 +48,13 @@ int main(int argc, char **argv) {
 
 	index_type Np = nodes1DProvisioner.get_NumLocalPoints();
 
-	const matrix_type & x = nodes1DProvisioner.get_xGrid();
+	const real_matrix_type & x = nodes1DProvisioner.get_xGrid();
 
 	real_type min_dx = x(1,0) - x(0,0);
 
-	matrix_type u(Np, K);
-	matrix_type uexact(Np, K);
-	matrix_type RHS(Np, K);
+	real_matrix_type u(Np, K);
+	real_matrix_type uexact(Np, K);
+	real_matrix_type RHS(Np, K);
 
 	firstIndex ii;
 	secondIndex jj;
@@ -77,16 +77,16 @@ int main(int argc, char **argv) {
 
 namespace blitzdg {
 	namespace poisson1d {
-		void applyPoissonOperator(const matrix_type & u, const Nodes1DProvisioner & nodes1D, const real_type tau, matrix_type & result) {
+		void applyPoissonOperator(const real_matrix_type & u, const Nodes1DProvisioner & nodes1D, const real_type tau, real_matrix_type & result) {
 			// Blitz indices
 			firstIndex ii;
 			secondIndex jj;
 			thirdIndex kk;
-			const matrix_type& Dr = nodes1D.get_Dr();
-			const matrix_type& rx = nodes1D.get_rx();
-			const matrix_type& Lift = nodes1D.get_Lift();
-			const matrix_type& Fscale = nodes1D.get_Fscale();
-			const matrix_type& nx = nodes1D.get_nx();
+			const real_matrix_type& Dr = nodes1D.get_Dr();
+			const real_matrix_type& rx = nodes1D.get_rx();
+			const real_matrix_type& Lift = nodes1D.get_Lift();
+			const real_matrix_type& Fscale = nodes1D.get_Fscale();
+			const real_matrix_type& nx = nodes1D.get_nx();
 
 			// Get volume to surface maps.
 			const index_vector_type& vmapM = nodes1D.get_vmapM();
@@ -101,23 +101,23 @@ namespace blitzdg {
 			index_type Np = nodes1D.get_NumLocalPoints();
 			index_type K = nodes1D.get_NumElements();
 
-			vector_type du(numFaces*Nfp*K);
-			vector_type uM(numFaces*Nfp*K);
-			vector_type uP(numFaces*Nfp*K);
-			vector_type nxVec(numFaces*Nfp*K);
+			real_vector_type du(numFaces*Nfp*K);
+			real_vector_type uM(numFaces*Nfp*K);
+			real_vector_type uP(numFaces*Nfp*K);
+			real_vector_type nxVec(numFaces*Nfp*K);
 
 			du = 0.*ii;
 			uM = 0.*ii;
 			uP = 0.*ii;
 			nxVec = 0.*ii;
 
-			matrix_type nxCol(numFaces*Nfp,K, ColumnMajorArray<2>());
+			real_matrix_type nxCol(numFaces*Nfp,K, ColumnMajorArray<2>());
 			nxCol = nx;		
 
-			matrix_type uCol(Np, K, ColumnMajorArray<2>());
+			real_matrix_type uCol(Np, K, ColumnMajorArray<2>());
 			uCol = u;
 
-			matrix_type uxCol(Np, K, ColumnMajorArray<2>());
+			real_matrix_type uxCol(Np, K, ColumnMajorArray<2>());
 			uxCol = rx*sum(Dr(ii,kk)*u(kk,jj), kk);
 
 			index_type count = 0;
@@ -137,7 +137,7 @@ namespace blitzdg {
 			// Compute jump in flux:
 			du = (uM - uP); 
 
-			matrix_type duMat(Nfp*numFaces, K);
+			real_matrix_type duMat(Nfp*numFaces, K);
 
 			count = 0;
 			for( index_type k=0; k < K; k++) {
@@ -147,7 +147,7 @@ namespace blitzdg {
 				}
 			}
 
-			matrix_type surfaceRHS(Np, K);
+			real_matrix_type surfaceRHS(Nfp*numFaces, K);
 			surfaceRHS = Fscale*duMat;
 			result = sum(Lift(ii,kk)*surfaceRHS(kk,jj), kk);
 		} // computeRHS

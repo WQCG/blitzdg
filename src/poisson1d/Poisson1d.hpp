@@ -12,6 +12,6 @@
 
 namespace blitzdg {
 	namespace poisson1d {
-		void applyPoissonOperator(const matrix_type & u, const Nodes1DProvisioner & nodes1D, const real_type tau, matrix_type & result);
+		void applyPoissonOperator(const real_matrix_type & u, const Nodes1DProvisioner & nodes1D, const real_type tau, real_matrix_type & result);
 	}
 }
