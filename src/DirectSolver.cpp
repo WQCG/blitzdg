@@ -34,7 +34,7 @@ namespace blitzdg {
 
         unique_ptr<index_type[]> ipiv(new index_type[sz]());
         unique_ptr<real_type[]> work(new real_type[sz*Nrhs]());
-        unique_ptr<float> swork(new float[sz*(sz+Nrhs)]());
+        unique_ptr<float[]> swork(new float[sz*(sz+Nrhs)]());
 
         unique_ptr<real_type[]> Apod(new real_type[sz*lda]());
         unique_ptr<real_type[]> Bpod(new real_type[dim]());
