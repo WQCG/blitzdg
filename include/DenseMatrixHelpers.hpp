@@ -106,7 +106,8 @@ namespace blitzdg {
 
     /**
      * Convert a blitz matrix (column-wise) to a vector.
-	 * .....
+	 * @param[in] mat The dense matrix.
+	 * @param[out] vec The output vector.
      */
 	template <typename T>
 	void fullToVector(const matrix_type<T>& mat, vector_type<T>& vec) {
@@ -121,7 +122,8 @@ namespace blitzdg {
 
 	/**
 	 * Convert a vector to a blitz matrix (column-wise).
-	 * .....
+	 * @param[in] vec The vector.
+	 * @param[out] mat The output dense matrix.
 	 */
 	template <typename T>
 	void vectorToFull(const vector_type<T>& vec, matrix_type<T>& mat) {
@@ -136,6 +138,9 @@ namespace blitzdg {
 
 	/**
 	 * Evaluate vector at an array of indices.
+	 * @param[in] vec The input vector to be evaluated at a list of indices (or map).
+	 * @param[in] map The map or list of indices.
+	 * @param[out] out The output vector containing the result of applying the map.
 	 */
 	template <typename T, typename U>
 	void applyIndexMap(const vector_type<T>& vec, const vector_type<U>& map, vector_type<T>& out) {
