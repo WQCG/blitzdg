@@ -13,6 +13,7 @@
 #include "Nodes1DProvisioner.hpp"
 #include "CsvOutputter.hpp"
 #include "Types.hpp"
+#include "DenseMatrixHelpers.hpp"
 #include "Warning.hpp"
 #include "Advec1d.hpp"
 #include "LSERK4.hpp"
@@ -156,18 +157,18 @@ namespace blitzdg {
 			uP = 0.*ii;
 			nxVec = 0.*ii;
 
-			real_matrix_type nxCol(numFaces*Nfp,K, ColumnMajorArray<2>());
+			real_matrix_type nxCol(numFaces*Nfp,K, ColumnMajorOrder());
 			nxCol = nx;		
 
-			real_matrix_type uCol(Np, K, ColumnMajorArray<2>());
+			real_matrix_type uCol(Np, K, ColumnMajorOrder());
 			uCol = u;
 
 			index_type count = 0;
 			for( index_type k=0; k < K; k++) {
 				for ( index_type f=0; f < Nfp*numFaces; f++) {
 					nxVec(count) = nxCol(f,k);
-					uM(count) = uCol(vmapM(count));
-					uP(count) = uCol(vmapP(count));
+					uM(count) = uCol.data()[vmapM(count)];
+					uP(count) = uCol.data()[vmapP(count)];
 					count++;
 				}
 			}
