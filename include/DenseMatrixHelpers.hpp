@@ -84,7 +84,7 @@ namespace blitzdg {
      * the number of columns. 
      */
     template <typename T, typename OutputItr>
-    void fullToPodArray(const matrix_type<T>& mat, OutputItr arrItr, bool byRows = true) {
+    void reshapeMatTo1D(const matrix_type<T>& mat, OutputItr arrItr, bool byRows = true) {
         // Fail at compile time if the type T is not
         // the same as the value type of OutputItr.
         static_assert(std::is_same<T, 
@@ -114,7 +114,7 @@ namespace blitzdg {
      * the number of columns. 
      */
     template <typename T, typename InputItr>
-    void podArrayToFull(InputItr arrItr, matrix_type<T>& mat, bool byRows = true) {
+    void reshape1DToMat(InputItr arrItr, matrix_type<T>& mat, bool byRows = true) {
         // Fail at compile time if the type T is not
         // the same as the value type of InputItr.
         static_assert(std::is_same<T, 
@@ -154,7 +154,7 @@ namespace blitzdg {
 	 */
 	template <typename T>
 	void vectorToFull(const vector_type<T>& vec, matrix_type<T>& mat, bool byRows = true) {
-		podArrayToFull(vec.begin(), mat, byRows);
+		reshape1DToMat(vec.begin(), mat, byRows);
 	}
 
 	/**
@@ -165,7 +165,7 @@ namespace blitzdg {
      */
 	template <typename T>
 	void fullToVector(const matrix_type<T>& mat, vector_type<T>& vec, bool byRows = true) {
-		fullToPodArray(mat, vec.begin(), byRows);
+		reshapeMatTo1D(mat, vec.begin(), byRows);
 	}
 
 } // namespace blitzdg

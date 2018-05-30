@@ -43,8 +43,8 @@ namespace blitzdg {
         index_type info;
         index_type iter;
 
-        fullToPodArray(A, Apod.get(), false);
-        fullToPodArray(B, Bpod.get(), false);
+        reshapeMatTo1D(A, Apod.get(), false);
+        reshapeMatTo1D(B, Bpod.get(), false);
 
         dsgesv_(&sz, &Nrhs, Apod.get(), &lda,
                 ipiv.get(), Bpod.get(), &ldb, Xpod.get(), &ldx, 
@@ -59,6 +59,6 @@ namespace blitzdg {
             throw runtime_error(strm.str());
         }
 
-        podArrayToFull(Xpod.get(), X, false);
+        reshape1DToMat(Xpod.get(), X, false);
     }
 } // namespace blitzdg

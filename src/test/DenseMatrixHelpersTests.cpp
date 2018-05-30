@@ -50,13 +50,13 @@ namespace blitzdg {
                 0, 0, 1, 0, 0,
                 0, 4, 2, 0, 1;
                 podCol = 2,3,0,0,0,3,0,-1,0,4,0,4,-3,1,2,0,0,2,0,0,0,6,0,0,1;
-                fullToPodArray(mat, pod.data());
+                reshapeMatTo1D(mat, pod.data());
                 podRow -= pod;
                 cout << "DenseMatrixHelpers: full to pod (rowwise)" << endl;
                 real_type diff = normInf(podRow);
                 Assert::That(diff, Equals(0.0));
 
-                fullToPodArray(mat, pod.data(), false);
+                reshapeMatTo1D(mat, pod.data(), false);
                 podCol -= pod;
                 cout << "DenseMatrixHelpers: full to pod (colwise)" << endl;
                 diff = normInf(podCol);
@@ -82,13 +82,13 @@ namespace blitzdg {
                 0, 0, 1, 0, 0,
                 0, 4, 2, 0, 1;
                 real_matrix_type ret(5,5);
-                podArrayToFull(pod.data(), ret);
+                reshape1DToMat(pod.data(), ret);
                 mat -= ret;
                 cout << "DenseMatrixHelpers: pod to full (rowwise)" << endl;
                 real_type diff = normMax(mat);
                 Assert::That(diff, Equals(0.0));
 
-                podArrayToFull(pod.data(), ret, false);
+                reshape1DToMat(pod.data(), ret, false);
                 
                 matT -= ret;
                 cout << "DenseMatrixHelpers: pod to full (colwise)" << endl;
