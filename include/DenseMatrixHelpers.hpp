@@ -9,8 +9,10 @@
 #include <blitz/array.h>
 #include <cmath>
 #include <cstddef>
+#include <iterator>
 #include <limits>
 #include <stdexcept>
+#include <type_traits>
 
 namespace blitzdg {
     /**
@@ -73,53 +75,61 @@ namespace blitzdg {
     }
 
     /**
-     * Vectorizes a dense matrix. 
+     * Vectorizes a dense matrix by writing it to an array.
      * @param[in] mat The Dense matrix.
-     * @param[in] byRows If true, the rows of mat are stored contiguously. Defaults to true.
-     * @param[out] arr Pointer to array that stores the vectorized matrix.
-     * @note The array pointed to by arr must have space allocated for at 
+     * @param[in] byRows If true, the matrix is copied to the array by rows. Defaults to true.
+     * @param[out] arrItr An output iterator to an array.
+     * @note The array must have space allocated for at 
      * least m*n elements, where m is the the number of rows of mat and n is 
      * the number of columns. 
      */
-    template <typename T>
-    void fullToPodArray(const matrix_type<T>& mat, T* arr, bool byRows = true) {
-        std::size_t nnz = 0;
+    template <typename T, typename OutputItr>
+    void fullToPodArray(const matrix_type<T>& mat, OutputItr arrItr, bool byRows = true) {
+        // Fail at compile time if the type T is not
+        // the same as the value type of OutputItr.
+        static_assert(std::is_same<T, 
+        typename std::iterator_traits<OutputItr>::value_type>::value,
+        "Matrix value type differs from array value type");
         if (byRows) {
             for (index_type i = 0; i < mat.rows(); ++i) {
                 for (index_type j = 0; j < mat.cols(); ++j)
-                    arr[nnz++] = mat(i, j);
+                    *arrItr++ = mat(i, j);
             }
         }
         else {
             for (index_type j = 0; j < mat.cols(); ++j) {
                 for (index_type i = 0; i < mat.rows(); ++i)
-                    arr[nnz++] = mat(i, j);
+                    *arrItr++ = mat(i, j);
             }
         }
     }
 
     /**
      * Reshapes an array to a dense matrix.
-     * @param[in] arr Pointer to the array.
-     * @param[in] byRows If true, arr is stored in mat rowwise. Defaults to true.
+     * @param[in] arrItr An input iterator to the array.
+     * @param[in] byRows If true, the array is stored in mat rowwise. Defaults to true.
      * @param[out] mat The dense matrix.
-     * @note The array pointed to by arr must have space allocated for at 
+     * @note The array must have space allocated for at 
      * least m*n elements, where m is the the number of rows of mat and n is 
      * the number of columns. 
      */
-    template <typename T>
-    void podArrayToFull(const T* arr, matrix_type<T>& mat, bool byRows = true) {
-        std::size_t nnz = 0;
+    template <typename T, typename InputItr>
+    void podArrayToFull(InputItr arrItr, matrix_type<T>& mat, bool byRows = true) {
+        // Fail at compile time if the type T is not
+        // the same as the value type of InputItr.
+        static_assert(std::is_same<T, 
+        typename std::iterator_traits<InputItr>::value_type>::value,
+        "Matrix value type differs from array value type");
         if (byRows) {
             for (index_type i = 0; i < mat.rows(); ++i) {
                 for (index_type j = 0; j < mat.cols(); ++j)
-                    mat(i, j) = arr[nnz++];
+                    mat(i, j) = *arrItr++;
             }
         }
         else {
             for (index_type j = 0; j < mat.cols(); ++j) {
                 for (index_type i = 0; i < mat.rows(); ++i)
-                   mat(i, j) = arr[nnz++];
+                   mat(i, j) = *arrItr++;
             }
         }
     }

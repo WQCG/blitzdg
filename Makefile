@@ -19,7 +19,7 @@ SPECIFICOBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SPECIFICSOURCES:.$(SRC
 ALLOBJECTS := $(COMMONOBJECTS)
 ALLOBJECTS += $(SPECIFICOBJECTS)
 
-CFLAGS := -g -Wall -std=c++0x -fprofile-arcs -ftest-coverage
+CFLAGS := -g -Wall -std=c++0x -fprofile-arcs -ftest-coverage -DBZ_DEBUG
 LINKERFLAGS := -fprofile-arcs
 INC := -I include -I /usr/include
 LIB := -L lib -lblitz -lmetis -lumfpack -lcxsparse -llapack -lblas

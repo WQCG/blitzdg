@@ -24,6 +24,7 @@ namespace blitzdg {
         Nodes1DProvisioner * nodes1DProvisioner = nullptr;
 
         Describe(Nodes1DProvisioner_Object) {
+			const real_type eps = 2.*numeric_limits<double>::epsilon();
 			const float epsf = 5.7e-6;
 			const index_type NOrder = 3;
 			const index_type NumElements = 5;
@@ -203,8 +204,8 @@ namespace blitzdg {
                 Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
                 nodes1D.buildNodes();
 
-                index_vector_type Fmask = nodes1D.get_Fmask();
-                real_matrix_type Fx = nodes1D.get_Fx();
+                const index_vector_type & Fmask = nodes1D.get_Fmask();
+                const real_matrix_type & Fx = nodes1D.get_Fx();
 
                 Assert::That(Fmask(0), Equals(0));
                 Assert::That(Fmask(1), Equals(3));
@@ -213,10 +214,13 @@ namespace blitzdg {
                 expectedFx = -1,-0.6,-0.2,0.2,0.6,
                             -0.6,-0.2,0.2,0.6,1;
 
-                real_matrix_type resFx;
+				cout << "Fx: " << Fx << endl;
+				cout << "expectedFx: " << expectedFx << endl;
+
+                real_matrix_type resFx(NumFaces, NumElements);
                 resFx = Fx - expectedFx;
 
-                Assert::That(sqrt(sum(resFx*resFx)), Equals(0));
+                Assert::That(sqrt(sum(resFx*resFx)), IsLessThan(eps));
             }
 
             It(Should_Build_Volume_Maps) {
