@@ -105,7 +105,6 @@ namespace blitzdg {
 			real_matrix_type VinvTrans(Np, Np);
 			VinvTrans = Vinv(jj,ii);
 
-
 			real_vector_type du(numFaces*Nfp*K);
 			real_vector_type uM(numFaces*Nfp*K);
 			real_vector_type uP(numFaces*Nfp*K);
@@ -136,11 +135,8 @@ namespace blitzdg {
 			}
 
 			// impose boundary condition -- Dirichlet BC's
-			real_type uin  = -uM(mapI);
-			real_type uout = -uM(mapO);
-
-			uP(mapI) = uin;
-			uP(mapO) = uout;
+			uP(mapI) = -uM(mapI);
+			uP(mapO) = -uM(mapO);
 
 			// Compute jump in flux:
 			du = (uM - uP);
@@ -154,6 +150,12 @@ namespace blitzdg {
 					count++;
 				}
 			}
+
+			real_matrix_type fluxu(Nfp*numFaces, K);
+			real_matrix_type q(Np, K);
+			// Compute q
+			fluxu = nx*duMat/2.0;
+			q = rx*(Dr(ii,kk)*u(kk,jj)) - Lift*(Fscale*fluxu);
 
 			real_matrix_type surfaceRHS(Nfp*numFaces, K);
 			surfaceRHS = Fscale*duMat;
