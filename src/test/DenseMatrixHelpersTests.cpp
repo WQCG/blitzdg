@@ -97,6 +97,7 @@ namespace blitzdg {
             }
 
 			It(Should_Convert_Dense_Matrix_To_Vector) {
+				cout << "Should_Convert_Dense_Matrix_To_Vector" << endl;
 				real_matrix_type mat(5, 5);
 				real_vector_type vec(25), expectedvec(25);
 
@@ -140,6 +141,54 @@ namespace blitzdg {
 				vec -= expectedvec;
 				real_type diff = normInf(vec);
 				Assert::That(diff, Equals(0.0));
+			}
+
+			It(Should_Convert_Vector_To_Dense_Matrix) {
+				cout << "Should_Convert_Vector_To_Dense_Matrix" << endl;
+				real_vector_type vec(25);
+				real_matrix_type mat(5,5);
+
+				vec = 2,
+				3,
+				0,
+				0,
+				0,
+				3,
+				0,
+				-1,
+				0,
+				4,
+				0,
+				4,
+				-3,
+				1,
+				2,
+				0,
+				0,
+				2,
+				0,
+				0,
+				0,
+				6,
+				0,
+				0,
+				1;
+
+				real_matrix_type expectedmat(5,5);
+				expectedmat =   2,3,0,0,0,
+								3,0,4,0,6,
+								0,-1,-3,2,0,
+								0,0,1,0,0,
+								0,4,2,0,1;
+
+				// Ask for column-wise reshaping.
+				const bool byRowsOpt = false;
+
+				reshape1DToMat(vec, mat, byRowsOpt);
+				mat -= expectedmat;
+
+				real_type diff = normMax(mat);
+                Assert::That(diff, Equals(0.0));
 			}
         };
     } // namespace DenseMatrixHelpersTests
