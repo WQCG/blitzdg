@@ -50,13 +50,13 @@ namespace blitzdg {
                 0, 0, 1, 0, 0,
                 0, 4, 2, 0, 1;
                 podCol = 2,3,0,0,0,3,0,-1,0,4,0,4,-3,1,2,0,0,2,0,0,0,6,0,0,1;
-                fullToPodArray(mat, pod.data());
+                reshapeMatTo1D(mat, pod.data());
                 podRow -= pod;
                 cout << "DenseMatrixHelpers: full to pod (rowwise)" << endl;
                 real_type diff = normInf(podRow);
                 Assert::That(diff, Equals(0.0));
 
-                fullToPodArray(mat, pod.data(), false);
+                reshapeMatTo1D(mat, pod.data(), false);
                 podCol -= pod;
                 cout << "DenseMatrixHelpers: full to pod (colwise)" << endl;
                 diff = normInf(podCol);
@@ -82,19 +82,133 @@ namespace blitzdg {
                 0, 0, 1, 0, 0,
                 0, 4, 2, 0, 1;
                 real_matrix_type ret(5,5);
-                podArrayToFull(pod.data(), ret);
+                reshape1DToMat(pod.data(), ret);
                 mat -= ret;
                 cout << "DenseMatrixHelpers: pod to full (rowwise)" << endl;
                 real_type diff = normMax(mat);
                 Assert::That(diff, Equals(0.0));
 
-                podArrayToFull(pod.data(), ret, false);
+                reshape1DToMat(pod.data(), ret, false);
                 
                 matT -= ret;
                 cout << "DenseMatrixHelpers: pod to full (colwise)" << endl;
                 diff = normMax(matT);
                 Assert::That(diff, Equals(0.0));
             }
+
+			It(Should_Convert_Dense_Matrix_To_Vector) {
+				cout << "Should_Convert_Dense_Matrix_To_Vector" << endl;
+				real_matrix_type mat(5, 5);
+				real_vector_type vec(25), expectedvec(25);
+
+                mat =   2,3,0,0,0,
+                        3,0,4,0,6,
+                        0,-1,-3,2,0,
+                        0,0,1,0,0,
+                        0,4,2,0,1;
+				
+				// Ask for column-wise vector ordering.
+				const bool byRowsOpt = false;
+				
+				expectedvec = 2,
+				3,
+				0,
+				0,
+				0,
+				3,
+				0,
+				-1,
+				0,
+				4,
+				0,
+				4,
+				-3,
+				1,
+				2,
+				0,
+				0,
+				2,
+				0,
+				0,
+				0,
+				6,
+				0,
+				0,
+				1;
+				
+				fullToVector(mat, vec, byRowsOpt);
+
+				vec -= expectedvec;
+				real_type diff = normInf(vec);
+				Assert::That(diff, Equals(0.0));
+			}
+
+			It(Should_Convert_Vector_To_Dense_Matrix) {
+				cout << "Should_Convert_Vector_To_Dense_Matrix" << endl;
+				real_vector_type vec(25);
+				real_matrix_type mat(5,5);
+
+				vec = 2,
+				3,
+				0,
+				0,
+				0,
+				3,
+				0,
+				-1,
+				0,
+				4,
+				0,
+				4,
+				-3,
+				1,
+				2,
+				0,
+				0,
+				2,
+				0,
+				0,
+				0,
+				6,
+				0,
+				0,
+				1;
+
+				real_matrix_type expectedmat(5,5);
+				expectedmat =   2,3,0,0,0,
+								3,0,4,0,6,
+								0,-1,-3,2,0,
+								0,0,1,0,0,
+								0,4,2,0,1;
+
+				// Ask for column-wise reshaping.
+				const bool byRowsOpt = false;
+
+				vectorToFull(vec, mat, byRowsOpt);
+				mat -= expectedmat;
+
+				real_type diff = normMax(mat);
+                Assert::That(diff, Equals(0.0));
+			}
+
+			It(Should_Apply_Index_Map) {
+				real_vector_type vec(5);
+				vec = 1.1,1.2,1.3,1.4,1.5;
+				
+				index_vector_type map(3);
+				map = 0,2,4;
+
+				real_vector_type expectedout(3);
+				real_vector_type out(3);
+
+				expectedout = 1.1,1.3,1.5;
+
+				applyIndexMap(vec, map, out);
+
+				out -= expectedout;
+				real_type diff = normInf(out);
+                Assert::That(diff, Equals(0.0));
+			}
         };
     } // namespace DenseMatrixHelpersTests
 } // namespace blitzdg

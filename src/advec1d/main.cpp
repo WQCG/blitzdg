@@ -151,27 +151,20 @@ namespace blitzdg {
 			real_vector_type uM(numFaces*Nfp*K);
 			real_vector_type uP(numFaces*Nfp*K);
 			real_vector_type nxVec(numFaces*Nfp*K);
+			real_vector_type uVec(Np*K);
 
 			du = 0.*ii;
 			uM = 0.*ii;
 			uP = 0.*ii;
 			nxVec = 0.*ii;
 
-			real_matrix_type nxCol(numFaces*Nfp,K, ColumnMajorOrder());
-			nxCol = nx;		
+			// We want to apply maps to column-wise ordering of the nodes.
+			const bool byRowsOpt = false;
 
-			real_matrix_type uCol(Np, K, ColumnMajorOrder());
-			uCol = u;
-
-			index_type count = 0;
-			for( index_type k=0; k < K; k++) {
-				for ( index_type f=0; f < Nfp*numFaces; f++) {
-					nxVec(count) = nxCol(f,k);
-					uM(count) = uCol.data()[vmapM(count)];
-					uP(count) = uCol.data()[vmapP(count)];
-					count++;
-				}
-			}
+			fullToVector(nx, nxVec, byRowsOpt);
+			fullToVector(u, uVec, byRowsOpt);
+			applyIndexMap(uVec, vmapM, uM);
+			applyIndexMap(uVec, vmapP, uP);
 
 			// BC's
 			uP(mapO) = uM(mapO); // outflow - exit stage left.
@@ -181,14 +174,7 @@ namespace blitzdg {
 			du = (uM - uP)*0.5*(c*nxVec - (1-alpha)*fabs(c*nxVec)); 
 
 			real_matrix_type duMat(Nfp*numFaces, K);
-
-			count = 0;
-			for( index_type k=0; k < K; k++) {
-				for ( index_type f=0; f < Nfp*numFaces; f++) {
-					duMat(f,k) = du(count);
-					count++;
-				}
-			}
+			vectorToFull(du, duMat, byRowsOpt);
 
 			// Assumes PDE has been left-multiplied by local inverse mass matrix, so all we have left
 			// is the differentiation matrix contribution, and the surface integral
