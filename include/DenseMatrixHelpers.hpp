@@ -104,18 +104,6 @@ namespace blitzdg {
         }
     }
 
-	/**
-	 * Evaluate vector at an array of indices.
-	 * @param[in] vec The input vector to be evaluated at a list of indices (or map).
-	 * @param[in] map The map or list of indices.
-	 * @param[out] out The output vector containing the result of applying the map.
-	 */
-	template <typename T, typename U>
-	void applyIndexMap(const vector_type<T>& vec, const vector_type<U>& map, vector_type<T>& out) {
-		for( index_type i=0; i < map.length(0); i++) 
-				out(i) = vec(map(i));
-	}
-
     /**
      * Reshapes an array to a dense matrix.
      * @param[in] arrItr An input iterator to the array.
@@ -145,6 +133,18 @@ namespace blitzdg {
             }
         }
     }
+
+	/**
+	 * Evaluate vector at an array of indices.
+	 * @param[in] vec The input vector to be evaluated at a list of indices (or map).
+	 * @param[in] map The map or list of indices.
+	 * @param[out] out The output vector containing the result of applying the map.
+	 */
+	template <typename T, typename U>
+	void applyIndexMap(const vector_type<T>& vec, const vector_type<U>& map, vector_type<T>& out) {
+		for( index_type i=0; i < map.length(0); i++)
+				out(i) = vec(map(i));
+	}
 
 	/**
 	 * Convert a vector to a blitz matrix.
