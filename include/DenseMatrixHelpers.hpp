@@ -153,7 +153,7 @@ namespace blitzdg {
 	 * @param[in] byRows whether to convert row-wise (default) or column-wise.
 	 */
 	template <typename T>
-	void vectorToFull(const vector_type<T>& vec, matrix_type<T>& mat, bool byRows = true) {
+	void reshape1DToMat(const vector_type<T>& vec, matrix_type<T>& mat, bool byRows = true) {
 		podArrayToFull(vec.begin(), mat, byRows);
 	}
 
@@ -164,7 +164,7 @@ namespace blitzdg {
 	 * @param[in] byRows whether to convert row-wise (default) or column-wise.
      */
 	template <typename T>
-	void fullToVector(const matrix_type<T>& mat, vector_type<T>& vec, bool byRows = true) {
+	void reshapeMatTo1D(const matrix_type<T>& mat, vector_type<T>& vec, bool byRows = true) {
 		fullToPodArray(mat, vec.begin(), byRows);
 	}
 
