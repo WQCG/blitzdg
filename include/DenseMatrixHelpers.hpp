@@ -104,38 +104,6 @@ namespace blitzdg {
         }
     }
 
-    /**
-     * Convert a blitz matrix (column-wise) to a vector.
-	 * @param[in] mat The dense matrix.
-	 * @param[out] vec The output vector.
-     */
-	template <typename T>
-	void fullToVector(const matrix_type<T>& mat, vector_type<T>& vec) {
-		index_type count=0;
-		for (index_type j = 0; j < mat.cols(); ++j) {
-			for (index_type i = 0; i < mat.rows(); ++i) {
-				vec(count) = mat(i, j);
-				++count;
-			}
-		}
-	}
-
-	/**
-	 * Convert a vector to a blitz matrix (column-wise).
-	 * @param[in] vec The vector.
-	 * @param[out] mat The output dense matrix.
-	 */
-	template <typename T>
-	void vectorToFull(const vector_type<T>& vec, matrix_type<T>& mat) {
-		index_type count=0;
-		for( index_type j=0; j < mat.cols(); ++j) {
-			for ( index_type i=0; i < mat.rows(); i++) {
-				mat(i,j) = vec(count);
-				++count;
-			}
-		}
-	}
-
 	/**
 	 * Evaluate vector at an array of indices.
 	 * @param[in] vec The input vector to be evaluated at a list of indices (or map).
@@ -177,4 +145,27 @@ namespace blitzdg {
             }
         }
     }
+
+	/**
+	 * Convert a vector to a blitz matrix.
+	 * @param[in] vec The vector.
+	 * @param[out] mat The output dense matrix.
+	 * @param[in] byRows whether to convert row-wise (default) or column-wise.
+	 */
+	template <typename T>
+	void vectorToFull(const vector_type<T>& vec, matrix_type<T>& mat, bool byRows = true) {
+		podArrayToFull(vec.begin(), mat, byRows);
+	}
+
+	/**
+     * Convert a blitz matrix to a vector.
+	 * @param[in] mat The dense matrix.
+	 * @param[out] vec The output vector.
+	 * @param[in] byRows whether to convert row-wise (default) or column-wise.
+     */
+	template <typename T>
+	void fullToVector(const matrix_type<T>& mat, vector_type<T>& vec, bool byRows = true) {
+		fullToPodArray(mat, vec.begin(), byRows);
+	}
+
 } // namespace blitzdg

@@ -158,8 +158,11 @@ namespace blitzdg {
 			uP = 0.*ii;
 			nxVec = 0.*ii;
 
-			fullToVector(nx, nxVec);
-			fullToVector(u, uVec);
+			// We want to apply maps to column-wise ordering of the nodes.
+			const bool byRowsOpt = false;
+
+			fullToVector(nx, nxVec, byRowsOpt);
+			fullToVector(u, uVec, byRowsOpt);
 			applyIndexMap(uVec, vmapM, uM);
 			applyIndexMap(uVec, vmapP, uP);
 
@@ -171,7 +174,7 @@ namespace blitzdg {
 			du = (uM - uP)*0.5*(c*nxVec - (1-alpha)*fabs(c*nxVec)); 
 
 			real_matrix_type duMat(Nfp*numFaces, K);
-			vectorToFull(du, duMat);
+			vectorToFull(du, duMat, byRowsOpt);
 
 			// Assumes PDE has been left-multiplied by local inverse mass matrix, so all we have left
 			// is the differentiation matrix contribution, and the surface integral
