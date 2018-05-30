@@ -190,6 +190,25 @@ namespace blitzdg {
 				real_type diff = normMax(mat);
                 Assert::That(diff, Equals(0.0));
 			}
+
+			It(Should_Apply_Index_Map) {
+				real_vector_type vec(5);
+				vec = 1.1,1.2,1.3,1.4,1.5;
+				
+				index_vector_type map(3);
+				map = 0,2,4;
+
+				real_vector_type expectedout(3);
+				real_vector_type out(3);
+
+				expectedout = 1.1,1.3,1.5;
+
+				applyIndexMap(vec, map, out);
+
+				out -= expectedout;
+				real_type diff = normInf(out);
+                Assert::That(diff, Equals(0.0));
+			}
         };
     } // namespace DenseMatrixHelpersTests
 } // namespace blitzdg
