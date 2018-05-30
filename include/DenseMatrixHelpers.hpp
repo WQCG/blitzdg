@@ -105,6 +105,45 @@ namespace blitzdg {
     }
 
     /**
+     * Convert a blitz matrix (column-wise) to a vector.
+	 * .....
+     */
+	template <typename T>
+	void fullToVector(const matrix_type<T>& mat, vector_type<T>& vec) {
+		index_type count=0;
+		for (index_type j = 0; j < mat.cols(); ++j) {
+			for (index_type i = 0; i < mat.rows(); ++i) {
+				vec(count) = mat(i, j);
+				++count;
+			}
+		}
+	}
+
+	/**
+	 * Convert a vector to a blitz matrix (column-wise).
+	 * .....
+	 */
+	template <typename T>
+	void vectorToFull(const vector_type<T>& vec, matrix_type<T>& mat) {
+		index_type count=0;
+		for( index_type j=0; j < mat.cols(); ++j) {
+			for ( index_type i=0; i < mat.rows(); i++) {
+				mat(i,j) = vec(count);
+				++count;
+			}
+		}
+	}
+
+	/**
+	 * Evaluate vector at an array of indices.
+	 */
+	template <typename T, typename U>
+	void applyIndexMap(const vector_type<T>& vec, const vector_type<U>& map, vector_type<T>& out) {
+		for( index_type i=0; i < map.length(0); i++) 
+				out(i) = vec(map(i));
+	}
+
+    /**
      * Reshapes an array to a dense matrix.
      * @param[in] arrItr An input iterator to the array.
      * @param[in] byRows If true, the array is stored in mat rowwise. Defaults to true.
