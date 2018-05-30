@@ -95,6 +95,28 @@ namespace blitzdg {
                 diff = normMax(matT);
                 Assert::That(diff, Equals(0.0));
             }
+
+			It(Should_Convert_Dense_Matrix_To_Vector) {
+				real_matrix_type mat(5, 5);
+				real_vector_type vec(25), expectedvec(25);
+
+                mat =   2,3,0,0,0,
+                        3,0,4,0,6,
+                        0,-1,-3,2,0,
+                        0,0,1,0,0,
+                        0,4,2,0,1;
+				
+				expectedvec = 2,3,0,0,0,3,0,-1,0,4,0,4,-3,1,2,0,0,2,0,0,0,6,0,0,1;
+
+				
+				fullToVector(mat, vec);
+
+				std::cout << "vec: " << vec << std::endl;
+
+				vec -= expectedvec;
+				real_type diff = normInf(vec);
+				Assert::That(diff, Equals(0.0));
+			}
         };
     } // namespace DenseMatrixHelpersTests
 } // namespace blitzdg
