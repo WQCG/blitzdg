@@ -106,9 +106,36 @@ namespace blitzdg {
                         0,0,1,0,0,
                         0,4,2,0,1;
 				
-				expectedvec = 2,3,0,0,0,3,0,-1,0,4,0,4,-3,1,2,0,0,2,0,0,0,6,0,0,1;
+				// Ask for column-wise vector ordering.
+				const bool byRowsOpt = false;
 				
-				reshapeMatTo1D(mat, vec);
+				expectedvec = 2,
+				3,
+				0,
+				0,
+				0,
+				3,
+				0,
+				-1,
+				0,
+				4,
+				0,
+				4,
+				-3,
+				1,
+				2,
+				0,
+				0,
+				2,
+				0,
+				0,
+				0,
+				6,
+				0,
+				0,
+				1;
+				
+				reshapeMatTo1D(mat, vec, byRowsOpt);
 
 				vec -= expectedvec;
 				real_type diff = normInf(vec);
