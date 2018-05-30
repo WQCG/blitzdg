@@ -9,8 +9,10 @@
 #include <blitz/array.h>
 #include <cmath>
 #include <cstddef>
+#include <iterator>
 #include <limits>
 #include <stdexcept>
+#include <type_traits>
 
 namespace blitzdg {
     /**
@@ -73,54 +75,97 @@ namespace blitzdg {
     }
 
     /**
-     * Vectorizes a dense matrix. 
+     * Vectorizes a dense matrix by writing it to an array.
      * @param[in] mat The Dense matrix.
-     * @param[in] byRows If true, the rows of mat are stored contiguously. Defaults to true.
-     * @param[out] arr Pointer to array that stores the vectorized matrix.
-     * @note The array pointed to by arr must have space allocated for at 
+     * @param[in] byRows If true, the matrix is copied to the array by rows. Defaults to true.
+     * @param[out] arrItr An output iterator to an array.
+     * @note The array must have space allocated for at 
      * least m*n elements, where m is the the number of rows of mat and n is 
      * the number of columns. 
      */
-    template <typename T>
-    void fullToPodArray(const matrix_type<T>& mat, T* arr, bool byRows = true) {
-        std::size_t nnz = 0;
+    template <typename T, typename OutputItr>
+    void reshapeMatTo1D(const matrix_type<T>& mat, OutputItr arrItr, bool byRows = true) {
+        // Fail at compile time if the type T is not
+        // the same as the value type of OutputItr.
+        static_assert(std::is_same<T, 
+        typename std::iterator_traits<OutputItr>::value_type>::value,
+        "Matrix value type differs from array value type");
         if (byRows) {
             for (index_type i = 0; i < mat.rows(); ++i) {
                 for (index_type j = 0; j < mat.cols(); ++j)
-                    arr[nnz++] = mat(i, j);
+                    *arrItr++ = mat(i, j);
             }
         }
         else {
             for (index_type j = 0; j < mat.cols(); ++j) {
                 for (index_type i = 0; i < mat.rows(); ++i)
-                    arr[nnz++] = mat(i, j);
+                    *arrItr++ = mat(i, j);
             }
         }
     }
 
     /**
      * Reshapes an array to a dense matrix.
-     * @param[in] arr Pointer to the array.
-     * @param[in] byRows If true, arr is stored in mat rowwise. Defaults to true.
+     * @param[in] arrItr An input iterator to the array.
+     * @param[in] byRows If true, the array is stored in mat rowwise. Defaults to true.
      * @param[out] mat The dense matrix.
-     * @note The array pointed to by arr must have space allocated for at 
+     * @note The array must have space allocated for at 
      * least m*n elements, where m is the the number of rows of mat and n is 
      * the number of columns. 
      */
-    template <typename T>
-    void podArrayToFull(const T* arr, matrix_type<T>& mat, bool byRows = true) {
-        std::size_t nnz = 0;
+    template <typename T, typename InputItr>
+    void reshape1DToMat(InputItr arrItr, matrix_type<T>& mat, bool byRows = true) {
+        // Fail at compile time if the type T is not
+        // the same as the value type of InputItr.
+        static_assert(std::is_same<T, 
+        typename std::iterator_traits<InputItr>::value_type>::value,
+        "Matrix value type differs from array value type");
         if (byRows) {
             for (index_type i = 0; i < mat.rows(); ++i) {
                 for (index_type j = 0; j < mat.cols(); ++j)
-                    mat(i, j) = arr[nnz++];
+                    mat(i, j) = *arrItr++;
             }
         }
         else {
             for (index_type j = 0; j < mat.cols(); ++j) {
                 for (index_type i = 0; i < mat.rows(); ++i)
-                   mat(i, j) = arr[nnz++];
+                   mat(i, j) = *arrItr++;
             }
         }
     }
+
+	/**
+	 * Evaluate vector at an array of indices.
+	 * @param[in] vec The input vector to be evaluated at a list of indices (or map).
+	 * @param[in] map The map or list of indices.
+	 * @param[out] out The output vector containing the result of applying the map.
+	 */
+	template <typename T, typename U>
+	void applyIndexMap(const vector_type<T>& vec, const vector_type<U>& map, vector_type<T>& out) {
+		for( index_type i=0; i < map.length(0); i++)
+				out(i) = vec(map(i));
+	}
+
+	/**
+	 * Convert a vector to a blitz matrix.
+	 * @param[in] vec The vector.
+	 * @param[out] mat The output dense matrix.
+	 * @param[in] byRows whether to convert row-wise (default) or column-wise.
+	 */
+	template <typename T>
+	void vectorToFull(const vector_type<T>& vec, matrix_type<T>& mat, bool byRows = true) {
+		reshape1DToMat(vec.begin(), mat, byRows);
+	}
+
+	/**
+     * Convert a blitz matrix to a vector.
+	 * @param[in] mat The dense matrix.
+	 * @param[out] vec The output vector.
+	 * @param[in] byRows whether to convert row-wise (default) or column-wise.
+     */
+	template <typename T>
+	void fullToVector(const matrix_type<T>& mat, vector_type<T>& vec, bool byRows = true) {
+		reshapeMatTo1D(mat, vec.begin(), byRows);
+	}
+
 } // namespace blitzdg
