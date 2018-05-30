@@ -136,7 +136,7 @@ namespace blitzdg {
 				0,
 				1;
 				
-				reshapeMatTo1D(mat, vec, byRowsOpt);
+				fullToVector(mat, vec, byRowsOpt);
 
 				vec -= expectedvec;
 				real_type diff = normInf(vec);
@@ -184,7 +184,7 @@ namespace blitzdg {
 				// Ask for column-wise reshaping.
 				const bool byRowsOpt = false;
 
-				reshape1DToMat(vec, mat, byRowsOpt);
+				vectorToFull(vec, mat, byRowsOpt);
 				mat -= expectedmat;
 
 				real_type diff = normMax(mat);
