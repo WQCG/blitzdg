@@ -18,7 +18,6 @@
 #include <string>
 #include <stdexcept>
 
-using blitz::ColumnMajorArray;
 using blitz::firstIndex;
 using blitz::secondIndex;
 using blitz::thirdIndex;
