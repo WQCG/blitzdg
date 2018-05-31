@@ -8,6 +8,7 @@
 #include "Nodes1DProvisioner.hpp"
 #include "CsvOutputter.hpp"
 #include "Types.hpp"
+#include "Constants.hpp"
 #include "Warning.hpp"
 #include "Poisson1d.hpp"
 #include "LSERK4.hpp"
@@ -26,6 +27,7 @@ using blitzdg::normMax;
 using blitzdg::poisson1d::PoissonOperator;
 using blitzdg::poisson1d::Precon;
 using blitzdg::fullToVector;
+using blitzdg::constants::pi;
 using std::abs;
 using std::string;
 using std::cout;
@@ -70,8 +72,8 @@ int main(int argc, char **argv) {
 	printDisclaimer();
 
 	// Intialize fields.
-	uexact = sin(M_PI*x(ii,jj));
-	RHSexact = -M_PI*M_PI*sin(M_PI*x(ii,jj));
+	uexact = sin(pi*x(ii,jj));
+	RHSexact = -pi*pi*sin(pi*x(ii,jj));
 
 	const bool byRowsOpt = false;
 
