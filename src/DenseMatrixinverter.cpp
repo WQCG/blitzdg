@@ -35,7 +35,7 @@ namespace blitzdg {
         unique_ptr<real_type[]> work(new real_type[lwork]());
         unique_ptr<real_type[]> Apod(new real_type[N*N]());
 
-        fullToPodArray(A, Apod.get(), false);
+        reshapeMatTo1D(A, Apod.get(), false);
 
         dgetrf_(&N, &N, Apod.get(), &N, ipiv.get(), &info);
         
@@ -59,6 +59,6 @@ namespace blitzdg {
             throw runtime_error(strm.str());
         }
 
-        podArrayToFull(Apod.get(), Ainv, false);
+        reshape1DToMat(Apod.get(), Ainv, false);
     }
 } // namespace blitzdg
