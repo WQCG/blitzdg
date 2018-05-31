@@ -17,7 +17,7 @@ namespace blitzdg {
         /**
          * Inverts the dense matrix \f$A\f$.
          * @param[in] A The \f$n\times n\f$ coefficient matrix.
-         * @param[out] Ainv The \f$n\times k\f$ solution matrix.
+         * @param[out] Ainv The \f$n\times n\f$ inverse of matrix A.
          * @note We assume that the matrix \f$A\f$ uses the default rowwise storage order
          * of blitz++ 2D arrays.
          */
