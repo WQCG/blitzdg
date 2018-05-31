@@ -60,14 +60,14 @@ int main(int argc, char **argv) {
 
 	const index_type numGlobalNodes = Np*K;
 
-	real_vector_type RHSexactVec(numGlobalNodes);
+	real_vector_type MMRHSVec(numGlobalNodes);
 	real_vector_type outVec(numGlobalNodes);
 
 	firstIndex ii;
 	secondIndex jj;
+	thirdIndex kk;
 
 	outVec = 0*ii;
-
 
 	printDisclaimer();
 
@@ -78,7 +78,16 @@ int main(int argc, char **argv) {
 
 	const bool byRowsOpt = false;
 
-	fullToVector(RHSexact, RHSexactVec, byRowsOpt);
+	real_matrix_type MassMatrix(Np,Np);
+	real_matrix_type MMRHS(Np, K);
+
+	const real_matrix_type & J = nodes1DProvisioner.get_J();
+	const real_matrix_type & Vinv = nodes1DProvisioner.get_Vinv();
+
+	MassMatrix = sum(Vinv(kk,ii)*Vinv(kk,jj), kk);
+	MMRHS = J*(sum(MassMatrix(ii,kk)*RHSexact(kk,jj),kk));
+
+	fullToVector(MMRHS, MMRHSVec, byRowsOpt);
 	
 	const char delim = ' ';
 	outputter.writeFieldToFile("x.dat", x, delim);
@@ -89,14 +98,14 @@ int main(int argc, char **argv) {
 	GMRESParams params;
 	params.verbose = true;
 
-	GMRESOut result = gmres.solve(PoissonOperator(nodes1DProvisioner), Precon(), RHSexactVec, outVec, params);
+	GMRESOut result = gmres.solve(PoissonOperator(nodes1DProvisioner), Precon(), MMRHSVec, outVec, params);
 
 	vectorToFull(outVec, u, byRowsOpt);
 	cout << result << endl;
 	cout << u << endl;
 
 	outputter.writeFieldToFile("u.dat", u, delim);
-	outputter.writeFieldToFile("uexact.dat", u, delim);
+	outputter.writeFieldToFile("uexact.dat", uexact, delim);
 	outputter.writeFieldToFile("RHS.dat", RHSexact, delim);
 
 	u -= uexact;
