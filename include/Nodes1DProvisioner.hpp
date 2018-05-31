@@ -12,6 +12,7 @@
 #pragma once
 #include "DirectSolver.hpp"
 #include "JacobiBuilders.hpp"
+#include "DenseMatrixInverter.hpp"
 #include "Types.hpp"
 
 namespace blitzdg {
@@ -53,6 +54,8 @@ namespace blitzdg {
       real_matrix_type* rx;
       real_matrix_type* nx;
 
+      real_matrix_type Vinv;
+
       index_vector_type* Fmask;
       real_matrix_type* Fx;
 
@@ -67,6 +70,7 @@ namespace blitzdg {
 
       DirectSolver LinSolver;
       JacobiBuilders Jacobi;
+      DenseMatrixInverter Inverter;
 
     public:
       /**
@@ -180,6 +184,11 @@ namespace blitzdg {
        * Returns a reference to the generalized Vandermonde matrix.
        */
       const real_matrix_type & get_V() const;
+
+      /**
+       * Returns a reference to the inverse of the generalized Vandermonde matrix.
+       */
+      const real_matrix_type & get_Vinv() const;
 
       /**
        * Returns a reference to the Jacobian scaling matrix.

@@ -4,6 +4,7 @@
 #include "Nodes1DProvisioner.hpp"
 #include "CSCMatrix.hpp"
 #include "DenseMatrixHelpers.hpp"
+#include "DenseMatrixInverter.hpp"
 #include "Types.hpp"
 #include <blitz/array.h>
 #include <cmath>
@@ -26,14 +27,15 @@ namespace blitzdg {
     Nodes1DProvisioner::Nodes1DProvisioner(index_type _NOrder, index_type _NumElements, real_type _xmin, real_type _xmax) 
         : Min_x{ _xmin }, Max_x{ _xmax }, NumElements{ _NumElements }, NOrder{ _NOrder },
         NumLocalPoints{ NOrder + 1 }, mapI{ 0 }, mapO{ NumFacePoints*NumFaces*NumElements - 1 },
-        vmapI{ 0 }, vmapO{ NumLocalPoints*NumElements - 1 },
-        xGrid{ new real_matrix_type(NumLocalPoints, NumElements) },
-        rGrid{ new real_vector_type(NumLocalPoints) },
-        V{ nullptr }, Dr{ nullptr }, 
-        Lift{ new real_matrix_type(NumLocalPoints, NumFacePoints*NumFaces) },
-        J{ new real_matrix_type(NumLocalPoints, NumElements) },
-        rx{ new real_matrix_type(NumLocalPoints, NumElements) },
+        vmapI{ 0 }, vmapO{ (NOrder + 1)*NumElements - 1 },
+        xGrid{ new real_matrix_type((NOrder + 1), NumElements) },
+        rGrid{ new real_vector_type((NOrder + 1)) },
+        V{ nullptr }, Dr{ nullptr },
+        Lift{ new real_matrix_type((NOrder + 1), NumFacePoints*NumFaces) },
+        J{ new real_matrix_type((NOrder + 1), NumElements) },
+        rx{ new real_matrix_type((NOrder + 1), NumElements) },
         nx{ new real_matrix_type(NumFacePoints*NumFaces, NumElements) },
+        Vinv((NOrder + 1), (NOrder + 1)),
         Fmask{ new index_vector_type (NumFacePoints*NumFaces) },
         Fx{ new real_matrix_type(NumFacePoints*NumFaces, NumElements) },
         Fscale{ new real_matrix_type(NumFacePoints*NumFaces, NumElements) },
@@ -42,7 +44,7 @@ namespace blitzdg {
         EToF{ new index_matrix_type(NumElements, NumFaces) },
         vmapM{ new index_vector_type(NumFacePoints*NumFaces*NumElements) },
         vmapP{ new index_vector_type(NumFacePoints*NumFaces*NumElements) },
-        LinSolver{}, Jacobi{}
+        LinSolver{}, Jacobi{}, Inverter{}
     {}
 
     void Nodes1DProvisioner::buildNodes() {
@@ -281,6 +283,8 @@ namespace blitzdg {
             Jacobi.computeJacobiPolynomial(*rGrid, 0.0, 0.0, j, p);
             Vref(Range::all(), j) = p;
         }
+
+        Inverter.computeInverse(Vref, Vinv);
     }
 
     void Nodes1DProvisioner::buildDr() {
@@ -345,6 +349,10 @@ namespace blitzdg {
 
     const real_matrix_type & Nodes1DProvisioner::get_V() const {
         return *V;
+    }
+
+    const real_matrix_type & Nodes1DProvisioner::get_Vinv() const {
+        return Vinv;
     }
 
     const real_matrix_type & Nodes1DProvisioner::get_J() const {
