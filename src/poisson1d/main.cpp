@@ -67,12 +67,9 @@ int main(int argc, char **argv) {
 	secondIndex jj;
 	thirdIndex kk;
 
-	outVec = 0*ii;
-
 	printDisclaimer();
 
 	// Intialize fields.
-	u = 0*jj;
 	uexact = sin(M_PI*x(ii,jj));
 	RHSexact = -M_PI*M_PI*sin(M_PI*x(ii,jj));
 
@@ -93,7 +90,6 @@ int main(int argc, char **argv) {
 	outputter.writeFieldToFile("x.dat", x, delim);
 
 	// Calculate Right-hand side for funs.
-	//poisson1d::applyPoissonOperator(uexact, nodes1DProvisioner, RHS);
 	GMRESSolver gmres;
 	GMRESParams params;
 	params.verbose = true;
@@ -101,15 +97,13 @@ int main(int argc, char **argv) {
 	GMRESOut result = gmres.solve(PoissonOperator(nodes1DProvisioner), Precon(), MMRHSVec, outVec, params);
 
 	vectorToFull(outVec, u, byRowsOpt);
-	cout << result << endl;
-	cout << u << endl;
 
 	outputter.writeFieldToFile("u.dat", u, delim);
 	outputter.writeFieldToFile("uexact.dat", uexact, delim);
 	outputter.writeFieldToFile("RHS.dat", RHSexact, delim);
 
 	u -= uexact;
-	cout << normMax(u) << endl;
+	cout << "Error: " << normMax(u) << endl;
 
 	return 0;
 } // end main
