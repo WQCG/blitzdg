@@ -5,6 +5,7 @@
  * @file LinAlgHelpers.hpp
  * @brief Implements a set functions for basic linear algebra operations.
  */
+#pragma once
 #include "Types.hpp"
 #include <cmath>
 
