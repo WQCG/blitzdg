@@ -8,10 +8,6 @@
 #pragma once
 #include <blitz/array.h>
 
-#ifndef M_PI
-#define M_PI (3.141592653589793238)
-#endif
-
 namespace blitzdg {
     template <typename T>
     using vector_type = blitz::Array<T, 1>;
