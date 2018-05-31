@@ -37,7 +37,7 @@ namespace blitzdg {
 
         unique_ptr<real_type[]> Apod(new real_type[sz*lda]());
 
-        fullToPodArray(A, Apod.get());
+        reshapeMatTo1D(A, Apod.get());
 
         /* Determining optimal workspace parameters */
         dsyevd_( &JOBZ, UPLO, &sz, Apod.get(), &lda, ww, &wkopt, &lwork, &iwkopt, &liwork, &info );
@@ -65,7 +65,7 @@ namespace blitzdg {
             throw runtime_error(strm.str());
         }
 
-        podArrayToFull(Apod.get(), eigenvectors, false);
+        reshape1DToMat(Apod.get(), eigenvectors, false);
 
         for (index_type i=0; i < sz; i++)
             eigenvalues(i) = ww[i];

@@ -84,7 +84,7 @@ namespace blitzdg {
      * the number of columns. 
      */
     template <typename T, typename OutputItr>
-    void fullToPodArray(const matrix_type<T>& mat, OutputItr arrItr, bool byRows = true) {
+    void reshapeMatTo1D(const matrix_type<T>& mat, OutputItr arrItr, bool byRows = true) {
         // Fail at compile time if the type T is not
         // the same as the value type of OutputItr.
         static_assert(std::is_same<T, 
@@ -114,7 +114,7 @@ namespace blitzdg {
      * the number of columns. 
      */
     template <typename T, typename InputItr>
-    void podArrayToFull(InputItr arrItr, matrix_type<T>& mat, bool byRows = true) {
+    void reshape1DToMat(InputItr arrItr, matrix_type<T>& mat, bool byRows = true) {
         // Fail at compile time if the type T is not
         // the same as the value type of InputItr.
         static_assert(std::is_same<T, 
@@ -133,4 +133,39 @@ namespace blitzdg {
             }
         }
     }
+
+	/**
+	 * Evaluate vector at an array of indices.
+	 * @param[in] vec The input vector to be evaluated at a list of indices (or map).
+	 * @param[in] map The map or list of indices.
+	 * @param[out] out The output vector containing the result of applying the map.
+	 */
+	template <typename T, typename U>
+	void applyIndexMap(const vector_type<T>& vec, const vector_type<U>& map, vector_type<T>& out) {
+		for( index_type i=0; i < map.length(0); i++)
+				out(i) = vec(map(i));
+	}
+
+	/**
+	 * Convert a vector to a blitz matrix.
+	 * @param[in] vec The vector.
+	 * @param[out] mat The output dense matrix.
+	 * @param[in] byRows whether to convert row-wise (default) or column-wise.
+	 */
+	template <typename T>
+	void vectorToFull(const vector_type<T>& vec, matrix_type<T>& mat, bool byRows = true) {
+		reshape1DToMat(vec.begin(), mat, byRows);
+	}
+
+	/**
+     * Convert a blitz matrix to a vector.
+	 * @param[in] mat The dense matrix.
+	 * @param[out] vec The output vector.
+	 * @param[in] byRows whether to convert row-wise (default) or column-wise.
+     */
+	template <typename T>
+	void fullToVector(const matrix_type<T>& mat, vector_type<T>& vec, bool byRows = true) {
+		reshapeMatTo1D(mat, vec.begin(), byRows);
+	}
+
 } // namespace blitzdg

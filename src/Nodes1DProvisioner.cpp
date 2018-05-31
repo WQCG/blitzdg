@@ -111,7 +111,7 @@ namespace blitzdg {
         xmat = *xGrid;
 
         unique_ptr<real_type[]> x(new real_type[NumElements*NumLocalPoints]());
-        fullToPodArray(xmat, x.get(), false);
+        reshapeMatTo1D(xmat, x.get(), false);
 
         // Assemble global volume node numbering.
         nodeIds = ii + NumLocalPoints*jj;
