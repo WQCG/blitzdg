@@ -12,6 +12,7 @@
 #include "Poisson1d.hpp"
 #include "LSERK4.hpp"
 #include "LinAlgHelpers.hpp"
+#include "DenseMatrixHelpers.hpp"
 #include <blitz/array.h>
 #include <cmath>
 #include <string>
@@ -36,8 +37,6 @@ int main(int argc, char **argv) {
 	const index_type N = 4;
 	const index_type K = 15;
 
-	const real_type tau = 1.0;
-
 	// Build dependencies.
 	Nodes1DProvisioner nodes1DProvisioner(N, K, xmin, xmax);
 	CsvOutputter outputter;
@@ -49,8 +48,6 @@ int main(int argc, char **argv) {
 	index_type Np = nodes1DProvisioner.get_NumLocalPoints();
 
 	const real_matrix_type & x = nodes1DProvisioner.get_xGrid();
-
-	real_type min_dx = x(1,0) - x(0,0);
 
 	real_matrix_type u(Np, K);
 	real_matrix_type uexact(Np, K);
@@ -69,21 +66,22 @@ int main(int argc, char **argv) {
 	const char delim = ' ';
 	outputter.writeFieldToFile("x.dat", x, delim);
 
-	// Calculate Right-hand side.
-	poisson1d::applyPoissonOperator(u, nodes1DProvisioner, tau, RHS);
+	// Calculate Right-hand side for funs.
+	poisson1d::applyPoissonOperator(uexact, nodes1DProvisioner, RHS);
 
 	return 0;
 } // end main
 
 namespace blitzdg {
 	namespace poisson1d {
-		void applyPoissonOperator(const real_matrix_type & u, const Nodes1DProvisioner & nodes1D, const real_type tau, real_matrix_type & result) {
+		void applyPoissonOperator(const real_matrix_type & u, const Nodes1DProvisioner & nodes1D, real_matrix_type & result) {
 			// Blitz indices
 			firstIndex ii;
 			secondIndex jj;
 			thirdIndex kk;
 			const real_matrix_type& Dr = nodes1D.get_Dr();
 			const real_matrix_type& rx = nodes1D.get_rx();
+			const real_matrix_type& J = nodes1D.get_J();
 			const real_matrix_type& Lift = nodes1D.get_Lift();
 			const real_matrix_type& Fscale = nodes1D.get_Fscale();
 			const real_matrix_type& nx = nodes1D.get_nx();
@@ -113,26 +111,21 @@ namespace blitzdg {
 			du = 0.*ii;
 			uM = 0.*ii;
 			uP = 0.*ii;
-			nxVec = 0.*ii;
 
-			real_matrix_type nxCol(numFaces*Nfp,K, ColumnMajorArray<2>());
-			nxCol = nx;		
+			const bool byRowsOpt = false;
+			fullToVector(nx, nxVec, byRowsOpt);
 
-			real_matrix_type uCol(Np, K, ColumnMajorArray<2>());
-			uCol = u;
+			real_matrix_type ux(Np, K);
+			real_vector_type uVec(Np*K);
+			real_vector_type uxVec(Np*K);
 
-			real_matrix_type uxCol(Np, K, ColumnMajorArray<2>());
-			uxCol = rx*sum(Dr(ii,kk)*u(kk,jj), kk);
+			fullToVector(u, uVec, byRowsOpt);
 
-			index_type count = 0;
-			for( index_type k=0; k < K; k++) {
-				for ( index_type f=0; f < Nfp*numFaces; f++) {
-					nxVec(count) = nxCol(f,k);
-					uM(count) = uCol(vmapM(count));
-					uP(count) = uCol(vmapP(count));
-					count++;
-				}
-			}
+			ux = rx*sum(Dr(ii,kk)*u(kk,jj), kk);
+			fullToVector(ux, uxVec, byRowsOpt);
+
+			applyIndexMap(uVec, vmapM, uM);
+			applyIndexMap(uVec, vmapP, uP);
 
 			// impose boundary condition -- Dirichlet BC's
 			uP(mapI) = -uM(mapI);
@@ -142,24 +135,52 @@ namespace blitzdg {
 			du = (uM - uP);
 
 			real_matrix_type duMat(Nfp*numFaces, K);
-
-			count = 0;
-			for( index_type k=0; k < K; k++) {
-				for ( index_type f=0; f < Nfp*numFaces; f++) {
-					duMat(f,k) = du(count);
-					count++;
-				}
-			}
-
-			real_matrix_type fluxu(Nfp*numFaces, K);
-			real_matrix_type q(Np, K);
-			// Compute q
-			fluxu = nx*duMat/2.0;
-			q = rx*(Dr(ii,kk)*u(kk,jj)) - Lift*(Fscale*fluxu);
+			vectorToFull(du, duMat, byRowsOpt);
 
 			real_matrix_type surfaceRHS(Nfp*numFaces, K);
-			surfaceRHS = Fscale*duMat;
-			result = sum(Lift(ii,kk)*surfaceRHS(kk,jj), kk);
+			real_matrix_type q(Np, K);
+			real_vector_type qVec(Np, K);
+
+			surfaceRHS = Fscale*(nx*duMat/2.0);
+
+			q  = rx*(Dr(ii,kk)*u(kk,jj));
+			q -= sum(Lift(ii,kk)*(surfaceRHS(kk,jj)), kk);
+
+			fullToVector(q, qVec, byRowsOpt);
+			real_vector_type dq(numFaces*Nfp*K);
+			real_vector_type qM(numFaces*Nfp*K);
+			real_vector_type qP(numFaces*Nfp*K);
+			real_vector_type uxM(numFaces*Nfp*K);
+			real_vector_type uxP(numFaces*Nfp*K);
+
+			applyIndexMap(qVec, vmapM, qM);
+			applyIndexMap(uxVec, vmapM, uxM);
+			applyIndexMap(uxVec, vmapP, uxP);
+
+			// Neumann BC's on q
+			uxP(mapI) = uxM(mapI);
+			uxP(mapO) = uxM(mapO);
+
+			qP = 0.5*(uxM + uxP);
+
+			dq = qM -qP;
+
+			real_matrix_type dqMat;
+			vectorToFull(dq, dqMat, byRowsOpt);
+
+			const double hmin = 2.0/normMax(rx);
+			const double tau = (Np*Np)/hmin;
+
+			surfaceRHS = nx*(dqMat + tau*nx*duMat);
+
+			real_matrix_type MassMatrix(Np, Np);
+			MassMatrix = sum(Vinv(kk,ii)*Vinv(kk,jj), kk);
+
+			real_matrix_type tmp(Np,K);
+
+			tmp  = rx*(Dr(ii,kk)*q(kk,jj));
+			tmp -= sum(Lift(ii,kk)*(surfaceRHS(kk,jj)), kk);
+			result = J*(MassMatrix(ii,kk)*tmp(jj,kk));
 		} // computeRHS
 	} // namespace poisson1d
 } // namespace blitzdg
