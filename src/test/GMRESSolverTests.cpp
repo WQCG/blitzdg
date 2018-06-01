@@ -29,58 +29,6 @@ namespace blitzdg {
             }
         };
 
-        class MatvecNonsingular {
-            real_matrix_type * restrict A;
-        public:
-            MatvecNonsingular() {
-                A = new real_matrix_type(5,5);
-                
-                *A = 2.,3.,0.,0.,0.,
-                    3.,0.,4.,0.,6.,
-                    0.,-1.,-3.,2.,0.,
-                    0.,0.,1.,0.,0.,
-                    0.,4.,2.,0.,1.;
-            }
-
-            bool operator()(const real_vector_type& in, real_vector_type& out) const {
-                firstIndex i;
-                secondIndex j;
-                real_matrix_type & Aref = *A;
-                out = sum(Aref(i, j) * in(j), j);
-                return true;
-            }
-
-            ~MatvecNonsingular() {
-                delete A;
-            }
-        };
-
-        class MatvecSingular {
-            real_matrix_type * restrict A;
-        public:
-            MatvecSingular() {
-                A = new real_matrix_type(5,5);
-                
-                *A = 2.,3.,0.,0.,2.,
-                    3.,0.,4.,0.,3.,
-                    0.,-1.,-3.,2.,0.,
-                    0.,0.,1.,0.,0.,
-                    0.,4.,2.,0.,0.;
-            }
-
-            bool operator()(const real_vector_type& in, real_vector_type& out) const {
-                firstIndex i;
-                secondIndex j;
-                real_matrix_type & Aref = *A;
-                out = sum(Aref(i, j) * in(j), j);
-                return true;
-            }
-
-            ~MatvecSingular() {
-                delete A;
-            }
-        };
-
         // identity preconditioner
         class Precon {
         public:
