@@ -264,7 +264,7 @@ namespace blitzdg {
         }
 
         if (params.verbose) {
-            std::cout << "inner iter  outer iter  relative rnrm  conv rate\n";
+            std::cout << "outer iter  inner iter  relative rnrm  conv rate\n";
             std::cout << std::setw(10) << 0 << "  "
                 << std::setw(10) << 0 << "  "
                 << std::scientific << std::setprecision(2)
