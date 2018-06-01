@@ -95,6 +95,8 @@ int main(int argc, char **argv) {
 	GMRESParams params;
 	params.verbose = true;
 
+	// Need to initialize to zero to tell gmres we aren't making an initial guess.
+	outVec = 0*ii;
 	GMRESOut result = gmres.solve(PoissonOperator(nodes1DProvisioner), Precon(), MMRHSVec, outVec, params);
 
 	vectorToFull(outVec, u, byRowsOpt);
@@ -104,7 +106,8 @@ int main(int argc, char **argv) {
 	outputter.writeFieldToFile("RHS.dat", RHSexact, delim);
 
 	u -= uexact;
-	cout << "Error: " << normMax(u) << endl;
+	double err = normMax(u);
+	cout << "Error: " << err << endl;
 
 	return 0;
 } // end main
