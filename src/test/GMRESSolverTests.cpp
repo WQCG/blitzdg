@@ -30,7 +30,7 @@ namespace blitzdg {
         };
 
         class MatvecNonsingular {
-            real_matrix_type * A;
+            real_matrix_type * restrict A;
         public:
             MatvecNonsingular() {
                 A = new real_matrix_type(5,5);
@@ -56,7 +56,7 @@ namespace blitzdg {
         };
 
         class MatvecSingular {
-            real_matrix_type * A;
+            real_matrix_type * restrict A;
         public:
             MatvecSingular() {
                 A = new real_matrix_type(5,5);

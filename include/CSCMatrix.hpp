@@ -23,7 +23,7 @@ namespace blitzdg {
          * objects of type cs_di created by cs_di_spalloc.
          */
 		struct deleter {
-			void operator()(cs_di* ptr) const {
+			void operator()(cs_di* restrict ptr) const {
 				cs_di_spfree(ptr);
 				ptr = nullptr;
 			}
@@ -181,7 +181,7 @@ namespace blitzdg {
          * This pointer is used to interface with the 
          * functions in the CXSparse library.
          */
-		const cs_di* matPtr() const {
+		const cs_di* restrict matPtr() const {
 			return mat_.get();
 		}
 		
@@ -189,7 +189,7 @@ namespace blitzdg {
          * Returns a const pointer to the  
          * array of row indices.
          */
-		const index_type* rowInds() const {
+		const index_type* restrict rowInds() const {
 			return mat_->i;
 		}
 		
@@ -198,7 +198,7 @@ namespace blitzdg {
          * array that stores the locations of 
          * the start of each column.
          */
-		const index_type* colPtrs() const {
+		const index_type* restrict colPtrs() const {
 			return mat_->p;
 		}
 		
@@ -206,7 +206,7 @@ namespace blitzdg {
          * Returns a const pointer to the array
          * of values.
          */
-		const real_type* elems() const {
+		const real_type* restrict elems() const {
 			return mat_->x;
 		}
 

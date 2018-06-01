@@ -15,7 +15,7 @@
 namespace blitzdg {
 	namespace poisson1d {
 		class PoissonOperator {
-			const Nodes1DProvisioner* nodes1D;
+			const Nodes1DProvisioner* restrict nodes1D;
 		public:
 			explicit PoissonOperator(const Nodes1DProvisioner& _nodes1D)
                 : nodes1D{ &_nodes1D }
