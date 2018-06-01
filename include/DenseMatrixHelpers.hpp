@@ -5,6 +5,7 @@
  * @file DenseMatrixHelpers.hpp
  * @brief Defines a set of utility functions for working with dense matrices.
  */
+#pragma once
 #include "Types.hpp"
 #include <blitz/array.h>
 #include <cmath>
