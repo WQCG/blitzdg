@@ -51,7 +51,7 @@ namespace blitzdg {
     }
   private:
     index_type order_; // order of the current linear system
-    const CSCMat* mat_; // non-owning pointer to input matrix
+    const CSCMat* restrict mat_; // non-owning pointer to input matrix
     void* symbolic_; // pointer to symbolic factorization structure
     void* numeric_; // pointer to numeric factorization structure
 

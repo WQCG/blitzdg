@@ -174,7 +174,7 @@ namespace blitzdg {
         printArray<index_type>(EToV, NumElements, ElementType);
     }
 
-    const real_type* MeshManager::get_Vertices() const {
+    const real_type* restrict MeshManager::get_Vertices() const {
         return Vert;
     }
 
@@ -194,15 +194,15 @@ namespace blitzdg {
         return ElementType;
     }
 
-    const index_type* MeshManager::get_Elements() const {
+    const index_type* restrict MeshManager::get_Elements() const {
         return EToV;
     }
 
-    const index_type* MeshManager::get_ElementPartitionMap() const {
+    const index_type* restrict MeshManager::get_ElementPartitionMap() const {
         return ElementPartitionMap;
     }
 
-    const index_type* MeshManager::get_VertexPartitionMap() const {
+    const index_type* restrict MeshManager::get_VertexPartitionMap() const {
         return VertexPartitionMap;
     }
 
