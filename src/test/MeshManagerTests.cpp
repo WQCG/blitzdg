@@ -25,15 +25,15 @@ namespace blitzdg {
         Describe(MeshManager_Object) {
             using find_vector_type = vector<iterator_range<string::iterator>>;
 
-            MeshManager * meshManager=nullptr;
-            string *ExePath = nullptr;
+            MeshManager* restrict meshManager=nullptr;
+            string* restrict ExePath = nullptr;
 
             void SetUp() {
                 meshManager = new MeshManager();
                 if (ExePath == nullptr) {
                     // Deal with paths to the test input files.
                     index_type cap = 1024;
-                    char * pathBuffer = new char[cap];
+                    char* restrict pathBuffer = new char[cap];
                     index_type length = wai_getExecutablePath(pathBuffer, cap, NULL);
                     ExePath = new string();
 
@@ -103,7 +103,7 @@ namespace blitzdg {
                 Assert::That(mgr.get_NumVerts(), Equals(6));
                 Assert::That(mgr.get_Dim(), Equals(2));
 
-                const real_type* verts = mgr.get_Vertices();
+                const real_type* restrict verts = mgr.get_Vertices();
 
                 Assert::That(verts[0], Equals(0.0));
                 Assert::That(verts[1], Equals(0.0));
@@ -136,7 +136,7 @@ namespace blitzdg {
                 Assert::That(mgr.get_NumElements(), Equals(2));
                 Assert::That(mgr.get_ElementType(), Equals(4));
 
-                const index_type* elements = mgr.get_Elements();
+                const index_type* restrict elements = mgr.get_Elements();
 
                 Assert::That(elements[0], Equals(0));
                 Assert::That(elements[1], Equals(1));
