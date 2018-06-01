@@ -24,7 +24,7 @@ using std::vector;
 namespace blitzdg {
     namespace {
         template<typename T>
-        void printArray(T* arr, index_type numRows, index_type numCols) {
+        void printArray(T* restrict arr, index_type numRows, index_type numCols) {
             for(index_type i=0; i < numRows; i++) {
                 for (index_type j=0; j < numCols; j++) {
                     cout << arr[MeshManager::get_Index(i, j, numCols)] << " ";
@@ -34,7 +34,7 @@ namespace blitzdg {
         }
 
         template<typename T>
-        void readCsvFile(const string& csvFile, const string& delimiters, T** result, index_type dims[2]) {
+        void readCsvFile(const string& csvFile, const string& delimiters, T** restrict result, index_type dims[2]) {
             ifstream fileStream(csvFile);
 
             string line;
@@ -87,8 +87,8 @@ namespace blitzdg {
     }
 
     void MeshManager::partitionMesh(index_type numPartitions) {
-        index_type * eind = EToV;
-        index_type * eptr = new index_type[NumElements+1];
+        index_type* restrict eind = EToV;
+        index_type* restrict eptr = new index_type[NumElements+1];
         index_type objval = 0;
         index_type NE = NumElements;
         index_type NV = NumVerts;
@@ -113,8 +113,8 @@ namespace blitzdg {
         metisOptions[METIS_OPTION_CONTIG] = 1;
 
         // output arrays
-        index_type * epart = new index_type[NumElements]{0};
-        index_type * npart = new index_type[NumVerts]{0};
+        index_type* restrict epart = new index_type[NumElements]{0};
+        index_type* restrict npart = new index_type[NumVerts]{0};
 
         // Assume mesh with homogenous element type, then eptr 
         // dictates an equal stride of size ElementType across EToV array.

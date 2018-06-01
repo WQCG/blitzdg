@@ -43,7 +43,7 @@ namespace blitzdg {
         : mat_{ nullptr }
     {
         // create a CXSparse triplet that is a copy of triplet
-        cs_di* tmp = cs_di_spalloc(triplet.rows(), triplet.cols(), triplet.nnz(), 1, 1);
+        cs_di* restrict tmp = cs_di_spalloc(triplet.rows(), triplet.cols(), triplet.nnz(), 1, 1);
         if (!tmp)
             throw runtime_error("CSCMat::CSCMat: unable to create matrix from sparse triplet");
         for (index_type k = 0; k < triplet.nnz(); ++k) {
@@ -126,7 +126,7 @@ namespace blitzdg {
     }
 
     void CSCMat::transpose() {
-        cs_di* trsp = cs_di_transpose(mat_.get(), 1);
+        cs_di* restrict trsp = cs_di_transpose(mat_.get(), 1);
         if (!trsp)
             throw runtime_error("CSCMat::tranpose: failed");
         mat_.reset(trsp);
@@ -163,14 +163,14 @@ namespace blitzdg {
     }
 	
 	CSCMat transpose(const CSCMat& mat) {
-		cs_di* tmp = cs_di_transpose(mat.matPtr(), 1);
+		cs_di* restrict tmp = cs_di_transpose(mat.matPtr(), 1);
 		if (!tmp)
 			throw runtime_error("CSCMat matrix transpose failed");
 		return CSCMat(CSCMat::cs_di_smart_ptr{ tmp });
 	}
 	
 	CSCMat multiply(const CSCMat& lhs, const CSCMat& rhs) {
-		cs_di* tmp = cs_di_multiply(lhs.matPtr(), rhs.matPtr());
+		cs_di* restrict tmp = cs_di_multiply(lhs.matPtr(), rhs.matPtr());
 		if (!tmp)
 			throw runtime_error("CSCMat matrix-matrix multiplication failed");
 		return CSCMat(CSCMat::cs_di_smart_ptr{ tmp });

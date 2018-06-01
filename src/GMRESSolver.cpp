@@ -27,8 +27,8 @@ namespace blitzdg {
             char diag = 'N';
             index_type lda = A.rows();
             index_type incx = 1;
-            real_type* Aptr = A.data();
-            real_type* xptr = x.data();
+            real_type* restrict Aptr = A.data();
+            real_type* restrict xptr = x.data();
             dtrsv_(&uplo, &trans, &diag, &n, Aptr, &lda, xptr, &incx);
         }
 
@@ -40,9 +40,9 @@ namespace blitzdg {
             index_type incy = 1;
             real_type alpha = real_type(1);
             real_type beta = real_type(0);
-            real_type* Aptr = A.data();
-            real_type* xptr = x.data();
-            real_type* yptr = result.data();
+            real_type* restrict Aptr = A.data();
+            real_type* restrict xptr = x.data();
+            real_type* restrict yptr = result.data();
             dgemv_(&trans, &m, &n, &alpha, Aptr, &lda, xptr, &incx, &beta, yptr, &incy);
         }
     } // namespace details
