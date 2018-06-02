@@ -30,12 +30,13 @@ using blitz::sum;
 using std::abs;
 using std::string;
 using std::cout;
+using std::endl;
 
 int main(int argc, char **argv) {
 	using namespace blitzdg;
 	// Physical parameters
 	const real_type xmin =-1.0;
-	const real_type xmax = 1.0;
+	const real_type xmax = 4.0;
 	const real_type c = 0.1;
 
 	const real_type finalTime = 20.0;
@@ -43,7 +44,7 @@ int main(int argc, char **argv) {
 
 	// Numerical parameters:
 	const index_type N = 4;
-	const index_type K = 15;
+	const index_type K = 30;
 	const real_type CFL = 0.8;
 
 	// Build dependencies.
@@ -108,6 +109,14 @@ int main(int argc, char **argv) {
 		t += dt;
 		count++;
 	}
+
+	double finalShift = c*t;
+	real_matrix_type ufinal(Np, K);
+
+	ufinal = exp(-10*((x(ii,jj)-finalShift)*(x(ii,jj)-finalShift)));
+	u -= ufinal;
+	double err = normMax(u);
+	cout << "Error: " << err << endl;
 
 	return 0;
 } // end main
