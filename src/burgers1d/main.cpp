@@ -38,17 +38,17 @@ int main(int argc, char **argv) {
 	const real_type xmin =-4.0;
 	const real_type xmax = 4.0;
 
-	const real_type alph = 1.0;
+	const real_type alpha = 1.0;
 	const real_type nu = 0.1;
 	const real_type c = 0.5;
 
-	const real_type finalTime = 2.0;
+	const real_type finalTime = 0.1;
 	real_type t = 0.0;
 
 	// Numerical parameters:
-	const index_type N = 3;
-	const index_type K = 50;
-	const real_type CFL = 0.25;
+	const index_type N = 4;
+	const index_type K = 40;
+	const real_type CFL = 0.005;
 
 	// Build dependencies.
 	Nodes1DProvisioner nodes1DProvisioner(N, K, xmin, xmax);
@@ -76,8 +76,8 @@ int main(int argc, char **argv) {
 	printDisclaimer();
 
 	// Intialize fields at t=0
-    // Eq (2) from https://www.hindawi.com/journals/mpe/2015/414808/
-	u = c/alph - (c/alph)*tanh( (c/(2*nu)) * x(ii,jj) );
+    burgers1d::Burgers2(u, x, 0, alpha, nu, c);
+
 	RHS = 0*jj;
 	resRK = 0*jj;
 
@@ -95,7 +95,7 @@ int main(int argc, char **argv) {
 		for (index_type i=0; i < LSERK4::numStages;  i++ ) {
 
 			// Calculate Right-hand side.
-			burgers1d::computeRHS(u, c, alph, nu, nodes1DProvisioner, RHS);
+			burgers1d::computeRHS(u, x, t, c, alpha, nu, nodes1DProvisioner, RHS);
 
 			// Compute Runge-Kutta Residual.
 			resRK = LSERK4::rk4a[i]*resRK + dt*RHS;
@@ -113,11 +113,9 @@ int main(int argc, char **argv) {
 		count++;
 	}
 
-	double finalShift = c*t;
 	real_matrix_type ufinal(u.shape());
+    burgers1d::Burgers2(ufinal, x, t, alpha, nu, c);
 
-    // Eq (2) from https://www.hindawi.com/journals/mpe/2015/414808/
-	ufinal = c/alph - (c/alph)*tanh( (c/(2*nu)) * (x(ii,jj)-finalShift) );
 	u -= ufinal;
 	double err = normMax(u);
 	cout << "Error: " << err << endl;
@@ -127,7 +125,19 @@ int main(int argc, char **argv) {
 
 namespace blitzdg {
 	namespace burgers1d {
-		void computeRHS(const real_matrix_type & u, real_type c, real_type alph, real_type nu, Nodes1DProvisioner & nodes1D, real_matrix_type & RHS) {
+        real_type Burgers2(real_type x, real_type t, real_type alpha, real_type nu, real_type c) {
+            // Eq (2) from https://www.hindawi.com/journals/mpe/2015/414808/
+            return (c/alpha) - (c/alpha)*tanh( (c/(2.0*nu)) * (x - c*t) );
+        }
+        void Burgers2(real_matrix_type & u, const real_matrix_type & x, real_type t, real_type alpha, real_type nu, real_type c) {
+             for (index_type i=0; i < u.extent(0); i++) {
+               for (index_type j=0; j <u.extent(1); j++) {
+                 u(i,j) = Burgers2(x(i,j), t, alpha, nu, c);
+               }
+             }
+        }
+
+		void computeRHS(const real_matrix_type & u, const real_matrix_type & x, real_type t, real_type c, real_type alpha, real_type nu, Nodes1DProvisioner & nodes1D, real_matrix_type & RHS) {
 			// Blitz indices
 			firstIndex ii;
 			secondIndex jj;
@@ -154,43 +164,92 @@ namespace blitzdg {
 			real_vector_type du(numFaces*Nfp*K);
 			real_vector_type uM(numFaces*Nfp*K);
 			real_vector_type uP(numFaces*Nfp*K);
+			real_vector_type dq(numFaces*Nfp*K);
+			real_vector_type qM(numFaces*Nfp*K);
+			real_vector_type qP(numFaces*Nfp*K);
 			real_vector_type nxVec(numFaces*Nfp*K);
+			real_vector_type xVec(Np*K);
 			real_vector_type uVec(Np*K);
+			real_vector_type qVec(Np*K);
 
+            real_type uL, uR;
 			du = 0.*ii;
 			uM = 0.*ii;
 			uP = 0.*ii;
 			nxVec = 0.*ii;
+			xVec = 0.*ii;
 
 			// We want to apply maps to column-wise ordering of the nodes.
 			const bool byRowsOpt = false;
 
 			fullToVector(nx, nxVec, byRowsOpt);
 			fullToVector(u, uVec, byRowsOpt);
+			fullToVector(x, xVec, byRowsOpt);
 			applyIndexMap(uVec, vmapM, uM);
 			applyIndexMap(uVec, vmapP, uP);
 
-			// BCs
-			uP(mapO) = uM(mapO); // outflow - exit stage left.
-			uP(mapI) = 2*c/alph; // inflow at x=xmin
-					
-			// Compute jump in flux: this part is certainly wrong!
-			du = (uM - uP)*0.5*(alph*0.5*(uM+uP)*nxVec);
+            // Following implementation of
+            // https://github.com/dsteinmo/euler-nullproj/blob/master/NUDG/Codes1D/BurgersRHS1D.m
+
+ 			// BCs
+            uL = Burgers2(xVec(mapI), t, alpha, nu, c);
+			uR = Burgers2(xVec(mapO), t, alpha, nu, c);
+
+			// Compute jump in flux
+			du = (uM - uP);
+
+            // Why factor of 2 here?
+            du(mapI) = 2*(uVec(mapI)-uL);
+            du(mapO) = 2*(uVec(mapO)-uR);
 
 			real_matrix_type duMat(Nfp*numFaces, K);
 			vectorToFull(du, duMat, byRowsOpt);
 
-			// Assumes PDE has been left-multiplied by local inverse mass matrix, so all we have left
-			// is the differentiation matrix contribution, and the surface integral
+            // Derivatives
             real_matrix_type ux(u.shape());
-            real_matrix_type uxx(u.shape());
-            ux  = sum(Dr(ii,kk)*u(kk,jj), kk);
-            uxx = sum(Dr(ii,kk)*ux(kk,jj), kk);
-			RHS = rx*(-alph*u*ux + nu*uxx);
+            ux  = rx*sum(Dr(ii,kk)*u(kk,jj), kk);
 
-			real_matrix_type surfaceRHS(Nfp*numFaces, K);
-			surfaceRHS = Fscale*duMat;
-			RHS += sum(Lift(ii,kk)*surfaceRHS(kk,jj), kk);
+            // compute q and q stuff
+			real_matrix_type tmp(Nfp*numFaces, K);
+			real_matrix_type q(u.shape());
+
+            tmp = 0.5*Fscale*nx*duMat;
+            q = sqrt(nu)*(ux - sum(Lift(ii,kk)*tmp(kk,jj), kk));
+
+			fullToVector(q, qVec, byRowsOpt);
+			applyIndexMap(qVec, vmapM, qM);
+			applyIndexMap(qVec, vmapP, qP);
+
+            dq = qM-qP;
+            dq(mapI) = 0.0;
+            dq(mapO) = 0.0;
+
+            // Evaluate nonlinear flux, boundary conditions
+            real_vector_type du2(numFaces*Nfp*K);
+            du2 = 0.5*(uM*uM - uP*uP);
+            du2(mapI) = uVec(mapI)*uVec(mapI) - uL*uL;
+            du2(mapO) = uVec(mapO)*uVec(mapO) - uR*uR;
+
+            real_type maxvel = max(abs(u)); 
+
+            real_vector_type flux(numFaces*Nfp*K); 
+            flux = nxVec*(du2/2.0 - sqrt(nu)*dq) - (maxvel/2.0)*du;
+
+			real_matrix_type fluxMat(Nfp*numFaces, K);
+			vectorToFull(flux, fluxMat, byRowsOpt);
+
+            real_matrix_type dfdr(u.shape());
+            real_matrix_type tmp2(u.shape());
+            tmp2 = (0.5*u*u - sqrt(nu)*q);
+            dfdr = sum(Dr(ii,kk)*tmp2(kk,jj), kk);
+
+            
+    		RHS = -rx*dfdr;
+
+            real_matrix_type tmp3(fluxMat.shape());
+            tmp3 = Fscale*fluxMat;
+
+			RHS += sum(Lift(ii,kk)*tmp3(kk,jj), kk);
 		} // computeRHS
 	} // namespace burgers1d
 } // namespace blitzdg
