@@ -13,7 +13,7 @@
 #include "Nodes1DProvisioner.hpp"
 #include "CsvOutputter.hpp"
 #include "Types.hpp"
-#include "DenseMatrixHelpers.hpp"
+#include "BlitzHelpers.hpp"
 #include "Warning.hpp"
 #include "Advec1d.hpp"
 #include "LSERK4.hpp"

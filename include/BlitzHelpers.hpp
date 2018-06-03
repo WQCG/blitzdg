@@ -2,17 +2,18 @@
 // See COPYING and LICENSE files at project root for more details.
 
 /**
- * @file DenseMatrixHelpers.hpp
- * @brief Defines a set of utility functions for working with dense matrices.
+ * @file BlitzHelpers.hpp
+ * @brief Defines a set of utility functions for working with blitz arrays
+ * and their matrix and vector aliases.
  */
+#pragma once
+#include "Traits.hpp"
 #include "Types.hpp"
 #include <blitz/array.h>
 #include <cmath>
 #include <cstddef>
-#include <iterator>
 #include <limits>
 #include <stdexcept>
-#include <type_traits>
 
 namespace blitzdg {
     /**
@@ -87,8 +88,7 @@ namespace blitzdg {
     void reshapeMatTo1D(const matrix_type<T>& mat, OutputItr arrItr, bool byRows = true) {
         // Fail at compile time if the type T is not
         // the same as the value type of OutputItr.
-        static_assert(std::is_same<T, 
-        typename std::iterator_traits<OutputItr>::value_type>::value,
+        static_assert(iteratorValueTypeSameAs<OutputItr, T>(),
         "Matrix value type differs from array value type");
         if (byRows) {
             for (index_type i = 0; i < mat.rows(); ++i) {
@@ -117,8 +117,7 @@ namespace blitzdg {
     void reshape1DToMat(InputItr arrItr, matrix_type<T>& mat, bool byRows = true) {
         // Fail at compile time if the type T is not
         // the same as the value type of InputItr.
-        static_assert(std::is_same<T, 
-        typename std::iterator_traits<InputItr>::value_type>::value,
+        static_assert(iteratorValueTypeSameAs<InputItr, T>(),
         "Matrix value type differs from array value type");
         if (byRows) {
             for (index_type i = 0; i < mat.rows(); ++i) {
@@ -142,9 +141,10 @@ namespace blitzdg {
 	 */
 	template <typename T, typename U>
 	void applyIndexMap(const vector_type<T>& vec, const vector_type<U>& map, vector_type<T>& out) {
-		for( index_type i=0; i < map.length(0); i++)
-				out(i) = vec(map(i));
-	}
+		static_assert(isIntegral<U>(), "map value_type is not integral");
+        for (index_type k = 0; k < map.length(0); ++k)
+            out(k) = vec(map(k));
+    }
 
 	/**
 	 * Convert a vector to a blitz matrix.
@@ -167,5 +167,4 @@ namespace blitzdg {
 	void fullToVector(const matrix_type<T>& mat, vector_type<T>& vec, bool byRows = true) {
 		reshapeMatTo1D(mat, vec.begin(), byRows);
 	}
-
 } // namespace blitzdg

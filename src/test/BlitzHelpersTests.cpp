@@ -1,4 +1,4 @@
-#include "DenseMatrixHelpers.hpp"
+#include "BlitzHelpers.hpp"
 #include "LinAlgHelpers.hpp"
 #include "Types.hpp"
 #include <blitz/array.h>
@@ -19,7 +19,7 @@ namespace blitzdg {
             It(Should_Return_Matrix_Storage_Order) {
                 real_matrix_type rmat(5,3);
                 real_matrix_type cmat(4,2,ColumnMajorArray<2>());
-                cout << "DenseMatrixHelpers: storage order" << endl;
+                cout << "BlitzHelpers: storage order" << endl;
                 Assert::That(isRowMajor(rmat), Equals(true));
                 Assert::That(isColumnMajor(cmat), Equals(true));
             }
@@ -31,7 +31,7 @@ namespace blitzdg {
                         0,-1,-3,2,0,
                         0,0,1,0,0,
                         0,4,2,0,1;
-                cout << "DenseMatrixHelpers: count nonzeros" << endl;
+                cout << "BlitzHelpers: count nonzeros" << endl;
                 Assert::That(countNonzeros(mat), Equals(12));
             }
 
@@ -52,13 +52,13 @@ namespace blitzdg {
                 podCol = 2,3,0,0,0,3,0,-1,0,4,0,4,-3,1,2,0,0,2,0,0,0,6,0,0,1;
                 reshapeMatTo1D(mat, pod.data());
                 podRow -= pod;
-                cout << "DenseMatrixHelpers: full to pod (rowwise)" << endl;
+                cout << "BlitzHelpers: full to pod (rowwise)" << endl;
                 real_type diff = normInf(podRow);
                 Assert::That(diff, Equals(0.0));
 
                 reshapeMatTo1D(mat, pod.data(), false);
                 podCol -= pod;
-                cout << "DenseMatrixHelpers: full to pod (colwise)" << endl;
+                cout << "BlitzHelpers: full to pod (colwise)" << endl;
                 diff = normInf(podCol);
                 Assert::That(diff, Equals(0.0));
             }
@@ -84,14 +84,14 @@ namespace blitzdg {
                 real_matrix_type ret(5,5);
                 reshape1DToMat(pod.data(), ret);
                 mat -= ret;
-                cout << "DenseMatrixHelpers: pod to full (rowwise)" << endl;
+                cout << "BlitzHelpers: pod to full (rowwise)" << endl;
                 real_type diff = normMax(mat);
                 Assert::That(diff, Equals(0.0));
 
                 reshape1DToMat(pod.data(), ret, false);
                 
                 matT -= ret;
-                cout << "DenseMatrixHelpers: pod to full (colwise)" << endl;
+                cout << "BlitzHelpers: pod to full (colwise)" << endl;
                 diff = normMax(matT);
                 Assert::That(diff, Equals(0.0));
             }
