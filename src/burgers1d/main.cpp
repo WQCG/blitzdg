@@ -81,6 +81,8 @@ int main(int argc, char **argv) {
     // Intialize u field at t=0
     burgers1d::Burgers2(u, x, t, alpha, nu, c);
 
+    resRK = 0;
+
     index_type count = 0;
 
     const char delim = ' ';
