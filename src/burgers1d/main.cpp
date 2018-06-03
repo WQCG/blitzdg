@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
     const real_type nu = 0.1;
     const real_type c = 0.5;
 
-    const real_type finalTime = 1.0;
+    const real_type finalTime = 0.1;
     real_type t = 0.0;
 
     // Numerical parameters:
