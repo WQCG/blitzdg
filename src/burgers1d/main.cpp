@@ -124,121 +124,121 @@ int main(int argc, char **argv) {
 } // end main
 
 namespace blitzdg {
-namespace burgers1d {
-real_type Burgers2(real_type x, real_type t, real_type alpha, real_type nu, real_type c) {
-    // Eq (2) from https://www.hindawi.com/journals/mpe/2015/414808/
-    return (c/alpha) - (c/alpha)*tanh( 0.5*(c/nu) * (x - c*t) );
-}
-void Burgers2(real_matrix_type & u, const real_matrix_type & x, real_type t, real_type alpha, real_type nu, real_type c) {
-    for (index_type i=0; i < u.extent(0); i++) {
-        for (index_type j=0; j <u.extent(1); j++) {
-            u(i,j) = Burgers2(x(i,j), t, alpha, nu, c);
+    namespace burgers1d {
+        real_type Burgers2(real_type x, real_type t, real_type alpha, real_type nu, real_type c) {
+            // Eq (2) from https://www.hindawi.com/journals/mpe/2015/414808/
+            return (c/alpha) - (c/alpha)*tanh( 0.5*(c/nu) * (x - c*t) );
         }
-    }
-}
+        void Burgers2(real_matrix_type & u, const real_matrix_type & x, real_type t, real_type alpha, real_type nu, real_type c) {
+            for (index_type i=0; i < u.extent(0); i++) {
+                for (index_type j=0; j <u.extent(1); j++) {
+                    u(i,j) = Burgers2(x(i,j), t, alpha, nu, c);
+                }
+            }
+        }
 
-void computeRHS(const real_matrix_type & u, const real_matrix_type & x, real_type t, real_type c, real_type alpha, real_type nu, Nodes1DProvisioner & nodes1D, real_matrix_type & RHS) {
-    // Blitz indices
-    firstIndex ii;
-    secondIndex jj;
-    thirdIndex kk;
-    const real_matrix_type& Dr = nodes1D.get_Dr();
-    const real_matrix_type& rx = nodes1D.get_rx();
-    const real_matrix_type& Lift = nodes1D.get_Lift();
-    const real_matrix_type& Fscale = nodes1D.get_Fscale();
-    const real_matrix_type& nx = nodes1D.get_nx();
+        void computeRHS(const real_matrix_type & u, const real_matrix_type & x, real_type t, real_type c, real_type alpha, real_type nu, Nodes1DProvisioner & nodes1D, real_matrix_type & RHS) {
+            // Blitz indices
+            firstIndex ii;
+            secondIndex jj;
+            thirdIndex kk;
+            const real_matrix_type& Dr = nodes1D.get_Dr();
+            const real_matrix_type& rx = nodes1D.get_rx();
+            const real_matrix_type& Lift = nodes1D.get_Lift();
+            const real_matrix_type& Fscale = nodes1D.get_Fscale();
+            const real_matrix_type& nx = nodes1D.get_nx();
 
-    // Get volume to surface maps.
-    const index_vector_type& vmapM = nodes1D.get_vmapM();
-    const index_vector_type& vmapP = nodes1D.get_vmapP();
+            // Get volume to surface maps.
+            const index_vector_type& vmapM = nodes1D.get_vmapM();
+            const index_vector_type& vmapP = nodes1D.get_vmapP();
 
-    // boundary indices.
-    index_type mapO = nodes1D.get_mapO();
-    index_type mapI = nodes1D.get_mapI();
-    index_type vmapO = nodes1D.get_vmapO();
-    index_type vmapI = nodes1D.get_vmapI();
+            // boundary indices.
+            index_type mapO = nodes1D.get_mapO();
+            index_type mapI = nodes1D.get_mapI();
+            index_type vmapO = nodes1D.get_vmapO();
+            index_type vmapI = nodes1D.get_vmapI();
 
-    index_type numFaces = nodes1D.NumFaces;
-    index_type Nfp = nodes1D.NumFacePoints;
-    index_type Np = nodes1D.get_NumLocalPoints();
-    index_type K = nodes1D.get_NumElements();
+            index_type numFaces = nodes1D.NumFaces;
+            index_type Nfp = nodes1D.NumFacePoints;
+            index_type Np = nodes1D.get_NumLocalPoints();
+            index_type K = nodes1D.get_NumElements();
 
-    real_matrix_type duMat(Nfp*numFaces, K);
-    real_vector_type du(numFaces*Nfp*K);
-    real_vector_type du2(numFaces*Nfp*K);
-    real_vector_type uM(numFaces*Nfp*K);
-    real_vector_type uP(numFaces*Nfp*K);
+            real_matrix_type duMat(Nfp*numFaces, K);
+            real_vector_type du(numFaces*Nfp*K);
+            real_vector_type du2(numFaces*Nfp*K);
+            real_vector_type uM(numFaces*Nfp*K);
+            real_vector_type uP(numFaces*Nfp*K);
 
-    real_matrix_type q(Np,K);
-    real_vector_type dq(numFaces*Nfp*K);
-    real_vector_type qM(numFaces*Nfp*K);
-    real_vector_type qP(numFaces*Nfp*K);
-    real_vector_type qVec(Np*K);
+            real_matrix_type q(Np,K);
+            real_vector_type dq(numFaces*Nfp*K);
+            real_vector_type qM(numFaces*Nfp*K);
+            real_vector_type qP(numFaces*Nfp*K);
+            real_vector_type qVec(Np*K);
 
-    real_matrix_type fluxMat(Nfp*numFaces, K);
-    real_vector_type flux(numFaces*Nfp*K);
+            real_matrix_type fluxMat(Nfp*numFaces, K);
+            real_vector_type flux(numFaces*Nfp*K);
 
-    real_matrix_type tmp(Nfp*numFaces, K);
-    real_matrix_type tmp2(Np,K);
+            real_matrix_type tmp(Nfp*numFaces, K);
+            real_matrix_type tmp2(Np,K);
 
-    real_vector_type nxVec(numFaces*Nfp*K);
-    real_vector_type xVec(Np*K);
-    real_vector_type uVec(Np*K);
+            real_vector_type nxVec(numFaces*Nfp*K);
+            real_vector_type xVec(Np*K);
+            real_vector_type uVec(Np*K);
 
-    real_type uL;
-    real_type uR;
-    real_type maxvel = max(abs(u));
+            real_type uL;
+            real_type uR;
+            real_type maxvel = max(abs(u));
 
-    // We want to apply maps to column-wise ordering of the nodes.
-    const bool byRowsOpt = false;
+            // We want to apply maps to column-wise ordering of the nodes.
+            const bool byRowsOpt = false;
 
-    fullToVector(nx, nxVec, byRowsOpt);
-    fullToVector(u, uVec, byRowsOpt);
-    fullToVector(x, xVec, byRowsOpt);
+            fullToVector(nx, nxVec, byRowsOpt);
+            fullToVector(u, uVec, byRowsOpt);
+            fullToVector(x, xVec, byRowsOpt);
 
-    applyIndexMap(uVec, vmapM, uM);
-    applyIndexMap(uVec, vmapP, uP);
+            applyIndexMap(uVec, vmapM, uM);
+            applyIndexMap(uVec, vmapP, uP);
 
-    // Following implementation of
-    // https://github.com/dsteinmo/euler-nullproj/blob/master/NUDG/Codes1D/BurgersRHS1D.m
+            // Following implementation of
+            // https://github.com/dsteinmo/euler-nullproj/blob/master/NUDG/Codes1D/BurgersRHS1D.m
 
-    // BCs
-    uL = Burgers2(xVec(vmapI), t, alpha, nu, c);
-    uR = Burgers2(xVec(vmapO), t, alpha, nu, c);
+            // BCs
+            uL = Burgers2(xVec(vmapI), t, alpha, nu, c);
+            uR = Burgers2(xVec(vmapO), t, alpha, nu, c);
 
-    // Compute jump in flux
-    du = uM - uP;
-    du(mapI) = 2*(uVec(vmapI)-uL);
-    du(mapO) = 2*(uVec(vmapO)-uR);
-    vectorToFull(du, duMat, byRowsOpt);
+            // Compute jump in flux
+            du = uM - uP;
+            du(mapI) = 2*(uVec(vmapI)-uL);
+            du(mapO) = 2*(uVec(vmapO)-uR);
+            vectorToFull(du, duMat, byRowsOpt);
 
-    // q and dq
-    tmp = 0.5*Fscale*nx*duMat;
-    q = sqrt(nu)*(rx*sum(Dr(ii,kk)*u(kk,jj), kk) - sum(Lift(ii,kk)*tmp(kk,jj), kk));
+            // q and dq
+            tmp = 0.5*Fscale*nx*duMat;
+            q = sqrt(nu)*(rx*sum(Dr(ii,kk)*u(kk,jj), kk) - sum(Lift(ii,kk)*tmp(kk,jj), kk));
 
-    fullToVector(q, qVec, byRowsOpt);
-    applyIndexMap(qVec, vmapM, qM);
-    applyIndexMap(qVec, vmapP, qP);
+            fullToVector(q, qVec, byRowsOpt);
+            applyIndexMap(qVec, vmapM, qM);
+            applyIndexMap(qVec, vmapP, qP);
 
-    dq = 0.5*(qM-qP);
-    dq(mapI) = dq(mapO) = 0.0;
+            dq = 0.5*(qM-qP);
+            dq(mapI) = dq(mapO) = 0.0;
 
-    // Nonlinear flux
-    du2 = 0.5*(uM*uM - uP*uP);
-    du2(mapI) = uVec(vmapI)*uVec(vmapI) - uL*uL;
-    du2(mapO) = uVec(vmapO)*uVec(vmapO) - uR*uR;
+            // Nonlinear flux
+            du2 = 0.5*(uM*uM - uP*uP);
+            du2(mapI) = uVec(vmapI)*uVec(vmapI) - uL*uL;
+            du2(mapO) = uVec(vmapO)*uVec(vmapO) - uR*uR;
 
-    // Flux
-    flux = nxVec*(0.5*du2 - sqrt(nu)*dq) - (0.5*maxvel)*du;
-    vectorToFull(flux, fluxMat, byRowsOpt);
+            // Flux
+            flux = nxVec*(0.5*du2 - sqrt(nu)*dq) - (0.5*maxvel)*du;
+            vectorToFull(flux, fluxMat, byRowsOpt);
 
-    // Form RHS
-    tmp2 = (0.5*u*u - sqrt(nu)*q);
-    RHS = -rx*sum(Dr(ii,kk)*tmp2(kk,jj), kk);
+            // Form RHS
+            tmp2 = (0.5*u*u - sqrt(nu)*q);
+            RHS = -rx*sum(Dr(ii,kk)*tmp2(kk,jj), kk);
 
-    tmp = Fscale*fluxMat;
-    RHS += sum(Lift(ii,kk)*tmp(kk,jj), kk);
+            tmp = Fscale*fluxMat;
+            RHS += sum(Lift(ii,kk)*tmp(kk,jj), kk);
 
-} // computeRHS
-} // namespace burgers1d
+        } // computeRHS
+    } // namespace burgers1d
 } // namespace blitzdg
