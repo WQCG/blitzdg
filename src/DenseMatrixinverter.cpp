@@ -2,7 +2,7 @@
 // See COPYING and LICENSE files at project root for more details.
 
 #include "DenseMatrixInverter.hpp"
-#include "DenseMatrixHelpers.hpp"
+#include "BlitzHelpers.hpp"
 #include "Types.hpp"
 #include <string>
 #include <stdexcept>

@@ -2,7 +2,7 @@
 // See COPYING and LICENSE files at project root for more details.
 
 #include "EigenSolver.hpp"
-#include "DenseMatrixHelpers.hpp"
+#include "BlitzHelpers.hpp"
 #include <blitz/array.h>
 #include <iomanip>
 #include <stdexcept>

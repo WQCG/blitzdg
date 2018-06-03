@@ -1,5 +1,5 @@
 #include "SparseTriplet.hpp" 
-#include "DenseMatrixHelpers.hpp"
+#include "BlitzHelpers.hpp"
 #include <cmath>
 #include <iomanip>
 #include <limits>

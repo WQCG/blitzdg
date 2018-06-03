@@ -3,7 +3,7 @@
 
 #include "Nodes1DProvisioner.hpp"
 #include "CSCMatrix.hpp"
-#include "DenseMatrixHelpers.hpp"
+#include "BlitzHelpers.hpp"
 #include "DenseMatrixInverter.hpp"
 #include "Types.hpp"
 #include <blitz/array.h>
