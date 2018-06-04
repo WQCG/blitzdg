@@ -1,15 +1,6 @@
 // Copyright (C) 2017-2018  Waterloo Quantitative Consulting Group, Inc.
 // See COPYING and LICENSE files at project root for more details.
 
-/** \mainpage blitzdg documentation
-  *
-  * \section intro_sec Introduction
-  *
-  * This is the auto-generated API docs page for the blitzdg project.
-  *
-  * Click on 'Classes' to start familarizing yourself with the API
-  */
-
 #include "Nodes1DProvisioner.hpp"
 #include "CsvOutputter.hpp"
 #include "Types.hpp"
