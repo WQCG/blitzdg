@@ -116,11 +116,11 @@ int main(int argc, char **argv) {
 
 namespace blitzdg {
     namespace burgers1d {
-        real_type Burgers2(real_type x, real_type t, real_type alpha, real_type nu, real_type c) {
+        real_type Burgers2(const real_type x, const real_type t, const real_type alpha, const real_type nu, const real_type c) {
             // Eq (2) from https://www.hindawi.com/journals/mpe/2015/414808/
             return (c/alpha) - (c/alpha)*tanh( 0.5*(c/nu) * (x - c*t) );
         }
-        void Burgers2(real_matrix_type & u, const real_matrix_type & x, real_type t, real_type alpha, real_type nu, real_type c) {
+        void Burgers2(real_matrix_type & u, const real_matrix_type & x, const real_type t, const real_type alpha, const real_type nu, const real_type c) {
             u = (c/alpha) - (c/alpha)*tanh( 0.5*(c/nu) * (x - c*t) );
         }
 
