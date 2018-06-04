@@ -45,7 +45,7 @@ namespace blitzdg {
      */
     string CsvOutputter::generateFileName(const string & fieldName, const index_type fileNumber) {
         stringstream fileNameStrm;
-        fileNameStrm << "u" << setfill('0') << setw(7) << fileNumber << ".dat";
+        fileNameStrm << fieldName << setfill('0') << setw(7) << fileNumber << ".dat";
         return fileNameStrm.str();
     }
 }
