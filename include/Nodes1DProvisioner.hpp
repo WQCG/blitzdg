@@ -19,18 +19,6 @@ namespace blitzdg {
   /**
    * Provides facilities for the construction of one-dimensional
    * nodes, operators, and geometric factors.
-   * 
-   * Facilities provided include:
-   * <ul>
-   * <li> Construction of one-dimensional nodes over the computational domain based
-   * on Gauss-Jacobi-Lobotto quadrature rules. </li>
-   * 
-   * <li> </li>
-   * 
-   * <li> </li>
-   * 
-   * <li> </li>
-   * </ul>
    */ 
   class Nodes1DProvisioner {
       real_type Min_x;

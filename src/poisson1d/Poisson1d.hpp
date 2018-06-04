@@ -7,7 +7,7 @@
  */
 #pragma once
 #include "Nodes1DProvisioner.hpp"
-#include "DenseMatrixHelpers.hpp"
+#include "BlitzHelpers.hpp"
 #include "LinAlgHelpers.hpp"
 #include "Types.hpp"
 #include <string>

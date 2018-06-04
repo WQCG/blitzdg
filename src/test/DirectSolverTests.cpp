@@ -5,7 +5,7 @@
 #include "DirectSolver.hpp"
 #include "Types.hpp"
 #include <igloo/igloo_alt.h>
-#include <DenseMatrixHelpers.hpp>
+#include <BlitzHelpers.hpp>
 #include <iostream>
 #include <limits>
 
