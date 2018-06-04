@@ -130,11 +130,7 @@ namespace blitzdg {
             return (c/alpha) - (c/alpha)*tanh( 0.5*(c/nu) * (x - c*t) );
         }
         void Burgers2(real_matrix_type & u, const real_matrix_type & x, real_type t, real_type alpha, real_type nu, real_type c) {
-            for (index_type i=0; i < u.extent(0); i++) {
-                for (index_type j=0; j <u.extent(1); j++) {
-                    u(i,j) = Burgers2(x(i,j), t, alpha, nu, c);
-                }
-            }
+            u = (c/alpha) - (c/alpha)*tanh( 0.5*(c/nu) * (x - c*t) );
         }
 
         void computeRHS(const real_matrix_type & u, const real_matrix_type & x, real_type t, real_type c, real_type alpha, real_type nu, Nodes1DProvisioner & nodes1D, real_matrix_type & RHS) {
