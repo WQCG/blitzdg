@@ -30,7 +30,8 @@ namespace blitzdg {
         vmapI{ 0 }, vmapO{ (_NOrder + 1)*NumElements - 1 },
         xGrid{ new real_matrix_type(_NOrder + 1, NumElements) },
         rGrid{ new real_vector_type(_NOrder + 1) },
-        V{ nullptr }, Dr{ nullptr },
+        V{ new real_matrix_type(_NOrder + 1, _NOrder + 1) }, 
+        Dr{ new real_matrix_type(_NOrder + 1, _NOrder + 1) },
         Lift{ new real_matrix_type(_NOrder + 1, NumFacePoints*NumFaces) },
         J{ new real_matrix_type(_NOrder + 1, NumElements) },
         rx{ new real_matrix_type(_NOrder + 1, NumElements) },
@@ -274,10 +275,7 @@ namespace blitzdg {
     }
 
     void Nodes1DProvisioner::buildVandermondeMatrix() {
-        V.reset(new real_matrix_type(NOrder + 1, NOrder + 1));
-
-        real_matrix_type & Vref = *V;
-
+        real_matrix_type& Vref = *V;
         real_vector_type p(NOrder+1);
         for (index_type j=0; j <= NOrder; j++) {
             Jacobi.computeJacobiPolynomial(*rGrid, 0.0, 0.0, j, p);
@@ -290,8 +288,6 @@ namespace blitzdg {
     void Nodes1DProvisioner::buildDr() {
         firstIndex ii;
         secondIndex jj;
-
-        Dr.reset(new real_matrix_type(NOrder + 1, NOrder + 1));
 
         real_matrix_type & Vref = *V;
         real_matrix_type & Drref = *Dr;

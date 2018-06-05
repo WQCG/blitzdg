@@ -146,22 +146,22 @@ namespace blitzdg {
       Nodes1DProvisioner(index_type NOrder, index_type NumElements, real_type xmin, real_type xmax);
 
       /**
-       * Deleted copy constructor.
+       * Copy constructor (deleted).
        */
       Nodes1DProvisioner(const Nodes1DProvisioner&) = delete;
 
       /**
-       * Deleted copy assignment operator.
+       * Copy assignment operator (deleted).
        */
       Nodes1DProvisioner& operator=(const Nodes1DProvisioner&) = delete;
 
       /**
-       * Default move constructor.
+       * Move constructor.
        */
       Nodes1DProvisioner(Nodes1DProvisioner&&) = default;
 
       /**
-       * Default move assignment operator.
+       * Move assignment operator.
        */
       Nodes1DProvisioner& operator=(Nodes1DProvisioner&&) = default;
       
