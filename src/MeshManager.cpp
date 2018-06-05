@@ -113,8 +113,8 @@ namespace blitzdg {
         metisOptions[METIS_OPTION_CONTIG] = 1;
 
         // output arrays
-        index_type * epart = new index_type[NumElements]{0};
-        index_type * npart = new index_type[NumVerts]{0};
+        index_type * epart = new index_type[NumElements]();
+        index_type * npart = new index_type[NumVerts]();
 
         // Assume mesh with homogenous element type, then eptr 
         // dictates an equal stride of size ElementType across EToV array.

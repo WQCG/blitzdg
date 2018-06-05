@@ -26,17 +26,18 @@ namespace blitzdg {
 
     Nodes1DProvisioner::Nodes1DProvisioner(index_type _NOrder, index_type _NumElements, real_type _xmin, real_type _xmax) 
         : Min_x{ _xmin }, Max_x{ _xmax }, NumElements{ _NumElements }, NOrder{ _NOrder },
-        NumLocalPoints{ NOrder + 1 }, mapI{ 0 }, mapO{ NumFacePoints*NumFaces*NumElements - 1 },
-        vmapI{ 0 }, vmapO{ (NOrder + 1)*NumElements - 1 },
-        xGrid{ new real_matrix_type((NOrder + 1), NumElements) },
-        rGrid{ new real_vector_type((NOrder + 1)) },
-        V{ nullptr }, Dr{ nullptr },
-        Lift{ new real_matrix_type((NOrder + 1), NumFacePoints*NumFaces) },
-        J{ new real_matrix_type((NOrder + 1), NumElements) },
-        rx{ new real_matrix_type((NOrder + 1), NumElements) },
+        NumLocalPoints{ _NOrder + 1 }, mapI{ 0 }, mapO{ NumFacePoints*NumFaces*NumElements - 1 },
+        vmapI{ 0 }, vmapO{ (_NOrder + 1)*NumElements - 1 },
+        xGrid{ new real_matrix_type(_NOrder + 1, NumElements) },
+        rGrid{ new real_vector_type(_NOrder + 1) },
+        V{ new real_matrix_type(_NOrder + 1, _NOrder + 1) }, 
+        Dr{ new real_matrix_type(_NOrder + 1, _NOrder + 1) },
+        Lift{ new real_matrix_type(_NOrder + 1, NumFacePoints*NumFaces) },
+        J{ new real_matrix_type(_NOrder + 1, NumElements) },
+        rx{ new real_matrix_type(_NOrder + 1, NumElements) },
         nx{ new real_matrix_type(NumFacePoints*NumFaces, NumElements) },
-        Vinv((NOrder + 1), (NOrder + 1)),
-        Fmask{ new index_vector_type (NumFacePoints*NumFaces) },
+        Vinv{ new real_matrix_type(_NOrder + 1, _NOrder + 1) },
+        Fmask{ new index_vector_type(NumFacePoints*NumFaces) },
         Fx{ new real_matrix_type(NumFacePoints*NumFaces, NumElements) },
         Fscale{ new real_matrix_type(NumFacePoints*NumFaces, NumElements) },
         EToV{ new index_matrix_type(NumElements, NumFaces) },
@@ -274,24 +275,19 @@ namespace blitzdg {
     }
 
     void Nodes1DProvisioner::buildVandermondeMatrix() {
-        V = new real_matrix_type(NOrder+1, NOrder+1);
-
-        real_matrix_type & Vref = *V;
-
+        real_matrix_type& Vref = *V;
         real_vector_type p(NOrder+1);
         for (index_type j=0; j <= NOrder; j++) {
             Jacobi.computeJacobiPolynomial(*rGrid, 0.0, 0.0, j, p);
             Vref(Range::all(), j) = p;
         }
 
-        Inverter.computeInverse(Vref, Vinv);
+        Inverter.computeInverse(Vref, *Vinv);
     }
 
     void Nodes1DProvisioner::buildDr() {
         firstIndex ii;
         secondIndex jj;
-
-        Dr = new real_matrix_type(NOrder+1, NOrder+1);
 
         real_matrix_type & Vref = *V;
         real_matrix_type & Drref = *Dr;
@@ -352,7 +348,7 @@ namespace blitzdg {
     }
 
     const real_matrix_type & Nodes1DProvisioner::get_Vinv() const {
-        return Vinv;
+        return *Vinv;
     }
 
     const real_matrix_type & Nodes1DProvisioner::get_J() const {
@@ -406,26 +402,6 @@ namespace blitzdg {
     index_type Nodes1DProvisioner::get_vmapO() const {
         return vmapO;
     }
-
-    Nodes1DProvisioner::~Nodes1DProvisioner() {
-        delete V; V = nullptr;
-        delete Dr; Dr = nullptr;
-        delete rGrid; rGrid = nullptr;
-        delete xGrid; xGrid = nullptr;
-        delete J; J = nullptr;
-        delete rx; rx = nullptr;
-        delete Lift; Lift = nullptr;
-        delete EToV; EToV = nullptr;
-        delete EToE; EToE = nullptr;
-        delete EToF; EToF = nullptr;
-        delete Fmask; Fmask = nullptr;
-        delete Fx; Fx = nullptr;
-        delete Fscale; Fscale = nullptr;
-        delete nx; nx = nullptr;
-        delete vmapM; vmapM = nullptr;
-        delete vmapP; vmapP = nullptr;
-    }
-
 
     void Nodes1DProvisioner::computeGradVandermonde(real_matrix_type & DVr) const {
         firstIndex ii;
