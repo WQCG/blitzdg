@@ -19,7 +19,8 @@ namespace blitzdg {
         const real_type eps = 10*numeric_limits<real_type>::epsilon();
         const float epsf = 5.7e-6;
 
-        JacobiBuilders* restrict Jacobi = nullptr;
+        JacobiBuilders * Jacobi = nullptr;
+
 
         Describe(JacobiBuilders_Object) {
             void SetUp() {
@@ -34,7 +35,7 @@ namespace blitzdg {
                 cout << "Should_Generate_0th_Order_Legendre_Polynomial" << endl;
                 real_vector_type x(3);
                 x = -1.,0.,1.;
-                real_vector_type p(3);
+                real_vector_type  p(3);
 
                 const JacobiBuilders & jacobi = *Jacobi;
 
@@ -59,6 +60,7 @@ namespace blitzdg {
                 Assert::That(p(1), Equals(0.0));
                 Assert::That(p(2), Equals(sqrt(3./2.)));
             }
+
 
             It(Should_Generate_2nd_Order_Legendre_Polynomial) {
                 cout << "Should_Generate_2nd_Order_Legendre_Polynomial" << endl;
