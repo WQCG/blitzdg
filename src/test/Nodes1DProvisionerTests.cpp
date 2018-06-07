@@ -21,7 +21,7 @@ namespace blitzdg {
         firstIndex ii;
         secondIndex jj;
 
-        Nodes1DProvisioner* restrict nodes1DProvisioner = nullptr;
+        Nodes1DProvisioner * nodes1DProvisioner = nullptr;
 
         Describe(Nodes1DProvisioner_Object) {
 			const real_type eps = 2.*numeric_limits<double>::epsilon();
