@@ -1,6 +1,7 @@
 // Copyright (C) 2017-2018  Waterloo Quantitative Consulting Group, Inc.
 // See COPYING and LICENSE files at project root for more details.
 
+#include "LinAlgHelpers.hpp"
 #include "Nodes1DProvisioner.hpp"
 #include "Types.hpp"
 #include <igloo/igloo_alt.h>
@@ -25,7 +26,7 @@ namespace blitzdg {
 
         Describe(Nodes1DProvisioner_Object) {
 			const real_type eps = 2.*numeric_limits<double>::epsilon();
-			const float epsf = 5.7e-6;
+			const float epsf = 5.8e-5;
 			const index_type NOrder = 3;
 			const index_type NumElements = 5;
 			const int NumFaces = 2;
@@ -56,7 +57,7 @@ namespace blitzdg {
 
                 real_matrix_type res(NOrder+1,NOrder+1);
                 res  = V - expectedV;
-                Assert::That(sqrt(sum(res(ii)*res(ii))), IsLessThan(epsf));
+                Assert::That(normFro(res), IsLessThan(epsf));
             }
 
             It(Should_Build_3rd_Order_Differentiation_Matrix) {
@@ -74,7 +75,7 @@ namespace blitzdg {
 
                 real_matrix_type res(NOrder+1,NOrder+1);
                 res = Dr - expectedDr;
-                Assert::That(sqrt(sum(res(ii)*res(ii))), IsLessThan(epsf));
+                Assert::That(normFro(res), IsLessThan(epsf));
             }
 
             It(Should_Build_A_1D_X_Grid) {
@@ -94,7 +95,7 @@ namespace blitzdg {
 
                 real_matrix_type res(NOrder+1, NumElements);
                 res = x - expectedx;
-                Assert::That(sqrt(sum(res(ii)*res(ii))), IsLessThan(epsf));
+                Assert::That(normFro(res), IsLessThan(epsf));
             }
 
             It(Should_Build_Element_To_Vertex_Connectivity) {
@@ -143,9 +144,9 @@ namespace blitzdg {
                 resrx = rx - expectedrx;
                 resFscale = Fscale - expectedFscale;
 
-                Assert::That(sqrt(sum(resJ(ii)*resJ(ii))), IsLessThan(epsf));
-                Assert::That(sqrt(sum(resrx(ii)*resrx(ii))), IsLessThan(epsf));
-                Assert::That(sqrt(sum(resFscale(ii)*resFscale(ii))), IsLessThan(epsf));
+                Assert::That(normFro(resJ), IsLessThan(epsf));
+                Assert::That(normFro(resrx), IsLessThan(epsf));
+                Assert::That(normFro(resFscale), IsLessThan(epsf));
             }
 
             It(Should_Build_1D_Lift_Operator) {
@@ -165,7 +166,7 @@ namespace blitzdg {
                 real_matrix_type resLift(NOrder+1,2);
 
                 resLift = Lift - expectedLift;
-                Assert::That(sqrt(sum(resLift*resLift)), IsLessThan(epsf));
+                Assert::That(normFro(resLift), IsLessThan(epsf));
             }
 
             It(Should_Build_1D_Connectivity_Matrices) {
@@ -195,8 +196,8 @@ namespace blitzdg {
                 resEToE = EToE - expectedEToE;
                 resEToF = EToF - expectedEToF;
 
-                Assert::That(sqrt(sum(resEToE*resEToE)), Equals(0));
-                Assert::That(sqrt(sum(resEToF*resEToF)), Equals(0));
+                Assert::That(normFro(resEToE), Equals(0));
+                Assert::That(normFro(resEToF), Equals(0));
             }
 
             It(Should_Build_Face_Mask) {
@@ -220,10 +221,11 @@ namespace blitzdg {
                 real_matrix_type resFx(NumFaces, NumElements);
                 resFx = Fx - expectedFx;
 
-                Assert::That(sqrt(sum(resFx*resFx)), IsLessThan(eps));
+                Assert::That(normFro(resFx), IsLessThan(eps));
             }
 
             It(Should_Build_Volume_Maps) {
+                cout << "Should_Build_Volume_Maps" << endl;
                 Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
                 nodes1D.buildNodes();
 
@@ -242,12 +244,12 @@ namespace blitzdg {
                 resVmapM = vmapM - expectedVmapM;
                 resVmapP = vmapP - expectedVmapP;
 
-                Assert::That(sqrt(sum(resVmapM*resVmapM)), Equals(0));
-                Assert::That(sqrt(sum(resVmapP*resVmapP)), Equals(0));
+                Assert::That(norm2(resVmapM), Equals(0));
+                Assert::That(norm2(resVmapP), Equals(0));
             }
 
             It(Should_Build_Normals) {
-
+                cout << "Should_Build_Normals" << endl;
                 Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
                 nodes1D.buildNodes();
 
@@ -261,45 +263,7 @@ namespace blitzdg {
 
                 resnx = nx - expectednx;
 
-                Assert::That(sqrt(sum(resnx*resnx)), Equals(0));
-            }
-        };
-
-		Describe(Nodes1DProvisioner_Object_4th_Order) {
-			const index_type NOrder = 4;
-			const float epsf = 7.8e-6;
-
-			void SetUp() {
-                const index_type NumElements = 5;
-                const real_type xmin = -1.0;
-                const real_type xmax = 1.0;
-
-                nodes1DProvisioner = new Nodes1DProvisioner(NOrder, NumElements, xmin, xmax);
-            }
-
-			void TearDown() {
-				delete nodes1DProvisioner;
-			}
-
-			It(Should_Build_4th_Order_GradVandermonde_Matrix) {
-                cout << "Should_Build_4th_Order_GradVandermonde_Matrix" << endl;
-                Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
-
-                nodes1D.buildNodes();
-
-                real_matrix_type DVr(NOrder+1,NOrder+1);
-                nodes1D.computeGradVandermonde(DVr);
-
-                real_matrix_type expectedDVr(NOrder+1,NOrder+1);
-                expectedDVr = 0.00000,1.22474,-4.74342,11.22497,-21.21320,
-                            0.00000,1.22474,-3.10530, 3.20713, -0.00000,
-                            0.00000,1.22474,-0.00000,-2.80624,  0.00000,
-                            0.00000,1.22474, 3.10530, 3.20713,  0.00000,
-                            0.00000,1.22474 ,4.74342,11.22497, 21.21320;
-
-                real_matrix_type res(NOrder+1,NOrder+1);
-                res = DVr - expectedDVr;
-                Assert::That(sqrt(sum(res(ii)*res(ii))), IsLessThan(epsf));
+                Assert::That(normFro(resnx), Equals(0));
             }
 		};
    } // namespace Nodes1DProvisionerTests

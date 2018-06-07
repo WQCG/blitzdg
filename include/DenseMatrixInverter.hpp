@@ -2,15 +2,20 @@
 // See COPYING and LICENSE files at project root for more details. 
 
 /**
- * @file DirectSolver.hpp
- * @brief Defines the DenseMatrixInverter class that ... does something.
+ * @file DenseMatrixInverter.hpp
+ * @brief Defines the DenseMatrixInverter class that computes the explicit
+ * inverse of a dense matrix via the LAPACK routines DGETRF and DGETRI.
+ * Documentation at: http://www.netlib.org/lapack/lapack-3.1.1/html/dgetrf.f.html
+ * and http://www.netlib.org/lapack/lapack-3.1.1/html/dgetri.f.html.
  */
 #pragma once
 #include "Types.hpp"
 
 namespace blitzdg {
     /**
-     * Implements the dense matrix LAPACK routine DSGESV,
+     * Implements the explicit inverse of a dense matrix via the LAPACK routines
+     * DGETRF and DGETRI. The routine DGETRF computes the LU factorization of the
+     * dense matrix and DGETRI computes the inverse from the LU factorization.
      */
     class DenseMatrixInverter {  
     public:

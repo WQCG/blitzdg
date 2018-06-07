@@ -2,7 +2,7 @@
 // See COPYING and LICENSE files at project root for more details.
 
 #include "DenseMatrixInverter.hpp"
-#include "DenseMatrixHelpers.hpp"
+#include "BlitzHelpers.hpp"
 #include "Types.hpp"
 #include <string>
 #include <stdexcept>
@@ -21,11 +21,9 @@ namespace blitzdg {
 
         // generate inverse of a matrix given its LU decomposition
         void dgetri_(int* N, double* A, int* lda, int* IPIV, double* WORK, int* lwork, int* INFO);
-
     }
 
     void DenseMatrixInverter::computeInverse(const real_matrix_type& A, real_matrix_type& Ainv) const {
-
         // Assumes a square matrix so that A is NxN (M=N).
         index_type N = A.rows();
         index_type lwork = N*N;
@@ -58,7 +56,6 @@ namespace blitzdg {
             strm << "Unable to compute inverse from LU factors with i=" << info << "." << endl;
             throw runtime_error(strm.str());
         }
-
         reshape1DToMat(Apod.get(), Ainv, false);
     }
 } // namespace blitzdg

@@ -50,30 +50,50 @@ namespace blitzdg {
     }
 
     /**
-     * Returns the one-norm of the input vector x.
+     * Returns the one-norm of a vector x.
      */
-    inline real_type norm1(const real_vector_type& x) {
+    template <typename T>
+    inline T norm1(const vector_type<T>& x) {
         return blitz::sum(blitz::abs(x));
     }
 
     /**
-     * Returns the two-norm of the input vector x.
+     * Returns the two-norm of a vector x.
      */
-    inline real_type norm2(const real_vector_type& x) {
+    template <typename T>
+    inline real_type norm2(const vector_type<T>& x) {
         return std::sqrt(blitz::sum(x * x));
     }
 
     /**
-     * Returns the infinity-norm of the input vector x.
+     * Returns the Frobenius norm (two-norm) of a vector x. 
      */
-    inline real_type normInf(const real_vector_type& x) {
+    template <typename T>
+    inline real_type normFro(const vector_type<T>& x) {
+        return std::sqrt(blitz::sum(x * x));
+    }
+
+    /**
+     * Returns the infinity-norm of a vector x.
+     */
+    template <typename T>
+    inline T normInf(const vector_type<T>& x) {
         return blitz::max(blitz::abs(x));
     }
 
 	/**
-	 * Returns the maximum absolute value of all entries of a matrix/firled.
+	 * Returns the maximum absolute value of all elements of a matrix mat.
 	 */
-	inline real_type normMax(const real_matrix_type& mat) {
+    template <typename T>
+	inline T normMax(const matrix_type<T>& mat) {
 		return blitz::max(blitz::abs(mat));
 	}
+
+    /**
+     * Returns the Frobenius norm of a matrix mat.
+     */
+    template <typename T>
+    inline real_type normFro(const matrix_type<T>& mat) {
+        return std::sqrt(blitz::sum(mat * mat));
+    }
 } // namespace blitzdg
