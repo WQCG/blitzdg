@@ -44,29 +44,29 @@ namespace blitzdg {
       index_type vmapI;
       index_type vmapO;
       
-      real_matrix_type* restrict xGrid;
-      real_vector_type* restrict rGrid;
+      real_matrix_type* xGrid;
+      real_vector_type* rGrid;
 
-      real_matrix_type* restrict V;
-      real_matrix_type* restrict Dr;
-      real_matrix_type* restrict Lift;
-      real_matrix_type* restrict J;
-      real_matrix_type* restrict rx;
-      real_matrix_type* restrict nx;
+      real_matrix_type* V;
+      real_matrix_type* Dr;
+      real_matrix_type* Lift;
+      real_matrix_type* J;
+      real_matrix_type* rx;
+      real_matrix_type* nx;
 
       real_matrix_type Vinv;
 
-      index_vector_type* restrict Fmask;
-      real_matrix_type* restrict Fx;
+      index_vector_type* Fmask;
+      real_matrix_type* Fx;
 
-      real_matrix_type* restrict Fscale;
+      real_matrix_type* Fscale;
 
-      index_matrix_type* restrict EToV;
-      index_matrix_type* restrict EToE;
-      index_matrix_type* restrict EToF;
+      index_matrix_type* EToV;
+      index_matrix_type* EToE;
+      index_matrix_type* EToF;
 
-      index_vector_type* restrict vmapM;
-      index_vector_type* restrict vmapP;
+      index_vector_type* vmapM;
+      index_vector_type* vmapP;
 
       DirectSolver LinSolver;
       JacobiBuilders Jacobi;

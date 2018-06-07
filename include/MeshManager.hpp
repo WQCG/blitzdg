@@ -106,7 +106,7 @@ namespace blitzdg {
        * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
        * for j = 0,...,vd-1 and i = 0,...,nv-1.
        */
-      const real_type* restrict get_Vertices() const;
+      const real_type* get_Vertices() const;
 
       /**
        * Returns the dimension of a vertex, typically 2 or 3.
@@ -130,7 +130,7 @@ namespace blitzdg {
        * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
        * for j = 0,...,et-1 and i = 0,...,ne-1.
        */
-      const index_type* restrict get_Elements() const;
+      const index_type* get_Elements() const;
 
       /**
        * Returns the number of elements.
@@ -150,7 +150,7 @@ namespace blitzdg {
        * It contains the processor rank of each element, which is used 
        * for distributed computing with MPI.
        */
-      const index_type* restrict get_ElementPartitionMap() const;
+      const index_type* get_ElementPartitionMap() const;
       
       /**
        * Returns a pointer to the underlying array that stores
@@ -159,7 +159,7 @@ namespace blitzdg {
        * It contains the processor rank of each vertex, which is used 
        * for distributed computing with MPI.
        */
-      const index_type* restrict get_VertexPartitionMap() const;
+      const index_type* get_VertexPartitionMap() const;
 
       /**
        * Write the vertices to the console.

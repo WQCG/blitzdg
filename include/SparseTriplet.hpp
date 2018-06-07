@@ -56,7 +56,7 @@ namespace blitzdg {
 		 * @note The input arrays must have at least nnz elements allocated.
 		 */
 		SparseTriplet(index_type rows, index_type cols, index_type nnz,
-			const index_type* restrict rowPtr, const index_type* restrict colPtr, const real_type* restrict elemsPtr)
+			const index_type* rowPtr, const index_type* colPtr, const real_type* elemsPtr)
 			: rows_{ rows }, cols_{ cols }, nnz_{ nnz }, nzmax_{ nnz },
 			row_(rowPtr, rowPtr + nnz), col_(colPtr, colPtr + nnz),
 			elems_(elemsPtr, elemsPtr + nnz)
@@ -72,8 +72,8 @@ namespace blitzdg {
 		 * @param[in] elemsPtr Pointer to the array of values.
 		 * @note The input arrays must have at least nnz elements allocated.
 		 */
-		SparseTriplet(index_type nnz, const index_type* restrict rowPtr, 
-			const index_type* restrict colPtr, const real_type* restrict elemsPtr)
+		SparseTriplet(index_type nnz, const index_type* rowPtr, 
+			const index_type* colPtr, const real_type* elemsPtr)
 			: SparseTriplet(*std::max_element(rowPtr, rowPtr + nnz) + 1,
 			*std::max_element(colPtr, colPtr + nnz) + 1, 
 			nnz, rowPtr, colPtr, elemsPtr)
