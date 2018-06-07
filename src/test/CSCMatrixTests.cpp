@@ -71,7 +71,7 @@ namespace blitzdg {
             }
 
             It(Should_Build_From_A_Cs_Di_Pointer) {
-                cs_di* restrict tmp = cs_di_spalloc(5, 5, 25, 1, 1);
+                cs_di* tmp = cs_di_spalloc(5, 5, 25, 1, 1);
                 index_type k = 0;
                 for (index_type j = 0; j < 5; ++j) {
                     tmp->p[j] = k;
