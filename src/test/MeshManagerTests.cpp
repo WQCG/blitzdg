@@ -103,25 +103,25 @@ namespace blitzdg {
                 Assert::That(mgr.get_NumVerts(), Equals(6));
                 Assert::That(mgr.get_Dim(), Equals(2));
 
-                const real_type* verts = mgr.get_Vertices();
+                const real_vector_type& verts = mgr.get_Vertices();
 
-                Assert::That(verts[0], Equals(0.0));
-                Assert::That(verts[1], Equals(0.0));
+                Assert::That(verts(0), Equals(0.0));
+                Assert::That(verts(1), Equals(0.0));
 
-                Assert::That(verts[2], Equals(0.5));
-                Assert::That(verts[3], Equals(0.0));
+                Assert::That(verts(2), Equals(0.5));
+                Assert::That(verts(3), Equals(0.0));
 
-                Assert::That(verts[4], Equals(1.0));
-                Assert::That(verts[5], Equals(0.0));
+                Assert::That(verts(4), Equals(1.0));
+                Assert::That(verts(5), Equals(0.0));
 
-                Assert::That(verts[6], Equals(1.0));
-                Assert::That(verts[7], Equals(1.0));
+                Assert::That(verts(6), Equals(1.0));
+                Assert::That(verts(7), Equals(1.0));
 
-                Assert::That(verts[8], Equals(0.5));
-                Assert::That(verts[9], Equals(1.0));
+                Assert::That(verts(8), Equals(0.5));
+                Assert::That(verts(9), Equals(1.0));
 
-                Assert::That(verts[10], Equals(0.0));
-                Assert::That(verts[11], Equals(1.0));
+                Assert::That(verts(10), Equals(0.0));
+                Assert::That(verts(11), Equals(1.0));
             }
 
             It(Reads_Element_Files) {
@@ -136,17 +136,16 @@ namespace blitzdg {
                 Assert::That(mgr.get_NumElements(), Equals(2));
                 Assert::That(mgr.get_ElementType(), Equals(4));
 
-                const index_type* elements = mgr.get_Elements();
+                const index_vector_type& elements = mgr.get_Elements();
 
-                Assert::That(elements[0], Equals(0));
-                Assert::That(elements[1], Equals(1));
-                Assert::That(elements[2], Equals(4));
-                Assert::That(elements[3], Equals(5));
-
-                Assert::That(elements[4], Equals(1));
-                Assert::That(elements[5], Equals(2));
-                Assert::That(elements[6], Equals(3));
-                Assert::That(elements[7], Equals(4));
+                Assert::That(elements(0), Equals(0));
+                Assert::That(elements(1), Equals(1));
+                Assert::That(elements(2), Equals(4));
+                Assert::That(elements(3), Equals(5));
+                Assert::That(elements(4), Equals(1));
+                Assert::That(elements(5), Equals(2));
+                Assert::That(elements(6), Equals(3));
+                Assert::That(elements(7), Equals(4));
             }
 
             It(Can_Print_Vertices_And_DoesNotThrow) {
@@ -155,7 +154,7 @@ namespace blitzdg {
                 cout << "Can_Print_Vertices_And_DoesNotThrow" << endl;
                 cout << "MeshManager Reads Vertex File: " << vertexFile << endl;
 
-                MeshManager & mgr = *meshManager;
+                MeshManager & mgr = *meshManager;   
                 mgr.readVertices(vertexFile);
                 cout << "Vertices:" << endl;
                 mgr.printVertices();
@@ -188,17 +187,17 @@ namespace blitzdg {
                 cout << "Nv: " << mgr.get_NumVerts() << endl;
                 mgr.partitionMesh(2);
 
-                const index_type * epMap = mgr.get_ElementPartitionMap();
-                Assert::That(epMap[0], Equals(1));
-                Assert::That(epMap[1], Equals(0));
+                const index_vector_type& epMap = mgr.get_ElementPartitionMap();
+                Assert::That(epMap(0), Equals(1));
+                Assert::That(epMap(1), Equals(0));
 
-                const index_type * vpMap = mgr.get_VertexPartitionMap();
-                Assert::That(vpMap[0], IsGreaterThan(-1));
-                Assert::That(vpMap[1], IsGreaterThan(-1));
-                Assert::That(vpMap[2], IsGreaterThan(-1));
-                Assert::That(vpMap[3], IsGreaterThan(-1));
-                Assert::That(vpMap[4], IsGreaterThan(-1));
-                Assert::That(vpMap[5], IsGreaterThan(-1));
+                const index_vector_type& vpMap = mgr.get_VertexPartitionMap();
+                Assert::That(vpMap(0), IsGreaterThan(-1));
+                Assert::That(vpMap(1), IsGreaterThan(-1));
+                Assert::That(vpMap(2), IsGreaterThan(-1));
+                Assert::That(vpMap(3), IsGreaterThan(-1));
+                Assert::That(vpMap(4), IsGreaterThan(-1));
+                Assert::That(vpMap(5), IsGreaterThan(-1));
             } 
         };
     } // namespace MeshManagerTests

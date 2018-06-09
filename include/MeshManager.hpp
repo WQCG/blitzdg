@@ -9,23 +9,27 @@
 
 #pragma once
 #include "Types.hpp"
+#include <memory>
 #include <string>
 
 namespace blitzdg {
   /**
-   * Reads mesh input files and partitions meshes with METIS.
+   * Implements a class for reading mesh input files and partitioning meshes with METIS.
    */
   class MeshManager {
-      real_type* Vert;
-      index_type* EToV;
+      using real_vec_smart_ptr = std::unique_ptr<real_vector_type>;
+      using index_vec_smart_ptr = std::unique_ptr<index_vector_type>;
+
       index_type Dim;
       index_type NumVerts;
       index_type ElementType;
       index_type NumElements;
       std::string CsvDelimiters;
-      index_type* ElementPartitionMap;
-      index_type* VertexPartitionMap;
-
+      real_vec_smart_ptr Vert;
+      index_vec_smart_ptr EToV;
+      index_vec_smart_ptr ElementPartitionMap;
+      index_vec_smart_ptr VertexPartitionMap;
+      
     public:
       /**
        * Default constructor.
@@ -95,20 +99,6 @@ namespace blitzdg {
       void partitionMesh(index_type numPartitions);
 
       /**
-       * Returns a pointer to the array of vertex coordinates.
-       * 
-       * If vd is the integer denoting the vertex dimension and
-       * nv is the number of vertices, then the jth coordinate
-       * of the ith vertex may be accessed by
-       * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-       * const index_type* coords = mm.get_Vertices();
-       * coords(MeshManager::get_Index(i, j, vd));
-       * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-       * for j = 0,...,vd-1 and i = 0,...,nv-1.
-       */
-      const real_type* get_Vertices() const;
-
-      /**
        * Returns the dimension of a vertex, typically 2 or 3.
        */
       index_type get_Dim() const;
@@ -117,20 +107,6 @@ namespace blitzdg {
        * Returns the number of vertices.
        */
       index_type get_NumVerts() const;
-
-      /**
-       * Returns a pointer to the array of element indices.
-       * 
-       * If et is the integer denoting the element type and
-       * ne is the number of elements, then the jth index
-       * of the ith element may be accessed by
-       * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-       * const index_type* elems = mm.get_Elements();
-       * elems(MeshManager::get_Index(i, j, et));
-       * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-       * for j = 0,...,et-1 and i = 0,...,ne-1.
-       */
-      const index_type* get_Elements() const;
 
       /**
        * Returns the number of elements.
@@ -144,22 +120,50 @@ namespace blitzdg {
       index_type get_ElementType() const;
 
       /**
-       * Returns a pointer to the underlying array that stores
+       * Returns a reference to the array of vertex coordinates.
+       * 
+       * If vd is the integer denoting the vertex dimension and
+       * nv is the number of vertices, then the jth coordinate
+       * of the ith vertex may be accessed by
+       * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+       * const index_vector_type& coords = mm.get_Vertices();
+       * coords(MeshManager::get_Index(i, j, vd));
+       * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+       * for j = 0,...,vd-1 and i = 0,...,nv-1.
+       */
+      const real_vector_type& get_Vertices() const;
+
+      /**
+       * Returns a reference to the array of element indices.
+       * 
+       * If et is the integer denoting the element type and
+       * ne is the number of elements, then the jth index
+       * of the ith element may be accessed by
+       * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+       * const index_vector_type& elems = mm.get_Elements();
+       * elems(MeshManager::get_Index(i, j, et));
+       * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+       * for j = 0,...,et-1 and i = 0,...,ne-1.
+       */
+      const index_vector_type& get_Elements() const;
+
+       /**
+       * Returns a reference to the underlying array that stores
        * the element partition map.
        * The array has length equal to the number of elements. 
        * It contains the processor rank of each element, which is used 
        * for distributed computing with MPI.
        */
-      const index_type* get_ElementPartitionMap() const;
+      const index_vector_type& get_ElementPartitionMap() const;
       
       /**
-       * Returns a pointer to the underlying array that stores
+       * Returns a reference to the underlying array that stores
        * the vertex partition map.
        * The array has length equal to the number of vertices. 
        * It contains the processor rank of each vertex, which is used 
        * for distributed computing with MPI.
        */
-      const index_type* get_VertexPartitionMap() const;
+      const index_vector_type& get_VertexPartitionMap() const;
 
       /**
        * Write the vertices to the console.
@@ -170,10 +174,5 @@ namespace blitzdg {
        * Write the elements to the console.
        */
       void printElements() const;
-      
-      /**
-       * Destructor.
-       */
-      ~MeshManager();
   };
 } // namespace blitzdg

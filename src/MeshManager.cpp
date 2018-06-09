@@ -2,12 +2,15 @@
 // See COPYING and LICENSE files at project root for more details.
 
 #include "MeshManager.hpp"
+#include "CSVFileReader.hpp"
 #include "Types.hpp"
 #include <boost/algorithm/string.hpp>
 #include <metis.h>
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <sstream>
+#include <stdexcept>
 #include <vector>
 
 using boost::algorithm::is_any_of;
@@ -18,77 +21,38 @@ using std::cout;
 using std::endl;
 using std::getline;
 using std::ifstream;
+using std::istringstream;
+using std::runtime_error;
 using std::string;
+using std::to_string;
+using std::unique_ptr;
 using std::vector;
 
 namespace blitzdg {
     namespace {
         template<typename T>
-        void printArray(T* arr, index_type numRows, index_type numCols) {
-            for(index_type i=0; i < numRows; i++) {
-                for (index_type j=0; j < numCols; j++) {
-                    cout << arr[MeshManager::get_Index(i, j, numCols)] << " ";
+        void printArray(const vector_type<T>& arr, index_type numRows, index_type numCols) {
+            for(index_type i = 0; i < numRows; ++i) {
+                for (index_type j = 0; j < numCols; ++j) {
+                    cout << arr(MeshManager::get_Index(i, j, numCols)) << " ";
                 }
                 cout << endl;
             }
         }
-
-        template<typename T>
-        void readCsvFile(const string& csvFile, const string& delimiters, T** result, index_type dims[2]) {
-            ifstream fileStream(csvFile);
-
-            string line;
-
-            vector<string> splitVec;
-            index_type numLines = 0;
-
-            index_type numCols = -1;
-            while(getline(fileStream, line)) {
-                // Take first line as source of truth for number of columns.
-                if (numLines == 0) {
-                    trim(line);
-                    split( splitVec, line, is_any_of(delimiters), token_compress_on );
-                    numCols = splitVec.size();
-                }
-                numLines++;
-            }
-
-            dims[0] = numLines;
-            dims[1] = numCols;
-            // roll-back stream.
-            fileStream.clear();
-            fileStream.seekg(0, std::ios::beg);
-
-            *result = new T[numLines*numCols];
-            index_type count = 0;
-            while(getline(fileStream, line)) {
-                trim(line);
-                vector<string> splitVec;
-                split( splitVec, line, is_any_of(delimiters), token_compress_on ); 
-                
-                for(index_type i=0; i < numCols; i++) {
-                    (*result)[count] = atof(splitVec[i].c_str());
-                    count++;
-                }
-            }
-            fileStream.close();
-        }
     } // anonymous namespace
 
     MeshManager::MeshManager() 
-        : Vert{ nullptr }, EToV{ nullptr }, Dim{ 0 },
-        NumVerts{ 0 }, ElementType{}, NumElements{ 0 },
-        CsvDelimiters{ " \t" }, ElementPartitionMap{ nullptr },
-        VertexPartitionMap{ nullptr }
+        :  Dim{ 0 }, NumVerts{ 0 }, ElementType{}, NumElements{ 0 },
+        CsvDelimiters{ "\t " }, Vert{ nullptr }, EToV{ nullptr },
+        ElementPartitionMap{ nullptr }, VertexPartitionMap{ nullptr }
     {}
 
     void MeshManager::readMesh(const string& gmshInputFile) {
-        throw("Not implemented!");
+        throw runtime_error("MeshManager::readMesh not implemented");
     }
 
     void MeshManager::partitionMesh(index_type numPartitions) {
-        index_type * eind = EToV;
-        index_type * eptr = new index_type[NumElements+1];
+        unique_ptr<index_type[]> eptr(new index_type[NumElements + 1]);
         index_type objval = 0;
         index_type NE = NumElements;
         index_type NV = NumVerts;
@@ -113,19 +77,22 @@ namespace blitzdg {
         metisOptions[METIS_OPTION_CONTIG] = 1;
 
         // output arrays
-        index_type * epart = new index_type[NumElements]();
-        index_type * npart = new index_type[NumVerts]();
+        ElementPartitionMap.reset(new index_vector_type(NumElements));
+        VertexPartitionMap.reset(new index_vector_type(NumVerts));
+        *ElementPartitionMap = 0;
+        *VertexPartitionMap = 0;
 
         // Assume mesh with homogenous element type, then eptr 
         // dictates an equal stride of size ElementType across EToV array.
-        for (index_type i=0; i <= NumElements; i++) {
-            eptr[i] = ElementType*i;
-            cout << eptr[i] << endl;
+        for (index_type i = 0; i <= NumElements; ++i) {
+            eptr[i] = ElementType * i;
         }
 
         cout << "About to call METIS_PartMeshNodal" << endl;
-        index_type result =  METIS_PartMeshNodal(&NE, &NV, eptr, eind, (idx_t*)NULL, (idx_t*)NULL,
-                        &numPartitions, (real_t*)NULL, metisOptions, &objval, epart, npart);
+        index_type result =  METIS_PartMeshNodal(&NE, &NV, eptr.get(), EToV->data(), 
+            (idx_t*)NULL, (idx_t*)NULL, &numPartitions, (real_t*)NULL, 
+            metisOptions, &objval, ElementPartitionMap->data(), 
+            VertexPartitionMap->data());
 
         if (result == METIS_OK)
             cout << "METIS partitioning successful!" << endl;
@@ -139,43 +106,28 @@ namespace blitzdg {
         cout << "total communication volume of partition: " << objval << endl;
 
         cout << "Element partitioning vector: " << endl;
-        for (index_type i=0; i<NumElements; i++)
-            cout << epart[i] << endl;
+        for (index_type i = 0; i < NumElements; ++i)
+            cout << (*ElementPartitionMap)(i) << endl;
 
         cout << "Vertex partitioning vector: " << endl;
-        for (index_type i=0; i<NumVerts; i++)
-            cout << npart[i] << endl;
-
-        ElementPartitionMap = epart;
-        VertexPartitionMap = npart;
-
-        delete[] eptr;
+        for (index_type i = 0; i < NumVerts; ++i)
+            cout << (*VertexPartitionMap)(i) << endl;
     }
 
     void MeshManager::readVertices(const string& vertFile) {
-        index_type dims[2];
-        readCsvFile<real_type>(vertFile, CsvDelimiters, &Vert, dims);
-        NumVerts = dims[0];
-        Dim = dims[1];
+        Vert = csvread<real_type>(vertFile, NumVerts, Dim);
     }
 
     void MeshManager::readElements(const string& E2VFile) {
-        index_type dims[2];
-        readCsvFile<index_type>(E2VFile, CsvDelimiters, &EToV, dims);
-        NumElements = dims[0];
-        ElementType = dims[1];
+        EToV = csvread<index_type>(E2VFile, NumElements, ElementType);
     }
 
     void MeshManager::printVertices() const {
-        printArray<real_type>(Vert, NumVerts, Dim);
+        printArray(*Vert, NumVerts, Dim);
     }
 
     void MeshManager::printElements() const {
-        printArray<index_type>(EToV, NumElements, ElementType);
-    }
-
-    const real_type* MeshManager::get_Vertices() const {
-        return Vert;
+        printArray(*EToV, NumElements, ElementType);
     }
 
     index_type MeshManager::get_Dim() const {
@@ -194,22 +146,19 @@ namespace blitzdg {
         return ElementType;
     }
 
-    const index_type* MeshManager::get_Elements() const {
-        return EToV;
+    const real_vector_type& MeshManager::get_Vertices() const {
+        return *Vert;
     }
 
-    const index_type* MeshManager::get_ElementPartitionMap() const {
-        return ElementPartitionMap;
+    const index_vector_type& MeshManager::get_Elements() const {
+        return *EToV;
     }
 
-    const index_type* MeshManager::get_VertexPartitionMap() const {
-        return VertexPartitionMap;
+    const index_vector_type& MeshManager::get_ElementPartitionMap() const {
+        return *ElementPartitionMap;
     }
 
-    MeshManager::~MeshManager() {
-        delete[] Vert; Vert = nullptr;
-        delete[] EToV; EToV = nullptr;
-        delete[] ElementPartitionMap; ElementPartitionMap = nullptr;
-        delete[] VertexPartitionMap; VertexPartitionMap = nullptr;
+    const index_vector_type& MeshManager::get_VertexPartitionMap() const {
+        return *VertexPartitionMap;
     }
 } // namespace blitzdg

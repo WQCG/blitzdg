@@ -59,6 +59,14 @@ namespace blitzdg {
 	};
 
 	/**
+	 * Specialization of IteratorValueType for std::back_insert_iterator.
+	 */
+	template <typename Container>
+	struct IteratorValueType<std::back_insert_iterator<Container>> {
+		using type = typename Container::value_type;
+	};
+
+	/**
 	 * Returns true if Iterator1 and Iterator2 have the same value_type.
 	 */
 	template <typename Iterator1, typename Iterator2>
