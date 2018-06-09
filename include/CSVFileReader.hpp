@@ -41,6 +41,14 @@ namespace blitzdg {
         };
         template <typename T> std::istringstream StrCast<T>::ss_;
 
+        template <>
+        struct StrCast<std::string> {
+            static bool convert(const std::string& s, std::string& ret) {
+                ret = s;
+                return true;
+            }
+        };
+
         /**
          * Specialization of StrCast for type char.
          */
