@@ -10,10 +10,11 @@ build_script:
     Expand-Archive -Path include-deps.zip -DestinationPath .\include\
     Expand-Archive -Path deps-win-mingw64.zip -DestinationPath .\lib\
     $env:PATH = $env:PATH + ";C:\mingw-w64\x86_64-6.3.0-posix-seh-rt_v5-rev1\mingw64\bin" 
+    $env:CXX = "C:\mingw-w64\x86_64-6.3.0-posix-seh-rt_v5-rev1\mingw64\bin\x86_64-w64-mingw32-g++.exe"
     & 'C:\mingw-w64\x86_64-6.3.0-posix-seh-rt_v5-rev1\mingw64\bin\mingw32-make.exe'
     if($LASTEXITCODE -ne 0) { exit 1 }
 test_script:
-  - dir bin&&C:\mingw-w64\x86_64-6.3.0-posix-seh-rt_v5-rev1\mingw64\msys\1.0\bin\bash -e -l -c "/c/projects/blitzdg-vdg02/bin/test.exe;  exit 0"
+  - dir bin&&bin\test.exe"
 artifacts:
   - path: bin
 
