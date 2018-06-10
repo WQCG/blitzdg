@@ -19,7 +19,6 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include <cstdlib>
 
 namespace blitzdg {
     namespace details {
