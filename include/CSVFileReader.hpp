@@ -41,6 +41,9 @@ namespace blitzdg {
         };
         template <typename T> std::istringstream StrCast<T>::ss_;
 
+        /**
+        * Specialization of StrCast for type std::string.
+        */
         template <>
         struct StrCast<std::string> {
             static bool convert(const std::string& s, std::string& ret) {
@@ -394,7 +397,7 @@ namespace blitzdg {
 				throw std::runtime_error("CSVFileReader: invalid number of fields on line "
 					+ std::to_string(lineno_) + " of file " + filename_);
 			}
-			readRowRec(splitVec.begin(), args...); // write to the output arguments
+			parseRowRec(splitVec.begin(), args...); // write to the output arguments
 		}
 		return static_cast<bool>(strm_);
 	}
