@@ -7,8 +7,8 @@ build_script:
     Invoke-RestMethod -Uri https://s3.amazonaws.com/dsteinmo-libs/deps-win-mingw64.zip -OutFile deps-win-mingw64.zip
     Expand-Archive -Path include-deps.zip -DestinationPath .\include\
     Expand-Archive -Path deps-win-mingw64.zip -DestinationPath .\lib\
-    cp cpp11patch\include\wchar.h C:\MinGW\include\.
-    cp cpp11patch\include\stdio.h C:\MinGW\include\.
+    cp cpp11patch\wchar.h C:\MinGW\include\.
+    cp cpp11patch\stdio.h C:\MinGW\include\.
     cp cpp11patch\os_defines.h C:\MinGW\lib\gcc\mingw32\5.3.0\include\c++\mingw32\bits
     & C:\MinGW\msys\1.0\bin\bash -e -l -c "set && ls /mingw/lib/gcc/mingw32/5.3.0/ && cd /c/projects/blitzdg-vdg02 && make"
     if($LASTEXITCODE -ne 0) { exit 1 }
