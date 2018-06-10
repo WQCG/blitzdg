@@ -66,7 +66,7 @@ namespace blitzdg {
             }
 
             It(Reads_A_CSV_File) {
-                cout << "Read a CSV file" << endl;
+                cout << "CSVFileReaderTests: Read a CSV file" << endl;
                 string fname = getFilePath("csvtest1.csv");
                 CSVFileReader reader(fname);
                 index_type nrows = reader.getNumRows();
@@ -82,7 +82,7 @@ namespace blitzdg {
             }
 
             It(Reads_A_CSV_File_To_A_Matrix) {
-                cout << "Read a CSV file to a matrix" << endl;
+                cout << "CSVFileReaderTests: Read a CSV file to a matrix" << endl;
                 string fname = getFilePath("csvtest1.csv");
                 unique_ptr<matrix_type<double>> out = csvread<double>(fname);
                 matrix_type<double> ret(6,2);
@@ -97,7 +97,7 @@ namespace blitzdg {
             }
 
             It(Reads_A_CSV_File_To_A_Vector) {
-                cout << "Read a CSV file to a vector" << endl;
+                cout << "CSVFileReaderTests: Read a CSV file to a vector" << endl;
                 string fname = getFilePath("csvtest1.csv");
                 index_type nrows, ncols;
                 unique_ptr<vector_type<double>> out = csvread<double>(fname, nrows, ncols);
@@ -113,7 +113,7 @@ namespace blitzdg {
             }
 
             It(Skips_The_First_Few_Lines) {
-                cout << "Read a CSV file skipping the first few lines" << endl;
+                cout << "CSVFileReaderTests: Read a CSV file skipping the first few lines" << endl;
                 string fname = getFilePath("csvtest1.csv");
                 unique_ptr<matrix_type<double>> out = csvread<double>(fname, 4);
                 matrix_type<double> ret(4,2);
@@ -126,7 +126,7 @@ namespace blitzdg {
             }
 
             It(Reads_Different_Field_Types) {
-                cout << "Read a CSV file with different field types" << endl;
+                cout << "CSVFileReaderTests: Read a CSV file with different field types" << endl;
                 string fname = getFilePath("csvtest2.csv");
                 CSVFileReader reader(fname, 1);
                 vector<string> name;
@@ -159,7 +159,7 @@ namespace blitzdg {
             }
 
             It(Opens_A_New_File_To_Read) {
-                cout << "Open new CSV file to read" << endl;
+                cout << "CSVFileReaderTests: Open new CSV file to read" << endl;
                 string fname1 = getFilePath("csvtest1.csv");
                 string fname2 = getFilePath("csvtest2.csv");
                 CSVFileReader reader(fname2, 1);
@@ -179,7 +179,7 @@ namespace blitzdg {
             }
 
             It(Detects_A_Missing_Field) {
-                cout << "Detects a missing field" << endl;
+                cout << "CSVFileReaderTests: Detects a missing field" << endl;
                 string fname = getFilePath("csvtest3.csv");
                 bool caught = false;
                 try {
@@ -193,11 +193,62 @@ namespace blitzdg {
             }
 
             It(Detects_An_Invalid_Field) {
-                cout << "Detects an invalid field" << endl;
+                cout << "CSVFileReaderTests: Detects an invalid field" << endl;
                 string fname = getFilePath("csvtest4.csv");
                 bool caught = false;
                 try {
                     unique_ptr<matrix_type<double>> out = csvread<double>(fname);
+                }
+                catch (std::runtime_error& e) {
+                    cout << e.what() << endl;
+                    caught = true;
+                }
+                Assert::That(caught, Equals(true));
+            }
+
+            It(Detects_Too_Many_Skipped_Lines) {
+                cout << "CSVFileReaderTests: Detects too many skipped lines" << endl;
+                string fname = getFilePath("csvtest1.csv");
+                bool caught = false;
+                try {
+                    CSVFileReader reader(fname, 11);
+                }
+                catch (std::runtime_error& e) {
+                    cout << e.what() << endl;
+                    caught = true;
+                }
+                Assert::That(caught, Equals(true));
+                caught = false;
+                 try {
+                    CSVFileReader reader(fname);
+                    reader.openFile(fname, 11);
+                }
+                catch (std::runtime_error& e) {
+                    cout << e.what() << endl;
+                    caught = true;
+                }
+                Assert::That(caught, Equals(true));
+            }
+
+            It(Detects_Invalid_Delimiter_Sequence) {
+                cout << "CSVFileReaderTests: Detects invalid delimiter sequence" << endl;
+                string fname = getFilePath("csvtest1.csv");
+                bool caught = false;
+                try {
+                    CSVFileReader reader(fname, 0, "~$#@*|^8x,");
+                }
+                catch (std::runtime_error& e) {
+                    cout << e.what() << endl;
+                    caught = true;
+                }
+                Assert::That(caught, Equals(true));
+            }
+
+             It(Detects_Invalid_File) {
+                cout << "CSVFileReaderTests: Detects the file could not be opened" << endl;
+                bool caught = false;
+                try {
+                    CSVFileReader reader("not_a_file.csv");
                 }
                 catch (std::runtime_error& e) {
                     cout << e.what() << endl;
