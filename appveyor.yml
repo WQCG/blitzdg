@@ -9,8 +9,8 @@ build_script:
     Expand-Archive -Path include-deps.zip -DestinationPath .\include\
     Expand-Archive -Path deps-win-mingw64.zip -DestinationPath .\lib\
     Expand-Archive -Path cpp11patch.zip -Destinationpath .
-    cp wchar.h C:\MinGW\include\.
-    cp stdio.h C:\MinGW\include\.
+    cp include\wchar.h C:\MinGW\include\.
+    cp include\stdio.h C:\MinGW\include\.
     cp os_defines.h C:\MinGW\lib\gcc\mingw32\5.3.0\include\c++\mingw32\bits
     & C:\MinGW\msys\1.0\bin\bash -e -l -c "set && ls /mingw/lib/gcc/mingw32/5.3.0/ && cd /c/projects/blitzdg-vdg02 && make"
     if($LASTEXITCODE -ne 0) { exit 1 }
