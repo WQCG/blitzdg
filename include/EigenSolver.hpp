@@ -12,6 +12,10 @@
 #include "Types.hpp"
 
 namespace blitzdg {
+  /**
+   * Implements a class for computing the eigenvectors and eigenvalues of a dense,
+   * symmetric matirx via the LAPACK routine DSYEVD.
+   */
   class EigenSolver {
   public:
       /**

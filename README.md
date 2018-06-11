@@ -2,7 +2,7 @@
 
 blitzdg is an open-source project aiming to implement parallel discontinuous Galerkin (dg) solvers for common partial differential equations systems using blitz++ for array and tensor manipulations and MPI for distributed parallelism.
 
-[![Build Status](https://travis-ci.org/dsteinmo/blitzdg.svg?branch=master)](https://travis-ci.org/WQCG/blitzdg)  [![Coverage Status](https://coveralls.io/repos/github/WQCG/blitzdg/badge.svg?branch=master)](https://coveralls.io/github/WQCG/blitzdg?branch=master) [![Windows Build Status](https://ci.appveyor.com/api/projects/status/pmx725yhsrnq3thu?svg=true)](https://ci.appveyor.com/project/WQCG/blitzdg)
+[![Build Status](https://travis-ci.org/dsteinmo/blitzdg.svg?branch=master)](https://travis-ci.org/WQCG/blitzdg)  [![Coverage Status](https://coveralls.io/repos/github/WQCG/blitzdg/badge.svg?branch=master)](https://coveralls.io/github/WQCG/blitzdg?branch=master)
 
 ## Getting Started
 
@@ -36,7 +36,7 @@ Dependency installation is outlined in `pull-deps.sh` (tested on Ubuntu and Mac 
 
 ### Windows Dependencies
 
-The Windows build requires [MinGW/MinGW64](http://www.mingw.org/wiki/Getting_Started "MinGW Installation Instructions") and is currently tested in the AppVeyor CI process. There is currently not a Visual Studio/MSVC build.
+The Windows build requires [MinGW/MinGW64](http://www.mingw.org/wiki/Getting_Started "MinGW Installation Instructions"). There is currently not a Visual Studio/MSVC build.
 
 Run `.\pull-deps.ps1` in Powershell (4+ or Powershell Core (`pwsh`)).
 
@@ -44,7 +44,7 @@ Run `.\pull-deps.ps1` in Powershell (4+ or Powershell Core (`pwsh`)).
 
 We accept pull requests from public forks, and we use pull requests as the primary delivery mechanism of any new code within the base repository.
 
-If you add code, please write tests using the igloo testing framework that is included as a project dependency. Your code additions will be subject to peer review and will be run through our AppVeyor and Travis-CI continuous integration processes.
+If you add code, please write tests using the igloo testing framework that is included as a project dependency. Your code additions will be subject to peer review and will be run through our Travis-CI continuous integration process.
 
 Interested developers should consult the [Guidelines for Contributing](https://github.com/WQCG/blitzdg/blob/master/CONTRIBUTING.md "Contributing Markdown") before getting started.
 

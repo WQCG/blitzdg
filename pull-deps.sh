@@ -38,6 +38,9 @@ if [ "$machine" == "Linux" ] ; then
 
     # pull in valgrind
     apt-get -y install valgrind valgrind-dbg
+
+    # pull in clang
+    apt-get -y install clang
 fi
 
 if [ "$machine" == "Mac" ] ; then
