@@ -11,7 +11,8 @@ script:
     make test && \
     for filename in bin/* ; do \
       valgrind --error-exitcode=1 --leak-check=full --track-origins=yes "$filename"; \
-    done
+    done \
+    make clean && CXX=clang++ make test
 after_success:
   - make docs
   - coveralls --exclude include/igloo --gcov-options '\-lp'
