@@ -106,7 +106,25 @@ namespace blitzdg {
                 Assert::That(abs(p(1)- -0.547722557505166), IsLessThan(epsf));
                 Assert::That(abs(p(2)-  0.547722557505166), IsLessThan(epsf));
                 Assert::That(abs(p(3)-  1.224744871391589), IsLessThan(epsf));
-            } 
+            }
+
+            It(Should_Generate_1st_Order_Jacobi_Polynomial_4pt_Grid_NonZero_Alpha_and_Beta) {
+                cout << "Should_Generate_1st_Order_Jacobi_Polynomial_4pt_Grid_NonZero_Alpha_and_Beta" << endl;
+                real_vector_type x(4);
+                x = -1,-0.447214,0.447214,1;
+                real_vector_type p(4);
+
+                JacobiBuilders & jacobi = *Jacobi;
+
+                const real_type alpha = 1.0;
+                const real_type beta = 2.0;
+                jacobi.computeJacobiPolynomial(x, alpha, beta, 1, p);
+
+                Assert::That(abs(p(0)- -2.598076211353316), IsLessThan(epsf));
+                Assert::That(abs(p(1)- -1.401259414212354), IsLessThan(epsf));
+                Assert::That(abs(p(2)-  0.535234010427916), IsLessThan(epsf));
+                Assert::That(abs(p(3)-  1.732050807568877), IsLessThan(epsf));
+            }
 
             It(Should_Generate_4th_Order_Quadrature_Points_and_Weights) {
                 cout << "Should_Generate_4th_Order_Quadrature_Points_and_Weights" << endl;
