@@ -1,0 +1,263 @@
+// Copyright (C) 2017-2018  Waterloo Quantitative Consulting Group, Inc. 
+// See COPYING and LICENSE files at project root for more details. 
+
+/**
+ * @file TriangleNodesProvisioner.hpp
+ * @brief Defines the TriangleNodesProvisioner class that provides a construcletion
+ * of 2D nodal points on the triangle.
+ */
+
+#pragma once
+#include "Nodes1DProvisioner.hpp"
+#include "MeshManager.hpp"
+#include "Types.hpp"
+#include <memory>
+
+namespace blitzdg {
+  /**
+   * Provides facilities for the construction of two-dimensional
+   * nodes, operators, and geometric factors on triangles.
+   * @note This class is moveable but not copyable.
+   */ 
+  class TriangleNodesProvisioner {
+      using real_mat_smart_ptr = std::unique_ptr<real_matrix_type>;
+      using index_mat_smart_ptr = std::unique_ptr<index_matrix_type>;
+      using real_vec_smart_ptr = std::unique_ptr<real_vector_type>;
+      using index_vec_smart_ptr = std::unique_ptr<index_vector_type>;
+
+      index_type NumElements;
+      index_type NOrder;
+      index_type NumLocalPoints;
+
+      real_mat_smart_ptr xGrid;
+      real_mat_smart_ptr yGrid;
+
+      real_vec_smart_ptr rGrid;
+      real_vec_smart_ptr sGrid;
+
+      real_mat_smart_ptr V;
+      real_mat_smart_ptr Dr;
+      real_mat_smart_ptr Ds;
+      real_mat_smart_ptr Lift;
+      real_mat_smart_ptr J;
+      real_mat_smart_ptr rx;
+      real_mat_smart_ptr sx;
+      real_mat_smart_ptr ry;
+      real_mat_smart_ptr sy;
+      real_mat_smart_ptr nx;
+      real_mat_smart_ptr ny;
+      real_mat_smart_ptr Vinv;
+
+      index_vec_smart_ptr Fmask;
+      real_mat_smart_ptr Fx;
+      real_mat_smart_ptr Fy;
+
+      real_mat_smart_ptr Fscale;
+
+      index_mat_smart_ptr EToV;
+      index_mat_smart_ptr EToE;
+      index_mat_smart_ptr EToF;
+
+      index_vec_smart_ptr vmapM;
+      index_vec_smart_ptr vmapP;
+
+      const MeshManager * Mesh2D;
+      
+      std::unique_ptr<Nodes1DProvisioner> Nodes1D;
+
+  public:
+      static const index_type NumFaces;
+      static const real_type NodeTol;
+    /**
+     * Constructor.
+     * @param[in] NOrder Order of the approximating polynomials.
+     * @param[in] NumElements The number of elements.
+     * @param[in] MeshManager The MeshManager storing the 2D mesh.
+     * @note Assumes uniform elements.
+     */
+    TriangleNodesProvisioner(index_type _NOrder, index_type _NumElements, const MeshManager * _MeshManager);
+
+    /**
+     * Copy constructor (deleted).
+     */
+    TriangleNodesProvisioner(const TriangleNodesProvisioner&) = delete;
+
+    /**
+     * Copy assignment operator (deleted).
+     */
+    TriangleNodesProvisioner& operator=(const TriangleNodesProvisioner&) = delete;
+
+    /**
+     * Move constructor.
+     */
+    TriangleNodesProvisioner(TriangleNodesProvisioner&&) = default;
+
+    /**
+     * Move assignment operator.
+     */
+    TriangleNodesProvisioner& operator=(TriangleNodesProvisioner&&) = default;
+
+
+     /**
+      * Builds the nodes and all geometric factors for each element.
+      */
+      void buildNodes();
+
+     /**
+      * Computes the 2D Vandermonde matrix which maps modal coefficients to nodal values.
+      */
+      void buildVandermondeMatrix();
+
+     /**
+      * Computes the Jacobian (determinant), the geometric factor rx (dr/dx), 
+      * and Fscale using nodes and differentiation matrix.
+      */
+      void computeJacobian();
+      
+      /**
+       * Returns a reference to a matrix whose jth column contains the
+       * x-component of the local grid points for the jth element.
+       */
+      const real_matrix_type & get_xGrid() const;
+
+      /**
+       * Returns a reference to a matrix whose jth column contains the
+       * y-component of the local grid points for the jth element.
+       */
+      const real_matrix_type & get_yGrid() const;
+
+      /**
+       * Returns a reference to a vector that contains the 
+       * r-component of the local grid points on the standard element.
+       */
+      const real_vector_type & get_rGrid() const;
+
+      /**
+       * Returns a reference to a vector that contains the 
+       * s-component of the local grid points on the standard element.
+       */
+      const real_vector_type & get_sGrid() const;
+
+      /**
+       * Returns a reference to the differentiation matrix with respect
+       * to the r component on the the standard element.
+       */
+      const real_matrix_type & get_Dr() const;
+
+      /**
+       * Returns a reference to the differentiation matrix with respect
+       * to the s component on the the standard element.
+       */
+      const real_matrix_type & get_Ds() const;
+
+      /**
+       * Returns a reference to the 2D generalized Vandermonde matrix
+       * for 2D orthonormal basis functions on the triangle.
+       */
+      const real_matrix_type & get_V() const;
+
+      /**
+       * Returns a reference to the inverse of the 2D generalized Vandermonde matrix.
+       */
+      const real_matrix_type & get_Vinv() const;
+
+      /**
+       * Returns a reference to the Jacobian scaling matrix.
+       */
+      const real_matrix_type & get_J() const;
+
+      /**
+       * Returns a reference to the geometric scaling matrix rx.
+       */
+      const real_matrix_type & get_rx() const;
+
+      /**
+       * Returns a reference to the geometric scaling matrix ry.
+       */
+      const real_matrix_type & get_ry() const;
+
+      /**
+       * Returns a reference to the geometric scaling matrix sx.
+       */
+      const real_matrix_type & get_sx() const;
+
+      /**
+       * Returns a reference to the geometric scaling matrix sy.
+       */
+      const real_matrix_type & get_sy() const;
+
+      /**
+       * Returns a reference to a matrix whose jth column contains the
+       * the x-coordinate of the unit normal vectors for each face point.
+       */
+      const real_matrix_type & get_nx() const;
+
+      /**
+       * Returns a reference to a matrix whose jth column contains the
+       * the y-coordinate of the unit normal vectors for each face point.
+       */
+      const real_matrix_type & get_ny() const;
+
+      /**
+       * Returns a reference to the index-mask for the face nodes.
+       */
+      const index_vector_type & get_Fmask() const;
+
+      /**
+       * Returns a reference to the faces-only x-grid.
+       */
+      const real_matrix_type & get_Fx() const;
+
+      /**
+       * Returns a reference to the faces-only y-grid.
+       */
+      const real_matrix_type & get_Fy() const;
+
+      /**
+       * Returns a reference to the Face-scaling factor (inverse of Jacobian at face nodes).
+       */
+      const real_matrix_type & get_Fscale() const;
+
+      /**
+       * Returns a reference to the 2D lifting operator.
+       */
+      const real_matrix_type & get_Lift() const;
+
+      /**
+       * Returns a reference to the MeshManager.
+       */
+      const index_matrix_type & get_MeshManager() const;
+    
+      /**
+       * Returns a reference to the Element-To-Element connectivity table.
+       */
+      const index_matrix_type & get_EToE() const;
+
+      /**
+       * Returns a reference to the Element-to-Face connectivity table.
+       */
+      const index_matrix_type & get_EToF() const;
+
+      /**
+       * Returns a refernce to the volume to surface map, 'minus' traces.
+       */
+      const index_vector_type & get_vmapM() const;
+
+      /**
+       * Returns a reference to the volume to surface map, 'plus' traces.
+       */
+      const index_vector_type & get_vmapP() const;
+      
+      /**
+       * Returns the number of nodes local to a 2D triangular element.
+       */
+      index_type get_NumLocalPoints() const;
+
+      /**
+       * Returns the number of elements in the 2D grid.
+       */
+      index_type get_NumElements() const;
+
+  };
+} // namespace blitzdg
+
