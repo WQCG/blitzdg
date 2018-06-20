@@ -45,8 +45,23 @@ namespace blitzdg {
         vmapM{ new index_vector_type((_NOrder+1)*NumFaces*NumElements) },
         vmapP{ new index_vector_type((_NOrder+1)*NumFaces*NumElements) },
         Mesh2D { _MeshManager },
-        Nodes1D{ new Nodes1DProvisioner(_NOrder, NumElements, -1.0, 1.0) }
+        Nodes1D{ new Nodes1DProvisioner(_NOrder, NumElements, -1.0, 1.0) },
+		Jacobi{}
     {}
+
+
+	void TriangleNodesProvisioner::evaluateSimplexPolynomial(const real_vector_type & a, const real_vector_type & b, const index_type i, const index_type j, real_vector_type & p) {
+		real_vector_type h1(a.length(0));
+		real_vector_type h2(b.length(0));
+
+		Jacobi.computeJacobiPolynomial(a, 0.0, 0.0, i, h1);
+		Jacobi.computeJacobiPolynomial(b, 2.0*i+1.0, 0.0, j, h2);
+
+		real_vector_type c(b.length(0));
+
+		p = sqrt(2.0)*h1*h2*pow(1.-b, i);
+	}
+
 
     void TriangleNodesProvisioner::buildVandermondeMatrix() {
     }

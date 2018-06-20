@@ -64,6 +64,7 @@ namespace blitzdg {
       const MeshManager * Mesh2D;
       
       std::unique_ptr<Nodes1DProvisioner> Nodes1D;
+	  JacobiBuilders Jacobi;
 
   public:
       static const index_type NumFaces;
@@ -113,6 +114,12 @@ namespace blitzdg {
       * and Fscale using nodes and differentiation matrix.
       */
       void computeJacobian();
+
+	 /**
+	  * Evaluates the 2D orthonormal polynomial on the simplex at (a,b) of order (i,j).
+	  */
+	  void evaluateSimplexPolynomial(const real_vector_type & a, const real_vector_type & b, const index_type i, const index_type j, real_vector_type & p);
+
       
       /**
        * Returns a reference to a matrix whose jth column contains the
