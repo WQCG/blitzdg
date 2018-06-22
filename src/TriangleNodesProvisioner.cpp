@@ -62,6 +62,16 @@ namespace blitzdg {
 		p = sqrt(2.0)*h1*h2*pow(1.-b, i);
 	}
 
+    void TriangleNodesProvisioner::rsToab(const real_vector_type & r, const real_vector_type & s, real_vector_type & a, real_vector_type & b) {
+        int Np = r.length(0);
+        for( index_type i=0; i < Np; i++) {
+            if(s(i) != 1.0) 
+                a(i) = 2.0*(1.0+r(i))/(1.0-s(i)) - 1.0;
+            else
+                a(i) = -1.0;
+        }
+        b = s;
+    }
 
     void TriangleNodesProvisioner::buildVandermondeMatrix() {
     }

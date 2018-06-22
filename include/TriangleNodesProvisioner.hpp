@@ -115,11 +115,15 @@ namespace blitzdg {
       */
       void computeJacobian();
 
-	 /**
-	  * Evaluates the 2D orthonormal polynomial on the simplex at (a,b) of order (i,j).
-	  */
-	  void evaluateSimplexPolynomial(const real_vector_type & a, const real_vector_type & b, const index_type i, const index_type j, real_vector_type & p);
+     /**
+      * Evaluates the 2D orthonormal polynomial on the simplex at (a,b) of order (i,j).
+      */
+      void evaluateSimplexPolynomial(const real_vector_type & a, const real_vector_type & b, const index_type i, const index_type j, real_vector_type & p);
 
+     /**
+      * Map from (r,s) to (a,b) coordinates in the triangle.
+      */     
+      void rsToab(const real_vector_type & r, const real_vector_type & s, real_vector_type & a, real_vector_type & b);
       
       /**
        * Returns a reference to a matrix whose jth column contains the

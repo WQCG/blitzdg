@@ -59,11 +59,37 @@ namespace blitzdg {
 
 				triangleNodes.evaluateSimplexPolynomial(a, b, 1, 2, p);
 
-				cout << p << endl;
-
 				Assert::That(abs(p(0) - 0.133252242007405), IsLessThan(eps));
 				Assert::That(abs(p(1) - 0.355359724434270), IsLessThan(eps));
 				Assert::That(abs(p(2) - 0.637112282097905), IsLessThan(eps));
+            }
+
+			It(Should_Map_rs_Coords_To_ab) {
+                cout << "Should_Map_rs_Coords_To_ab" << endl;
+                TriangleNodesProvisioner & triangleNodes = *triangleNodesProvisioner;
+
+				real_vector_type r(3);
+				real_vector_type s(3);
+
+				r = -.1,.1,.2;
+				s = .2,.3,.5;
+
+				real_vector_type a(3);
+				real_vector_type b(3);
+
+
+				triangleNodes.rsToab(r, s, a, b);
+
+				cout << "a: " << a << endl;
+				cout << "b: " << b << endl;
+
+				Assert::That(abs(b(0) - 0.2), IsLessThan(eps));
+				Assert::That(abs(b(1) - 0.3), IsLessThan(eps));
+				Assert::That(abs(b(2) - 0.5), IsLessThan(eps));
+
+				Assert::That(abs(a(0) - 1.25), IsLessThan(eps));
+				Assert::That(abs(a(1) - 2.14285714285714), IsLessThan(eps));
+				Assert::That(abs(a(2) - 3.8), IsLessThan(eps));
             }
 		};
    } // namespace Nodes1DProvisionerTests
