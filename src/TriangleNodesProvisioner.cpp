@@ -46,7 +46,7 @@ namespace blitzdg {
         vmapP{ new index_vector_type((_NOrder+1)*NumFaces*NumElements) },
         Mesh2D { _MeshManager },
         Nodes1D{ new Nodes1DProvisioner(_NOrder, NumElements, -1.0, 1.0) },
-		Jacobi{}
+		Jacobi{}, Vandermonde{}, LinSolver{}
     {}
 
 
@@ -72,7 +72,70 @@ namespace blitzdg {
         }
         b = s;
     }
+    /*
+    % function [V2D] = Vandermonde2D(N, r, s);
+    % Purpose : Initialize the 2D Vandermonde Matrix,  V_{ij} = phi_j(r_i, s_i);
 
+    V2D = zeros(length(r),(N+1)*(N+2)/2);
+
+    % Transfer to (a,b) coordinates
+    [a, b] = rstoab(r, s);
+
+    % build the Vandermonde matrix
+    sk = 1;
+    for i=0:N
+    for j=0:N - i
+        V2D(:,sk) = Simplex2DP(a,b,i,j);
+        sk = sk+1;
+    end
+    end
+    return;
+    */
     void TriangleNodesProvisioner::buildVandermondeMatrix() {
+    }
+
+    void TriangleNodesProvisioner::buildNodes() {
+
+    }
+
+    void TriangleNodesProvisioner::computeWarpFactor(const real_vector_type & r, real_vector_type & warpFactor) const {
+        firstIndex ii;
+        secondIndex jj;
+
+        const int Np = NOrder+1;
+        const int Nr = r.length(0);
+
+        real_vector_type req(Np), rLGL(Np);
+        req = -1.0 + 2*ii/(Np-1.0);
+
+        Jacobi.computeGaussLobottoPoints(0.0, 0.0, NOrder, rLGL);
+
+        real_matrix_type Veq(Np,Np), Veqinv(Np,Np);
+        Vandermonde.computeVandermondeMatrix(req, Veq, Veqinv);
+
+        // Evaluate Lagrange polynomial at rout
+    
+        real_matrix_type P(Np, Nr), L(Np,Nr);
+        for (index_type i=0; i< Np; i++) {
+            real_vector_type p(Nr);
+            Jacobi.computeJacobiPolynomial(r, 0.0, 0.0, i, p);
+            P(i, Range::all()) = p;
+        }
+
+        std::cout << "P: " << P << std::endl;
+
+        real_matrix_type VeqT(Np,Np);
+        VeqT = Veq(jj,ii);
+
+        LinSolver.solve(VeqT, P,  L);
+
+        // warp = L^T * (rLGL - req)
+        warpFactor = sum(L(jj,ii)*(rLGL(jj) - req(jj)), jj);
+
+        // Scaling.
+        real_vector_type zf(Nr), sf(Nr);
+        zf = (abs(r) < 1.0-1e-10);
+        sf = 1.0 - (zf*r)*(zf*r); 
+        warpFactor = warpFactor / sf + warpFactor*(zf-1.0);
     }
 }

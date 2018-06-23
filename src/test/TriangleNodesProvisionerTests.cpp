@@ -9,12 +9,14 @@
 #include <blitz/array.h>
 #include <iostream>
 #include <limits>
+#include <cmath>
 
 using blitz::firstIndex;
 using blitz::secondIndex;
 using std::cout;
 using std::endl;
 using std::numeric_limits;
+using std::abs;
 
 namespace blitzdg {
     namespace TriangleNodesProvisionerTests {
@@ -28,7 +30,7 @@ namespace blitzdg {
 		TriangleNodesProvisioner * triangleNodesProvisioner = nullptr;
 
         Describe(Nodes1DProvisioner_Object) {
-			const real_type eps = 5.*numeric_limits<double>::epsilon();
+			const real_type eps = 20.*numeric_limits<double>::epsilon();
 			const float epsf = 5.8e-5;
 			const index_type NOrder = 3;
 			const index_type NumElements = 5;
@@ -91,6 +93,26 @@ namespace blitzdg {
 				Assert::That(abs(a(1) - 2.14285714285714), IsLessThan(eps));
 				Assert::That(abs(a(2) - 3.8), IsLessThan(eps));
             }
+
+			It(Should_Compute_Warp_Factor) {
+				cout << "Should_Compute_warpFactor" << endl;
+                TriangleNodesProvisioner & triangleNodes = *triangleNodesProvisioner;
+
+				real_vector_type r(3);
+				real_vector_type warp(3);
+				r = -.1,.1,.2;
+				warp = 0.0,0.0,0.0;
+
+				triangleNodes.computeWarpFactor(r, warp);
+
+				Assert::That(abs(warp(0) - -0.0384345884812357), IsLessThan(eps));
+				Assert::That(abs(warp(1) -  0.0384345884812359), IsLessThan(eps));
+				Assert::That(abs(warp(2) -  0.0768691769624717), IsLessThan(eps));
+
+				cout << warp(0) << endl;
+				cout << warp(1) << endl;
+				cout << warp(2) << endl;
+			}
 		};
    } // namespace Nodes1DProvisionerTests
 } // namespace blitzdg
