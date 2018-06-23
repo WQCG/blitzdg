@@ -12,6 +12,7 @@
 #include "DirectSolver.hpp"
 #include "JacobiBuilders.hpp"
 #include "DenseMatrixInverter.hpp"
+#include "VandermondeBuilders.hpp"
 #include "Types.hpp"
 #include <memory>
 
@@ -64,6 +65,7 @@ namespace blitzdg {
       DirectSolver LinSolver;
       JacobiBuilders Jacobi;
       DenseMatrixInverter Inverter;
+      VandermondeBuilders Vandermonde;
 
       /**
        * Builds the global connectivity matrices (EToE, EToF) for 1D grid
@@ -82,11 +84,6 @@ namespace blitzdg {
       void buildDr();
 
       /**
-       * Computes the Vandermonde matrix which maps modal coefficients to nodal values.
-       */
-      void buildVandermondeMatrix();
-
-      /**
        * Builds the lifting operator.
        */
       void buildLift();
@@ -101,12 +98,6 @@ namespace blitzdg {
        * 1D elements.
        */
       void buildNormals();
-
-      /**
-       * Builds the elementwise derivative of the Vandermonde matrix.
-       * @param[out] DVr Elementwise derivative of Vandermonde matrix.
-       */
-      void computeGradVandermonde(real_matrix_type& DVr) const;
 
     public:
       /**

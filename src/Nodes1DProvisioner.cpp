@@ -5,6 +5,7 @@
 #include "CSCMatrix.hpp"
 #include "BlitzHelpers.hpp"
 #include "DenseMatrixInverter.hpp"
+#include "VandermondeBuilders.hpp"
 #include "Types.hpp"
 #include <blitz/array.h>
 #include <cmath>
@@ -45,7 +46,7 @@ namespace blitzdg {
         EToF{ new index_matrix_type(NumElements, NumFaces) },
         vmapM{ new index_vector_type(NumFacePoints*NumFaces*NumElements) },
         vmapP{ new index_vector_type(NumFacePoints*NumFaces*NumElements) },
-        LinSolver{}, Jacobi{}, Inverter{}
+        LinSolver{}, Jacobi{}, Inverter{}, Vandermonde{}
     {}
 
     void Nodes1DProvisioner::buildNodes() {
@@ -55,8 +56,8 @@ namespace blitzdg {
         real_vector_type& r = *rGrid;
 
         Jacobi.computeGaussLobottoPoints(alpha, beta, NOrder, r);
-        
-        buildVandermondeMatrix();
+
+        Vandermonde.computeVandermondeMatrix(r, *V, *Vinv);
         buildDr();
         buildLift();
 
@@ -274,17 +275,6 @@ namespace blitzdg {
         }
     }
 
-    void Nodes1DProvisioner::buildVandermondeMatrix() {
-        real_matrix_type& Vref = *V;
-        real_vector_type p(NOrder+1);
-        for (index_type j=0; j <= NOrder; j++) {
-            Jacobi.computeJacobiPolynomial(*rGrid, 0.0, 0.0, j, p);
-            Vref(Range::all(), j) = p;
-        }
-
-        Inverter.computeInverse(Vref, *Vinv);
-    }
-
     void Nodes1DProvisioner::buildDr() {
         firstIndex ii;
         secondIndex jj;
@@ -295,7 +285,7 @@ namespace blitzdg {
         real_matrix_type DVr(NOrder+1, NOrder+1);
         DVr = 0.*jj;
 
-        computeGradVandermonde(DVr);
+        Vandermonde.computeGradVandermonde(*rGrid, DVr);
 
 		// Note: this is not a column major ordering trick. We need these transposes.
         real_matrix_type Vtrans(NOrder+1, NOrder+1);
@@ -403,13 +393,4 @@ namespace blitzdg {
         return vmapO;
     }
 
-    void Nodes1DProvisioner::computeGradVandermonde(real_matrix_type & DVr) const {
-        firstIndex ii;
-        real_vector_type dp(NOrder+1);
-        for (index_type i=0; i<=NOrder; i++) {
-            dp = 0.*ii;
-            Jacobi.computeGradJacobi(*rGrid, 0.0, 0.0, i, dp);
-            DVr(Range::all(), i) = dp;
-        }
-    }
 } // namespace blitzdg
