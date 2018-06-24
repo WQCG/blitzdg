@@ -107,11 +107,6 @@ namespace blitzdg {
       void buildNodes();
 
      /**
-      * Computes the 2D Vandermonde matrix which maps modal coefficients to nodal values.
-      */
-      void buildVandermondeMatrix();
-
-     /**
       * Computes the Jacobian (determinant), the geometric factor rx (dr/dx), 
       * and Fscale using nodes and differentiation matrix.
       */
@@ -120,18 +115,27 @@ namespace blitzdg {
      /**
       * Evaluates the 2D orthonormal polynomial on the simplex at (a,b) of order (i,j).
       */
-      void evaluateSimplexPolynomial(const real_vector_type & a, const real_vector_type & b, const index_type i, const index_type j, real_vector_type & p);
+      void evaluateSimplexPolynomial(const real_vector_type & a, const real_vector_type & b, const index_type i, const index_type j, real_vector_type & p) const;
 
      /**
       * Maps from (r,s) to (a,b) coordinates in the triangle.
       */     
-      void rsToab(const real_vector_type & r, const real_vector_type & s, real_vector_type & a, real_vector_type & b);
+      void rsToab(const real_vector_type & r, const real_vector_type & s, real_vector_type & a, real_vector_type & b) const;
       
 
      /**
       * Computes geometric warp function for interior nodes.
       */
       void computeWarpFactor(const real_vector_type & r, real_vector_type & warpFactor) const;
+
+     /**
+      * Computes the 2D Vandermonde matrix which maps modal coefficients to nodal values.
+      * @param[in] N Order of the approximating polynomials.
+      * @param[in] r 1st coordinate for standard triangle.
+      * @param[in] s 2nd coordinate for standard triangle.
+      * @param[out] V Vandermonde matrix.
+      */
+      void computeVandermondeMatrix(const int N, const real_vector_type & r, const real_vector_type & s, const real_matrix_type & V) const;
 
      /**
       * Returns a reference to a matrix whose jth column contains the

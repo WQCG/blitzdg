@@ -50,7 +50,7 @@ namespace blitzdg {
     {}
 
 
-	void TriangleNodesProvisioner::evaluateSimplexPolynomial(const real_vector_type & a, const real_vector_type & b, const index_type i, const index_type j, real_vector_type & p) {
+	void TriangleNodesProvisioner::evaluateSimplexPolynomial(const real_vector_type & a, const real_vector_type & b, const index_type i, const index_type j, real_vector_type & p) const {
 		real_vector_type h1(a.length(0));
 		real_vector_type h2(b.length(0));
 
@@ -62,7 +62,7 @@ namespace blitzdg {
 		p = sqrt(2.0)*h1*h2*pow(1.-b, i);
 	}
 
-    void TriangleNodesProvisioner::rsToab(const real_vector_type & r, const real_vector_type & s, real_vector_type & a, real_vector_type & b) {
+    void TriangleNodesProvisioner::rsToab(const real_vector_type & r, const real_vector_type & s, real_vector_type & a, real_vector_type & b) const {
         int Np = r.length(0);
         for( index_type i=0; i < Np; i++) {
             if(s(i) != 1.0) 
@@ -72,26 +72,23 @@ namespace blitzdg {
         }
         b = s;
     }
-    /*
-    % function [V2D] = Vandermonde2D(N, r, s);
-    % Purpose : Initialize the 2D Vandermonde Matrix,  V_{ij} = phi_j(r_i, s_i);
 
-    V2D = zeros(length(r),(N+1)*(N+2)/2);
+    void TriangleNodesProvisioner::computeVandermondeMatrix(const int N, const real_vector_type & r, const real_vector_type & s, const real_matrix_type & V) const {
+        const index_type Nr = r.length(0);
 
-    % Transfer to (a,b) coordinates
-    [a, b] = rstoab(r, s);
+        real_vector_type a(Nr), b(Nr);
+        rsToab(r, s, a, b);
 
-    % build the Vandermonde matrix
-    sk = 1;
-    for i=0:N
-    for j=0:N - i
-        V2D(:,sk) = Simplex2DP(a,b,i,j);
-        sk = sk+1;
-    end
-    end
-    return;
-    */
-    void TriangleNodesProvisioner::buildVandermondeMatrix() {
+        // build the Vandermonde matrix
+        index_type count = 0;
+        for (index_type i=0; i < N + 1; ++i) {
+            for (index_type j=0; j < N - i + 1; ++j) {
+                real_vector_type p(Nr);
+                evaluateSimplexPolynomial(a,b,i,j,p);
+                V(Range::all(),count) = p;
+                ++count;
+            }
+        }
     }
 
     void TriangleNodesProvisioner::buildNodes() {
