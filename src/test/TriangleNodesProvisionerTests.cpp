@@ -154,11 +154,38 @@ namespace blitzdg {
 
 				const int Np = (NOrder+1)*(NOrder+2)/2;
 
-				real_vector_type x(Np), y(Np);
+				real_vector_type x(Np), y(Np), expectedx(Np), expectedy(Np);
 				triangleNodes.computeEquilateralNodes(x, y);
 
-				cout << "x: " << x << endl;
-				cout << "y: " << y << endl;
+				expectedx = -1.000000000000000,
+							-0.447213595499958,
+							 0.447213595499958,
+							 1.000000000000000,
+							-0.723606797749979,
+							-0.000000000000000,
+							 0.723606797749979,
+							-0.276393202250021,
+							 0.276393202250021,
+							 0.000000000000000;
+
+				expectedy = -5.77350269189626e-01,
+							-5.77350269189626e-01,
+							-5.77350269189626e-01,
+							-5.77350269189626e-01,
+							-9.86232000259289e-02,
+							-9.67499238300623e-17,
+							-9.86232000259288e-02,
+							 6.75973469215554e-01,
+							 6.75973469215555e-01,
+							 1.15470053837925e+00;
+
+				real_vector_type resx(Np), resy(Np);
+
+				resx = x - expectedx;
+				resy = y - expectedy;
+
+				Assert::That(normInf(resx), IsLessThan(eps));
+				Assert::That(normInf(resy), IsLessThan(eps));
 			}
 		};
    } // namespace Nodes1DProvisionerTests

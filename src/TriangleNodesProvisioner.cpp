@@ -113,12 +113,16 @@ namespace blitzdg {
 
         for (index_type n=1; n <= NOrder+1; ++n) {
             for (index_type m=1; m <= NOrder+2-n; ++m) {
-                L1(count) = (n-1)/NOrder;
-                L3(count) = (m-1)/NOrder;
+                L1(count) = (n-1.0)/NOrder;
+                L3(count) = (m-1.0)/NOrder;
                 ++count;
             }
         }
         L2 = 1.0 - L1 - L3;
+
+        std::cout << "L1: " << L1 << std::endl;
+        std::cout << "L2: " << L2 << std::endl;
+        std::cout << "L3: " << L3 << std::endl;
 
         x = -L2+L3; 
         y = (-L2-L3+2*L1)/sqrt(3.0);
