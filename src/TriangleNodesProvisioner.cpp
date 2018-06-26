@@ -6,6 +6,7 @@
 #include "BlitzHelpers.hpp"
 #include "DenseMatrixInverter.hpp"
 #include "MeshManager.hpp"
+#include "Constants.hpp"
 #include "Types.hpp"
 #include <blitz/array.h>
 #include <cmath>
@@ -23,6 +24,7 @@ using std::unique_ptr;
 namespace blitzdg {
     const index_type TriangleNodesProvisioner::NumFaces = 3;
     const real_type TriangleNodesProvisioner::NodeTol = 1.e-5;
+    const real_type pi = blitzdg::constants::pi;
 
     TriangleNodesProvisioner::TriangleNodesProvisioner(index_type _NOrder, index_type _NumElements, const MeshManager * _MeshManager) 
         : NumElements{ _NumElements }, NOrder{ _NOrder },
@@ -91,8 +93,58 @@ namespace blitzdg {
         }
     }
 
-    void TriangleNodesProvisioner::buildNodes() {
+    void TriangleNodesProvisioner::computeEquilateralNodes(real_vector_type & x, real_vector_type & y) const {
+        real_vector_type alphaOptimal(15);
 
+        alphaOptimal = 0.0000,0.0000,1.4152,0.1001,0.2751,0.9800,1.0999,
+                       1.2832,1.3648,1.4773,1.4959,1.5743, 1.5770,1.6223,1.6258;
+
+        double alpha = 2.0/3.0;
+        if (NOrder < 16) {
+            alpha = alphaOptimal(NOrder-1);
+        }
+
+        const int Np = (NOrder+1)*(NOrder+2)/2;
+
+        // Create equidistributed nodes on equilateral triangle.
+        real_vector_type L1(Np), L2(Np), L3(Np);
+
+        index_type count = 0;
+
+        for (index_type n=1; n <= NOrder+1; ++n) {
+            for (index_type m=1; m <= NOrder+2-n; ++m) {
+                L1(count) = (n-1)/NOrder;
+                L3(count) = (m-1)/NOrder;
+                ++count;
+            }
+        }
+        L2 = 1.0 - L1 - L3;
+
+        x = -L2+L3; 
+        y = (-L2-L3+2*L1)/sqrt(3.0);
+
+        // Compute blending function at each node for each edge.
+        real_vector_type blend1(Np), blend2(Np), blend3(Np);
+        blend1 = 4*L2*L3; 
+        blend2 = 4*L1*L3; 
+        blend3 = 4*L1*L2;
+
+        // Amount of warp for each node, for each edge.
+        real_vector_type warpf1(Np), warpf2(Np), warpf3(Np), temp(Np);
+
+        temp = L3 - L2; computeWarpFactor(temp, warpf1);
+        temp = L1 - L3; computeWarpFactor(temp, warpf2);
+        temp = L2 - L1; computeWarpFactor(temp, warpf3);
+
+        // Combine blend & warp
+        real_vector_type warp1(Np), warp2(Np), warp3(Np);
+        warp1 = blend1*warpf1*(1 + (alpha*L1)*(alpha*L1));
+        warp2 = blend2*warpf2*(1 + (alpha*L2)*(alpha*L2));
+        warp3 = blend3*warpf3*(1 + (alpha*L3)*(alpha*L3));
+
+        // Accumulate deformations associated with each edge.
+        x = x + 1*warp1 + cos(2*pi/3)*warp2 + cos(4*pi/3)*warp3;
+        y = y + 0*warp1 + sin(2*pi/3)*warp2 + sin(4*pi/3)*warp3;
     }
 
     void TriangleNodesProvisioner::computeWarpFactor(const real_vector_type & r, real_vector_type & warpFactor) const {
@@ -110,16 +162,13 @@ namespace blitzdg {
         real_matrix_type Veq(Np,Np), Veqinv(Np,Np);
         Vandermonde.computeVandermondeMatrix(req, Veq, Veqinv);
 
-        // Evaluate Lagrange polynomial at rout
-    
+        // Evaluate Lagrange polynomial at r.
         real_matrix_type P(Np, Nr), L(Np,Nr);
         for (index_type i=0; i< Np; i++) {
             real_vector_type p(Nr);
             Jacobi.computeJacobiPolynomial(r, 0.0, 0.0, i, p);
             P(i, Range::all()) = p;
         }
-
-        std::cout << "P: " << P << std::endl;
 
         real_matrix_type VeqT(Np,Np);
         VeqT = Veq(jj,ii);

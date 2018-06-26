@@ -102,9 +102,9 @@ namespace blitzdg {
 
 
      /**
-      * Builds the nodes and all geometric factors for each element.
+      * Compute (x,y) nodes in equilateral triangle for polynomial of order N.
       */
-      void buildNodes();
+      void computeEquilateralNodes(real_vector_type & x, real_vector_type & y) const;
 
      /**
       * Computes the Jacobian (determinant), the geometric factor rx (dr/dx), 

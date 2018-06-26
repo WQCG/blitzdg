@@ -146,6 +146,20 @@ namespace blitzdg {
 				res = V-V_expected;
 				Assert::That(normFro(res), IsLessThan(epsf));
 			}
+
+			It(Should_Compute_Equilateral_Nodes) {
+				cout << "Should_Compute_Equilateral_Nodes" << endl;
+
+				TriangleNodesProvisioner & triangleNodes = *triangleNodesProvisioner;
+
+				const int Np = (NOrder+1)*(NOrder+2)/2;
+
+				real_vector_type x(Np), y(Np);
+				triangleNodes.computeEquilateralNodes(x, y);
+
+				cout << "x: " << x << endl;
+				cout << "y: " << y << endl;
+			}
 		};
    } // namespace Nodes1DProvisionerTests
 } // namespace blitzdg
