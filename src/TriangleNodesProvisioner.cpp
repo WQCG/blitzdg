@@ -120,10 +120,6 @@ namespace blitzdg {
         }
         L2 = 1.0 - L1 - L3;
 
-        std::cout << "L1: " << L1 << std::endl;
-        std::cout << "L2: " << L2 << std::endl;
-        std::cout << "L3: " << L3 << std::endl;
-
         x = -L2+L3; 
         y = (-L2-L3+2*L1)/sqrt(3.0);
 
