@@ -150,9 +150,10 @@ namespace blitzdg {
 
         // Combine blend & warp
         real_vector_type warp1(Np), warp2(Np), warp3(Np);
-        warp1 = blend1*warpf1*(1 + (alpha*L1)*(alpha*L1));
-        warp2 = blend2*warpf2*(1 + (alpha*L2)*(alpha*L2));
-        warp3 = blend3*warpf3*(1 + (alpha*L3)*(alpha*L3));
+		const real_type alphaSquared = alpha*alpha;
+        warp1 = blend1*warpf1*(1 + alphaSquared*L1*L1);
+        warp2 = blend2*warpf2*(1 + alphaSquared*L2*L2);
+        warp3 = blend3*warpf3*(1 + alphaSquared*L3*L3);
 
         // Accumulate deformations associated with each edge.
         x = x + 1*warp1 + cos(2*pi/3)*warp2 + cos(4*pi/3)*warp3;
