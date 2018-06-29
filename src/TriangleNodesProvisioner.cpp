@@ -111,12 +111,12 @@ namespace blitzdg {
         alphaOptimal = 0.0000,0.0000,1.4152,0.1001,0.2751,0.9800,1.0999,
                        1.2832,1.3648,1.4773,1.4959,1.5743, 1.5770,1.6223,1.6258;
 
-        double alpha = 2.0/3.0;
+        real_type alpha = 2.0/3.0;
         if (NOrder < 16) {
             alpha = alphaOptimal(NOrder-1);
         }
 
-        const int Np = (NOrder+1)*(NOrder+2)/2;
+        const index_type Np = (NOrder+1)*(NOrder+2)/2;
 
         // Create equidistributed nodes on equilateral triangle.
         real_vector_type L1(Np), L2(Np), L3(Np);
