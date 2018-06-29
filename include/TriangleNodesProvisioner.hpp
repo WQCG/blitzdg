@@ -115,7 +115,7 @@ namespace blitzdg {
      /**
       * Evaluates the 2D orthonormal polynomial on the simplex at (a,b) of order (i,j).
       */
-      void evaluateSimplexPolynomial(const real_vector_type & a, const real_vector_type & b, const index_type i, const index_type j, real_vector_type & p) const;
+      void evaluateSimplexPolynomial(const real_vector_type & a, const real_vector_type & b, index_type i, index_type j, real_vector_type & p) const;
 
      /**
       * Maps from (r,s) to (a,b) coordinates in the triangle.
@@ -139,7 +139,7 @@ namespace blitzdg {
       * @param[in] s 2nd coordinate for standard triangle.
       * @param[out] V Vandermonde matrix.
       */
-      void computeVandermondeMatrix(const int N, const real_vector_type & r, const real_vector_type & s, const real_matrix_type & V) const;
+      void computeVandermondeMatrix(int N, const real_vector_type & r, const real_vector_type & s, const real_matrix_type & V) const;
 
      /**
       * Returns a reference to a matrix whose jth column contains the

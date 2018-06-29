@@ -52,7 +52,7 @@ namespace blitzdg {
     {}
 
 
-	void TriangleNodesProvisioner::evaluateSimplexPolynomial(const real_vector_type & a, const real_vector_type & b, const index_type i, const index_type j, real_vector_type & p) const {
+	void TriangleNodesProvisioner::evaluateSimplexPolynomial(const real_vector_type & a, const real_vector_type & b, index_type i, index_type j, real_vector_type & p) const {
 		real_vector_type h1(a.length(0));
 		real_vector_type h2(b.length(0));
 
@@ -87,7 +87,7 @@ namespace blitzdg {
     }
 
 
-    void TriangleNodesProvisioner::computeVandermondeMatrix(const int N, const real_vector_type & r, const real_vector_type & s, const real_matrix_type & V) const {
+    void TriangleNodesProvisioner::computeVandermondeMatrix(int N, const real_vector_type & r, const real_vector_type & s, const real_matrix_type & V) const {
         const index_type Nr = r.length(0);
 
         real_vector_type a(Nr), b(Nr);
