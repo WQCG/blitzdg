@@ -156,8 +156,8 @@ namespace blitzdg {
         warp3 = blend3*warpf3*(1 + alphaSquared*L3*L3);
 
         // Accumulate deformations associated with each edge.
-        x = x + 1*warp1 + cos(2*pi/3)*warp2 + cos(4*pi/3)*warp3;
-        y = y + 0*warp1 + sin(2*pi/3)*warp2 + sin(4*pi/3)*warp3;
+        x += + 1*warp1 + cos(2*pi/3)*warp2 + cos(4*pi/3)*warp3;
+        y += + 0*warp1 + sin(2*pi/3)*warp2 + sin(4*pi/3)*warp3;
     }
 
     void TriangleNodesProvisioner::computeWarpFactor(const real_vector_type & r, real_vector_type & warpFactor) const {
