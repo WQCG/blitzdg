@@ -121,7 +121,11 @@ namespace blitzdg {
       * Maps from (r,s) to (a,b) coordinates in the triangle.
       */     
       void rsToab(const real_vector_type & r, const real_vector_type & s, real_vector_type & a, real_vector_type & b) const;
-      
+
+     /**
+      * Maps from (x,y) in the equilateral triangle to (r,s) coordinates in standard triangle
+      */
+      void xyTors(const real_vector_type & x, const real_vector_type & y, real_vector_type & r, real_vector_type & s) const;
 
      /**
       * Computes geometric warp function for interior nodes.

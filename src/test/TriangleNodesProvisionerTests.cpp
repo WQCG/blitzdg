@@ -79,7 +79,6 @@ namespace blitzdg {
 				real_vector_type a(3);
 				real_vector_type b(3);
 
-
 				triangleNodes.rsToab(r, s, a, b);
 
 				cout << "a: " << a << endl;
@@ -93,6 +92,26 @@ namespace blitzdg {
 				Assert::That(abs(a(1) - 2.14285714285714), IsLessThan(eps));
 				Assert::That(abs(a(2) - 3.8), IsLessThan(eps));
             }
+
+			It(Should_Map_xy_Coords_To_rs) {
+                cout << "Should_Map_xy_Coords_To_rs" << endl;
+                TriangleNodesProvisioner & triangleNodes = *triangleNodesProvisioner;
+
+				real_vector_type x(3), y(3), r(3), s(3);
+
+				x = 0.5,0.6,0.7;
+				y = 0.2,0.3,0.4;
+
+				triangleNodes.xyTors(x, y, r, s);
+
+				Assert::That(abs(r(0) -  0.0511966128287416), IsLessThan(eps));
+				Assert::That(abs(r(1) -  0.0934615859097789), IsLessThan(eps));
+				Assert::That(abs(r(2) -  0.1357265589908162), IsLessThan(eps));
+
+				Assert::That(abs(s(0) - -0.1023932256574831), IsLessThan(eps));
+				Assert::That(abs(s(1) -  0.0130768281804420), IsLessThan(eps));
+				Assert::That(abs(s(2) -  0.1285468820183672), IsLessThan(eps));
+			}
 
 			It(Should_Compute_Warp_Factor) {
 				cout << "Should_Compute_warpFactor" << endl;

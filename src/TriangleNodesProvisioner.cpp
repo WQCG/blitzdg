@@ -75,6 +75,18 @@ namespace blitzdg {
         b = s;
     }
 
+    void TriangleNodesProvisioner::xyTors(const real_vector_type & x, const real_vector_type & y, real_vector_type & r, real_vector_type & s) const {
+        const index_type Np = x.length(0);
+        real_vector_type L1(Np), L2(Np), L3(Np);
+        L1 = (sqrt(3.0)*y+1.0)/3.0;
+        L2 = (-3.0*x - sqrt(3.0)*y + 2.0)/6.0;
+        L3 = ( 3.0*x - sqrt(3.0)*y + 2.0)/6.0;
+
+        r =-L2 + L3 - L1;
+        s =-L2 - L3 + L1;
+    }
+
+
     void TriangleNodesProvisioner::computeVandermondeMatrix(const int N, const real_vector_type & r, const real_vector_type & s, const real_matrix_type & V) const {
         const index_type Nr = r.length(0);
 
