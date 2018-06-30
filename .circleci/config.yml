@@ -27,3 +27,6 @@ jobs:
       - run:
           name: Valgrind
           command: for filename in bin/* ; do valgrind --error-exitcode=1 --leak-check=full --track-origins=yes "$filename"; done
+      - run:
+          name: Code Coverage
+          command: coveralls --exclude include/igloo --gcov-options '\-lp'
