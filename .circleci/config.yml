@@ -20,7 +20,7 @@ jobs:
           command: CXX=clang++ make -j4 && make clean
       - run:
           name: Build (gcc)
-          command: CXX=g++ make -j4
+          command: CXX='g++ -Og' make -j4
       - run:
           name: Test
           command: make test
