@@ -51,7 +51,7 @@ test: $(BINDIR)/test
 
 $(VALGRINDTARGETS): $(TARGETS)
 	@mkdir -p artifacts
-	@echo "$(VALGRIND) --log-file=$@ $<"; $(VALGRIND) --log-file="$@" $<
+	@echo "$(VALGRIND) --log-file=$@ $<"; $(VALGRIND) --log-file="$@" $< ; cat $@
 
 valgrind: $(VALGRINDTARGETS)
 
