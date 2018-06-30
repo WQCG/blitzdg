@@ -9,6 +9,7 @@ SRCEXT := cpp
 
 TARGETS := $(patsubst src/,,$(patsubst src/%/,bin/%,$(sort $(dir $(wildcard src/**/)))))
 BUILDDIRS := $(subst bin,build,$(TARGETS))
+VALGRINDTARGETS :=$(patsubst bin/%,artifacts/%,$(TARGETS:%=%.log))
 
 COMMONSOURCES := $(wildcard $(SRCDIR)/*.$(SRCEXT))
 COMMONOBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(COMMONSOURCES:.$(SRCEXT)=.o))
@@ -24,6 +25,7 @@ LINKERFLAGS := -fprofile-arcs
 INC := -I include -I /usr/include
 LIB := -L lib -lblitz -lmetis -lumfpack -lcxsparse -llapack -lblas
 EXPLICITLIBS := -lgfortran -lcholmod -lamd -lcolamd -lquadmath -lsuitesparseconfig
+VALGRIND := valgrind --error-exitcode=1 --leak-check=full --track-origins=yes
 
 ifeq ($(OS), Windows_NT)
 	LIB += $(EXPLICITLIBS)
@@ -44,8 +46,14 @@ clean:
 	@echo " Cleaning...";
 	@echo " $(RM) -r $(BUILDDIR) $(BINDIR)"; $(RM) -r $(BUILDDIR) $(BINDIR)
 
-test: bin/test
-	@bin/test
+test: $(BINDIR)/test
+	@$(BINDIR)/test
+
+$(VALGRINDTARGETS): $(TARGETS)
+	@mkdir -p artifacts
+	@echo "$(VALGRIND) --log-file=$@ $<"; $(VALGRIND) --log-file="$@" $<
+
+valgrind: $(VALGRINDTARGETS)
 
 get-deps:
 	@sudo /bin/bash pull-deps.sh
@@ -56,4 +64,4 @@ docs:
 	@doxygen -u doxygen.conf
 	@doxygen doxygen.conf
 
-.PHONY: clean docs
+.PHONY: clean docs valgrind
