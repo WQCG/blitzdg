@@ -13,8 +13,11 @@ jobs:
                    rm -rf igloo-igloo.1.1.1 &&
                    rm igloo.1.1.1.tar.gz
       - run:
-          name: Build
-          command: make -j4
+          name: Build (clang)
+          command: CXX=clang++ make -j4 && make clean
+      - run:
+          name: Build (gcc)
+          command: CXX=g++ make -j4
       - run:
           name: Test
           command: make test
