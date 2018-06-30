@@ -51,12 +51,12 @@ test: $(BINDIR)/test
 
 artifacts/%.log: $(BINDIR)/%
 	@mkdir -p artifacts
-	@echo "$(VALGRIND) --log-file=$@ $<"; $(VALGRIND) --log-file="$@" $<
+	@echo "$(VALGRIND) --log-file=$@ $<"; $(VALGRIND) --log-file="$@" $< > $@.out
 
 valgrind: $(VALGRINDTARGETS)
 
 valgrind-print: $(VALGRINDTARGETS)
-	@cat $(VALGRINDTARGETS)
+	@cat artifacts/*
 
 get-deps:
 	@sudo /bin/bash pull-deps.sh
