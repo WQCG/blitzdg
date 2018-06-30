@@ -1,4 +1,7 @@
 language: cpp
+addons:
+  apt:
+    update: true
 install: make get-deps
 script:
   - make docs
