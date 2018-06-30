@@ -2,12 +2,31 @@ version: 2
 jobs:
   build:
     docker:
-      - image: debian:stretch
+      - image: dsteinmoeller/blitzdg-circle:0.10
+    environment:
+      EXTRACFLAGS: "-Wno-deprecated-declarations"
+
     steps:
       - checkout
       - run:
-          name: Build
-          command: make
+          name: Pull Igloo
+          command: curl -fSL https://github.com/joakimkarlsson/igloo/archive/igloo.1.1.1.tar.gz -o ./igloo.1.1.1.tar.gz &&
+                   tar xzf ./igloo.1.1.1.tar.gz &&
+                   cp -r igloo-igloo.1.1.1/igloo include/. &&
+                   rm -rf igloo-igloo.1.1.1 &&
+                   rm igloo.1.1.1.tar.gz
+      - run:
+          name: Build (clang)
+          command: CXX=clang++ make -j4 && make clean
+      - run:
+          name: Build (gcc)
+          command: CXX='g++ -Og' make -j4
       - run:
           name: Test
           command: make test
+      - run:
+          name: Valgrind
+          command: make -j4 valgrind && make valgrind-print
+      - run:
+          name: Code Coverage
+          command: coveralls --exclude include/igloo --gcov-options '\-lp'
