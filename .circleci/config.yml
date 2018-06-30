@@ -7,10 +7,10 @@ jobs:
       - checkout
       - run:
           name: Pull Igloo
-          command: curl -fSL https://github.com/joakimkarlsson/igloo/archive/igloo.1.1.1.tar.gz -o ./igloo.1.1.1.tar.gz
-                    tar xzf ./igloo.1.1.1.tar.gz
-                    cp -r igloo-igloo.1.1.1/igloo include/.
-                    rm -rf igloo-igloo.1.1.1
+          command: curl -fSL https://github.com/joakimkarlsson/igloo/archive/igloo.1.1.1.tar.gz -o ./igloo.1.1.1.tar.gz && \
+                    tar xzf ./igloo.1.1.1.tar.gz && \
+                    cp -r igloo-igloo.1.1.1/igloo include/. && \
+                    rm -rf igloo-igloo.1.1.1 && \
                     rm igloo.1.1.1.tar.gz
       - run:
           name: Build
@@ -20,6 +20,6 @@ jobs:
           command: make test
       - run:
           name: Valgrind
-          command: for filename in bin/* ; do
-                     valgrind --error-exitcode=1 --leak-check=full --track-origins=yes "$filename";
+          command: for filename in bin/* ; do \
+                     valgrind --error-exitcode=1 --leak-check=full --track-origins=yes "$filename"; \
                    done
