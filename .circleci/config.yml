@@ -26,7 +26,7 @@ jobs:
           command: make test
       - run:
           name: Valgrind
-          command: make -j4 valgrind
+          command: make -j4 valgrind && make valgrind-print
       - run:
           name: Code Coverage
           command: coveralls --exclude include/igloo --gcov-options '\-lp'

@@ -51,9 +51,12 @@ test: $(BINDIR)/test
 
 $(VALGRINDTARGETS): $(TARGETS)
 	@mkdir -p artifacts
-	@echo "$(VALGRIND) --log-file=$@ $<"; $(VALGRIND) --log-file="$@" $< ; cat $@
+	@echo "$(VALGRIND) --log-file=$@ $<"; $(VALGRIND) --log-file="$@" $<
 
 valgrind: $(VALGRINDTARGETS)
+
+valgrind-print: $(VALGRINDTARGETS)
+	@cat $(VALGRINDTARGETS)
 
 get-deps:
 	@sudo /bin/bash pull-deps.sh
@@ -64,4 +67,4 @@ docs:
 	@doxygen -u doxygen.conf
 	@doxygen doxygen.conf
 
-.PHONY: clean docs valgrind
+.PHONY: clean docs valgrind valgrind-print
