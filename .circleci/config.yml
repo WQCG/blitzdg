@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: gcc:7.3.0
+      - image: dsteinmoeller/blitzdg-circle:0.10
     steps:
       - checkout
       - run:
