@@ -4,7 +4,7 @@ jobs:
     docker:
       - image: dsteinmoeller/blitzdg-circle:0.10
     environment:
-      EXTRACFLAGS: "-Wno-deprecated-declarations -Og"
+      EXTRACFLAGS: "-Wno-deprecated-declarations"
 
     steps:
       - checkout
