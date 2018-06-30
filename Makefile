@@ -49,7 +49,7 @@ clean:
 test: $(BINDIR)/test
 	@$(BINDIR)/test
 
-$(VALGRINDTARGETS): $(TARGETS)
+artifacts/%.log: $(BINDIR)/%
 	@mkdir -p artifacts
 	@echo "$(VALGRIND) --log-file=$@ $<"; $(VALGRIND) --log-file="$@" $<
 
