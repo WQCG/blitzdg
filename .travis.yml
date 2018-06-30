@@ -1,24 +1,7 @@
 language: cpp
-addons:
-  apt:
-    update: true
-before_install:
-  - pip install --user cpp-coveralls
-install: make get-deps && ./configure
+install: make get-deps
 script:
-  - |
-    CXX=clang++ make test && make clean && \
-    CXX=g++ make test && \
-    for filename in bin/* ; do \
-      valgrind --error-exitcode=1 --leak-check=full --track-origins=yes "$filename"; \
-    done
-after_success:
   - make docs
-  - coveralls --exclude include/igloo --gcov-options '\-lp'
-sudo: required
-env:
-  global:
-    - EXTRACFLAGS=-Wno-deprecated-declarations
 
 deploy:
   provider: pages
@@ -29,3 +12,4 @@ deploy:
   verbose: true
   on:
     branch: master
+sudo: required
