@@ -1,0 +1,13 @@
+FROM gcc:7.3.0
+
+ENV DEBIAN_FRONTEND noninteractive
+ENV TERM linux 
+RUN apt-get -y update
+RUN apt-get -y install apt-utils
+RUN apt-get -y install curl
+RUN update-alternatives --install /usr/bin/gfortran gfortran /usr/local/bin/gfortran 999
+RUN apt-get -y install libsuitesparse-dev
+RUN apt-get -y install libmetis-dev
+RUN apt-get -y install libboost-dev 
+
+ENTRYPOINT ["/bin/bash"]
