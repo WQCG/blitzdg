@@ -11,3 +11,10 @@ jobs:
       - run:
           name: Test
           command: make test
+      - run:
+          name: Valgrind
+          command:
+            - |
+              for filename in bin/* ; do \
+                valgrind --error-exitcode=1 --leak-check=full --track-origins=yes "$filename"; \
+              done
