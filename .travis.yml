@@ -2,23 +2,21 @@ language: cpp
 addons:
   apt:
     update: true
-before_install:
-  - pip install --user cpp-coveralls
-install: make get-deps && ./configure
-script:
+install:
   - |
-    CXX=clang++ make test && make clean && \
-    CXX=g++ make test && \
-    for filename in bin/* ; do \
-      valgrind --error-exitcode=1 --leak-check=full --track-origins=yes "$filename"; \
-    done
-after_success:
+    sudo apt-get -y install graphviz texlive-latex-base ghostscript texlive-generic-recommended
+    sudo apt-get -y install cmake
+    git clone https://github.com/doxygen/doxygen.git doxrepo
+    mkdir -p doxrepo/build
+    cd doxrepo/build
+    export CC=/usr/bin/gcc
+    cmake -G "Unix Makefiles" ..
+    make
+    sudo make install
+    cd ../..
+    rm -rf doxrepo
+script:
   - make docs
-  - coveralls --exclude include/igloo --gcov-options '\-lp'
-sudo: required
-env:
-  global:
-    - EXTRACFLAGS=-Wno-deprecated-declarations
 
 deploy:
   provider: pages
@@ -29,3 +27,4 @@ deploy:
   verbose: true
   on:
     branch: master
+sudo: required
