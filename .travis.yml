@@ -4,15 +4,15 @@ addons:
     update: true
 install:
   - |
-    apt-get -y install graphviz texlive-latex-base ghostscript texlive-generic-recommended
-    apt-get -y install cmake
+    sudo apt-get -y install graphviz texlive-latex-base ghostscript texlive-generic-recommended
+    sudo apt-get -y install cmake
     git clone https://github.com/doxygen/doxygen.git doxrepo
     mkdir -p doxrepo/build
     cd doxrepo/build
     export CC=/usr/bin/gcc
     cmake -G "Unix Makefiles" ..
     make
-    make install
+    sudo make install
     cd ../..
     rm -rf doxrepo
 script:
