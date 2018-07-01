@@ -197,4 +197,38 @@ namespace blitzdg {
         sf = 1.0 - (zf*r)*(zf*r); 
         warpFactor = warpFactor / sf + warpFactor*(zf-1.0);
     }
+
+    void TriangleNodesProvisioner::evaluateGradSimplex(const real_vector_type & a, const real_vector_type & b, index_type id, index_type jd, real_vector_type & dpdr, real_vector_type & dpds) const {
+        const int Np = a.length(0);
+
+        real_vector_type fa(Np), gb(Np), dfa(Np), dgb(Np), tmp(Np);
+
+        Jacobi.computeJacobiPolynomial(a, 0.,       0., id, fa);
+        Jacobi.computeJacobiPolynomial(b, 2.*id+1., 0., jd, gb);
+
+        Jacobi.computeGradJacobi(a,       0., 0., id, dfa);
+        Jacobi.computeGradJacobi(b, 2.*id+1., 0., jd, dgb);
+
+        // r-derivative
+        // d/dr = da/dr d/da + db/dr d/db = (2/(1-s)) d/da = (2/(1-b)) d/da
+        dpdr = dfa*gb;
+        if (id > 0)
+            dpdr *= pow(0.5*(1.-b), id-1);
+
+        // s-derivative
+        // d/ds = ((1+a)/2)/((1-b)/2) d/da + d/db
+        dpds = dfa*(gb*(0.5*(1+a)));
+        if ( id > 0 )
+            dpds *= pow(0.5*(1.-b), id-1);
+
+        tmp = dgb*pow(0.5*(1.-b), id);
+        if( id > 0 )
+            tmp -= 0.5*id*gb*pow(0.5*(1-b), id-1);
+
+        dpds += fa*tmp;
+
+        // Normalize
+        dpdr = pow(2., id+0.5)*dpdr; 
+        dpds = pow(2., id+0.5)*dpds;
+    }
 }

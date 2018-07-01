@@ -118,6 +118,11 @@ namespace blitzdg {
       void evaluateSimplexPolynomial(const real_vector_type & a, const real_vector_type & b, index_type i, index_type j, real_vector_type & p) const;
 
      /**
+      * Evaluates the gradient of the 2D orthonormal polynomial of index (id,jd) on the simplex at (a,b).
+      */
+      void evaluateGradSimplex(const real_vector_type & a, const real_vector_type & b, index_type id, index_type jd, real_vector_type & dpdr, real_vector_type & dpds) const;
+
+     /**
       * Maps from (r,s) to (a,b) coordinates in the triangle.
       */     
       void rsToab(const real_vector_type & r, const real_vector_type & s, real_vector_type & a, real_vector_type & b) const;

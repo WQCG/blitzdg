@@ -30,7 +30,7 @@ namespace blitzdg {
 		TriangleNodesProvisioner * triangleNodesProvisioner = nullptr;
 
         Describe(Nodes1DProvisioner_Object) {
-			const real_type eps = 20.*numeric_limits<double>::epsilon();
+			const real_type eps = 5.e1*numeric_limits<double>::epsilon();
 			const float epsf = 5.8e-5;
 			const index_type NOrder = 3;
 			const index_type NumElements = 5;
@@ -205,6 +205,46 @@ namespace blitzdg {
 
 				Assert::That(normInf(resx), IsLessThan(eps));
 				Assert::That(normInf(resy), IsLessThan(eps));
+			}
+
+			It(Should_Compute_Gradient_Of_Simplex_Polynomials) {
+				cout << "Should_Compute_Gradient_Of_Simplex_Polynomials" << endl;
+
+				TriangleNodesProvisioner & triangleNodes = *triangleNodesProvisioner;
+
+				const int Np = (NOrder+1)*(NOrder+2)/2;
+
+				real_vector_type a(Np), b(Np), dpdr(Np), dpds(Np), x(Np), y(Np), r(Np), s(Np);
+
+				triangleNodes.computeEquilateralNodes(x, y);
+
+				triangleNodes.xyTors(x, y, r, s);
+
+				triangleNodes.rsToab(r, s, a, b);
+
+				triangleNodes.evaluateGradSimplex(a, b, 1, 2, dpdr, dpds);
+
+				Assert::That(dpdr(0) -  2.44948974278318, IsLessThan(eps));
+				Assert::That(dpdr(1) -  2.44948974278318, IsLessThan(eps));
+				Assert::That(dpdr(2) -  2.44948974278318, IsLessThan(eps));
+				Assert::That(dpdr(3) -  2.44948974278318, IsLessThan(eps));
+				Assert::That(dpdr(4) - -1.74516635192836, IsLessThan(eps));
+				Assert::That(dpdr(5) - -1.63299316185545, IsLessThan(eps));
+				Assert::That(dpdr(6) - -1.74516635192836, IsLessThan(eps));
+				Assert::That(dpdr(7) -  8.11383968316462, IsLessThan(eps));
+				Assert::That(dpdr(8) -  8.11383968316462, IsLessThan(eps));
+				Assert::That(dpdr(9) -  24.49489742783178, IsLessThan(eps));
+
+				Assert::That(dpds(0) -  15.921683328090657, IsLessThan(eps));
+				Assert::That(dpds(1) -  7.797415561453585, IsLessThan(eps));
+				Assert::That(dpds(2) - -5.347925818670407, IsLessThan(eps));
+				Assert::That(dpds(3) - -13.472193585307480, IsLessThan(eps));
+				Assert::That(dpds(4) - -0.525635522272996, IsLessThan(eps));
+				Assert::That(dpds(5) - -0.816496580927726, IsLessThan(eps));
+				Assert::That(dpds(6) - -1.219530829655363, IsLessThan(eps));
+				Assert::That(dpds(7) - -2.168803194788500, IsLessThan(eps));
+				Assert::That(dpds(8) -  10.282642877953123, IsLessThan(eps));
+				Assert::That(dpds(9) -  12.247448713915887, IsLessThan(eps));
 			}
 		};
    } // namespace Nodes1DProvisionerTests
