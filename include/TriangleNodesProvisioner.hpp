@@ -144,7 +144,17 @@ namespace blitzdg {
       * @param[in] s 2nd coordinate for standard triangle.
       * @param[out] V Vandermonde matrix.
       */
-      void computeVandermondeMatrix(int N, const real_vector_type & r, const real_vector_type & s, const real_matrix_type & V) const;
+      void computeVandermondeMatrix(index_type N, const real_vector_type & r, const real_vector_type & s, const real_matrix_type & V) const;
+
+     /**
+      * Computes the Gradient of the 2D Vandermonde matrix.
+      * @param[in] N Order of the approximating polynomials;.
+      * @param[in] r 1st coordinate for the standard triangle.
+      * @param[in] s 2nd coordinate for the standard triangle.
+      * @param[out] V2Dr r-component of the Gradient of the Vandermonde matrix.
+      * @param[out] V2Ds s-component of the Gradient of the Vandermonde matrix.
+      */
+      void computeGradVandermondeMatrix(index_type N,  const real_vector_type & r, const real_vector_type & s, const real_matrix_type & V2Dr, const real_matrix_type & V2Ds) const;
 
      /**
       * Returns a reference to a matrix whose jth column contains the

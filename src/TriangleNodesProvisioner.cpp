@@ -105,6 +105,28 @@ namespace blitzdg {
         }
     }
 
+    void TriangleNodesProvisioner::computeGradVandermondeMatrix(index_type N,  const real_vector_type & r, const real_vector_type & s, const real_matrix_type & V2Dr, const real_matrix_type & V2Ds) const {
+        const index_type Nr = r.length(0);
+        const index_type Np = (N+1)*(N+2)/2;
+
+        real_vector_type a(Nr), b(Nr);
+
+        rsToab(r, s, a, b);
+
+        index_type count = 0;
+        for (index_type i=0; i < N+1; ++i) {
+            for (index_type j=0; j < N-i+1; ++j) {
+
+                real_vector_type v2drCol(Np), v2dsCol(Np);
+                evaluateGradSimplex(a, b, i, j, v2drCol, v2dsCol);
+
+                V2Dr(Range::all(), count) = v2drCol;
+                V2Ds(Range::all(), count) = v2dsCol;
+                ++count;
+            }
+        }
+    }
+
     void TriangleNodesProvisioner::computeEquilateralNodes(real_vector_type & x, real_vector_type & y) const {
         real_vector_type alphaOptimal(15);
 
