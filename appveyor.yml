@@ -11,6 +11,5 @@ build_script:
     $env:CXX = "/c/mingw-w64/x86_64-7.3.0-posix-seh-rt_v5-rev0/mingw64/bin/g++.exe"
     & 'C:\mingw-w64\x86_64-7.3.0-posix-seh-rt_v5-rev0\mingw64\bin\mingw32-make.exe'
     if($LASTEXITCODE -ne 0) { exit 1 }	
-test_script:	
-- pwsh: |
     & 'bin\test.exe'
+    if($LASTEXITCODE -ne 0) { exit 2 }
