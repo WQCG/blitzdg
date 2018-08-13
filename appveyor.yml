@@ -9,7 +9,6 @@ build_script:
     Expand-Archive -Path deps-win-mingw64.zip -DestinationPath .\lib\	
     $env:PATH = $env:PATH + ";C:\mingw-w64\x86_64-7.3.0-posix-seh-rt_v5-rev0\mingw64\bin"
     $env:CXX = "/c/mingw-w64/x86_64-7.3.0-posix-seh-rt_v5-rev0/mingw64/bin/g++.exe"
-    $env:WINDOWS_INCLUDEPATH = '/c/mingw-w64/x86_64-7.3.0-posix-seh-rt_v5-rev0/mingw64/usr/include'
     & 'C:\mingw-w64\x86_64-7.3.0-posix-seh-rt_v5-rev0\mingw64\bin\mingw32-make.exe'
     if($LASTEXITCODE -ne 0) { exit 1 }	
 test_script:	
