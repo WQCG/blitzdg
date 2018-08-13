@@ -12,6 +12,5 @@ build_script:
     & 'C:\mingw-w64\x86_64-7.3.0-posix-seh-rt_v5-rev0\mingw64\bin\mingw32-make.exe'
     if($LASTEXITCODE -ne 0) { exit 1 }	
 test_script:	
-  - dir bin&&cd bin&&test.exe
-artifacts:	
-  - path: bin
+- pwsh: |
+    & 'bin\test.exe'
