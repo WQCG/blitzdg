@@ -29,8 +29,6 @@ VALGRIND := valgrind --error-exitcode=1 --leak-check=full --track-origins=yes
 
 ifeq ($(OS), Windows_NT)
 	LIB += $(EXPLICITLIBS)
-	WINDOWS_INCLUDEPATH := $(or $(WINDOWS_INCLUDEPATH), /c/mingw64/usr/include)
-	INC += $(WINDOWS_INCLUDEPATH)
 endif
 
 all: $(TARGETS)
