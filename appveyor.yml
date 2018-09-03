@@ -1,0 +1,15 @@
+version: 1.0.{build}
+environment:	
+  EXTRACFLAGS: -Wno-deprecated-declarations	
+build_script:	
+- pwsh: |	
+    Invoke-RestMethod -Uri https://s3.amazonaws.com/dsteinmo-libs/include-deps.zip -OutFile include-deps.zip	
+    Invoke-RestMethod -Uri https://s3.amazonaws.com/dsteinmo-libs/deps-win-mingw64-gcc7.zip -OutFile deps-win-mingw64.zip	
+    Expand-Archive -Path include-deps.zip -DestinationPath .\include\	
+    Expand-Archive -Path deps-win-mingw64.zip -DestinationPath .\lib\	
+    $env:PATH = $env:PATH + ";C:\mingw-w64\x86_64-7.3.0-posix-seh-rt_v5-rev0\mingw64\bin"
+    $env:CXX = "/c/mingw-w64/x86_64-7.3.0-posix-seh-rt_v5-rev0/mingw64/bin/g++.exe"
+    & 'C:\mingw-w64\x86_64-7.3.0-posix-seh-rt_v5-rev0\mingw64\bin\mingw32-make.exe'
+    if($LASTEXITCODE -ne 0) { exit 1 }	
+    & 'bin\test.exe'
+    if($LASTEXITCODE -ne 0) { exit 2 }
