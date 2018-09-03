@@ -87,7 +87,7 @@ namespace blitzdg {
     }
 
 
-    void TriangleNodesProvisioner::computeVandermondeMatrix(int N, const real_vector_type & r, const real_vector_type & s, const real_matrix_type & V) const {
+    void TriangleNodesProvisioner::computeVandermondeMatrix(int N, const real_vector_type & r, const real_vector_type & s, real_matrix_type & V) const {
         const index_type Nr = r.length(0);
 
         real_vector_type a(Nr), b(Nr);
@@ -105,7 +105,7 @@ namespace blitzdg {
         }
     }
 
-    void TriangleNodesProvisioner::computeGradVandermondeMatrix(index_type N,  const real_vector_type & r, const real_vector_type & s, const real_matrix_type & V2Dr, const real_matrix_type & V2Ds) const {
+    void TriangleNodesProvisioner::computeGradVandermondeMatrix(index_type N,  const real_vector_type & r, const real_vector_type & s, real_matrix_type & V2Dr, real_matrix_type & V2Ds) const {
         const index_type Nr = r.length(0);
         const index_type Np = (N+1)*(N+2)/2;
 
@@ -125,6 +125,39 @@ namespace blitzdg {
                 ++count;
             }
         }
+    }
+
+    void TriangleNodesProvisioner::computeDifferentiationMatrices(const real_matrix_type & V2Dr, const real_matrix_type & V2Ds, const real_matrix_type & V, real_matrix_type & Dr, real_matrix_type & Ds) const {
+        firstIndex ii;
+        secondIndex jj;
+ 
+        const int numRowsV = V.rows();
+        const int numColsV = V.cols();
+
+
+		// Note: this is not a column major ordering trick. We need these transposes.
+        real_matrix_type Vtrans(numColsV, numRowsV);
+        real_matrix_type V2Drtrans(numColsV, numRowsV);
+        real_matrix_type V2Dstrans(numColsV, numRowsV);
+
+        real_matrix_type Drtrans(numColsV, numRowsV);
+        real_matrix_type Dstrans(numColsV, numRowsV);
+
+        Vtrans = V(jj, ii);
+        V2Drtrans = V2Dr(jj, ii);
+        V2Dstrans = V2Ds(jj, ii);
+
+
+        // Dr = V2Dr / V;
+        LinSolver.solve(Vtrans, V2Drtrans, Drtrans);
+
+        // Ds = V2Ds / V;
+        LinSolver.solve(Vtrans, V2Dstrans, Dstrans);
+
+        // Take transpose.
+        Dr = Drtrans(jj, ii); 
+        Ds = Dstrans(jj, ii);
+
     }
 
     void TriangleNodesProvisioner::computeEquilateralNodes(real_vector_type & x, real_vector_type & y) const {
