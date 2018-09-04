@@ -118,6 +118,11 @@ namespace blitzdg {
       void evaluateSimplexPolynomial(const real_vector_type & a, const real_vector_type & b, index_type i, index_type j, real_vector_type & p) const;
 
      /**
+      * Evaluates the gradient of the 2D orthonormal polynomial of index (id,jd) on the simplex at (a,b).
+      */
+      void evaluateGradSimplex(const real_vector_type & a, const real_vector_type & b, index_type id, index_type jd, real_vector_type & dpdr, real_vector_type & dpds) const;
+
+     /**
       * Maps from (r,s) to (a,b) coordinates in the triangle.
       */     
       void rsToab(const real_vector_type & r, const real_vector_type & s, real_vector_type & a, real_vector_type & b) const;
@@ -139,7 +144,28 @@ namespace blitzdg {
       * @param[in] s 2nd coordinate for standard triangle.
       * @param[out] V Vandermonde matrix.
       */
-      void computeVandermondeMatrix(int N, const real_vector_type & r, const real_vector_type & s, const real_matrix_type & V) const;
+      void computeVandermondeMatrix(index_type N, const real_vector_type & r, const real_vector_type & s, real_matrix_type & V) const;
+
+     /**
+      * Computes the Gradient of the 2D Vandermonde matrix.
+      * @param[in] N Order of the approximating polynomials;.
+      * @param[in] r 1st coordinate for the standard triangle.
+      * @param[in] s 2nd coordinate for the standard triangle.
+      * @param[out] V2Dr r-component of the Gradient of the Vandermonde matrix.
+      * @param[out] V2Ds s-component of the Gradient of the Vandermonde matrix.
+      */
+      void computeGradVandermondeMatrix(index_type N,  const real_vector_type & r, const real_vector_type & s, real_matrix_type & V2Dr, real_matrix_type & V2Ds) const;
+
+
+     /**
+      * Compute the two 2D differentiation matrices given the Gradient of the Vandermonde matrix and the Vandermonde matrix.
+      * @param[in] V2Dr r-component of the Gradient of the Vandermonde matrix.
+      * @param[in] V2Ds s-component of the Gradient of the Vandermonde matrix.
+      * @param[in] V 2D Vandermonde matrix.
+      * @param[out] Dr Differentiation matrix with respect to r coordinate.
+      * @param[out] Ds Differentiation matrix with respect to s coordinate.
+      */
+      void computeDifferentiationMatrices(const real_matrix_type & V2Dr, const real_matrix_type & V2Ds, const real_matrix_type & V, real_matrix_type & Dr, real_matrix_type & Ds) const;
 
      /**
       * Returns a reference to a matrix whose jth column contains the

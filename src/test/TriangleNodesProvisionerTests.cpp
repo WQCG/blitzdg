@@ -30,11 +30,11 @@ namespace blitzdg {
 		TriangleNodesProvisioner * triangleNodesProvisioner = nullptr;
 
         Describe(Nodes1DProvisioner_Object) {
-			const real_type eps = 20.*numeric_limits<double>::epsilon();
+			const real_type eps = 5.e1*numeric_limits<double>::epsilon();
 			const float epsf = 5.8e-5;
 			const index_type NOrder = 3;
 			const index_type NumElements = 5;
-			const int NumFaces = 2;
+			const index_type NumFaces = 2;
 
             void SetUp() {
 				meshManager = new MeshManager();
@@ -137,7 +137,7 @@ namespace blitzdg {
 				cout << "Should_Compute_Vandermonde_Matrix" << endl;
                 TriangleNodesProvisioner & triangleNodes = *triangleNodesProvisioner;
 
-				const int Np = (NOrder+1)*(NOrder+2)/2;
+				const index_type Np = (NOrder+1)*(NOrder+2)/2;
 
 				real_vector_type r(Np);
 				real_vector_type s(Np);
@@ -166,12 +166,119 @@ namespace blitzdg {
 				Assert::That(normFro(res), IsLessThan(epsf));
 			}
 
+			It(Should_Compute_Grad_Vandermonde_Matrices) {
+
+				cout << "Should_Compute_Grad_Vandermonde_Matrices" << endl;
+                TriangleNodesProvisioner & triangleNodes = *triangleNodesProvisioner;
+
+				const index_type Np = (NOrder+1)*(NOrder+2)/2;
+
+				real_vector_type r(Np);
+				real_vector_type s(Np);
+
+				r = .1,.2,.3,.4,.5,.6,.7,.8,.9,1.;
+				s = .1,.2,.3,.4,.5,.6,.7,.8,.9,1.;
+
+				real_matrix_type VDr(Np,Np), VDrexpected(Np,Np);
+				real_matrix_type VDs(Np,Np), VDsexpected(Np,Np), res(Np,Np);
+
+				VDr = 0*jj; 
+				VDs = 0*jj;
+
+				triangleNodes.computeGradVandermondeMatrix(NOrder, r, s, VDr, VDs);
+
+				cout << "VDr: " << VDr << endl;
+				cout << "VDs: " << VDs << endl;
+
+				VDrexpected =   0.00000,0.00000,-0.00000,-0.00000,1.73205,3.71231,1.84324,5.34029,17.57436,10.71985,
+								0.00000,0.00000,-0.00000,-0.00000,1.73205,4.24264,3.33131,6.57267,24.28629,17.06196,
+								0.00000,0.00000,0.00000,-0.00000,1.73205,4.77297,5.07657,7.80505,31.99434,24.63881,
+								0.00000,0.00000,0.00000,-0.00000,1.73205,5.30330,7.07903,9.03742,40.69851,33.45042,
+								0.00000,0.00000,0.00000,-0.00000,1.73205,5.83363,9.33868,10.26980,50.39880,43.49677,
+								0.00000,0.00000,0.00000,0.00000,1.73205,6.36396,11.85553,11.50217,61.09520,54.77786,
+								0.00000,0.00000,0.00000,0.00000,1.73205,6.89429,14.62958,12.73455,72.78773,67.29371,
+								0.00000,0.00000,0.00000,0.00000,1.73205,7.42462,17.66082,13.96693,85.47637,81.04430,
+								0.00000,0.00000,0.00000,0.00000,1.73205,7.95495,20.94926,15.19930,99.16112,96.02964,
+								0.00000,0.00000,0.00000,0.00000,1.73205,8.48528,24.49490,-0.00000,-0.00000,0.00000;
+
+				VDsexpected =   0.00000,1.50000,1.83712,-1.93570,0.86603,5.30330,9.75815,3.28634,16.70868,7.00158,
+								0.00000,1.50000,2.44949,-0.84853,0.86603,6.36396,14.59896,3.83406,23.90682,10.32697,
+								0.00000,1.50000,3.06186,0.60988,0.86603,7.42462,20.33995,4.38178,32.26709,14.18556,
+								0.00000,1.50000,3.67423,2.43952,0.86603,8.48528,26.98113,4.92950,41.78950,18.57733,
+								0.00000,1.50000,4.28661,4.64039,0.86603,9.54594,34.52250,5.47723,52.47404,23.50229,
+								0.00000,1.50000,4.89898,7.21249,0.86603,10.60660,42.96405,6.02495,64.32073,28.96043,
+								0.00000,1.50000,5.51135,10.15582,0.86603,11.66726,52.30579,6.57267,77.32955,34.95176,
+								0.00000,1.50000,6.12372,13.47038,0.86603,12.72792,62.54772,7.12039,91.50050,41.47627,
+								0.00000,1.50000,6.73610,17.15618,0.86603,13.78858,73.68984,7.66812,106.83360,48.53397,
+								0.00000,1.50000,7.34847,21.21320,0.86603,4.24264,12.24745,0.00000,0.00000,0.00000;
+
+
+				res = VDrexpected - VDr;
+				Assert::That(normFro(res), IsLessThan(epsf));
+
+				res = VDsexpected - VDs;
+				Assert::That(normFro(res), IsLessThan(epsf));
+			}
+
+			It(Should_Compute_Differentiation_Matrices) {
+				cout << "Should_Compute_Differentiation_Matrices" << endl;
+
+                TriangleNodesProvisioner & triangleNodes = *triangleNodesProvisioner;
+
+				const index_type Np = (NOrder+1)*(NOrder+2)/2;
+
+				real_matrix_type V(Np,Np), V2Dr(Np,Np), V2Ds(Np,Np), Dr(Np,Np), Ds(Np,Np), 
+					expectedDr(Np,Np), expectedDs(Np,Np), res(Np,Np);
+
+				V2Dr = 0*jj; V2Ds = 0*jj; V = 0*jj; Dr = 0*jj; Ds = 0*jj;
+
+				real_vector_type x(Np), y(Np), r(Np), s(Np);
+
+				triangleNodes.computeEquilateralNodes(x, y);
+				triangleNodes.xyTors(x, y, r, s);
+
+				triangleNodes.computeVandermondeMatrix(NOrder, r, s, V);
+				triangleNodes.computeGradVandermondeMatrix(NOrder, r, s, V2Dr, V2Ds);
+				triangleNodes.computeDifferentiationMatrices(V2Dr, V2Ds, V, Dr, Ds);
+
+				cout << "Dr:" << endl << Dr << endl;
+				cout << "Ds:" << endl << Ds << endl;
+
+				expectedDr =-3.00000,4.04508,-1.54508,0.50000,-0.00000,-0.00000,-0.00000,-0.00000,-0.00000,0.00000,
+							-0.80902,0.00000,1.11803,-0.30902,-0.00000,-0.00000,0.00000,-0.00000,0.00000,0.00000,
+							0.30902,-1.11803,-0.00000,0.80902,-0.00000,-0.00000,0.00000,-0.00000,0.00000,0.00000,
+							-0.50000,1.54508,-4.04508,3.00000,-0.00000,0.00000,-0.00000,-0.00000,-0.00000,0.00000,
+							-0.70902,1.61803,-1.30902,0.60000,-2.00000,2.70000,-0.61803,-0.19098,-0.19098,0.10000,
+							0.33333,-0.62113,0.62113,-0.33333,-0.72723,0.00000,0.72723,-0.10610,0.10610,0.00000,
+							-0.60000,1.30902,-1.61803,0.70902,0.61803,-2.70000,2.00000,0.19098,0.19098,-0.10000,
+							0.40902,-0.19098,-0.61803,0.60000,-1.30902,2.70000,-1.30902,-2.00000,1.61803,0.10000,
+							-0.60000,0.61803,0.19098,-0.40902,1.30902,-2.70000,1.30902,-1.61803,2.00000,-0.10000,
+							-0.50000,-0.00000,-0.00000,0.50000,1.54508,0.00000,-1.54508,-4.04508,4.04508,-0.00000;
+
+				expectedDs =-3.00000,0.00000,0.00000,0.00000,4.04508,0.00000,-0.00000,-1.54508,0.00000,0.50000,
+							-0.70902,-2.00000,-0.19098,0.10000,1.61803,2.70000,-0.19098,-1.30902,-0.61803,0.60000,
+							0.40902,-1.30902,-2.00000,0.10000,-0.19098,2.70000,1.61803,-0.61803,-1.30902,0.60000,
+							-0.50000,1.54508,-4.04508,-0.00000,-0.00000,0.00000,4.04508,0.00000,-1.54508,0.50000,
+							-0.80902,0.00000,0.00000,-0.00000,0.00000,-0.00000,0.00000,1.11803,-0.00000,-0.30902,
+							0.33333,-0.72723,-0.10610,0.00000,-0.62113,0.00000,0.10610,0.62113,0.72723,-0.33333,
+							-0.60000,1.30902,-1.61803,-0.10000,0.61803,-2.70000,2.00000,0.19098,1.30902,-0.40902,
+							0.30902,-0.00000,0.00000,-0.00000,-1.11803,-0.00000,-0.00000,0.00000,0.00000,0.80902,
+							-0.60000,0.61803,0.19098,-0.10000,1.30902,-2.70000,0.19098,-1.61803,2.00000,0.70902,
+							-0.50000,0.00000,-0.00000,-0.00000,1.54508,0.00000,-0.00000,-4.04508,0.00000,3.00000;
+
+				res = Dr - expectedDr;
+				Assert::That(normFro(res), IsLessThan(epsf));
+
+				res = Ds - expectedDs;
+				Assert::That(normFro(res), IsLessThan(epsf));
+			}
+
 			It(Should_Compute_Equilateral_Nodes) {
 				cout << "Should_Compute_Equilateral_Nodes" << endl;
 
 				TriangleNodesProvisioner & triangleNodes = *triangleNodesProvisioner;
 
-				const int Np = (NOrder+1)*(NOrder+2)/2;
+				const index_type Np = (NOrder+1)*(NOrder+2)/2;
 
 				real_vector_type x(Np), y(Np), expectedx(Np), expectedy(Np);
 				triangleNodes.computeEquilateralNodes(x, y);
@@ -205,6 +312,46 @@ namespace blitzdg {
 
 				Assert::That(normInf(resx), IsLessThan(eps));
 				Assert::That(normInf(resy), IsLessThan(eps));
+			}
+
+			It(Should_Compute_Gradient_Of_Simplex_Polynomials) {
+				cout << "Should_Compute_Gradient_Of_Simplex_Polynomials" << endl;
+
+				TriangleNodesProvisioner & triangleNodes = *triangleNodesProvisioner;
+
+				const index_type Np = (NOrder+1)*(NOrder+2)/2;
+
+				real_vector_type a(Np), b(Np), dpdr(Np), dpds(Np), x(Np), y(Np), r(Np), s(Np);
+
+				triangleNodes.computeEquilateralNodes(x, y);
+
+				triangleNodes.xyTors(x, y, r, s);
+
+				triangleNodes.rsToab(r, s, a, b);
+
+				triangleNodes.evaluateGradSimplex(a, b, 1, 2, dpdr, dpds);
+
+				Assert::That(dpdr(0) -  2.44948974278318, IsLessThan(eps));
+				Assert::That(dpdr(1) -  2.44948974278318, IsLessThan(eps));
+				Assert::That(dpdr(2) -  2.44948974278318, IsLessThan(eps));
+				Assert::That(dpdr(3) -  2.44948974278318, IsLessThan(eps));
+				Assert::That(dpdr(4) - -1.74516635192836, IsLessThan(eps));
+				Assert::That(dpdr(5) - -1.63299316185545, IsLessThan(eps));
+				Assert::That(dpdr(6) - -1.74516635192836, IsLessThan(eps));
+				Assert::That(dpdr(7) -  8.11383968316462, IsLessThan(eps));
+				Assert::That(dpdr(8) -  8.11383968316462, IsLessThan(eps));
+				Assert::That(dpdr(9) -  24.49489742783178, IsLessThan(eps));
+
+				Assert::That(dpds(0) -  15.921683328090657, IsLessThan(eps));
+				Assert::That(dpds(1) -  7.797415561453585, IsLessThan(eps));
+				Assert::That(dpds(2) - -5.347925818670407, IsLessThan(eps));
+				Assert::That(dpds(3) - -13.472193585307480, IsLessThan(eps));
+				Assert::That(dpds(4) - -0.525635522272996, IsLessThan(eps));
+				Assert::That(dpds(5) - -0.816496580927726, IsLessThan(eps));
+				Assert::That(dpds(6) - -1.219530829655363, IsLessThan(eps));
+				Assert::That(dpds(7) - -2.168803194788500, IsLessThan(eps));
+				Assert::That(dpds(8) -  10.282642877953123, IsLessThan(eps));
+				Assert::That(dpds(9) -  12.247448713915887, IsLessThan(eps));
 			}
 		};
    } // namespace Nodes1DProvisionerTests

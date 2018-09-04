@@ -65,7 +65,7 @@ namespace blitzdg {
 	}
 
     void TriangleNodesProvisioner::rsToab(const real_vector_type & r, const real_vector_type & s, real_vector_type & a, real_vector_type & b) const {
-        int Np = r.length(0);
+        index_type Np = r.length(0);
         for( index_type i=0; i < Np; i++) {
             if(s(i) != 1.0) 
                 a(i) = 2.0*(1.0+r(i))/(1.0-s(i)) - 1.0;
@@ -87,7 +87,7 @@ namespace blitzdg {
     }
 
 
-    void TriangleNodesProvisioner::computeVandermondeMatrix(int N, const real_vector_type & r, const real_vector_type & s, const real_matrix_type & V) const {
+    void TriangleNodesProvisioner::computeVandermondeMatrix(index_type N, const real_vector_type & r, const real_vector_type & s, real_matrix_type & V) const {
         const index_type Nr = r.length(0);
 
         real_vector_type a(Nr), b(Nr);
@@ -103,6 +103,61 @@ namespace blitzdg {
                 ++count;
             }
         }
+    }
+
+    void TriangleNodesProvisioner::computeGradVandermondeMatrix(index_type N,  const real_vector_type & r, const real_vector_type & s, real_matrix_type & V2Dr, real_matrix_type & V2Ds) const {
+        const index_type Nr = r.length(0);
+        const index_type Np = (N+1)*(N+2)/2;
+
+        real_vector_type a(Nr), b(Nr);
+
+        rsToab(r, s, a, b);
+
+        index_type count = 0;
+        for (index_type i=0; i <= N; ++i) {
+            for (index_type j=0; j <= N-i; ++j) {
+
+                real_vector_type v2drCol(Np), v2dsCol(Np);
+                evaluateGradSimplex(a, b, i, j, v2drCol, v2dsCol);
+
+                V2Dr(Range::all(), count) = v2drCol;
+                V2Ds(Range::all(), count) = v2dsCol;
+                ++count;
+            }
+        }
+    }
+
+    void TriangleNodesProvisioner::computeDifferentiationMatrices(const real_matrix_type & V2Dr, const real_matrix_type & V2Ds, const real_matrix_type & V, real_matrix_type & Dr, real_matrix_type & Ds) const {
+        firstIndex ii;
+        secondIndex jj;
+ 
+        const index_type numRowsV = V.rows();
+        const index_type numColsV = V.cols();
+
+
+		// Note: this is not a column major ordering trick. We need these transposes.
+        real_matrix_type Vtrans(numColsV, numRowsV);
+        real_matrix_type V2Drtrans(numColsV, numRowsV);
+        real_matrix_type V2Dstrans(numColsV, numRowsV);
+
+        real_matrix_type Drtrans(numColsV, numRowsV);
+        real_matrix_type Dstrans(numColsV, numRowsV);
+
+        Vtrans = V(jj, ii);
+        V2Drtrans = V2Dr(jj, ii);
+        V2Dstrans = V2Ds(jj, ii);
+
+
+        // Dr = V2Dr / V;
+        LinSolver.solve(Vtrans, V2Drtrans, Drtrans);
+
+        // Ds = V2Ds / V;
+        LinSolver.solve(Vtrans, V2Dstrans, Dstrans);
+
+        // Take transpose.
+        Dr = Drtrans(jj, ii); 
+        Ds = Dstrans(jj, ii);
+
     }
 
     void TriangleNodesProvisioner::computeEquilateralNodes(real_vector_type & x, real_vector_type & y) const {
@@ -164,8 +219,8 @@ namespace blitzdg {
         firstIndex ii;
         secondIndex jj;
 
-        const int Np = NOrder+1;
-        const int Nr = r.length(0);
+        const index_type Np = NOrder+1;
+        const index_type Nr = r.length(0);
 
         real_vector_type req(Np), rLGL(Np);
         req = -1.0 + 2*ii/(Np-1.0);
@@ -196,5 +251,39 @@ namespace blitzdg {
         zf = (abs(r) < 1.0-1e-10);
         sf = 1.0 - (zf*r)*(zf*r); 
         warpFactor = warpFactor / sf + warpFactor*(zf-1.0);
+    }
+
+    void TriangleNodesProvisioner::evaluateGradSimplex(const real_vector_type & a, const real_vector_type & b, index_type id, index_type jd, real_vector_type & dpdr, real_vector_type & dpds) const {
+        const index_type Np = a.length(0);
+
+        real_vector_type fa(Np), gb(Np), dfa(Np), dgb(Np), tmp(Np);
+
+        Jacobi.computeJacobiPolynomial(a, 0.,       0., id, fa);
+        Jacobi.computeJacobiPolynomial(b, 2.*id+1., 0., jd, gb);
+
+        Jacobi.computeGradJacobi(a,       0., 0., id, dfa);
+        Jacobi.computeGradJacobi(b, 2.*id+1., 0., jd, dgb);
+
+        // r-derivative
+        // d/dr = da/dr d/da + db/dr d/db = (2/(1-s)) d/da = (2/(1-b)) d/da
+        dpdr = dfa*gb;
+        if (id > 0)
+            dpdr *= pow(0.5*(1.-b), id-1);
+
+        // s-derivative
+        // d/ds = ((1+a)/2)/((1-b)/2) d/da + d/db
+        dpds = dfa*(gb*(0.5*(1+a)));
+        if ( id > 0 )
+            dpds *= pow(0.5*(1.-b), id-1);
+
+        tmp = dgb*pow(0.5*(1.-b), id);
+        if( id > 0 )
+            tmp -= 0.5*id*gb*pow(0.5*(1-b), id-1);
+
+        dpds += fa*tmp;
+
+        // Normalize
+        dpdr = pow(2., id+0.5)*dpdr; 
+        dpds = pow(2., id+0.5)*dpds;
     }
 }
