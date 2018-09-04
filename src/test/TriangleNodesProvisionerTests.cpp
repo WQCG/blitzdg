@@ -34,7 +34,7 @@ namespace blitzdg {
 			const float epsf = 5.8e-5;
 			const index_type NOrder = 3;
 			const index_type NumElements = 5;
-			const int NumFaces = 2;
+			const index_type NumFaces = 2;
 
             void SetUp() {
 				meshManager = new MeshManager();
@@ -137,7 +137,7 @@ namespace blitzdg {
 				cout << "Should_Compute_Vandermonde_Matrix" << endl;
                 TriangleNodesProvisioner & triangleNodes = *triangleNodesProvisioner;
 
-				const int Np = (NOrder+1)*(NOrder+2)/2;
+				const index_type Np = (NOrder+1)*(NOrder+2)/2;
 
 				real_vector_type r(Np);
 				real_vector_type s(Np);
@@ -171,7 +171,7 @@ namespace blitzdg {
 				cout << "Should_Compute_Grad_Vandermonde_Matrices" << endl;
                 TriangleNodesProvisioner & triangleNodes = *triangleNodesProvisioner;
 
-				const int Np = (NOrder+1)*(NOrder+2)/2;
+				const index_type Np = (NOrder+1)*(NOrder+2)/2;
 
 				real_vector_type r(Np);
 				real_vector_type s(Np);
@@ -225,7 +225,7 @@ namespace blitzdg {
 
                 TriangleNodesProvisioner & triangleNodes = *triangleNodesProvisioner;
 
-				const int Np = (NOrder+1)*(NOrder+2)/2;
+				const index_type Np = (NOrder+1)*(NOrder+2)/2;
 
 				real_matrix_type V(Np,Np), V2Dr(Np,Np), V2Ds(Np,Np), Dr(Np,Np), Ds(Np,Np), 
 					expectedDr(Np,Np), expectedDs(Np,Np), res(Np,Np);
@@ -278,7 +278,7 @@ namespace blitzdg {
 
 				TriangleNodesProvisioner & triangleNodes = *triangleNodesProvisioner;
 
-				const int Np = (NOrder+1)*(NOrder+2)/2;
+				const index_type Np = (NOrder+1)*(NOrder+2)/2;
 
 				real_vector_type x(Np), y(Np), expectedx(Np), expectedy(Np);
 				triangleNodes.computeEquilateralNodes(x, y);
@@ -319,7 +319,7 @@ namespace blitzdg {
 
 				TriangleNodesProvisioner & triangleNodes = *triangleNodesProvisioner;
 
-				const int Np = (NOrder+1)*(NOrder+2)/2;
+				const index_type Np = (NOrder+1)*(NOrder+2)/2;
 
 				real_vector_type a(Np), b(Np), dpdr(Np), dpds(Np), x(Np), y(Np), r(Np), s(Np);
 

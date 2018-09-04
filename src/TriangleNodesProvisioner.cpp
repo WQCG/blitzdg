@@ -65,7 +65,7 @@ namespace blitzdg {
 	}
 
     void TriangleNodesProvisioner::rsToab(const real_vector_type & r, const real_vector_type & s, real_vector_type & a, real_vector_type & b) const {
-        int Np = r.length(0);
+        index_type Np = r.length(0);
         for( index_type i=0; i < Np; i++) {
             if(s(i) != 1.0) 
                 a(i) = 2.0*(1.0+r(i))/(1.0-s(i)) - 1.0;
@@ -87,7 +87,7 @@ namespace blitzdg {
     }
 
 
-    void TriangleNodesProvisioner::computeVandermondeMatrix(int N, const real_vector_type & r, const real_vector_type & s, real_matrix_type & V) const {
+    void TriangleNodesProvisioner::computeVandermondeMatrix(index_type N, const real_vector_type & r, const real_vector_type & s, real_matrix_type & V) const {
         const index_type Nr = r.length(0);
 
         real_vector_type a(Nr), b(Nr);
@@ -131,8 +131,8 @@ namespace blitzdg {
         firstIndex ii;
         secondIndex jj;
  
-        const int numRowsV = V.rows();
-        const int numColsV = V.cols();
+        const index_type numRowsV = V.rows();
+        const index_type numColsV = V.cols();
 
 
 		// Note: this is not a column major ordering trick. We need these transposes.
@@ -219,8 +219,8 @@ namespace blitzdg {
         firstIndex ii;
         secondIndex jj;
 
-        const int Np = NOrder+1;
-        const int Nr = r.length(0);
+        const index_type Np = NOrder+1;
+        const index_type Nr = r.length(0);
 
         real_vector_type req(Np), rLGL(Np);
         req = -1.0 + 2*ii/(Np-1.0);
@@ -254,7 +254,7 @@ namespace blitzdg {
     }
 
     void TriangleNodesProvisioner::evaluateGradSimplex(const real_vector_type & a, const real_vector_type & b, index_type id, index_type jd, real_vector_type & dpdr, real_vector_type & dpds) const {
-        const int Np = a.length(0);
+        const index_type Np = a.length(0);
 
         real_vector_type fa(Np), gb(Np), dfa(Np), dgb(Np), tmp(Np);
 
