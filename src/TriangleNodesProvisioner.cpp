@@ -114,8 +114,8 @@ namespace blitzdg {
         rsToab(r, s, a, b);
 
         index_type count = 0;
-        for (index_type i=0; i < N+1; ++i) {
-            for (index_type j=0; j < N-i+1; ++j) {
+        for (index_type i=0; i <= N; ++i) {
+            for (index_type j=0; j <= N-i; ++j) {
 
                 real_vector_type v2drCol(Np), v2dsCol(Np);
                 evaluateGradSimplex(a, b, i, j, v2drCol, v2dsCol);
