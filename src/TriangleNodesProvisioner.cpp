@@ -28,7 +28,8 @@ namespace blitzdg {
 
     TriangleNodesProvisioner::TriangleNodesProvisioner(index_type _NOrder, index_type _NumElements, const MeshManager * _MeshManager) 
         : NumElements{ _NumElements }, NOrder{ _NOrder },
-        NumLocalPoints{ (_NOrder + 2)*(_NOrder+1)/2 }, 
+        NumLocalPoints{ (_NOrder + 2)*(_NOrder+1)/2 },
+        NumFacePoints{ _NOrder + 1},
         xGrid{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
         rGrid{ new real_vector_type((_NOrder + 2)*(_NOrder+1)/2) },
         V{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) }, 
@@ -38,8 +39,6 @@ namespace blitzdg {
         rx{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
         nx{ new real_matrix_type((_NOrder+1)*NumFaces, NumElements) },
         Vinv{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
-        Fmask{ new index_vector_type((_NOrder+1)*NumFaces) },
-        Fx{ new real_matrix_type((_NOrder+1)*NumFaces, NumElements) },
         Fscale{ new real_matrix_type((_NOrder+1)*NumFaces, NumElements) },
         EToV{ new index_matrix_type(NumElements, NumFaces) },
         EToE{ new index_matrix_type(NumElements, NumFaces) },
@@ -48,7 +47,7 @@ namespace blitzdg {
         vmapP{ new index_vector_type((_NOrder+1)*NumFaces*NumElements) },
         Mesh2D { _MeshManager },
         Nodes1D{ new Nodes1DProvisioner(_NOrder, NumElements, -1.0, 1.0) },
-		Jacobi{}, Vandermonde{}, LinSolver{}
+		Jacobi{}, Vandermonde{}, LinSolver{}, Inverter{}
     {}
 
 
@@ -286,4 +285,149 @@ namespace blitzdg {
         dpdr = pow(2., id+0.5)*dpdr; 
         dpds = pow(2., id+0.5)*dpds;
     }
+
+    void TriangleNodesProvisioner::buildNodes() {
+        firstIndex ii;
+        secondIndex jj;
+
+        real_vector_type x(NumLocalPoints), y(NumLocalPoints);
+
+        real_vector_type& r = *rGrid.get();
+        real_vector_type& s = *sGrid.get();
+
+        computeEquilateralNodes(x, y);
+        xyTors(x, y, r, s);
+
+        real_vector_type fmask1(NumFacePoints), fmask2(NumFacePoints), fmask3(NumFacePoints), testField(NumLocalPoints);
+
+        testField = s+1;
+        index_type count = 0;
+        for (index_type i=0; i < NumLocalPoints; i++) {
+            if (testField(i) < NodeTol) {
+                fmask1(count) = i;
+                ++count;
+            }
+        }
+
+        testField = r+s;
+        count = 0;
+        for (index_type i=0; i < NumLocalPoints; i++) {
+            if (testField(i) < NodeTol) {
+                fmask2(count) = i;
+                ++count;
+            }
+        }
+
+        testField = r+1;
+        count = 0;
+        for (index_type i=0; i < NumLocalPoints; i++) {
+            if (testField(i) < NodeTol) {
+                fmask3(count) = i;
+                ++count;
+            }
+        }
+
+        // TODO: Move Fmask computation to a helper method.
+        index_matrix_type Fm = *Fmask.get();
+        Fm = 0*jj;
+        Fm(Range::all(), 0) = fmask1;
+        Fm(Range::all(), 1) = fmask2;
+        Fm(Range::all(), 2) = fmask3;
+    }
+
+    void TriangleNodesProvisioner::buildLift() {
+        firstIndex ii;
+        secondIndex jj;
+
+        real_matrix_type E(NumLocalPoints, NumFaces*NumFaces);
+
+        real_matrix_type & Liftref = *Lift.get();
+
+        real_vector_type& r = *rGrid.get();
+        real_vector_type& s = *sGrid.get();
+
+        index_matrix_type Fm = *Fmask.get();
+
+        real_vector_type faceR(NumFacePoints), faceS(NumFacePoints);
+        real_matrix_type V1D(NumFacePoints, NumFacePoints), V1Dinv(NumFacePoints,NumFacePoints);
+        real_matrix_type massEdgeInv(NumFacePoints, NumFacePoints);
+
+        real_matrix_type massEdge1(NumFacePoints, NumFacePoints), massEdge2(NumFacePoints,NumFacePoints),
+                         massEdge3(NumFacePoints, NumFacePoints);
+
+        // Face 1
+        for (index_type i=0; i < NumFacePoints; ++i)
+            faceR(i) = r(Fm(i, 0));
+        
+        Vandermonde.computeVandermondeMatrix(faceR, V1D, V1Dinv);
+        massEdgeInv = V1D(ii,jj)*V1D(jj,ii);
+
+        Inverter.computeInverse(massEdgeInv, massEdge1);
+        for (index_type i=0; i < NumFacePoints; ++i) {
+            for (index_type j=0; j < NumFacePoints; ++j) {
+                E(i,j) = massEdge1(i,j);
+            }
+        }
+
+        // Face 2
+        for (index_type i=0; i < NumFacePoints; ++i)
+            faceR(i) = r(Fm(i, 1));
+
+        Vandermonde.computeVandermondeMatrix(faceR, V1D, V1Dinv);
+        massEdgeInv = V1D(ii,jj)*V1D(jj,ii);
+
+        Inverter.computeInverse(massEdgeInv, massEdge2);
+        for (index_type i=0; i < NumFacePoints; ++i) {
+            for (index_type j=NumFacePoints; j < 2*NumFacePoints; ++j) {
+                E(i,j) = massEdge2(i,j % NumFacePoints);
+            }
+        }
+
+        // Face 3.
+        for (index_type i=0; i < NumFacePoints; ++i)
+            faceS(i) = s(Fm(i, 2));
+        
+        Vandermonde.computeVandermondeMatrix(faceS, V1D, V1Dinv);
+        massEdgeInv = V1D(ii,jj)*V1D(jj,ii);
+
+        Inverter.computeInverse(massEdgeInv, massEdge3);
+        for (index_type i=0; i < NumFacePoints; ++i) {
+            for (index_type j=2*NumFacePoints; j < 3*NumFacePoints; ++j) {
+                E(i,j) = massEdge3(i,j % NumFacePoints);
+            }
+        }
+
+        // Assign resulting matrix to object's property.
+        Liftref = E;
+    }
+
+    /* function [LIFT] = Lift2D()
+
+% function [LIFT] = Lift2D()
+% Purpose  : Compute surface to volume lift term for DG formulation
+
+Globals2D;
+Emat = zeros(Np, Nfaces*Nfp);
+
+% face 1
+faceR = r(Fmask(:,1));
+V1D = Vandermonde1D(N, faceR); 
+massEdge1 = inv(V1D*V1D');
+Emat(Fmask(:,1),1:Nfp) = massEdge1;
+
+% face 2
+faceR = r(Fmask(:,2));
+V1D = Vandermonde1D(N, faceR);
+massEdge2 = inv(V1D*V1D');
+Emat(Fmask(:,2),Nfp+1:2*Nfp) = massEdge2;
+
+% face 3
+faceS = s(Fmask(:,3));
+V1D = Vandermonde1D(N, faceS); 
+massEdge3 = inv(V1D*V1D');
+Emat(Fmask(:,3),2*Nfp+1:3*Nfp) = massEdge3;
+
+% inv(mass matrix)*\I_n (L_i,L_j)_{edge_n}
+LIFT = V*(V'*Emat);
+return */
 }
