@@ -5,7 +5,13 @@ CXX := $(or $(CXX), g++)
 SRCDIR := src
 BUILDDIR := build
 BINDIR := bin
+INCDIR := include
+
 SRCEXT := cpp
+DEPEXT := d
+OBJECT := o
+
+.DEFAULT_GOAL := all
 
 TARGETS := $(patsubst src/,,$(patsubst src/%/,bin/%,$(sort $(dir $(wildcard src/**/)))))
 BUILDDIRS := $(subst bin,build,$(TARGETS))
@@ -19,6 +25,20 @@ SPECIFICOBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SPECIFICSOURCES:.$(SRC
 
 ALLOBJECTS := $(COMMONOBJECTS)
 ALLOBJECTS += $(SPECIFICOBJECTS)
+
+ALLSOURCES := $(COMMONSOURCES)
+ALLSOURCES += $(SPECIFICSOURCES)
+
+DEPS := $(ALLOBJECTS:%.o=%.$(DEPEXT))
+DEPPATH := $(BUILDDIR)/$(*F)
+
+.SUFFIXES:
+.DELETE_ON_ERROR:
+
+# Pull in dependencies
+ifneq ($(MAKECMDGOALS), clean)
+-include $(DEPS)
+endif
 
 CFLAGS := -g -Wall -std=c++0x -fprofile-arcs -ftest-coverage -DBZ_DEBUG
 LINKERFLAGS := -fprofile-arcs
@@ -41,6 +61,12 @@ $(TARGETS): $(ALLOBJECTS)
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIRS)
 	@echo " $(CXX) $(CFLAGS) $(INC) -c -o $@ $<"; $(CXX) $(CFLAGS) $(INC) -c -o $@ $<
+
+$(BUILDDIR)/%.$(DEPEXT): $(SRCDIR)/%.$(SRCEXT)
+	@mkdir -p $(BUILDDIRS)
+	@echo "Building dependency $@..."
+	$(CXX) $(CFLAGS) $(INC) -MM -MF $@ -MP -MT $(DEPPATH).$(OBJEXT) -MT $(DEPPATH).$(DEPEXT) $<
+	@$(RM) [0-9]
 
 clean:
 	@echo " Cleaning...";
@@ -67,4 +93,4 @@ docs:
 	@doxygen -u doxygen.conf
 	@doxygen doxygen.conf
 
-.PHONY: clean docs valgrind valgrind-print
+.PHONY: clean docs valgrind valgrind-print all
