@@ -5,7 +5,7 @@ jobs:
       ignore:
         - gh-pages
     docker:
-      - image: dsteinmoeller/blitzdg-circle:0.10
+      - image: dsteinmoeller/blitzdg-circle:0.11
     environment:
       EXTRACFLAGS: "-Wno-deprecated-declarations"
 
@@ -18,6 +18,9 @@ jobs:
       - run:
           name: Build (clang)
           command: CXX=clang++ make -j4 && make clean
+      - run:
+          name: Build (mingw)
+          command: CXX=g++-mingw-w64-x86-64 make -j4 && make clean
       - run:
           name: Build (gcc)
           command: CXX='g++ -Og' make -j4
