@@ -147,7 +147,7 @@ namespace blitzdg {
         V2Dstrans = V2Ds(jj, ii);
 
 
-        // Dr = V2Dr / V;
+        // Dr = V2Dr * V^{-1}
         LinSolver.solve(Vtrans, V2Drtrans, Drtrans);
 
         // Ds = V2Ds / V;
@@ -266,18 +266,20 @@ namespace blitzdg {
         // r-derivative
         // d/dr = da/dr d/da + db/dr d/db = (2/(1-s)) d/da = (2/(1-b)) d/da
         dpdr = dfa*gb;
-        if (id > 0)
+        if (id > 1)
             dpdr *= pow(0.5*(1.-b), id-1);
 
         // s-derivative
         // d/ds = ((1+a)/2)/((1-b)/2) d/da + d/db
         dpds = dfa*(gb*(0.5*(1+a)));
-        if ( id > 0 )
+        if ( id > 1 )
             dpds *= pow(0.5*(1.-b), id-1);
 
-        tmp = dgb*pow(0.5*(1.-b), id);
-        if( id > 0 )
-            tmp -= 0.5*id*gb*pow(0.5*(1-b), id-1);
+		tmp = dgb*pow(0.5*(1.-b), id);
+        if( id > 0 ) {
+			tmp -= 0.5*id*gb*pow(0.5*(1-b), id-1);
+		}
+			
 
         dpds += fa*tmp;
 

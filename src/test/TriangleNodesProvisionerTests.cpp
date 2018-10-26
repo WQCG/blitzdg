@@ -30,7 +30,7 @@ namespace blitzdg {
 		TriangleNodesProvisioner * triangleNodesProvisioner = nullptr;
 
         Describe(Nodes1DProvisioner_Object) {
-			const real_type eps = 5.e1*numeric_limits<double>::epsilon();
+			const real_type eps = 50*numeric_limits<double>::epsilon();
 			const float epsf = 5.8e-5;
 			const index_type NOrder = 3;
 			const index_type NumElements = 5;
