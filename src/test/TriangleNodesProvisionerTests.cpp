@@ -113,6 +113,18 @@ namespace blitzdg {
 				Assert::That(abs(s(2) -  0.1285468820183672), IsLessThan(eps));
 			}
 
+			It(Should_Build_Lifting_Operator) {
+				cout << "Should_Build_Lifting_Operator" << endl;
+		        TriangleNodesProvisioner & triangleNodes = *triangleNodesProvisioner;
+				triangleNodes.buildNodes();
+				triangleNodes.buildLift();
+
+				const real_matrix_type& Lift = triangleNodes.get_Lift();
+				cout << Lift;
+				cout << endl;
+				Assert::That(false, IsTrue());
+			}
+
 			It(Should_Compute_Warp_Factor) {
 				cout << "Should_Compute_warpFactor" << endl;
                 TriangleNodesProvisioner & triangleNodes = *triangleNodesProvisioner;

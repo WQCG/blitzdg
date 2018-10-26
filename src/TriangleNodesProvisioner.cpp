@@ -20,6 +20,7 @@ using blitz::sum;
 using blitz::thirdIndex;
 using std::numeric_limits;
 using std::unique_ptr;
+using std::abs;
 
 namespace blitzdg {
     const index_type TriangleNodesProvisioner::NumFaces = 3;
@@ -31,7 +32,9 @@ namespace blitzdg {
         NumLocalPoints{ (_NOrder + 2)*(_NOrder+1)/2 },
         NumFacePoints{ _NOrder + 1},
         xGrid{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
+        yGrid{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
         rGrid{ new real_vector_type((_NOrder + 2)*(_NOrder+1)/2) },
+        sGrid{ new real_vector_type((_NOrder + 2)*(_NOrder+1)/2) },
         V{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) }, 
         Dr{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
         Lift{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder+1)*NumFaces) },
@@ -39,6 +42,7 @@ namespace blitzdg {
         rx{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
         nx{ new real_matrix_type((_NOrder+1)*NumFaces, NumElements) },
         Vinv{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
+        Fmask{ new index_matrix_type( _NOrder+1, NumFaces) },
         Fscale{ new real_matrix_type((_NOrder+1)*NumFaces, NumElements) },
         EToV{ new index_matrix_type(NumElements, NumFaces) },
         EToE{ new index_matrix_type(NumElements, NumFaces) },
@@ -305,7 +309,7 @@ namespace blitzdg {
         testField = s+1;
         index_type count = 0;
         for (index_type i=0; i < NumLocalPoints; i++) {
-            if (testField(i) < NodeTol) {
+            if (abs(testField(i)) < NodeTol) {
                 fmask1(count) = i;
                 ++count;
             }
@@ -314,7 +318,7 @@ namespace blitzdg {
         testField = r+s;
         count = 0;
         for (index_type i=0; i < NumLocalPoints; i++) {
-            if (testField(i) < NodeTol) {
+            if (abs(testField(i)) < NodeTol) {
                 fmask2(count) = i;
                 ++count;
             }
@@ -323,7 +327,7 @@ namespace blitzdg {
         testField = r+1;
         count = 0;
         for (index_type i=0; i < NumLocalPoints; i++) {
-            if (testField(i) < NodeTol) {
+            if (abs(testField(i)) < NodeTol) {
                 fmask3(count) = i;
                 ++count;
             }
@@ -332,6 +336,7 @@ namespace blitzdg {
         // TODO: Move Fmask computation to a helper method.
         index_matrix_type Fm = *Fmask.get();
         Fm = 0*jj;
+        std::cout << Fm << std::endl;
         Fm(Range::all(), 0) = fmask1;
         Fm(Range::all(), 1) = fmask2;
         Fm(Range::all(), 2) = fmask3;
@@ -341,7 +346,7 @@ namespace blitzdg {
         firstIndex ii;
         secondIndex jj;
 
-        real_matrix_type E(NumLocalPoints, NumFaces*NumFaces);
+        real_matrix_type E(NumLocalPoints, NumFaces*(NOrder+1));
 
         real_matrix_type & Liftref = *Lift.get();
 
@@ -403,33 +408,7 @@ namespace blitzdg {
         Liftref = E;
     }
 
-    /* function [LIFT] = Lift2D()
-
-% function [LIFT] = Lift2D()
-% Purpose  : Compute surface to volume lift term for DG formulation
-
-Globals2D;
-Emat = zeros(Np, Nfaces*Nfp);
-
-% face 1
-faceR = r(Fmask(:,1));
-V1D = Vandermonde1D(N, faceR); 
-massEdge1 = inv(V1D*V1D');
-Emat(Fmask(:,1),1:Nfp) = massEdge1;
-
-% face 2
-faceR = r(Fmask(:,2));
-V1D = Vandermonde1D(N, faceR);
-massEdge2 = inv(V1D*V1D');
-Emat(Fmask(:,2),Nfp+1:2*Nfp) = massEdge2;
-
-% face 3
-faceS = s(Fmask(:,3));
-V1D = Vandermonde1D(N, faceS); 
-massEdge3 = inv(V1D*V1D');
-Emat(Fmask(:,3),2*Nfp+1:3*Nfp) = massEdge3;
-
-% inv(mass matrix)*\I_n (L_i,L_j)_{edge_n}
-LIFT = V*(V'*Emat);
-return */
+    const real_matrix_type & TriangleNodesProvisioner::get_Lift() const {
+        return *Lift.get();
+    }
 }
