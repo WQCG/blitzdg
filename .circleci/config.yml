@@ -23,7 +23,7 @@ jobs:
           command: CXX=clang++ make -j4 && make clean
       - run:
           name: Build (mingw)
-          command: CXX=g++-mingw-w64-x86-64 make -j4 && make clean
+          command: CXX=x86_64-w64-mingw32-g++-posix make -j4 && make clean
       - run:
           name: Build (gcc)
           command: CXX='g++ -Og' make -j4
