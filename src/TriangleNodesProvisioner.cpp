@@ -345,8 +345,9 @@ namespace blitzdg {
     void TriangleNodesProvisioner::buildLift() {
         firstIndex ii;
         secondIndex jj;
+        thirdIndex kk;
 
-        real_matrix_type E(NumLocalPoints, NumFaces*(NOrder+1));
+        real_matrix_type E(NumLocalPoints, NumFaces*NumFacePoints);
 
         real_matrix_type & Liftref = *Lift.get();
 
@@ -367,12 +368,12 @@ namespace blitzdg {
             faceR(i) = r(Fm(i, 0));
         
         Vandermonde.computeVandermondeMatrix(faceR, V1D, V1Dinv);
-        massEdgeInv = V1D(ii,jj)*V1D(jj,ii);
+        massEdgeInv = sum(V1D(ii,kk)*V1D(kk,jj), kk);
 
         Inverter.computeInverse(massEdgeInv, massEdge1);
         for (index_type i=0; i < NumFacePoints; ++i) {
             for (index_type j=0; j < NumFacePoints; ++j) {
-                E(i,j) = massEdge1(i,j);
+                E(Fm(i,0),j) = massEdge1(i,j);
             }
         }
 
@@ -381,12 +382,12 @@ namespace blitzdg {
             faceR(i) = r(Fm(i, 1));
 
         Vandermonde.computeVandermondeMatrix(faceR, V1D, V1Dinv);
-        massEdgeInv = V1D(ii,jj)*V1D(jj,ii);
+        massEdgeInv = sum(V1D(ii,kk)*V1D(kk,jj), kk);
 
         Inverter.computeInverse(massEdgeInv, massEdge2);
         for (index_type i=0; i < NumFacePoints; ++i) {
             for (index_type j=NumFacePoints; j < 2*NumFacePoints; ++j) {
-                E(i,j) = massEdge2(i,j % NumFacePoints);
+                E(Fm(i,1),j) = massEdge2(i,j % NumFacePoints);
             }
         }
 
@@ -395,12 +396,12 @@ namespace blitzdg {
             faceS(i) = s(Fm(i, 2));
         
         Vandermonde.computeVandermondeMatrix(faceS, V1D, V1Dinv);
-        massEdgeInv = V1D(ii,jj)*V1D(jj,ii);
+        massEdgeInv = sum(V1D(ii,kk)*V1D(kk,jj), kk);
 
         Inverter.computeInverse(massEdgeInv, massEdge3);
         for (index_type i=0; i < NumFacePoints; ++i) {
             for (index_type j=2*NumFacePoints; j < 3*NumFacePoints; ++j) {
-                E(i,j) = massEdge3(i,j % NumFacePoints);
+                E(Fm(i,2),j) = massEdge3(i,j % NumFacePoints);
             }
         }
 
