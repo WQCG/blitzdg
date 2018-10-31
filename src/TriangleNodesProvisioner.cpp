@@ -422,6 +422,8 @@ namespace blitzdg {
             }
         }
 
+        std::cout << "E: " << std::endl << E << std::endl; 
+
         // Get the Vandermonde guy.
         real_matrix_type V2D(NumLocalPoints, NumLocalPoints);
         V2D = 0.0*jj;
