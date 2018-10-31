@@ -115,14 +115,31 @@ namespace blitzdg {
 
 			It(Should_Build_Lifting_Operator) {
 				cout << "Should_Build_Lifting_Operator" << endl;
+
+				const int Np = (NOrder+1)*(NOrder+2)/2;
+				const int totalNfp = (TriangleNodesProvisioner::NumFaces)*(NOrder+1);
+
 		        TriangleNodesProvisioner & triangleNodes = *triangleNodesProvisioner;
 				triangleNodes.buildNodes();
 				triangleNodes.buildLift();
 
 				const real_matrix_type& Lift = triangleNodes.get_Lift();
-				cout << Lift;
-				cout << endl;
-				Assert::That(false, IsTrue());
+
+				real_matrix_type Lift_expected(Np, totalNfp);
+				Lift_expected = 7,4.04508,-1.54508,0.5,-0.833333,-4.16667,-4.16667,-0.833333,7,4.04508,-1.54508,0.5,
+							0.809017,8,1.5,-0.309017,0.259115,2.26295,0.0719685,-0.805181,-0.292448,-2.23864,1.07038,-0.328153,
+							-0.309017,1.5,8,0.809017,-0.292448,-2.23864,1.07038,-0.328153,0.259115,2.26295,0.0719685,-0.805181,
+							0.5,-1.54508,4.04508,7,7,4.04508,-1.54508,0.5,-0.833333,-4.16667,-4.16667,-0.833333,
+							-0.292448,-2.23864,1.07038,-0.328153,-0.805181,0.0719685,2.26295,0.259115,0.809017,8,1.5,-0.309017,
+							0.0617284,-0.987654,-0.987654,0.0617284,0.0617284,-0.987654,-0.987654,0.0617284,0.0617284,-0.987654,-0.987654,0.0617284,
+							-0.328153,1.07038,-2.23864,-0.292448,0.809017,8,1.5,-0.309017,-0.805181,0.0719685,2.26295,0.259115,
+							0.259115,2.26295,0.0719685,-0.805181,-0.328153,1.07038,-2.23864,-0.292448,-0.309017,1.5,8,0.809017,
+							-0.805181,0.0719685,2.26295,0.259115,-0.309017,1.5,8,0.809017,-0.328153,1.07038,-2.23864,-0.292448,
+							-0.833333,-4.16667,-4.16667,-0.833333,0.5,-1.54508,4.04508,7,0.5,-1.54508,4.04508,7;
+
+				real_matrix_type res(Np, totalNfp);
+				res = Lift-Lift_expected;
+				Assert::That(normFro(res), IsLessThan(epsf));
 			}
 
 			It(Should_Compute_Warp_Factor) {

@@ -308,6 +308,7 @@ namespace blitzdg {
 
         testField = s+1;
         index_type count = 0;
+        fmask1 = 0*ii;
         for (index_type i=0; i < NumLocalPoints; i++) {
             if (abs(testField(i)) < NodeTol) {
                 fmask1(count) = i;
@@ -317,6 +318,7 @@ namespace blitzdg {
 
         testField = r+s;
         count = 0;
+        fmask2 = 0*ii;
         for (index_type i=0; i < NumLocalPoints; i++) {
             if (abs(testField(i)) < NodeTol) {
                 fmask2(count) = i;
@@ -326,6 +328,7 @@ namespace blitzdg {
 
         testField = r+1;
         count = 0;
+        fmask3 = 0*ii;
         for (index_type i=0; i < NumLocalPoints; i++) {
             if (abs(testField(i)) < NodeTol) {
                 fmask3(count) = i;
@@ -336,7 +339,6 @@ namespace blitzdg {
         // TODO: Move Fmask computation to a helper method.
         index_matrix_type Fm = *Fmask.get();
         Fm = 0*jj;
-        std::cout << Fm << std::endl;
         Fm(Range::all(), 0) = fmask1;
         Fm(Range::all(), 1) = fmask2;
         Fm(Range::all(), 2) = fmask3;
@@ -347,7 +349,7 @@ namespace blitzdg {
         secondIndex jj;
         thirdIndex kk;
 
-        real_matrix_type E(NumLocalPoints, NumFaces*NumFacePoints);
+        real_matrix_type E(NumLocalPoints, NumFaces*NumFacePoints), MassInv(NumLocalPoints, NumLocalPoints);
 
         real_matrix_type & Liftref = *Lift.get();
 
@@ -355,6 +357,7 @@ namespace blitzdg {
         real_vector_type& s = *sGrid.get();
 
         index_matrix_type Fm = *Fmask.get();
+
 
         real_vector_type faceR(NumFacePoints), faceS(NumFacePoints);
         real_matrix_type V1D(NumFacePoints, NumFacePoints), V1Dinv(NumFacePoints,NumFacePoints);
@@ -366,11 +369,18 @@ namespace blitzdg {
         // Face 1
         for (index_type i=0; i < NumFacePoints; ++i)
             faceR(i) = r(Fm(i, 0));
-        
+
+        std::cout << faceR << std::endl;
+
         Vandermonde.computeVandermondeMatrix(faceR, V1D, V1Dinv);
-        massEdgeInv = sum(V1D(ii,kk)*V1D(kk,jj), kk);
+        massEdgeInv = sum(V1D(ii,kk)*V1D(jj,kk), kk);
+
+        std::cout << massEdgeInv << std::endl;
 
         Inverter.computeInverse(massEdgeInv, massEdge1);
+
+        std::cout << massEdge1 << std::endl;
+
         for (index_type i=0; i < NumFacePoints; ++i) {
             for (index_type j=0; j < NumFacePoints; ++j) {
                 E(Fm(i,0),j) = massEdge1(i,j);
@@ -380,9 +390,13 @@ namespace blitzdg {
         // Face 2
         for (index_type i=0; i < NumFacePoints; ++i)
             faceR(i) = r(Fm(i, 1));
+        
+        std::cout << Fm(Range::all(), 1) << std::endl;
+        std::cout << faceR << std::endl;
+
 
         Vandermonde.computeVandermondeMatrix(faceR, V1D, V1Dinv);
-        massEdgeInv = sum(V1D(ii,kk)*V1D(kk,jj), kk);
+        massEdgeInv = sum(V1D(ii,kk)*V1D(jj,kk), kk);
 
         Inverter.computeInverse(massEdgeInv, massEdge2);
         for (index_type i=0; i < NumFacePoints; ++i) {
@@ -395,8 +409,11 @@ namespace blitzdg {
         for (index_type i=0; i < NumFacePoints; ++i)
             faceS(i) = s(Fm(i, 2));
         
+
+        std::cout << faceS << std::endl;
+
         Vandermonde.computeVandermondeMatrix(faceS, V1D, V1Dinv);
-        massEdgeInv = sum(V1D(ii,kk)*V1D(kk,jj), kk);
+        massEdgeInv = sum(V1D(ii,kk)*V1D(jj,kk), kk);
 
         Inverter.computeInverse(massEdgeInv, massEdge3);
         for (index_type i=0; i < NumFacePoints; ++i) {
@@ -405,8 +422,20 @@ namespace blitzdg {
             }
         }
 
-        // Assign resulting matrix to object's property.
-        Liftref = E;
+        // Get the Vandermonde guy.
+        real_matrix_type V2D(NumLocalPoints, NumLocalPoints);
+        V2D = 0.0*jj;
+        computeVandermondeMatrix(NOrder, r, s, V2D);
+
+        MassInv = 0.0*jj;
+        MassInv = sum(V2D(ii,kk)*V2D(jj,kk), kk);
+
+        std::cout << "Minv:" << std::endl << MassInv << std::endl;
+
+        // Multiply by inverse mass matrix;
+        Liftref = sum(MassInv(ii,kk)*E(kk,jj),kk);
+
+        std::cout << "Lift:" << std::endl << Liftref << std::endl;
     }
 
     const real_matrix_type & TriangleNodesProvisioner::get_Lift() const {
