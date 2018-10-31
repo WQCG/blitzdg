@@ -381,6 +381,7 @@ namespace blitzdg {
 
         std::cout << massEdge1 << std::endl;
 
+        E = 0.0*jj;
         for (index_type i=0; i < NumFacePoints; ++i) {
             for (index_type j=0; j < NumFacePoints; ++j) {
                 E(Fm(i,0),j) = massEdge1(i,j);
