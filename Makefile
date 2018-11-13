@@ -70,7 +70,7 @@ $(BUILDDIR)/%.$(DEPEXT): $(SRCDIR)/%.$(SRCEXT)
 
 clean:
 	@echo " Cleaning...";
-	@echo " $(RM) -r $(BUILDDIR) $(BINDIR)"; $(RM) -r $(BUILDDIR) $(BINDIR)
+	@echo " $(RM) -r $(BUILDDIR) $(BINDIR)" artifacts; $(RM) -r $(BUILDDIR) $(BINDIR) artifacts
 
 test: $(BINDIR)/test
 	@$(BINDIR)/test
