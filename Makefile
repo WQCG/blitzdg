@@ -51,6 +51,10 @@ ifeq ($(OS), Windows_NT)
 	LIB += $(EXPLICITLIBS)
 endif
 
+ifeq ($(CXX), x86_64-w64-mingw32-g++-posix)
+	INC += -I /usr/include/x86_64-linux-gnu/
+endif
+
 all: $(TARGETS)
 
 $(TARGETS): $(ALLOBJECTS)
