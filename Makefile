@@ -42,7 +42,7 @@ endif
 
 CFLAGS := -g -Wall -std=c++0x -fprofile-arcs -ftest-coverage -DBZ_DEBUG
 LINKERFLAGS := -fprofile-arcs
-INC := -I include -I include/igloo
+INC := -I $(INCDIR) -I $(INCDIR)/igloo -I /opt/blitzpp/blitz-1.0.1
 LIB := -L lib -lblitz -lmetis -lumfpack -lcxsparse -llapack -lblas
 EXPLICITLIBS := -lgfortran -lcholmod -lamd -lcolamd -lquadmath -lsuitesparseconfig
 VALGRIND := valgrind --error-exitcode=1 --leak-check=full --track-origins=yes
