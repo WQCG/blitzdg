@@ -4,7 +4,7 @@
 #include <igloo/igloo_alt.h>
 #include "Warning.hpp"
 
-int main(const int argc, const char *argv[])
+int main(const int argc, char **argv)
 {
   using namespace igloo;
   blitzdg::printDisclaimer();
