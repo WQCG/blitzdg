@@ -11,7 +11,6 @@
 #pragma once
 #include "DirectSolver.hpp"
 #include "JacobiBuilders.hpp"
-#include "DenseMatrixInverter.hpp"
 #include "VandermondeBuilders.hpp"
 #include "Types.hpp"
 #include <memory>
@@ -64,7 +63,6 @@ namespace blitzdg {
 
       DirectSolver LinSolver;
       JacobiBuilders Jacobi;
-      DenseMatrixInverter Inverter;
       VandermondeBuilders Vandermonde;
 
       /**
