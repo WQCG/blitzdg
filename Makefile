@@ -72,6 +72,12 @@ $(BUILDDIR)/%.$(DEPEXT): $(SRCDIR)/%.$(SRCEXT)
 	$(CXX) $(CFLAGS) $(INC) -MM -MF $@ -MP -MT $(DEPPATH).$(OBJEXT) -MT $(DEPPATH).$(DEPEXT) $<
 	@$(RM) [0-9]
 
+$(BUILDDIR)/%.$(DEPEXT): $(SRCDIR)/%.$(SRCEXT)
+	@mkdir -p $(BUILDDIRS)
+	@echo "Building dependency $@..."
+	$(CXX) $(CFLAGS) $(INC) -MM -MF $@ -MP -MT $(DEPPATH).$(OBJEXT) -MT $(DEPPATH).$(DEPEXT) $<
+	@$(RM) [0-9]
+
 clean:
 	@echo " Cleaning...";
 	@echo " $(RM) -r $(BUILDDIR) $(BINDIR)" artifacts; $(RM) -r $(BUILDDIR) $(BINDIR) artifacts
