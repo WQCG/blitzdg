@@ -4,7 +4,6 @@
 #include "Nodes1DProvisioner.hpp"
 #include "CSCMatrix.hpp"
 #include "BlitzHelpers.hpp"
-#include "DenseMatrixInverter.hpp"
 #include "VandermondeBuilders.hpp"
 #include "Types.hpp"
 #include <blitz/array.h>
@@ -46,7 +45,7 @@ namespace blitzdg {
         EToF{ new index_matrix_type(NumElements, NumFaces) },
         vmapM{ new index_vector_type(NumFacePoints*NumFaces*NumElements) },
         vmapP{ new index_vector_type(NumFacePoints*NumFaces*NumElements) },
-        LinSolver{}, Jacobi{}, Inverter{}, Vandermonde{}
+        LinSolver{}, Jacobi{}, Vandermonde{}
     {}
 
     void Nodes1DProvisioner::buildNodes() {
