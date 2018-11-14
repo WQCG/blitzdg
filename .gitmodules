@@ -1,0 +1,3 @@
+[submodule "include/igloo"]
+	path = include/igloo
+	url = https://github.com/check002/igloo.git

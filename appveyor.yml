@@ -1,8 +1,9 @@
-version: 1.0.{build}
+version: 0.1.{build}
 environment:	
   EXTRACFLAGS: -Wno-deprecated-declarations	
 build_script:	
 - pwsh: |	
+    git submodule update --init --recursive
     Invoke-RestMethod -Uri https://s3.amazonaws.com/dsteinmo-libs/include-deps.zip -OutFile include-deps.zip	
     Invoke-RestMethod -Uri https://s3.amazonaws.com/dsteinmo-libs/deps-win-mingw64-gcc7.zip -OutFile deps-win-mingw64.zip	
     Expand-Archive -Path include-deps.zip -DestinationPath .\include\	
