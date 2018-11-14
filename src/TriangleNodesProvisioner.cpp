@@ -423,6 +423,6 @@ namespace blitzdg {
     }
 
     const real_matrix_type & TriangleNodesProvisioner::get_Lift() const {
-        return *Lift.get();
+        return *Lift;
     }
 }
