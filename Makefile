@@ -42,7 +42,7 @@ endif
 
 CFLAGS := -g -Wall -std=c++0x -fprofile-arcs -ftest-coverage -DBZ_DEBUG
 LINKERFLAGS := -fprofile-arcs
-INC := -I $(INCDIR) -I $(INCDIR)/igloo -I /opt/blitzpp/blitz-1.0.1
+INC := -I $(INCDIR) -I $(INCDIR)/igloo
 LIB := -L lib -lblitz -lmetis -lumfpack -lcxsparse -llapack -lblas
 EXPLICITLIBS := -lgfortran -lcholmod -lamd -lcolamd -lquadmath -lsuitesparseconfig
 VALGRIND := valgrind --error-exitcode=1 --leak-check=full --track-origins=yes
@@ -52,7 +52,9 @@ ifeq ($(OS), Windows_NT)
 endif
 
 ifeq ($(CXX), x86_64-w64-mingw32-g++-posix)
-	INC += -I $(INCDIR) -I $(INCDIR)/igloo -I /usr/lib/gcc/x86_64-w64-mingw32/6.3-posix/include/c++/parallel/ -I /opt/blitzpp-mingw64/blitz-1.0.1
+	INC += -I /usr/lib/gcc/x86_64-w64-mingw32/6.3-posix/include/c++/parallel/ -I /opt/blitzpp-mingw64/blitz-1.0.1
+else
+	INC += -I /opt/blitzpp/blitz-1.0.1
 endif
 
 all: $(TARGETS)
