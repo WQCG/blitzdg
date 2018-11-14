@@ -28,6 +28,7 @@ namespace blitzdg {
       index_type NumElements;
       index_type NOrder;
       index_type NumLocalPoints;
+      index_type NumFacePoints;
 
       real_mat_smart_ptr xGrid;
       real_mat_smart_ptr yGrid;
@@ -48,7 +49,7 @@ namespace blitzdg {
       real_mat_smart_ptr ny;
       real_mat_smart_ptr Vinv;
 
-      index_vec_smart_ptr Fmask;
+      index_mat_smart_ptr Fmask;
       real_mat_smart_ptr Fx;
       real_mat_smart_ptr Fy;
 
@@ -62,11 +63,12 @@ namespace blitzdg {
       index_vec_smart_ptr vmapP;
 
       const MeshManager * Mesh2D;
-      
+
       std::unique_ptr<Nodes1DProvisioner> Nodes1D;
-	    JacobiBuilders Jacobi;
+	  JacobiBuilders Jacobi;
       VandermondeBuilders Vandermonde;
       DirectSolver LinSolver;
+      DenseMatrixInverter Inverter;
 
   public:
       static const index_type NumFaces;
@@ -300,6 +302,16 @@ namespace blitzdg {
        * Returns a reference to the volume to surface map, 'plus' traces.
        */
       const index_vector_type & get_vmapP() const;
+
+      /**
+       * Builds nodes and local operators, geometric factors.
+       */
+      void buildNodes();
+
+      /**
+       * Builds the Surface-To-Volume Lifting Operator.
+       */
+      void buildLift();
       
       /**
        * Returns the number of nodes local to a 2D triangular element.

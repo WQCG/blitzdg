@@ -20,6 +20,7 @@ using blitz::sum;
 using blitz::thirdIndex;
 using std::numeric_limits;
 using std::unique_ptr;
+using std::abs;
 
 namespace blitzdg {
     const index_type TriangleNodesProvisioner::NumFaces = 3;
@@ -28,9 +29,12 @@ namespace blitzdg {
 
     TriangleNodesProvisioner::TriangleNodesProvisioner(index_type _NOrder, index_type _NumElements, const MeshManager * _MeshManager) 
         : NumElements{ _NumElements }, NOrder{ _NOrder },
-        NumLocalPoints{ (_NOrder + 2)*(_NOrder+1)/2 }, 
+        NumLocalPoints{ (_NOrder + 2)*(_NOrder+1)/2 },
+        NumFacePoints{ _NOrder + 1},
         xGrid{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
+        yGrid{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
         rGrid{ new real_vector_type((_NOrder + 2)*(_NOrder+1)/2) },
+        sGrid{ new real_vector_type((_NOrder + 2)*(_NOrder+1)/2) },
         V{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) }, 
         Dr{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
         Lift{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder+1)*NumFaces) },
@@ -38,8 +42,7 @@ namespace blitzdg {
         rx{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
         nx{ new real_matrix_type((_NOrder+1)*NumFaces, NumElements) },
         Vinv{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
-        Fmask{ new index_vector_type((_NOrder+1)*NumFaces) },
-        Fx{ new real_matrix_type((_NOrder+1)*NumFaces, NumElements) },
+        Fmask{ new index_matrix_type( _NOrder+1, NumFaces) },
         Fscale{ new real_matrix_type((_NOrder+1)*NumFaces, NumElements) },
         EToV{ new index_matrix_type(NumElements, NumFaces) },
         EToE{ new index_matrix_type(NumElements, NumFaces) },
@@ -48,7 +51,7 @@ namespace blitzdg {
         vmapP{ new index_vector_type((_NOrder+1)*NumFaces*NumElements) },
         Mesh2D { _MeshManager },
         Nodes1D{ new Nodes1DProvisioner(_NOrder, NumElements, -1.0, 1.0) },
-		Jacobi{}, Vandermonde{}, LinSolver{}
+		Jacobi{}, Vandermonde{}, LinSolver{}, Inverter{}
     {}
 
 
@@ -287,5 +290,139 @@ namespace blitzdg {
         // Normalize
         dpdr = pow(2., id+0.5)*dpdr; 
         dpds = pow(2., id+0.5)*dpds;
+    }
+
+    void TriangleNodesProvisioner::buildNodes() {
+        firstIndex ii;
+        secondIndex jj;
+
+        real_vector_type x(NumLocalPoints), y(NumLocalPoints);
+
+        real_vector_type& r = *rGrid.get();
+        real_vector_type& s = *sGrid.get();
+
+        computeEquilateralNodes(x, y);
+        xyTors(x, y, r, s);
+
+        real_vector_type fmask1(NumFacePoints), fmask2(NumFacePoints), fmask3(NumFacePoints), testField(NumLocalPoints);
+
+        testField = s+1;
+        index_type count = 0;
+        fmask1 = 0*ii;
+        for (index_type i=0; i < NumLocalPoints; i++) {
+            if (abs(testField(i)) < NodeTol) {
+                fmask1(count) = i;
+                ++count;
+            }
+        }
+
+        testField = r+s;
+        count = 0;
+        fmask2 = 0*ii;
+        for (index_type i=0; i < NumLocalPoints; i++) {
+            if (abs(testField(i)) < NodeTol) {
+                fmask2(count) = i;
+                ++count;
+            }
+        }
+
+        testField = r+1;
+        count = 0;
+        fmask3 = 0*ii;
+        for (index_type i=0; i < NumLocalPoints; i++) {
+            if (abs(testField(i)) < NodeTol) {
+                fmask3(count) = i;
+                ++count;
+            }
+        }
+
+        // TODO: Move Fmask computation to a helper method.
+        index_matrix_type Fm = *Fmask.get();
+        Fm = 0*jj;
+        Fm(Range::all(), 0) = fmask1;
+        Fm(Range::all(), 1) = fmask2;
+        Fm(Range::all(), 2) = fmask3;
+    }
+
+    void TriangleNodesProvisioner::buildLift() {
+        firstIndex ii;
+        secondIndex jj;
+        thirdIndex kk;
+
+        real_matrix_type E(NumLocalPoints, NumFaces*NumFacePoints), MassInv(NumLocalPoints, NumLocalPoints);
+
+        real_matrix_type & Liftref = *Lift.get();
+
+        real_vector_type& r = *rGrid.get();
+        real_vector_type& s = *sGrid.get();
+
+        index_matrix_type Fm = *Fmask.get();
+
+
+        real_vector_type faceR(NumFacePoints), faceS(NumFacePoints);
+        real_matrix_type V1D(NumFacePoints, NumFacePoints), V1Dinv(NumFacePoints,NumFacePoints);
+        real_matrix_type massEdgeInv(NumFacePoints, NumFacePoints);
+
+        real_matrix_type massEdge1(NumFacePoints, NumFacePoints), massEdge2(NumFacePoints,NumFacePoints),
+                         massEdge3(NumFacePoints, NumFacePoints);
+
+        // Face 1
+        for (index_type i=0; i < NumFacePoints; ++i)
+            faceR(i) = r(Fm(i, 0));
+
+        Vandermonde.computeVandermondeMatrix(faceR, V1D, V1Dinv);
+        massEdgeInv = sum(V1D(ii,kk)*V1D(jj,kk), kk);
+
+        Inverter.computeInverse(massEdgeInv, massEdge1);
+
+        E = 0.0*jj;
+        for (index_type i=0; i < NumFacePoints; ++i) {
+            for (index_type j=0; j < NumFacePoints; ++j) {
+                E(Fm(i,0),j) = massEdge1(i,j);
+            }
+        }
+
+        // Face 2
+        for (index_type i=0; i < NumFacePoints; ++i)
+            faceR(i) = r(Fm(i, 1));
+
+        Vandermonde.computeVandermondeMatrix(faceR, V1D, V1Dinv);
+        massEdgeInv = sum(V1D(ii,kk)*V1D(jj,kk), kk);
+
+        Inverter.computeInverse(massEdgeInv, massEdge2);
+        for (index_type i=0; i < NumFacePoints; ++i) {
+            for (index_type j=NumFacePoints; j < 2*NumFacePoints; ++j) {
+                E(Fm(i,1),j) = massEdge2(i,j - NumFacePoints);
+            }
+        }
+
+        // Face 3.
+        for (index_type i=0; i < NumFacePoints; ++i)
+            faceS(i) = s(Fm(i, 2));
+
+        Vandermonde.computeVandermondeMatrix(faceS, V1D, V1Dinv);
+        massEdgeInv = sum(V1D(ii,kk)*V1D(jj,kk), kk);
+
+        Inverter.computeInverse(massEdgeInv, massEdge3);
+        for (index_type i=0; i < NumFacePoints; ++i) {
+            for (index_type j=2*NumFacePoints; j < 3*NumFacePoints; ++j) {
+                E(Fm(i,2),j) = massEdge3(i,j - 2*NumFacePoints);
+            }
+        }
+
+        // Get the Vandermonde guy.
+        real_matrix_type V2D(NumLocalPoints, NumLocalPoints);
+        V2D = 0.0*jj;
+        computeVandermondeMatrix(NOrder, r, s, V2D);
+
+        MassInv = 0.0*jj;
+        MassInv = sum(V2D(ii,kk)*V2D(jj,kk), kk);
+
+        // Multiply by inverse mass matrix;
+        Liftref = sum(MassInv(ii,kk)*E(kk,jj),kk);
+    }
+
+    const real_matrix_type & TriangleNodesProvisioner::get_Lift() const {
+        return *Lift;
     }
 }
