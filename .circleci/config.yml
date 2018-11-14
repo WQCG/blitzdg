@@ -5,7 +5,7 @@ jobs:
       ignore:
         - gh-pages
     docker:
-      - image: dsteinmoeller/blitzdg-circle:0.11
+      - image: dsteinmoeller/blitzdg-circle:0.12
     environment:
       EXTRACFLAGS: "-Wno-deprecated-declarations"
 
