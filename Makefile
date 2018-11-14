@@ -52,7 +52,7 @@ ifeq ($(OS), Windows_NT)
 endif
 
 ifeq ($(CXX), x86_64-w64-mingw32-g++-posix)
-	INC += -I /usr/include/x86_64-linux-gnu/ -I /usr/lib/gcc/x86_64-w64-mingw32/6.3-posix/include/c++/parallel/
+	INC += -I /usr/lib/gcc/x86_64-w64-mingw32/6.3-posix/include/c++/parallel/
 endif
 
 all: $(TARGETS)
