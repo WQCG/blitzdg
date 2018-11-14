@@ -392,7 +392,7 @@ namespace blitzdg {
         Inverter.computeInverse(massEdgeInv, massEdge2);
         for (index_type i=0; i < NumFacePoints; ++i) {
             for (index_type j=NumFacePoints; j < 2*NumFacePoints; ++j) {
-                E(Fm(i,1),j) = massEdge2(i,j % NumFacePoints);
+                E(Fm(i,1),j) = massEdge2(i,j - NumFacePoints);
             }
         }
 
@@ -406,7 +406,7 @@ namespace blitzdg {
         Inverter.computeInverse(massEdgeInv, massEdge3);
         for (index_type i=0; i < NumFacePoints; ++i) {
             for (index_type j=2*NumFacePoints; j < 3*NumFacePoints; ++j) {
-                E(Fm(i,2),j) = massEdge3(i,j % NumFacePoints);
+                E(Fm(i,2),j) = massEdge3(i,j - 2*NumFacePoints);
             }
         }
 
