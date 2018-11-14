@@ -370,16 +370,10 @@ namespace blitzdg {
         for (index_type i=0; i < NumFacePoints; ++i)
             faceR(i) = r(Fm(i, 0));
 
-        std::cout << faceR << std::endl;
-
         Vandermonde.computeVandermondeMatrix(faceR, V1D, V1Dinv);
         massEdgeInv = sum(V1D(ii,kk)*V1D(jj,kk), kk);
 
-        std::cout << massEdgeInv << std::endl;
-
         Inverter.computeInverse(massEdgeInv, massEdge1);
-
-        std::cout << massEdge1 << std::endl;
 
         E = 0.0*jj;
         for (index_type i=0; i < NumFacePoints; ++i) {
@@ -391,10 +385,6 @@ namespace blitzdg {
         // Face 2
         for (index_type i=0; i < NumFacePoints; ++i)
             faceR(i) = r(Fm(i, 1));
-        
-        std::cout << Fm(Range::all(), 1) << std::endl;
-        std::cout << faceR << std::endl;
-
 
         Vandermonde.computeVandermondeMatrix(faceR, V1D, V1Dinv);
         massEdgeInv = sum(V1D(ii,kk)*V1D(jj,kk), kk);
@@ -409,9 +399,6 @@ namespace blitzdg {
         // Face 3.
         for (index_type i=0; i < NumFacePoints; ++i)
             faceS(i) = s(Fm(i, 2));
-        
-
-        std::cout << faceS << std::endl;
 
         Vandermonde.computeVandermondeMatrix(faceS, V1D, V1Dinv);
         massEdgeInv = sum(V1D(ii,kk)*V1D(jj,kk), kk);
@@ -423,8 +410,6 @@ namespace blitzdg {
             }
         }
 
-        std::cout << "E: " << std::endl << E << std::endl; 
-
         // Get the Vandermonde guy.
         real_matrix_type V2D(NumLocalPoints, NumLocalPoints);
         V2D = 0.0*jj;
@@ -433,12 +418,8 @@ namespace blitzdg {
         MassInv = 0.0*jj;
         MassInv = sum(V2D(ii,kk)*V2D(jj,kk), kk);
 
-        std::cout << "Minv:" << std::endl << MassInv << std::endl;
-
         // Multiply by inverse mass matrix;
         Liftref = sum(MassInv(ii,kk)*E(kk,jj),kk);
-
-        std::cout << "Lift:" << std::endl << Liftref << std::endl;
     }
 
     const real_matrix_type & TriangleNodesProvisioner::get_Lift() const {
