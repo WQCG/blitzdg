@@ -23,6 +23,12 @@ RUN tar xvf blitzpp-1.0.1.tar.gz -C /opt/blitzpp
 WORKDIR /opt/blitzpp/blitz-1.0.1
 RUN ./configure && make && make install
 
+# build blitz for mingw64
+RUN mkdir -p /opt/blitzpp-mingw64
+RUN tar xvf blitzpp-1.0.1.tar.gz -C /opt/blitzpp-mingw64
+WORKDIR /opt/blitzpp-mingw64/blitz-1.0.1
+RUN CXX=x86_64-w64-mingw32-g++-posix ./configure --host mingw64
+
 # Pull in doxygen and deps.
 RUN mkdir -p /opt/doxygen
 

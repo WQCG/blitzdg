@@ -52,7 +52,10 @@ ifeq ($(OS), Windows_NT)
 endif
 
 ifeq ($(CXX), x86_64-w64-mingw32-g++-posix)
-	INC += -I /usr/lib/gcc/x86_64-w64-mingw32/6.3-posix/include/c++/parallel/
+        @cp /usr/include/metis.h include/.
+        @ln -s /usr/include/suitesparse include/suitesparse
+        @ln -s /usr/include/boost include/boost
+        INC = -I $(INCDIR) -I $(INCDIR)/igloo -I /usr/lib/gcc/x86_64-w64-mingw32/6.3-posix/include/c++/parallel/ -I /opt/blitzpp-mingw64/blitz-1.0.1
 endif
 
 all: $(TARGETS)
