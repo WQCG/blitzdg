@@ -5,7 +5,7 @@ CXX := $(or $(CXX), g++)
 SRCDIR := src
 BUILDDIR := build
 BINDIR := bin
-INCDIR := include
+INCDIR := $(or $(INCDIR), include)
 
 SRCEXT := cpp
 DEPEXT := d
@@ -42,7 +42,7 @@ endif
 
 CFLAGS := -g -Wall -std=c++0x -fprofile-arcs -ftest-coverage -DBZ_DEBUG
 LINKERFLAGS := -fprofile-arcs
-INC := -I $(INCDIR) -I $(INCDIR)/igloo
+INC := -I include/igloo -I $(INCDIR)
 LIB := -L lib -lblitz -lmetis -lumfpack -lcxsparse -llapack -lblas
 EXPLICITLIBS := -lgfortran -lcholmod -lamd -lcolamd -lquadmath -lsuitesparseconfig
 VALGRIND := valgrind --error-exitcode=1 --leak-check=full --track-origins=yes
