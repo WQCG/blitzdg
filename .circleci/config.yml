@@ -6,8 +6,6 @@ jobs:
         - gh-pages
     docker:
       - image: dsteinmoeller/blitzdg-circle:0.12
-    environment:
-      INC: "-I /opt/blitzpp/blitz-1.0.1"
 
     steps:
       - checkout
@@ -17,7 +15,7 @@ jobs:
             git submodule update --init --recursive
       - run:
           name: Build (clang)
-          command: CXX=clang++ make -j4 && make clean
+          command: CXX=clang++ INC="-I /opt/blitzpp/blitz-1.0.1" make -j4 && make clean
       - run:
           name: Build (mingw)
           command: |
@@ -29,7 +27,7 @@ jobs:
             CXX=x86_64-w64-mingw32-g++-posix INC="$INC -I mingw-include/" make -j4 && make clean
       - run:
           name: Build (gcc)
-          command: CXX='g++ -Og' make -j4
+          command: CXX='g++ -Og' INC="-I /opt/blitzpp/blitz-1.0.1" make -j4
       - run:
           name: Test
           command: make test
