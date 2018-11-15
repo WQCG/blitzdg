@@ -5,7 +5,7 @@ CXX := $(or $(CXX), g++)
 SRCDIR := src
 BUILDDIR := build
 BINDIR := bin
-INCDIR := $(or $(INCDIR), include)
+INC := $(INC)
 
 SRCEXT := cpp
 DEPEXT := d
@@ -42,7 +42,7 @@ endif
 
 CFLAGS := -g -Wall -std=c++0x -fprofile-arcs -ftest-coverage -DBZ_DEBUG
 LINKERFLAGS := -fprofile-arcs
-INC := -I include/igloo -I $(INCDIR)
+INC += -I include/igloo -I include
 LIB := -L lib -lblitz -lmetis -lumfpack -lcxsparse -llapack -lblas
 EXPLICITLIBS := -lgfortran -lcholmod -lamd -lcolamd -lquadmath -lsuitesparseconfig
 VALGRIND := valgrind --error-exitcode=1 --leak-check=full --track-origins=yes
@@ -54,8 +54,6 @@ endif
 ifeq ($(CXX), x86_64-w64-mingw32-g++-posix)
 	INC += -I /usr/lib/gcc/x86_64-w64-mingw32/6.3-posix/include/c++/parallel/ -I /opt/blitzpp-mingw64/blitz-1.0.1
 	LIB += $(EXPLICITLIBS)
-else
-	INC += -I /opt/blitzpp/blitz-1.0.1
 endif
 
 all: $(TARGETS)

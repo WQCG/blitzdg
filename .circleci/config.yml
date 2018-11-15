@@ -7,7 +7,7 @@ jobs:
     docker:
       - image: dsteinmoeller/blitzdg-circle:0.12
     environment:
-      EXTRACFLAGS: "-Wno-deprecated-declarations"
+      INC: "-I /opt/blitzpp/blitz-1.0.1"
 
     steps:
       - checkout
@@ -21,13 +21,12 @@ jobs:
       - run:
           name: Build (mingw)
           command: |
-            cp /usr/include/metis.h include/.
             curl https://s3.amazonaws.com/dsteinmo-libs/include-deps.zip -o include-deps.zip
             mkdir -p mingw-include
             unzip include-deps.zip -d  mingw-include/
             curl https://s3.amazonaws.com/dsteinmo-libs/deps-win-mingw64-gcc7.zip -o deps-win-mingw64.zip
             unzip deps-win-mingw64.zip -d lib/
-            CXX=x86_64-w64-mingw32-g++-posix INCDIR=mingw-include/ make -j4 && make clean
+            CXX=x86_64-w64-mingw32-g++-posix INC="$INC -I mingw-include/" make -j4 && make clean
       - run:
           name: Build (gcc)
           command: CXX='g++ -Og' make -j4
