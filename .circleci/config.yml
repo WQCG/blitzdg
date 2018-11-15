@@ -21,10 +21,10 @@ jobs:
           command: |
             curl https://s3.amazonaws.com/dsteinmo-libs/include-deps.zip -o include-deps.zip
             mkdir -p mingw-include
-            unzip include-deps.zip -d  mingw-include/
+            unzip include-deps.zip -qq -d  mingw-include/
             rm -rf mingw-include/igloo
             curl https://s3.amazonaws.com/dsteinmo-libs/deps-win-mingw64-gcc7.zip -o deps-win-mingw64.zip
-            unzip deps-win-mingw64.zip -d lib/
+            unzip deps-win-mingw64.zip  -qq -d lib/
             CXX=x86_64-w64-mingw32-g++-posix INC="$INC -I mingw-include/" make -j4 && make clean
       - run:
           name: Build (gcc)
