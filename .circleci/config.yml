@@ -25,7 +25,7 @@ jobs:
             rm -rf mingw-include/igloo
             curl https://s3.amazonaws.com/dsteinmo-libs/deps-win-mingw64-gcc7.zip -o deps-win-mingw64.zip
             unzip -qq deps-win-mingw64.zip -d lib/
-            CXX=x86_64-w64-mingw32-g++-posix INC="$INC -I mingw-include/" make -j4 && make clean
+            CXX=x86_64-w64-mingw32-g++-posix INC="$INC -I mingw-include/" LIB="-L lib" make -j4 && make clean
       - run:
           name: Build (gcc)
           command: CXX='g++ -Og' INC="-I /opt/blitzpp/blitz-1.0.1" make -j4
