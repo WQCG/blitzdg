@@ -44,7 +44,7 @@ CFLAGS := -g -Wall -std=c++0x -fprofile-arcs -ftest-coverage -DBZ_DEBUG
 LINKERFLAGS := -fprofile-arcs
 INC += -I include/igloo -I include
 LIB := -L lib -lblitz -lmetis -lumfpack -lcxsparse -llapack -lblas
-EXPLICITLIBS := -lgfortran -lcholmod -lamd -lcolamd -lquadmath -lsuitesparseconfig
+EXPLICITLIBS := -lgfortran -lcholmod -lamd -lcolamd -lquadmath -lsuitesparseconfig -lcrtdll
 VALGRIND := valgrind --error-exitcode=1 --leak-check=full --track-origins=yes
 
 ifeq ($(OS), Windows_NT)
