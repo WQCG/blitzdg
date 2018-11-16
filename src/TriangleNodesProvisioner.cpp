@@ -20,6 +20,7 @@ using blitz::sum;
 using blitz::thirdIndex;
 using std::numeric_limits;
 using std::unique_ptr;
+using std::abs;
 
 namespace blitzdg {
     const index_type TriangleNodesProvisioner::NumFaces = 3;
@@ -31,7 +32,9 @@ namespace blitzdg {
         NumLocalPoints{ (_NOrder + 2)*(_NOrder+1)/2 },
         NumFacePoints{ _NOrder + 1},
         xGrid{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
+        yGrid{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
         rGrid{ new real_vector_type((_NOrder + 2)*(_NOrder+1)/2) },
+        sGrid{ new real_vector_type((_NOrder + 2)*(_NOrder+1)/2) },
         V{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) }, 
         Dr{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
         Lift{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder+1)*NumFaces) },
@@ -39,6 +42,7 @@ namespace blitzdg {
         rx{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
         nx{ new real_matrix_type((_NOrder+1)*NumFaces, NumElements) },
         Vinv{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
+        Fmask{ new index_matrix_type( _NOrder+1, NumFaces) },
         Fscale{ new real_matrix_type((_NOrder+1)*NumFaces, NumElements) },
         EToV{ new index_matrix_type(NumElements, NumFaces) },
         EToE{ new index_matrix_type(NumElements, NumFaces) },
@@ -304,8 +308,9 @@ namespace blitzdg {
 
         testField = s+1;
         index_type count = 0;
+        fmask1 = 0*ii;
         for (index_type i=0; i < NumLocalPoints; i++) {
-            if (testField(i) < NodeTol) {
+            if (abs(testField(i)) < NodeTol) {
                 fmask1(count) = i;
                 ++count;
             }
@@ -313,8 +318,9 @@ namespace blitzdg {
 
         testField = r+s;
         count = 0;
+        fmask2 = 0*ii;
         for (index_type i=0; i < NumLocalPoints; i++) {
-            if (testField(i) < NodeTol) {
+            if (abs(testField(i)) < NodeTol) {
                 fmask2(count) = i;
                 ++count;
             }
@@ -322,8 +328,9 @@ namespace blitzdg {
 
         testField = r+1;
         count = 0;
+        fmask3 = 0*ii;
         for (index_type i=0; i < NumLocalPoints; i++) {
-            if (testField(i) < NodeTol) {
+            if (abs(testField(i)) < NodeTol) {
                 fmask3(count) = i;
                 ++count;
             }
@@ -340,8 +347,9 @@ namespace blitzdg {
     void TriangleNodesProvisioner::buildLift() {
         firstIndex ii;
         secondIndex jj;
+        thirdIndex kk;
 
-        real_matrix_type E(NumLocalPoints, NumFaces*NumFaces);
+        real_matrix_type E(NumLocalPoints, NumFaces*NumFacePoints), MassInv(NumLocalPoints, NumLocalPoints);
 
         real_matrix_type & Liftref = *Lift.get();
 
@@ -349,6 +357,7 @@ namespace blitzdg {
         real_vector_type& s = *sGrid.get();
 
         index_matrix_type Fm = *Fmask.get();
+
 
         real_vector_type faceR(NumFacePoints), faceS(NumFacePoints);
         real_matrix_type V1D(NumFacePoints, NumFacePoints), V1Dinv(NumFacePoints,NumFacePoints);
@@ -360,14 +369,16 @@ namespace blitzdg {
         // Face 1
         for (index_type i=0; i < NumFacePoints; ++i)
             faceR(i) = r(Fm(i, 0));
-        
+
         Vandermonde.computeVandermondeMatrix(faceR, V1D, V1Dinv);
-        massEdgeInv = V1D(ii,jj)*V1D(jj,ii);
+        massEdgeInv = sum(V1D(ii,kk)*V1D(jj,kk), kk);
 
         Inverter.computeInverse(massEdgeInv, massEdge1);
+
+        E = 0.0*jj;
         for (index_type i=0; i < NumFacePoints; ++i) {
             for (index_type j=0; j < NumFacePoints; ++j) {
-                E(i,j) = massEdge1(i,j);
+                E(Fm(i,0),j) = massEdge1(i,j);
             }
         }
 
@@ -376,60 +387,42 @@ namespace blitzdg {
             faceR(i) = r(Fm(i, 1));
 
         Vandermonde.computeVandermondeMatrix(faceR, V1D, V1Dinv);
-        massEdgeInv = V1D(ii,jj)*V1D(jj,ii);
+        massEdgeInv = sum(V1D(ii,kk)*V1D(jj,kk), kk);
 
         Inverter.computeInverse(massEdgeInv, massEdge2);
         for (index_type i=0; i < NumFacePoints; ++i) {
             for (index_type j=NumFacePoints; j < 2*NumFacePoints; ++j) {
-                E(i,j) = massEdge2(i,j % NumFacePoints);
+                E(Fm(i,1),j) = massEdge2(i,j - NumFacePoints);
             }
         }
 
         // Face 3.
         for (index_type i=0; i < NumFacePoints; ++i)
             faceS(i) = s(Fm(i, 2));
-        
+
         Vandermonde.computeVandermondeMatrix(faceS, V1D, V1Dinv);
-        massEdgeInv = V1D(ii,jj)*V1D(jj,ii);
+        massEdgeInv = sum(V1D(ii,kk)*V1D(jj,kk), kk);
 
         Inverter.computeInverse(massEdgeInv, massEdge3);
         for (index_type i=0; i < NumFacePoints; ++i) {
             for (index_type j=2*NumFacePoints; j < 3*NumFacePoints; ++j) {
-                E(i,j) = massEdge3(i,j % NumFacePoints);
+                E(Fm(i,2),j) = massEdge3(i,j - 2*NumFacePoints);
             }
         }
 
-        // Assign resulting matrix to object's property.
-        Liftref = E;
+        // Get the Vandermonde guy.
+        real_matrix_type V2D(NumLocalPoints, NumLocalPoints);
+        V2D = 0.0*jj;
+        computeVandermondeMatrix(NOrder, r, s, V2D);
+
+        MassInv = 0.0*jj;
+        MassInv = sum(V2D(ii,kk)*V2D(jj,kk), kk);
+
+        // Multiply by inverse mass matrix;
+        Liftref = sum(MassInv(ii,kk)*E(kk,jj),kk);
     }
 
-    /* function [LIFT] = Lift2D()
-
-% function [LIFT] = Lift2D()
-% Purpose  : Compute surface to volume lift term for DG formulation
-
-Globals2D;
-Emat = zeros(Np, Nfaces*Nfp);
-
-% face 1
-faceR = r(Fmask(:,1));
-V1D = Vandermonde1D(N, faceR); 
-massEdge1 = inv(V1D*V1D');
-Emat(Fmask(:,1),1:Nfp) = massEdge1;
-
-% face 2
-faceR = r(Fmask(:,2));
-V1D = Vandermonde1D(N, faceR);
-massEdge2 = inv(V1D*V1D');
-Emat(Fmask(:,2),Nfp+1:2*Nfp) = massEdge2;
-
-% face 3
-faceS = s(Fmask(:,3));
-V1D = Vandermonde1D(N, faceS); 
-massEdge3 = inv(V1D*V1D');
-Emat(Fmask(:,3),2*Nfp+1:3*Nfp) = massEdge3;
-
-% inv(mass matrix)*\I_n (L_i,L_j)_{edge_n}
-LIFT = V*(V'*Emat);
-return */
+    const real_matrix_type & TriangleNodesProvisioner::get_Lift() const {
+        return *Lift;
+    }
 }
