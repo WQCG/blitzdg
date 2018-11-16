@@ -21,7 +21,7 @@ jobs:
           command: |
             curl https://s3.amazonaws.com/dsteinmo-libs/include-deps.zip -o include-deps.zip
             mkdir -p mingw-include
-            unzip include-deps.zip -qq -d  mingw-include/
+            unzip include-deps.zip -d mingw-include/ -q
             rm -rf mingw-include/igloo
             curl https://s3.amazonaws.com/dsteinmo-libs/deps-win-mingw64-gcc7.zip -o deps-win-mingw64.zip
             unzip deps-win-mingw64.zip  -qq -d lib/
