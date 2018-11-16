@@ -1,6 +1,6 @@
 version: 0.1.{build}
 environment:	
-  EXTRACFLAGS: -Wno-deprecated-declarations	
+  LIB: lib
 build_script:	
 - pwsh: |	
     Invoke-RestMethod -Uri https://s3.amazonaws.com/dsteinmo-libs/include-deps.zip -OutFile include-deps.zip
