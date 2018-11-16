@@ -5,7 +5,8 @@ CXX := $(or $(CXX), g++)
 SRCDIR := src
 BUILDDIR := build
 BINDIR := bin
-INCDIR := include
+LIB := $(LIB)
+INC := $(INC)
 
 SRCEXT := cpp
 DEPEXT := d
@@ -42,12 +43,17 @@ endif
 
 CFLAGS := -g -Wall -std=c++0x -fprofile-arcs -ftest-coverage -DBZ_DEBUG
 LINKERFLAGS := -fprofile-arcs
-INC := -I include -I include/igloo
-LIB := -L lib -lblitz -lmetis -lumfpack -lcxsparse -llapack -lblas
-EXPLICITLIBS := -lgfortran -lcholmod -lamd -lcolamd -lquadmath -lsuitesparseconfig
+INC += -I include/igloo -I include
+LIB += -lblitz -lmetis -lumfpack -lcxsparse -llapack -lblas
+EXPLICITLIBS := -lgfortran -lcholmod -lamd -lcolamd -lquadmath -lsuitesparseconfig -lcrtdll
 VALGRIND := valgrind --error-exitcode=1 --leak-check=full --track-origins=yes
 
 ifeq ($(OS), Windows_NT)
+	LIB += $(EXPLICITLIBS)
+endif
+
+ifeq ($(CXX), x86_64-w64-mingw32-g++-posix)
+	INC += -I /usr/lib/gcc/x86_64-w64-mingw32/6.3-posix/include/c++/parallel/ -I /opt/blitzpp-mingw64/blitz-1.0.1
 	LIB += $(EXPLICITLIBS)
 endif
 
@@ -61,6 +67,12 @@ $(TARGETS): $(ALLOBJECTS)
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIRS)
 	@echo " $(CXX) $(CFLAGS) $(INC) -c -o $@ $<"; $(CXX) $(CFLAGS) $(INC) -c -o $@ $<
+
+$(BUILDDIR)/%.$(DEPEXT): $(SRCDIR)/%.$(SRCEXT)
+	@mkdir -p $(BUILDDIRS)
+	@echo "Building dependency $@..."
+	$(CXX) $(CFLAGS) $(INC) -MM -MF $@ -MP -MT $(DEPPATH).$(OBJEXT) -MT $(DEPPATH).$(DEPEXT) $<
+	@$(RM) [0-9]
 
 $(BUILDDIR)/%.$(DEPEXT): $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIRS)
