@@ -51,25 +51,124 @@ namespace blitzdg {
         // gmsh .msh files are csv's with special headers/separators that begin
         // with either "'s or $'s.
 
-        ifstream istrm;
+        CSVFileReader csvReader(gmshInputFile);
 
-        istrm.open(gmshInputFile);
+        string line="";
+        csvReader.readLine(line);
 
-        string line;
         // parse headers
-        getline(istrm, line);
         if (line.compare("$MeshFormat") != 0)
             throw runtime_error("Missing $MeshFormat header in .msh file!");
 
-        getline(istrm, line);
-        if(line.compare("2.1 0 8") != 0 && line.compare("2.2 0 8") != 0)
-            throw runtime_error("Mesh reader only supports Gmsh output version 2.1, ASCII type, and 8-byte floats");
+        csvReader.setNumCols(3);
+        float vers;
+        int fileType;
+        int floatSize;
+        csvReader.parseRowValues(vers, fileType, floatSize);
 
-        getline(istrm, line);
-        if (line.compare("$EndMeshFormat") != 0)
-            throw runtime_error("Missing $EndMeshFormat separator!");
+        if (vers < 2.0 || vers >= 3.0)
+            throw runtime_error("Unsupported Gmsh version. Only 2.x is currently supported.");
 
-        istrm.close();
+        if(fileType != 0)
+            throw runtime_error("Only ASCII-type Gmsh formats are supported.");
+
+        if(floatSize != 8)
+            throw runtime_error("Only 8-byte reals in Gmsh files are supported!");
+
+        // This should skip the '$EndMeshFormat' line.
+        csvReader.skipLines(1);
+
+        csvReader.readLine(line);
+        if (line.compare("$Nodes") != 0)
+            throw runtime_error("Unexpected line marker in .msh file! Expected '$Nodes' but was:" + line + ".");
+        
+        csvReader.setNumCols(1);
+        csvReader.parseRowValues(NumVerts);
+
+        csvReader.setNumCols(4);
+
+        // Allocate storage for Vertices.
+        Vert = real_vec_smart_ptr(new real_vector_type(NumVerts*3));
+
+        real_vector_type& Vref = *Vert;
+
+        // Parse in the vertex coordinates. Gmsh format always has 
+        // z-coordinate (though can be identically zero).
+        for(index_type i=0; i < NumVerts; ++i) {
+            index_type nodeNum;
+            real_type vx, vy, vz;
+
+            csvReader.parseRowValues(nodeNum, vx, vy, vz);
+            Vref((nodeNum-1)*3)   = vx;
+            Vref((nodeNum-1)*3+1) = vy;
+            Vref((nodeNum-1)*3+2) = vz;
+        }
+
+        // This should skip the '$EndNodes' line.
+        csvReader.skipLines(1);
+        
+        csvReader.readLine(line);
+        if (line.compare("$Elements") != 0)
+            throw runtime_error("Unexpected line marker in .msh file! Expected '$Elements' but was:" + line + ".");
+
+        csvReader.setNumCols(1);
+        index_type numElementRows = 0;
+        csvReader.parseRowValues(numElementRows);
+
+        // It is now assumed that Gmsh gives 'point' elements first (Type 15),
+        // 'Line' elements second, (Type 1), Triangles (Type 2), Quadrangles (Type 3)
+        // and so on as described at http://www.manpagez.com/info/gmsh/gmsh-2.2.6/gmsh_63.php.
+
+        index_type numCols = 6;
+        csvReader.setNumCols(numCols);
+        unique_ptr<index_type> colPtr(new index_type());
+
+        index_vec_smart_ptr bdryNodes(new index_vector_type());
+
+        std::vector<index_type> points;
+
+        for(index_type i =0; i < numElementRows; ++i) {
+            index_type* col = colPtr.get();
+            if (tryParseElementIterator (colPtr.get(), numCols, csvReader)) {
+                
+                index_type elemNumber = *col++;
+                index_type elemType   = *col++;
+                index_type numTags    = *col++;
+
+                // skip over tags for now.
+                col+=numTags;
+                index_type numLocalVerts = numCols - numTags - 3;
+                std::vector<index_type> element(numLocalVerts);
+
+                for (index_type j=0; j < numLocalVerts; ++j) 
+                    element[j] = *col++;
+            } else
+                throw std::runtime_error("Unable to Parse Element on line number: " + csvReader.getLineNum());
+        }
+    }
+
+    bool MeshManager::tryParseElementIterator(int* itr, int& elemDim, CSVFileReader& reader) {
+        try {
+            reader.parseRowIterator(itr);
+        } catch(std::runtime_error) {
+            // Number of columns has changed, assume it's increased and try again.
+            index_type lineNum = reader.getLineNum();
+            string file = reader.getFilename();
+
+            // Choose sensible upper-bound (2D for now), to avoid stack overflow.
+            if (elemDim >= 10)
+                return false;
+
+            // Re-open file, and skip to where we were. There is no other
+            // API call in the moment to 'recover' like this.
+            reader.openFile(file);
+            reader.skipLines(lineNum + 1);
+            
+            ++elemDim;
+            return tryParseElementIterator(itr, elemDim, reader);
+        } 
+        
+        return true;
     }
 
     void MeshManager::partitionMesh(index_type numPartitions) {

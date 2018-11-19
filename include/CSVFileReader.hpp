@@ -283,6 +283,12 @@ namespace blitzdg {
          */
 		template <typename... Args>
 		bool parseRowValues(Args&... args);
+
+        /**
+         * Set the number of columns expected on a line, overriding what was
+         * counted during initial file scan.
+         */
+        void setNumCols(index_type cols);
 	private:
 		std::string filename_; // name of current file
         std::string delims_;   // csv delimiters

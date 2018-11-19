@@ -9,6 +9,7 @@
 
 #pragma once
 #include "Types.hpp"
+#include "CSVFileReader.hpp"
 #include <memory>
 #include <string>
 
@@ -29,6 +30,10 @@ namespace blitzdg {
       index_vec_smart_ptr EToV;
       index_vec_smart_ptr ElementPartitionMap;
       index_vec_smart_ptr VertexPartitionMap;
+
+
+      // Helper method to wrap some try-catch logic for reading weird-styled .msh files.
+      bool tryParseElementIterator(int* itr, int& elemDim, CSVFileReader& reader);
       
     public:
       /**
@@ -71,7 +76,7 @@ namespace blitzdg {
       void readVertices(const std::string& vertFile);
 
       /**
-       * Reads a list of elments from a file. 
+       * Reads a list of elements from a file. 
        * 
        * An element is defined by its vertex indices. Each row of the file
        * defines an element by listing its vertex indices delimited by spaces.
