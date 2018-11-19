@@ -18,6 +18,7 @@ using std::cout;
 using std::endl;
 using std::string;
 using std::vector;
+using std::unique_ptr;
 
 namespace blitzdg {
     namespace MeshManagerTests {
@@ -25,8 +26,10 @@ namespace blitzdg {
         Describe(MeshManager_Object) {
             using find_vector_type = vector<iterator_range<string::iterator>>;
 
-            MeshManager * meshManager=nullptr;
-            string *ExePath = nullptr;
+            string PathDelimeter = "/";
+            MeshManager* meshManager=nullptr;
+            string* ExePath = nullptr;
+            unique_ptr<vector<string>> InputPathVec = nullptr;
 
             void SetUp() {
                 meshManager = new MeshManager();
@@ -43,17 +46,18 @@ namespace blitzdg {
                     trim_right(*ExePath);
                     delete [] pathBuffer;
                 }
+                InputPathVec =  unique_ptr<vector<string>>(new vector<string>());
+                resolveInputPath();
             }
             void TearDown() {
                 delete ExePath;
                 delete meshManager;
             }
 
-            void get_VertexFilePath(string & vertFile) {    
+            void resolveInputPath() {
+                string path(*ExePath);
                 find_vector_type FindVec;
 
-                string PathDelimeter = "/";
-                string path(*ExePath);
                 replace_last(path, ".exe", "");
                 replace_last(path, "/bin/test", "");
                 find_all( FindVec, path, "\\" );
@@ -65,29 +69,29 @@ namespace blitzdg {
                 vector<string> pathVec;
                 pathVec.push_back(path);
                 pathVec.push_back("input");
-                pathVec.push_back("2box.V");
 
+                *InputPathVec = std::move(pathVec);
+            }
+
+            void get_VertexFilePath(string & vertFile) {
+                vector<string>& pathVec = *InputPathVec;
+                pathVec.push_back("2box.V");
                 vertFile = join(pathVec, PathDelimeter);
+                pathVec.pop_back();
             }
 
             void get_EToVFilePath(string & eToVFile) {
-                string path(*ExePath);
-                find_vector_type FindVec;
-
-                string PathDelimeter = "/";
-                replace_last(path, ".exe", "");
-                replace_last(path, "/bin/test", "");
-                find_all( FindVec, path, "\\" );
-                if (FindVec.size() > 0) {
-                    PathDelimeter = "\\";
-                    replace_last(path, "\\bin\\test", "");
-                }
-
-                vector<string> pathVec;
-                pathVec.push_back(path);
-                pathVec.push_back("input");
+                vector<string>& pathVec = *InputPathVec;
                 pathVec.push_back("2box.E2V");
                 eToVFile = join(pathVec, PathDelimeter);
+                pathVec.pop_back();
+            }
+
+            void get_MshFile(string& mshFile) {
+                vector<string>& pathVec = *InputPathVec;
+                pathVec.push_back("box.msh");
+                mshFile = join(pathVec, PathDelimeter);
+                pathVec.pop_back();
             }
 
             It(Reads_Vertex_Files) {
@@ -170,6 +174,14 @@ namespace blitzdg {
                 mgr.readElements(eToVFile);
                 cout << endl << "Elements" << endl;
                 mgr.printElements();
+            }
+
+            It(Can_Read_Gmsh_Mesh) {
+                cout << "Can_Read_Gmsh_Mesh" << endl;
+                string mshFile = "";
+                get_MshFile(mshFile);
+                MeshManager& mgr = *meshManager;
+                mgr.readMesh(mshFile);
             }
 
             It(Can_Partition_A_Mesh) {

@@ -48,7 +48,28 @@ namespace blitzdg {
     {}
 
     void MeshManager::readMesh(const string& gmshInputFile) {
-        throw runtime_error("MeshManager::readMesh not implemented");
+        // gmsh .msh files are csv's with special headers/separators that begin
+        // with either "'s or $'s.
+
+        ifstream istrm;
+
+        istrm.open(gmshInputFile);
+
+        string line;
+        // parse headers
+        getline(istrm, line);
+        if (line.compare("$MeshFormat") != 0)
+            throw runtime_error("Missing $MeshFormat header in .msh file!");
+
+        getline(istrm, line);
+        if(line.compare("2.1 0 8") != 0 && line.compare("2.2 0 8") != 0)
+            throw runtime_error("Mesh reader only supports Gmsh output version 2.1, ASCII type, and 8-byte floats");
+
+        getline(istrm, line);
+        if (line.compare("$EndMeshFormat") != 0)
+            throw runtime_error("Missing $EndMeshFormat separator!");
+
+        istrm.close();
     }
 
     void MeshManager::partitionMesh(index_type numPartitions) {
