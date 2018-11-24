@@ -289,6 +289,19 @@ namespace blitzdg {
          * counted during initial file scan.
          */
         void setNumCols(index_type cols);
+
+        /**
+         * Parses a line into string tokens based on the delimiter sequence.
+         * @param[in] line The line to be parsed.
+         * @param[out] splitVec A vector container of the tokens.
+         */
+		void tokenizeLine(const std::string& line, std::vector<std::string>& splitVec) const {
+			using boost::token_compress_on;
+			using boost::algorithm::is_any_of;
+			using boost::algorithm::split;
+			split(splitVec, line, is_any_of(delims_), token_compress_on);
+		}
+
 	private:
 		std::string filename_; // name of current file
         std::string delims_;   // csv delimiters
@@ -325,18 +338,6 @@ namespace blitzdg {
                 [](char c) { return (c == ' ' || c == '\t' || c == ',' 
                 || c == ';' || c == '^' || c == '|'); });
         }
-
-        /**
-         * Parses a line into string tokens based on the delimiter sequence.
-         * @param[in] line The line to be parsed.
-         * @param[out] splitVec A vector container of the tokens.
-         */
-		void tokenizeLine(const std::string& line, std::vector<std::string>& splitVec) const {
-			using boost::token_compress_on;
-			using boost::algorithm::is_any_of;
-			using boost::algorithm::split;
-			split(splitVec, line, is_any_of(delims_), token_compress_on);
-		}
 
         /**
          * Converts a string to the templated type T, which

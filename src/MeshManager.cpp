@@ -27,6 +27,7 @@ using std::string;
 using std::to_string;
 using std::unique_ptr;
 using std::vector;
+using std::stoi;
 
 namespace blitzdg {
     namespace {
@@ -115,35 +116,89 @@ namespace blitzdg {
         index_type numElementRows = 0;
         csvReader.parseRowValues(numElementRows);
 
-        // It is now assumed that Gmsh gives 'point' elements first (Type 15),
-        // 'Line' elements second, (Type 1), Triangles (Type 2), Quadrangles (Type 3)
+        // It is now assumed that Gmsh gives 'point' elements as Type 15,
+        // 'Line' elements as Type 1, Triangles as Type 2, Quadrangles as Type 3
         // and so on as described at http://www.manpagez.com/info/gmsh/gmsh-2.2.6/gmsh_63.php.
 
         index_type numCols = 6;
         csvReader.setNumCols(numCols);
         unique_ptr<index_type> colPtr(new index_type());
 
-        index_vec_smart_ptr bdryNodes(new index_vector_type());
+        std::vector<string> elementInfo;
 
-        std::vector<index_type> points;
+        std::vector<int> points;
+        std::vector<index_vector_type> lines;
+        std::vector<index_vector_type> tris;
+        std::vector<index_vector_type> quads;
 
         for(index_type i =0; i < numElementRows; ++i) {
-            index_type* col = colPtr.get();
-            if (tryParseElementIterator (colPtr.get(), numCols, csvReader)) {
+            csvReader.readLine(line);
+            csvReader.tokenizeLine(line, elementInfo);
+
+            index_type numCols = elementInfo.size();
+
+            //index_type elemNumber = stoi(elementInfo[0]);
+            index_type elemType   = stoi(elementInfo[1]);
+            index_type numTags    = stoi(elementInfo[2]);
+
+            index_type numLocalVerts = numCols - numTags - 3;
+
+            if (numLocalVerts == 1) {
+                if (elemType != 15)
+                    throw runtime_error("Incorrect Element Type for point element!");
+                points.push_back(stoi(elementInfo[3]));
+            }
+
+            if (numLocalVerts == 2) {
+                if (elemType !=1)
+                    throw runtime_error("Incorrect Element Type for line element!");
                 
-                index_type elemNumber = *col++;
-                index_type elemType   = *col++;
-                index_type numTags    = *col++;
+                index_vector_type lineElem(2);
+                lineElem = {stoi(elementInfo[3]), stoi(elementInfo[4])};
+                lines.push_back(lineElem);
+            }
 
-                // skip over tags for now.
-                col+=numTags;
-                index_type numLocalVerts = numCols - numTags - 3;
-                std::vector<index_type> element(numLocalVerts);
+            if (numLocalVerts == 3) {
+                if (elemType != 2)
+                    throw runtime_error("Incorrect Element Type for triangle element!");
 
-                for (index_type j=0; j < numLocalVerts; ++j) 
-                    element[j] = *col++;
-            } else
-                throw std::runtime_error("Unable to Parse Element on line number: " + csvReader.getLineNum());
+                index_vector_type triElem(3);
+                triElem = { stoi(elementInfo[3]),
+                            stoi(elementInfo[4]),
+                            stoi(elementInfo[5])};
+
+                tris.push_back(triElem);
+            }
+
+            if (numLocalVerts == 4) {
+                if (elemType != 3)
+                    throw runtime_error("Incorrect Element Type for quadrangle element!");
+                
+                index_vector_type quadElem(4);
+                quadElem = {stoi(elementInfo[3]),
+                            stoi(elementInfo[4]),
+                            stoi(elementInfo[5]),
+                            stoi(elementInfo[6])};
+                quads.push_back(quadElem);
+            }
+        }
+
+        if (quads.size() > 0)
+            throw runtime_error("Quadrangle elements currently not supported by blitzdg!");
+
+        // Allocate storage EToV.
+        index_type K = tris.size();
+        EToV = index_vec_smart_ptr(new index_vector_type(K*3));
+
+        index_vector_type& E2V = *EToV;
+
+        index_type ind=0;
+        for (index_type i=0; i < K; ++i) {
+
+            E2V(ind)   = tris[i](0);
+            E2V(ind+1) = tris[i](1);
+            E2V(ind+2) = tris[i](2);
+            ind += 3;
         }
     }
 
