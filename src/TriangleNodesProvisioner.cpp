@@ -21,6 +21,7 @@ using blitz::thirdIndex;
 using std::numeric_limits;
 using std::unique_ptr;
 using std::abs;
+using std::sqrt;
 
 namespace blitzdg {
     const index_type TriangleNodesProvisioner::NumFaces = 3;
