@@ -120,16 +120,12 @@ namespace blitzdg {
         // 'Line' elements as Type 1, Triangles as Type 2, Quadrangles as Type 3
         // and so on as described at http://www.manpagez.com/info/gmsh/gmsh-2.2.6/gmsh_63.php.
 
-        index_type numCols = 6;
-        csvReader.setNumCols(numCols);
-        unique_ptr<index_type> colPtr(new index_type());
-
         std::vector<string> elementInfo;
 
-        std::vector<int> points;
-        std::vector<index_vector_type> lines;
-        std::vector<index_vector_type> tris;
-        std::vector<index_vector_type> quads;
+        std::vector<index_type> points;
+        std::vector<std::vector<index_type>> lines;
+        std::vector<std::vector<index_type>> tris;
+        std::vector<std::vector<index_type>> quads;
 
         for(index_type i =0; i < numElementRows; ++i) {
             csvReader.readLine(line);
@@ -137,7 +133,7 @@ namespace blitzdg {
 
             index_type numCols = elementInfo.size();
 
-            //index_type elemNumber = stoi(elementInfo[0]);
+            // index_type elemNumber = stoi(elementInfo[0]); -- Gmsh element number, not used. Delete.
             index_type elemType   = stoi(elementInfo[1]);
             index_type numTags    = stoi(elementInfo[2]);
 
@@ -153,8 +149,13 @@ namespace blitzdg {
                 if (elemType !=1)
                     throw runtime_error("Incorrect Element Type for line element!");
                 
-                index_vector_type lineElem(2);
-                lineElem = {stoi(elementInfo[3]), stoi(elementInfo[4])};
+                std::vector<index_type> lineElem(2);
+                for (auto &s : elementInfo) {
+                    std::stringstream parser(s);
+                    index_type x = 0;
+                    parser >> x;
+                    lineElem.push_back(x);
+                }
                 lines.push_back(lineElem);
             }
 
@@ -162,11 +163,13 @@ namespace blitzdg {
                 if (elemType != 2)
                     throw runtime_error("Incorrect Element Type for triangle element!");
 
-                index_vector_type triElem(3);
-                triElem = { stoi(elementInfo[3]),
-                            stoi(elementInfo[4]),
-                            stoi(elementInfo[5])};
-
+                std::vector<index_type> triElem(3);
+                for (auto &s : elementInfo) {
+                    std::stringstream parser(s);
+                    index_type x = 0;
+                    parser >> x;
+                    triElem.push_back(x);
+                }
                 tris.push_back(triElem);
             }
 
@@ -174,11 +177,13 @@ namespace blitzdg {
                 if (elemType != 3)
                     throw runtime_error("Incorrect Element Type for quadrangle element!");
                 
-                index_vector_type quadElem(4);
-                quadElem = {stoi(elementInfo[3]),
-                            stoi(elementInfo[4]),
-                            stoi(elementInfo[5]),
-                            stoi(elementInfo[6])};
+                std::vector<index_type> quadElem(4);
+                for (auto &s : elementInfo) {
+                    std::stringstream parser(s);
+                    index_type x = 0;
+                    parser >> x;
+                    quadElem.push_back(x);
+                }
                 quads.push_back(quadElem);
             }
         }
@@ -194,12 +199,16 @@ namespace blitzdg {
 
         index_type ind=0;
         for (index_type i=0; i < K; ++i) {
+            E2V(ind)   = tris[i][8];
+            E2V(ind+1) = tris[i][9];
+            E2V(ind+2) = tris[i][10];
 
-            E2V(ind)   = tris[i](0);
-            E2V(ind+1) = tris[i](1);
-            E2V(ind+2) = tris[i](2);
+            std::cout << E2V(ind) << " " << E2V(ind+1) << " " << E2V(ind+1) << std::endl;
             ind += 3;
         }
+
+        //std::cout << "EToV " << std::endl << E2V << std::endl;
+        NumElements = K;
     }
 
     bool MeshManager::tryParseElementIterator(int* itr, int& elemDim, CSVFileReader& reader) {
