@@ -32,8 +32,9 @@ namespace blitzdg {
       index_vec_smart_ptr VertexPartitionMap;
 
 
-      // Helper method to wrap some try-catch logic for reading weird-styled .msh files.
-      bool tryParseElementIterator(int* itr, int& elemDim, CSVFileReader& reader);
+      // Helper method to convert vector of strings to vector of ints
+      // representing Gmsh element data.
+      std::vector<index_type> parseElem(std::vector<std::string> input);
       
     public:
       /**

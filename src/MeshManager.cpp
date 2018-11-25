@@ -48,6 +48,21 @@ namespace blitzdg {
         ElementPartitionMap{ nullptr }, VertexPartitionMap{ nullptr }
     {}
 
+
+    std::vector<index_type> MeshManager::parseElem(std::vector<string> input) {
+
+        std::vector<index_type> elem(input.size());
+        index_type count = 0;
+        for (auto &s : input) {
+            std::stringstream parser(s);
+            index_type x = 0;
+            parser >> x;
+            elem[count] = x;
+            ++count;
+        }
+        return std::move(elem);
+    }
+
     void MeshManager::readMesh(const string& gmshInputFile) {
         // gmsh .msh files are csv's with special headers/separators that begin
         // with either "'s or $'s.
@@ -149,13 +164,7 @@ namespace blitzdg {
                 if (elemType !=1)
                     throw runtime_error("Incorrect Element Type for line element!");
                 
-                std::vector<index_type> lineElem(2);
-                for (auto &s : elementInfo) {
-                    std::stringstream parser(s);
-                    index_type x = 0;
-                    parser >> x;
-                    lineElem.push_back(x);
-                }
+                std::vector<index_type> lineElem = parseElem(elementInfo);
                 lines.push_back(lineElem);
             }
 
@@ -163,13 +172,7 @@ namespace blitzdg {
                 if (elemType != 2)
                     throw runtime_error("Incorrect Element Type for triangle element!");
 
-                std::vector<index_type> triElem(3);
-                for (auto &s : elementInfo) {
-                    std::stringstream parser(s);
-                    index_type x = 0;
-                    parser >> x;
-                    triElem.push_back(x);
-                }
+                std::vector<index_type> triElem = parseElem(elementInfo);
                 tris.push_back(triElem);
             }
 
@@ -177,13 +180,7 @@ namespace blitzdg {
                 if (elemType != 3)
                     throw runtime_error("Incorrect Element Type for quadrangle element!");
                 
-                std::vector<index_type> quadElem(4);
-                for (auto &s : elementInfo) {
-                    std::stringstream parser(s);
-                    index_type x = 0;
-                    parser >> x;
-                    quadElem.push_back(x);
-                }
+                std::vector<index_type> quadElem = parseElem(elementInfo);
                 quads.push_back(quadElem);
             }
         }
@@ -199,9 +196,9 @@ namespace blitzdg {
 
         index_type ind=0;
         for (index_type i=0; i < K; ++i) {
-            E2V(ind)   = tris[i][8];
-            E2V(ind+1) = tris[i][9];
-            E2V(ind+2) = tris[i][10];
+            E2V(ind)   = tris[i][5];
+            E2V(ind+1) = tris[i][6];
+            E2V(ind+2) = tris[i][7];
 
             std::cout << E2V(ind) << " " << E2V(ind+1) << " " << E2V(ind+1) << std::endl;
             ind += 3;
@@ -209,30 +206,6 @@ namespace blitzdg {
 
         //std::cout << "EToV " << std::endl << E2V << std::endl;
         NumElements = K;
-    }
-
-    bool MeshManager::tryParseElementIterator(int* itr, int& elemDim, CSVFileReader& reader) {
-        try {
-            reader.parseRowIterator(itr);
-        } catch(std::runtime_error) {
-            // Number of columns has changed, assume it's increased and try again.
-            index_type lineNum = reader.getLineNum();
-            string file = reader.getFilename();
-
-            // Choose sensible upper-bound (2D for now), to avoid stack overflow.
-            if (elemDim >= 10)
-                return false;
-
-            // Re-open file, and skip to where we were. There is no other
-            // API call in the moment to 'recover' like this.
-            reader.openFile(file);
-            reader.skipLines(lineNum + 1);
-            
-            ++elemDim;
-            return tryParseElementIterator(itr, elemDim, reader);
-        } 
-        
-        return true;
     }
 
     void MeshManager::partitionMesh(index_type numPartitions) {
