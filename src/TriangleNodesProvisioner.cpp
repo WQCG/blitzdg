@@ -425,4 +425,41 @@ namespace blitzdg {
     const real_matrix_type & TriangleNodesProvisioner::get_Lift() const {
         return *Lift;
     }
+
+    const real_matrix_type & TriangleNodesProvisioner::get_Dr() const {
+        return *Dr;
+    }
+
+    const real_matrix_type & TriangleNodesProvisioner::get_Ds() const {
+        return *Ds;
+    }
+
+    const real_matrix_type & TriangleNodesProvisioner::get_rx() const {
+        return *rx;
+    }
+
+    const real_matrix_type & TriangleNodesProvisioner::get_ry() const {
+        return *ry;
+    }
+
+    const real_matrix_type & TriangleNodesProvisioner::get_sx() const {
+        return *sx;
+    }
+
+    const real_matrix_type & TriangleNodesProvisioner::get_sy() const {
+        return *sy;
+    }
+
+    const real_matrix_type & TriangleNodesProvisioner::get_xGrid() const {
+        return *xGrid;
+    }
+
+    const real_matrix_type & TriangleNodesProvisioner::get_yGrid() const {
+        return *yGrid;
+    }
+
+    index_type TriangleNodesProvisioner::get_NumLocalPoints() const {
+        return NumLocalPoints;
+    }
+
 }

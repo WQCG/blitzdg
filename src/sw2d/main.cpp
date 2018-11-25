@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
 
 	const real_matrix_type &x = triangleNodesProvisioner.get_xGrid();
 	const real_matrix_type &y = triangleNodesProvisioner.get_yGrid();
-	const index_type Np = triangleNodesProvisioner.get_NumLocalPoints();
+	index_type Np = triangleNodesProvisioner.get_NumLocalPoints();
 
 	real_matrix_type u(Np, K);
 	real_matrix_type RHS(Np, K);
