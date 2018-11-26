@@ -3,6 +3,7 @@
 
 #include "MeshManager.hpp"
 #include "Types.hpp"
+#include "LinAlgHelpers.hpp"
 #include <igloo/igloo_alt.h>
 #include <boost/algorithm/string.hpp>
 #include <whereami.h>
@@ -89,7 +90,7 @@ namespace blitzdg {
 
             void get_MshFile(string& mshFile) {
                 vector<string>& pathVec = *InputPathVec;
-                pathVec.push_back("box.msh");
+                pathVec.push_back("coarse_box.msh");
                 mshFile = join(pathVec, PathDelimeter);
                 pathVec.pop_back();
             }
@@ -182,6 +183,30 @@ namespace blitzdg {
                 get_MshFile(mshFile);
                 MeshManager& mgr = *meshManager;
                 mgr.readMesh(mshFile);
+
+                cout << mgr.get_Elements()<< endl;
+
+                const real_vector_type& verts = mgr.get_Vertices();
+                index_type K = mgr.get_NumElements();
+                index_type Nv = mgr.get_NumVerts();
+
+                Assert::That(Nv, Equals(29));
+                Assert::That(K, Equals(40));
+
+                real_vector_type expectedVerts(Nv*3);
+
+                expectedVerts = -1.,-1., 0., 1., -1., 0., 1., 1., 0., -1., 1., 0., -0.5, 1., 0., -2.7528e-12, 1., 0., 0.5, 1., 0., 1., 0.5, 0., 1., 2.7528e-12, 0., 1., -0.5, 0., 0.5, -1., 0., 2.7528e-12, -1., 0., -0.5, -1. , 0., -1., -0.5, 0, -1, -2.7528e-12, 0, -1, 0.5, 0, -5.41875e-18, -1.80625e-18, 0, 0.416667, 0.416667, 0, 0.416667, -0.416667, 0, -0.416667, -0.416667, 0, -0.416667, 0.416667, -0, 3.10552e-13, 0.559524, 0, 0.559524, -3.10552e-13, 0, -3.10552e-13, -0.559524, 0, -0.559524, 3.10437e-13, -0, -0.677083, 0.677083, -0, 0.677083, 0.677083, 0, 0.677083, -0.677083, 0, -0.677083, -0.677083, 0;
+
+                real_vector_type vertErr(Nv*3);
+                cout << verts << endl;
+
+                vertErr = verts - expectedVerts;
+
+                cout << expectedVerts << endl; 
+                cout << verts << endl;
+                cout << "vertErr:" << vertErr << endl;
+
+                Assert::That(normInf(vertErr), IsLessThan(3.4e-7));
             }
 
             It(Can_Partition_A_Mesh) {
@@ -210,7 +235,7 @@ namespace blitzdg {
                 Assert::That(vpMap(3), IsGreaterThan(-1));
                 Assert::That(vpMap(4), IsGreaterThan(-1));
                 Assert::That(vpMap(5), IsGreaterThan(-1));
-            } 
+            }
         };
     } // namespace MeshManagerTests
 } // namespace blitzdg
