@@ -4,7 +4,7 @@ blitzdg is an open-source project aiming to implement parallel discontinuous Gal
 
 [![Build Status](https://travis-ci.org/dsteinmo/blitzdg.svg?branch=master)](https://travis-ci.org/WQCG/blitzdg) [![Coverage Status](https://coveralls.io/repos/github/WQCG/blitzdg/badge.svg?branch=master)](https://coveralls.io/github/WQCG/blitzdg?branch=master)
 
-<img alt="Donate to blitzdg development" src="https://dantheman827.github.io/images/donate-button.svg" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=3RM7VGV28NEHU&source=url" />
+<img alt="Donate to blitzdg development" src="https://dantheman827.github.io/images/donate-button.svg" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=3RM7VGV28NEHU&source=url" width="75" />
 <img alt="" border="0" src="https://www.paypal.com/en_CA/i/scr/pixel.gif" width="1" height="1" />
 
 
