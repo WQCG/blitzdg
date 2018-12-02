@@ -55,9 +55,8 @@ namespace blitzdg {
 
       real_mat_smart_ptr Fscale;
 
-      index_mat_smart_ptr EToV;
-      index_mat_smart_ptr EToE;
-      index_mat_smart_ptr EToF;
+      index_vec_smart_ptr EToE;
+      index_vec_smart_ptr EToF;
 
       index_vec_smart_ptr vmapM;
       index_vec_smart_ptr vmapP;

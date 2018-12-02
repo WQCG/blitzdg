@@ -56,8 +56,6 @@ int main(int argc, char **argv) {
 	const real_matrix_type& sx = triangleNodesProvisioner.get_sx();
 	const real_matrix_type& sy = triangleNodesProvisioner.get_sy();
 
-
-
 	CsvOutputter outputter;
 
 	const real_matrix_type &x = triangleNodesProvisioner.get_xGrid();

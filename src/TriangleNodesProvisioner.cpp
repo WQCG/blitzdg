@@ -45,7 +45,6 @@ namespace blitzdg {
         Vinv{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
         Fmask{ new index_matrix_type( _NOrder+1, NumFaces) },
         Fscale{ new real_matrix_type((_NOrder+1)*NumFaces, NumElements) },
-        EToV{ new index_matrix_type(NumElements, NumFaces) },
         EToE{ new index_matrix_type(NumElements, NumFaces) },
         EToF{ new index_matrix_type(NumElements, NumFaces) },
         vmapM{ new index_vector_type((_NOrder+1)*NumFaces*NumElements) },
@@ -343,6 +342,51 @@ namespace blitzdg {
         Fm(Range::all(), 0) = fmask1;
         Fm(Range::all(), 1) = fmask2;
         Fm(Range::all(), 2) = fmask3;
+
+        // Get element data
+        const index_vector_type& EToV = Mesh2D->get_Elements();
+        const real_vector_type&  Vert = Mesh2D->get_Vertices();
+        NumElements = Mesh2D->get_NumElements();
+        index_type NumVertices = Mesh2D->get_NumVerts();
+
+        real_vector_type VX(NumVertices), VY(NumVertices), VZ(NumVertices);
+        index_vector_type va(NumElements), vb(NumElements), vc(NumElements);
+        index_type countE=0, countV=0;
+
+        // Unpack 1D arrays storing EToV and Vertex coordinates
+        for (index_type i=0; i < NumElements; ++i) {
+            va(i) = EToV(countE);
+            vb(i) = EToV(countE+1);
+            vc(i) = EToV(countE+2);
+
+            VX(i) = Vert(countV);
+            VY(i) = Vert(countV+1);
+            VZ(i) = Vert(countV+2);
+
+            countE += 3;
+            countV += 3;
+        }
+
+        real_vector_type VXa(NumElements), VXb(NumElements), VXc(NumElements);
+        real_vector_type VYa(NumElements), VYb(NumElements), VYc(NumElements);
+        for (index_type i=0; i < NumElements; ++i) {
+            VXa = VX(va(i));
+            VXb = VX(vb(i));
+            VXc = VX(vc(i));
+
+            VYa = VY(va(i));
+            VYb = VY(vb(i));
+            VYc = VY(vc(i));
+        }
+
+        //x = 0.5*(-(r+s)*VX)
+
+
+/*
+va = EToV(:,1)'; vb = EToV(:,2)'; vc = EToV(:,3)';
+x = 0.5*(-(r+s)*VX(va)+(1+r)*VX(vb)+(1+s)*VX(vc));
+y = 0.5*(-(r+s)*VY(va)+(1+r)*VY(vb)+(1+s)*VY(vc)); */
+
     }
 
     void TriangleNodesProvisioner::buildLift() {
