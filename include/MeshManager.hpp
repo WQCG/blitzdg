@@ -9,6 +9,7 @@
 
 #pragma once
 #include "Types.hpp"
+#include "CSVFileReader.hpp"
 #include <memory>
 #include <string>
 
@@ -29,6 +30,11 @@ namespace blitzdg {
       index_vec_smart_ptr EToV;
       index_vec_smart_ptr ElementPartitionMap;
       index_vec_smart_ptr VertexPartitionMap;
+
+
+      // Helper method to convert vector of strings to vector of ints
+      // representing Gmsh element data.
+      std::vector<index_type> parseElem(const std::vector<std::string>& input);
       
     public:
       /**
@@ -71,7 +77,7 @@ namespace blitzdg {
       void readVertices(const std::string& vertFile);
 
       /**
-       * Reads a list of elments from a file. 
+       * Reads a list of elements from a file. 
        * 
        * An element is defined by its vertex indices. Each row of the file
        * defines an element by listing its vertex indices delimited by spaces.

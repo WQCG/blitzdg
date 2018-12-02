@@ -58,6 +58,10 @@ namespace blitzdg {
 		countCols();
 	}
 
+	void CSVFileReader::setNumCols(index_type cols) {
+        ncols_ = cols;
+    }
+
 	bool CSVFileReader::readLine(string& line) {
 		if (getline(strm_, line))
 			++lineno_;

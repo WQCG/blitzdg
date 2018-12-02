@@ -27,6 +27,7 @@ using std::string;
 using std::to_string;
 using std::unique_ptr;
 using std::vector;
+using std::stoi;
 
 namespace blitzdg {
     namespace {
@@ -47,8 +48,158 @@ namespace blitzdg {
         ElementPartitionMap{ nullptr }, VertexPartitionMap{ nullptr }
     {}
 
+
+    std::vector<index_type> MeshManager::parseElem(const std::vector<string>& input) {
+
+        std::vector<index_type> elems;
+        elems.reserve(input.size());
+
+        for (const auto &s : input)
+            elems.push_back(std::stoi(s));
+
+        return elems;
+    }
+
     void MeshManager::readMesh(const string& gmshInputFile) {
-        throw runtime_error("MeshManager::readMesh not implemented");
+        // gmsh .msh files are csv's with special headers/separators that begin
+        // with either "'s or $'s.
+
+        CSVFileReader csvReader(gmshInputFile);
+
+        string line;
+        csvReader.readLine(line);
+
+        // parse headers
+        if (line != "$MeshFormat")
+            throw runtime_error("Missing $MeshFormat header in .msh file!");
+
+        csvReader.setNumCols(3);
+        float vers;
+        int fileType;
+        int floatSize;
+        csvReader.parseRowValues(vers, fileType, floatSize);
+
+        if (vers < 2.0 || vers >= 3.0)
+            throw runtime_error("Unsupported Gmsh version. Only 2.x is currently supported.");
+
+        if(fileType != 0)
+            throw runtime_error("Only ASCII-type Gmsh formats are supported.");
+
+        if(floatSize != 8)
+            throw runtime_error("Only 8-byte reals in Gmsh files are supported!");
+
+        // This should skip the '$EndMeshFormat' line.
+        csvReader.skipLines(1);
+
+        csvReader.readLine(line);
+        if (line != "$Nodes")
+            throw runtime_error("Unexpected line marker in .msh file! Expected '$Nodes' but was:" + line + ".");
+        
+        csvReader.setNumCols(1);
+        csvReader.parseRowValues(NumVerts);
+
+        csvReader.setNumCols(4);
+
+        // Allocate storage for Vertices.
+        Vert = real_vec_smart_ptr(new real_vector_type(NumVerts*3));
+
+        real_vector_type& Vref = *Vert;
+
+        // Parse in the vertex coordinates. Gmsh format always has 
+        // z-coordinate (though can be identically zero).
+        for(index_type i=0; i < NumVerts; ++i) {
+            index_type nodeNum;
+            real_type vx, vy, vz;
+
+            csvReader.parseRowValues(nodeNum, vx, vy, vz);
+            Vref((nodeNum-1)*3)   = vx;
+            Vref((nodeNum-1)*3+1) = vy;
+            Vref((nodeNum-1)*3+2) = vz;
+        }
+
+        // This should skip the '$EndNodes' line.
+        csvReader.skipLines(1);
+        
+        csvReader.readLine(line);
+        if (line != "$Elements")
+            throw runtime_error("Unexpected line marker in .msh file! Expected '$Elements' but was:" + line + ".");
+
+        csvReader.setNumCols(1);
+        index_type numElementRows = 0;
+        csvReader.parseRowValues(numElementRows);
+
+        // It is now assumed that Gmsh gives 'point' elements as Type 15,
+        // 'Line' elements as Type 1, Triangles as Type 2, Quadrangles as Type 3
+        // and so on as described at http://www.manpagez.com/info/gmsh/gmsh-2.2.6/gmsh_63.php.
+
+        std::vector<string> elementInfo;
+
+        std::vector<index_type> points;
+        std::vector<std::vector<index_type>> lines;
+        std::vector<std::vector<index_type>> tris;
+        std::vector<std::vector<index_type>> quads;
+
+        for(index_type i =0; i < numElementRows; ++i) {
+            csvReader.readLine(line);
+            csvReader.tokenizeLine(line, elementInfo);
+
+            index_type numCols = (index_type)elementInfo.size();
+
+            // index_type elemNumber = stoi(elementInfo[0]); -- Gmsh element number, not used. Delete.
+            index_type elemType   = stoi(elementInfo[1]);
+            index_type numTags    = stoi(elementInfo[2]);
+
+            index_type numLocalVerts = numCols - numTags - 3;
+
+            if (numLocalVerts == 1) {
+                if (elemType != 15)
+                    throw runtime_error("Incorrect Element Type for point element!");
+                points.push_back(stoi(elementInfo[3]));
+            }
+
+            if (numLocalVerts == 2) {
+                if (elemType !=1)
+                    throw runtime_error("Incorrect Element Type for line element!");
+                
+                lines.push_back(parseElem(elementInfo));
+            }
+
+            if (numLocalVerts == 3) {
+                if (elemType != 2)
+                    throw runtime_error("Incorrect Element Type for triangle element!");
+
+                tris.push_back(parseElem(elementInfo));
+            }
+
+            if (numLocalVerts == 4) {
+                if (elemType != 3)
+                    throw runtime_error("Incorrect Element Type for quadrangle element!");
+                
+                quads.push_back(parseElem(elementInfo));
+            }
+        }
+
+        if (quads.size() > 0)
+            throw runtime_error("Quadrangle elements currently not supported by blitzdg!");
+
+        // Allocate storage EToV.
+        index_type K = (index_type)tris.size();
+        EToV = index_vec_smart_ptr(new index_vector_type(K*3));
+
+        index_vector_type& E2V = *EToV;
+
+        index_type ind=0;
+        for (index_type i=0; i < K; ++i) {
+            E2V(ind)   = tris[i][5];
+            E2V(ind+1) = tris[i][6];
+            E2V(ind+2) = tris[i][7];
+
+            std::cout << E2V(ind) << " " << E2V(ind+1) << " " << E2V(ind+1) << std::endl;
+            ind += 3;
+        }
+
+        //std::cout << "EToV " << std::endl << E2V << std::endl;
+        NumElements = K;
     }
 
     void MeshManager::partitionMesh(index_type numPartitions) {

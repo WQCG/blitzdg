@@ -3,6 +3,7 @@
 
 #include "MeshManager.hpp"
 #include "Types.hpp"
+#include "LinAlgHelpers.hpp"
 #include <igloo/igloo_alt.h>
 #include <boost/algorithm/string.hpp>
 #include <whereami.h>
@@ -18,6 +19,7 @@ using std::cout;
 using std::endl;
 using std::string;
 using std::vector;
+using std::unique_ptr;
 
 namespace blitzdg {
     namespace MeshManagerTests {
@@ -25,8 +27,10 @@ namespace blitzdg {
         Describe(MeshManager_Object) {
             using find_vector_type = vector<iterator_range<string::iterator>>;
 
-            MeshManager * meshManager=nullptr;
-            string *ExePath = nullptr;
+            string PathDelimeter = "/";
+            MeshManager* meshManager=nullptr;
+            string* ExePath = nullptr;
+            unique_ptr<vector<string>> InputPathVec = nullptr;
 
             void SetUp() {
                 meshManager = new MeshManager();
@@ -43,17 +47,18 @@ namespace blitzdg {
                     trim_right(*ExePath);
                     delete [] pathBuffer;
                 }
+                InputPathVec =  unique_ptr<vector<string>>(new vector<string>());
+                resolveInputPath();
             }
             void TearDown() {
                 delete ExePath;
                 delete meshManager;
             }
 
-            void get_VertexFilePath(string & vertFile) {    
+            void resolveInputPath() {
+                string path(*ExePath);
                 find_vector_type FindVec;
 
-                string PathDelimeter = "/";
-                string path(*ExePath);
                 replace_last(path, ".exe", "");
                 replace_last(path, "/bin/test", "");
                 find_all( FindVec, path, "\\" );
@@ -65,29 +70,29 @@ namespace blitzdg {
                 vector<string> pathVec;
                 pathVec.push_back(path);
                 pathVec.push_back("input");
-                pathVec.push_back("2box.V");
 
+                *InputPathVec = std::move(pathVec);
+            }
+
+            void get_VertexFilePath(string & vertFile) {
+                vector<string>& pathVec = *InputPathVec;
+                pathVec.push_back("2box.V");
                 vertFile = join(pathVec, PathDelimeter);
+                pathVec.pop_back();
             }
 
             void get_EToVFilePath(string & eToVFile) {
-                string path(*ExePath);
-                find_vector_type FindVec;
-
-                string PathDelimeter = "/";
-                replace_last(path, ".exe", "");
-                replace_last(path, "/bin/test", "");
-                find_all( FindVec, path, "\\" );
-                if (FindVec.size() > 0) {
-                    PathDelimeter = "\\";
-                    replace_last(path, "\\bin\\test", "");
-                }
-
-                vector<string> pathVec;
-                pathVec.push_back(path);
-                pathVec.push_back("input");
+                vector<string>& pathVec = *InputPathVec;
                 pathVec.push_back("2box.E2V");
                 eToVFile = join(pathVec, PathDelimeter);
+                pathVec.pop_back();
+            }
+
+            void get_MshFile(string& mshFile) {
+                vector<string>& pathVec = *InputPathVec;
+                pathVec.push_back("coarse_box.msh");
+                mshFile = join(pathVec, PathDelimeter);
+                pathVec.pop_back();
             }
 
             It(Reads_Vertex_Files) {
@@ -172,6 +177,38 @@ namespace blitzdg {
                 mgr.printElements();
             }
 
+            It(Can_Read_Gmsh_Mesh) {
+                cout << "Can_Read_Gmsh_Mesh" << endl;
+                string mshFile = "";
+                get_MshFile(mshFile);
+                MeshManager& mgr = *meshManager;
+                mgr.readMesh(mshFile);
+
+                cout << mgr.get_Elements()<< endl;
+
+                const real_vector_type& verts = mgr.get_Vertices();
+                index_type K = mgr.get_NumElements();
+                index_type Nv = mgr.get_NumVerts();
+
+                Assert::That(Nv, Equals(29));
+                Assert::That(K, Equals(40));
+
+                real_vector_type expectedVerts(Nv*3);
+
+                expectedVerts = -1.,-1., 0., 1., -1., 0., 1., 1., 0., -1., 1., 0., -0.5, 1., 0., -2.7528e-12, 1., 0., 0.5, 1., 0., 1., 0.5, 0., 1., 2.7528e-12, 0., 1., -0.5, 0., 0.5, -1., 0., 2.7528e-12, -1., 0., -0.5, -1. , 0., -1., -0.5, 0, -1, -2.7528e-12, 0, -1, 0.5, 0, -5.41875e-18, -1.80625e-18, 0, 0.416667, 0.416667, 0, 0.416667, -0.416667, 0, -0.416667, -0.416667, 0, -0.416667, 0.416667, -0, 3.10552e-13, 0.559524, 0, 0.559524, -3.10552e-13, 0, -3.10552e-13, -0.559524, 0, -0.559524, 3.10437e-13, -0, -0.677083, 0.677083, -0, 0.677083, 0.677083, 0, 0.677083, -0.677083, 0, -0.677083, -0.677083, 0;
+
+                real_vector_type vertErr(Nv*3);
+                cout << verts << endl;
+
+                vertErr = verts - expectedVerts;
+
+                cout << expectedVerts << endl; 
+                cout << verts << endl;
+                cout << "vertErr:" << vertErr << endl;
+
+                Assert::That(normInf(vertErr), IsLessThan(3.4e-7));
+            }
+
             It(Can_Partition_A_Mesh) {
                 cout << "Can_Partition_A_Mesh" << endl;
                 string eToVFile = ""; 
@@ -198,7 +235,7 @@ namespace blitzdg {
                 Assert::That(vpMap(3), IsGreaterThan(-1));
                 Assert::That(vpMap(4), IsGreaterThan(-1));
                 Assert::That(vpMap(5), IsGreaterThan(-1));
-            } 
+            }
         };
     } // namespace MeshManagerTests
 } // namespace blitzdg
