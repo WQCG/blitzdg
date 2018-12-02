@@ -34,7 +34,7 @@ namespace blitzdg {
 
       // Helper method to convert vector of strings to vector of ints
       // representing Gmsh element data.
-      std::vector<index_type> parseElem(std::vector<std::string> input);
+      std::vector<index_type> parseElem(const std::vector<std::string>& input);
       
     public:
       /**
