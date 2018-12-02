@@ -49,18 +49,15 @@ namespace blitzdg {
     {}
 
 
-    std::vector<index_type> MeshManager::parseElem(std::vector<string> input) {
+    std::vector<index_type> MeshManager::parseElem(const std::vector<string>& input) {
 
-        std::vector<index_type> elem(input.size());
-        index_type count = 0;
-        for (auto &s : input) {
-            std::stringstream parser(s);
-            index_type x = 0;
-            parser >> x;
-            elem[count] = x;
-            ++count;
-        }
-        return std::move(elem);
+        std::vector<index_type> elems;
+        elems.reserve(input.size());
+
+        for (const auto &s : input)
+            elems.push_back(std::stoi(s));
+
+        return elems;
     }
 
     void MeshManager::readMesh(const string& gmshInputFile) {
@@ -69,11 +66,11 @@ namespace blitzdg {
 
         CSVFileReader csvReader(gmshInputFile);
 
-        string line="";
+        string line;
         csvReader.readLine(line);
 
         // parse headers
-        if (line.compare("$MeshFormat") != 0)
+        if (line != "$MeshFormat")
             throw runtime_error("Missing $MeshFormat header in .msh file!");
 
         csvReader.setNumCols(3);
@@ -95,7 +92,7 @@ namespace blitzdg {
         csvReader.skipLines(1);
 
         csvReader.readLine(line);
-        if (line.compare("$Nodes") != 0)
+        if (line != "$Nodes")
             throw runtime_error("Unexpected line marker in .msh file! Expected '$Nodes' but was:" + line + ".");
         
         csvReader.setNumCols(1);
@@ -124,7 +121,7 @@ namespace blitzdg {
         csvReader.skipLines(1);
         
         csvReader.readLine(line);
-        if (line.compare("$Elements") != 0)
+        if (line != "$Elements")
             throw runtime_error("Unexpected line marker in .msh file! Expected '$Elements' but was:" + line + ".");
 
         csvReader.setNumCols(1);
@@ -146,7 +143,7 @@ namespace blitzdg {
             csvReader.readLine(line);
             csvReader.tokenizeLine(line, elementInfo);
 
-            index_type numCols = elementInfo.size();
+            index_type numCols = (index_type)elementInfo.size();
 
             // index_type elemNumber = stoi(elementInfo[0]); -- Gmsh element number, not used. Delete.
             index_type elemType   = stoi(elementInfo[1]);
@@ -164,24 +161,21 @@ namespace blitzdg {
                 if (elemType !=1)
                     throw runtime_error("Incorrect Element Type for line element!");
                 
-                std::vector<index_type> lineElem = parseElem(elementInfo);
-                lines.push_back(lineElem);
+                lines.push_back(parseElem(elementInfo));
             }
 
             if (numLocalVerts == 3) {
                 if (elemType != 2)
                     throw runtime_error("Incorrect Element Type for triangle element!");
 
-                std::vector<index_type> triElem = parseElem(elementInfo);
-                tris.push_back(triElem);
+                tris.push_back(parseElem(elementInfo));
             }
 
             if (numLocalVerts == 4) {
                 if (elemType != 3)
                     throw runtime_error("Incorrect Element Type for quadrangle element!");
                 
-                std::vector<index_type> quadElem = parseElem(elementInfo);
-                quads.push_back(quadElem);
+                quads.push_back(parseElem(elementInfo));
             }
         }
 
@@ -189,7 +183,7 @@ namespace blitzdg {
             throw runtime_error("Quadrangle elements currently not supported by blitzdg!");
 
         // Allocate storage EToV.
-        index_type K = tris.size();
+        index_type K = (index_type)tris.size();
         EToV = index_vec_smart_ptr(new index_vector_type(K*3));
 
         index_vector_type& E2V = *EToV;
