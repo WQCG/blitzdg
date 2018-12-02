@@ -378,15 +378,6 @@ namespace blitzdg {
             VYb = VY(vb(i));
             VYc = VY(vc(i));
         }
-
-        //x = 0.5*(-(r+s)*VX)
-
-
-/*
-va = EToV(:,1)'; vb = EToV(:,2)'; vc = EToV(:,3)';
-x = 0.5*(-(r+s)*VX(va)+(1+r)*VX(vb)+(1+s)*VX(vc));
-y = 0.5*(-(r+s)*VY(va)+(1+r)*VY(vb)+(1+s)*VY(vc)); */
-
     }
 
     void TriangleNodesProvisioner::buildLift() {
