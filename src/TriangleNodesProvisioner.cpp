@@ -342,12 +342,18 @@ namespace blitzdg {
         Fm(Range::all(), 0) = fmask1;
         Fm(Range::all(), 1) = fmask2;
         Fm(Range::all(), 2) = fmask3;
+    }
+
+    void TriangleNodesProvisioner::buildPhysicalGrid() {
+        firstIndex ii;
+        secondIndex jj;
 
         // Get element data
         const index_vector_type& EToV = Mesh2D->get_Elements();
         const real_vector_type&  Vert = Mesh2D->get_Vertices();
-        NumElements = Mesh2D->get_NumElements();
         index_type NumVertices = Mesh2D->get_NumVerts();
+
+        NumElements = Mesh2D->get_NumElements();
 
         real_vector_type VX(NumVertices), VY(NumVertices), VZ(NumVertices);
         index_vector_type va(NumElements), vb(NumElements), vc(NumElements);
@@ -378,6 +384,11 @@ namespace blitzdg {
             VYb = VY(vb(i));
             VYc = VY(vc(i));
         }
+
+        real_vector_type& r = *rGrid.get();
+        real_vector_type& s = *sGrid.get();
+        *xGrid = 0.5*(-(r(ii)+s(ii) + 0.*jj)*VXa(jj) + (1+r(ii) + 0.*jj)*VXb(jj) + (1+s(ii) + 0.*jj)*VXc(jj));
+        *yGrid = 0.5*(-(r(ii)+s(ii) + 0.*jj)*VYa(jj) + (1+r(ii) + 0.*jj)*VYb(jj) + (1+s(ii) + 0.*jj)*VYc(jj));
     }
 
     void TriangleNodesProvisioner::buildLift() {

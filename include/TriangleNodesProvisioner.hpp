@@ -303,9 +303,14 @@ namespace blitzdg {
       const index_vector_type & get_vmapP() const;
 
       /**
-       * Builds nodes and local operators, geometric factors.
+       * Builds nodes and local operators.
        */
       void buildNodes();
+
+      /**
+       * Build x and y coordinates and geometric factors.
+       */
+      void buildPhysicalGrid();
 
       /**
        * Builds the Surface-To-Volume Lifting Operator.

@@ -38,7 +38,7 @@ int main(int argc, char **argv) {
 
 	// Build dependencies.
 	MeshManager meshManager;
-	meshManager.readMesh("box.msh");
+	meshManager.readMesh("input/box.msh");
 
 	const index_type K = meshManager.get_NumElements();
 
@@ -46,6 +46,8 @@ int main(int argc, char **argv) {
 
 	triangleNodesProvisioner.buildNodes();
 	triangleNodesProvisioner.buildLift();
+
+	return 0;
 
 	// Differentiation matrices and scaling factors.
 	const real_matrix_type& Dr = triangleNodesProvisioner.get_Dr();

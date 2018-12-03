@@ -194,11 +194,9 @@ namespace blitzdg {
             E2V(ind+1) = tris[i][6];
             E2V(ind+2) = tris[i][7];
 
-            std::cout << E2V(ind) << " " << E2V(ind+1) << " " << E2V(ind+1) << std::endl;
             ind += 3;
         }
 
-        //std::cout << "EToV " << std::endl << E2V << std::endl;
         NumElements = K;
     }
 
