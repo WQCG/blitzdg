@@ -146,20 +146,33 @@ namespace blitzdg {
         real_matrix_type Drtrans(numColsV, numRowsV);
         real_matrix_type Dstrans(numColsV, numRowsV);
 
+        Drtrans = 0.*jj;
+        Dstrans = 0.*jj;
+
+        std::cout << V << std::endl;
+
         Vtrans = V(jj, ii);
-        V2Drtrans = V2Dr(jj, ii);
-        V2Dstrans = V2Ds(jj, ii);
+        V2Drtrans = V2Dr(jj,ii);
+        V2Dstrans = V2Ds(jj,ii);
 
 
         // Dr = V2Dr * V^{-1}
         LinSolver.solve(Vtrans, V2Drtrans, Drtrans);
+
+        // LAPACK can mangle our input.
+        Vtrans = V(jj,ii);
 
         // Ds = V2Ds / V;
         LinSolver.solve(Vtrans, V2Dstrans, Dstrans);
 
         // Take transpose.
         Dr = Drtrans(jj, ii); 
+
+        std::cout << Dr << std::endl;
+
         Ds = Dstrans(jj, ii);
+
+        std::cout << Ds << std::endl;
 
     }
 
@@ -347,6 +360,7 @@ namespace blitzdg {
     void TriangleNodesProvisioner::buildPhysicalGrid() {
         firstIndex ii;
         secondIndex jj;
+        thirdIndex kk;
 
         // Get element data
         const index_vector_type& EToV = Mesh2D->get_Elements();
@@ -387,10 +401,48 @@ namespace blitzdg {
             VYc(i) = VY(vc(i));
         }
 
-        real_vector_type& r = *rGrid.get();
-        real_vector_type& s = *sGrid.get();
-        *xGrid = 0.5*(-(r(ii)+s(ii) + 0.*jj)*VXa(jj) + (1+r(ii) + 0.*jj)*VXb(jj) + (1+s(ii) + 0.*jj)*VXc(jj));
-        *yGrid = 0.5*(-(r(ii)+s(ii) + 0.*jj)*VYa(jj) + (1+r(ii) + 0.*jj)*VYb(jj) + (1+s(ii) + 0.*jj)*VYc(jj));
+        const real_vector_type& r = *rGrid;
+        const real_vector_type& s = *sGrid;
+        const real_matrix_type& V2D = *V;
+
+        index_type Np = NumLocalPoints;
+        index_type K = NumElements;
+
+        real_matrix_type V2Dr(Np,Np), V2Ds(Np,Np);
+        
+        real_matrix_type& D_r = *Dr;
+        real_matrix_type& D_s = *Ds;
+        computeGradVandermondeMatrix(NOrder, r, s, V2Dr, V2Ds);
+        computeDifferentiationMatrices(V2Dr, V2Ds, V2D, D_r, D_s);
+
+        real_matrix_type& x = *xGrid;
+        real_matrix_type& y = *yGrid;
+
+        real_matrix_type& Jac = *J;
+
+        real_matrix_type& r_x = *rx;
+        real_matrix_type& r_y = *ry;
+        real_matrix_type& s_x = *sx;
+        real_matrix_type& s_y = *sy;
+
+        real_matrix_type xr(Np,K), yr(Np,K), xs(Np,K), ys(Np,K);
+
+        x = 0.5*(-(r(ii)+s(ii) + 0.*jj)*VXa(jj) + (1+r(ii) + 0.*jj)*VXb(jj) + (1+s(ii) + 0.*jj)*VXc(jj));
+        y = 0.5*(-(r(ii)+s(ii) + 0.*jj)*VYa(jj) + (1+r(ii) + 0.*jj)*VYb(jj) + (1+s(ii) + 0.*jj)*VYc(jj));
+
+        xr = sum(D_r(ii,kk)*x(kk,jj), kk);
+        yr = sum(D_r(ii,kk)*y(kk,jj), kk);
+        std::cout << D_s << std::endl;
+        xs = sum(D_s(ii,kk)*x(kk,jj), kk);
+        ys = sum(D_s(ii,kk)*y(kk,jj), kk);
+
+        Jac = xr*ys - xs*yr;
+
+        // Invert the 2x2 mapping matrix.
+        r_x = ys/Jac;
+        r_y =-xs/Jac;
+        s_x =-yr/Jac;
+        s_y = xr/Jac;
     }
 
     void TriangleNodesProvisioner::buildLift() {
@@ -459,8 +511,8 @@ namespace blitzdg {
             }
         }
 
-        // Get the Vandermonde guy.
-        real_matrix_type V2D(NumLocalPoints, NumLocalPoints);
+        // Compute the Vandermonde guy.
+        real_matrix_type& V2D = *V;
         V2D = 0.0*jj;
         computeVandermondeMatrix(NOrder, r, s, V2D);
 
