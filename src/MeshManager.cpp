@@ -190,9 +190,11 @@ namespace blitzdg {
 
         index_type ind=0;
         for (index_type i=0; i < K; ++i) {
-            E2V(ind)   = tris[i][5];
-            E2V(ind+1) = tris[i][6];
-            E2V(ind+2) = tris[i][7];
+
+            // Subtract one to go from 1-based (Gmsh) to 0-based (us).
+            E2V(ind)   = tris[i][5] - 1;
+            E2V(ind+1) = tris[i][6] - 1;
+            E2V(ind+2) = tris[i][7] - 1;
 
             ind += 3;
         }

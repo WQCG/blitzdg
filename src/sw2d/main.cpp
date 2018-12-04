@@ -46,6 +46,7 @@ int main(int argc, char **argv) {
 
 	triangleNodesProvisioner.buildNodes();
 	triangleNodesProvisioner.buildLift();
+	triangleNodesProvisioner.buildPhysicalGrid();
 
 	return 0;
 

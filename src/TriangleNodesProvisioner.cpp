@@ -357,32 +357,34 @@ namespace blitzdg {
 
         real_vector_type VX(NumVertices), VY(NumVertices), VZ(NumVertices);
         index_vector_type va(NumElements), vb(NumElements), vc(NumElements);
-        index_type countE=0, countV=0;
+        index_type count=0;
 
         // Unpack 1D arrays storing EToV and Vertex coordinates
         for (index_type i=0; i < NumElements; ++i) {
-            va(i) = EToV(countE);
-            vb(i) = EToV(countE+1);
-            vc(i) = EToV(countE+2);
+            va(i) = EToV(count);
+            vb(i) = EToV(count+1);
+            vc(i) = EToV(count+2);
+            count += 3;
+        }
 
-            VX(i) = Vert(countV);
-            VY(i) = Vert(countV+1);
-            VZ(i) = Vert(countV+2);
-
-            countE += 3;
-            countV += 3;
+        count=0;
+        for (index_type i=0; i < NumVertices; ++i) {
+            VX(i) = Vert(count);
+            VY(i) = Vert(count+1);
+            VZ(i) = Vert(count+2);
+            count += 3;
         }
 
         real_vector_type VXa(NumElements), VXb(NumElements), VXc(NumElements);
         real_vector_type VYa(NumElements), VYb(NumElements), VYc(NumElements);
         for (index_type i=0; i < NumElements; ++i) {
-            VXa = VX(va(i));
-            VXb = VX(vb(i));
-            VXc = VX(vc(i));
+            VXa(i) = VX(va(i));
+            VXb(i) = VX(vb(i));
+            VXc(i) = VX(vc(i));
 
-            VYa = VY(va(i));
-            VYb = VY(vb(i));
-            VYc = VY(vc(i));
+            VYa(i) = VY(va(i));
+            VYb(i) = VY(vb(i));
+            VYc(i) = VY(vc(i));
         }
 
         real_vector_type& r = *rGrid.get();
