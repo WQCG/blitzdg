@@ -38,10 +38,15 @@ namespace blitzdg {
         sGrid{ new real_vector_type((_NOrder + 2)*(_NOrder+1)/2) },
         V{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) }, 
         Dr{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
+        Ds{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
         Lift{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder+1)*NumFaces) },
         J{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
         rx{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
+        sx{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
+        ry{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
+        sy{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
         nx{ new real_matrix_type((_NOrder+1)*NumFaces, NumElements) },
+        ny{ new real_matrix_type((_NOrder+1)*NumFaces, NumElements) },
         Vinv{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
         Fmask{ new index_matrix_type( _NOrder+1, NumFaces) },
         Fscale{ new real_matrix_type((_NOrder+1)*NumFaces, NumElements) },
@@ -149,12 +154,9 @@ namespace blitzdg {
         Drtrans = 0.*jj;
         Dstrans = 0.*jj;
 
-        std::cout << V << std::endl;
-
         Vtrans = V(jj, ii);
         V2Drtrans = V2Dr(jj,ii);
         V2Dstrans = V2Ds(jj,ii);
-
 
         // Dr = V2Dr * V^{-1}
         LinSolver.solve(Vtrans, V2Drtrans, Drtrans);
@@ -167,13 +169,7 @@ namespace blitzdg {
 
         // Take transpose.
         Dr = Drtrans(jj, ii); 
-
-        std::cout << Dr << std::endl;
-
         Ds = Dstrans(jj, ii);
-
-        std::cout << Ds << std::endl;
-
     }
 
     void TriangleNodesProvisioner::computeEquilateralNodes(real_vector_type & x, real_vector_type & y) const {
@@ -432,7 +428,6 @@ namespace blitzdg {
 
         xr = sum(D_r(ii,kk)*x(kk,jj), kk);
         yr = sum(D_r(ii,kk)*y(kk,jj), kk);
-        std::cout << D_s << std::endl;
         xs = sum(D_s(ii,kk)*x(kk,jj), kk);
         ys = sum(D_s(ii,kk)*y(kk,jj), kk);
 
