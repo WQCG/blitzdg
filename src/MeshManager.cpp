@@ -341,7 +341,7 @@ namespace blitzdg {
         return Dim;
     }
 
-    index_vector_type& MeshManager::get_BCType() const {
+    const index_vector_type& MeshManager::get_BCType() const {
         return *BCType;
     }
 

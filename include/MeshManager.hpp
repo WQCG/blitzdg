@@ -138,7 +138,7 @@ namespace blitzdg {
        * Returns table of boundary condition tags corresponding
        * to element faces. (length = NumElements * NumFaces).
        */
-      index_vector_type& get_BCType() const;
+      const index_vector_type& get_BCType() const;
 
       /**
        * Returns a reference to the array of vertex coordinates.
