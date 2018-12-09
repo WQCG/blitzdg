@@ -312,6 +312,11 @@ namespace blitzdg {
        * Builds the Surface-To-Volume Lifting Operator.
        */
       void buildLift();
+
+      /**
+       * Build volume-to-surface maps for '-' and '+' traces, as well as for BC faces.
+       */
+      void buildMaps();
       
       /**
        * Returns the number of nodes local to a 2D triangular element.

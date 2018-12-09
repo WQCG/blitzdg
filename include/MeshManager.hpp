@@ -148,7 +148,7 @@ namespace blitzdg {
       /**
        * Returns element-to-element connectivity table.
        */
-      const index_vector_type& get_EToE() const; 
+      const index_vector_type& get_EToE() const;
 
       /**
        * Return element-to-face connectivity table.
