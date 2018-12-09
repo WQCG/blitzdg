@@ -146,7 +146,7 @@ namespace blitzdg {
             csvReader.readLine(line);
             csvReader.tokenizeLine(line, elementInfo);
 
-            index_type numCols = (index_type)elementInfo.size();
+            index_type numCols = static_cast<index_type>(elementInfo.size());
 
             // index_type elemNumber = stoi(elementInfo[0]); -- Gmsh element number, not used. Delete.
             index_type elemType   = stoi(elementInfo[1]);
@@ -186,7 +186,7 @@ namespace blitzdg {
             throw runtime_error("Quadrangle elements currently not supported by blitzdg!");
 
         // Allocate storage EToV and BC Table.
-        index_type K = (index_type)tris.size();
+        index_type K = static_cast<index_type>(tris.size());
         EToV = index_vec_smart_ptr(new index_vector_type(K*3));
         BCType = index_vec_smart_ptr(new index_vector_type(K*3));
 
@@ -231,7 +231,7 @@ namespace blitzdg {
                 // check if midpoint of the triangle edge
                 // lies on a boundary edge, if it does,
                 // then the current face is on the boundary.
-                for (index_type edge=0; edge < (index_type)edges.size(); ++edge) {
+                for (index_type edge=0; edge < static_cast<index_type>(edges.size()); ++edge) {
 
                     // Look up node numbers from 'lines' table.
                     // (make node references 1-based).
