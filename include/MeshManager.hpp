@@ -23,11 +23,11 @@ namespace blitzdg {
 
       index_type Dim;
       index_type NumVerts;
-      index_type ElementType;
+      index_type NumFaces;
       index_type NumElements;
       std::string CsvDelimiters;
       real_vec_smart_ptr Vert;
-      index_vec_smart_ptr EToV, BCType;
+      index_vec_smart_ptr EToV, EToE, EToF, BCType;
       index_vec_smart_ptr ElementPartitionMap;
       index_vec_smart_ptr VertexPartitionMap;
 
@@ -114,6 +114,11 @@ namespace blitzdg {
       void partitionMesh(index_type numPartitions);
 
       /**
+       * Build EToE and EToF connectivity tables.
+       */
+      void buildConnectivity();
+
+      /**
        * Returns the dimension of a vertex, typically 2 or 3.
        */
       index_type get_Dim() const;
@@ -129,16 +134,26 @@ namespace blitzdg {
       index_type get_NumElements() const;
      
       /**
-       * Returns an integer that defines the element type.
+       * Returns an integer that defines the number of faces in an element.
        * Returns 3 for triangles, 4 for a quadrilaterals, etc.
        */
-      index_type get_ElementType() const;
+      index_type get_NumFaces() const;
 
       /**
        * Returns table of boundary condition tags corresponding
        * to element faces. (length = NumElements * NumFaces).
        */
-      index_vector_type& get_BCType() const;
+      const index_vector_type& get_BCType() const;
+
+      /**
+       * Returns element-to-element connectivity table.
+       */
+      const index_vector_type& get_EToE() const; 
+
+      /**
+       * Return element-to-face connectivity table.
+       */
+      const index_vector_type& get_EToF() const;
 
       /**
        * Returns a reference to the array of vertex coordinates.

@@ -46,7 +46,7 @@ namespace blitzdg {
     const real_type MeshManager::NodeTol = 1.e-10;
 
     MeshManager::MeshManager() 
-        :  Dim{ 0 }, NumVerts{ 0 }, ElementType{}, NumElements{ 0 },
+        :  Dim{ 0 }, NumVerts{ 0 }, NumFaces{}, NumElements{ 0 },
         CsvDelimiters{ "\t " }, Vert{ nullptr }, EToV{ nullptr },
         ElementPartitionMap{ nullptr }, VertexPartitionMap{ nullptr }
     {}
@@ -148,7 +148,6 @@ namespace blitzdg {
 
             index_type numCols = (index_type)elementInfo.size();
 
-            // index_type elemNumber = stoi(elementInfo[0]); -- Gmsh element number, not used. Delete.
             index_type elemType   = stoi(elementInfo[1]);
             index_type numTags    = stoi(elementInfo[2]);
 
@@ -185,10 +184,17 @@ namespace blitzdg {
         if (quads.size() > 0)
             throw runtime_error("Quadrangle elements currently not supported by blitzdg!");
 
+        NumFaces = 3;
+
         // Allocate storage EToV and BC Table.
+        // Note: we are doing this here as opposed to in the initializer list,
+        // since prior to this point we did not know how many elements there are.
         index_type K = (index_type)tris.size();
         EToV = index_vec_smart_ptr(new index_vector_type(K*3));
         BCType = index_vec_smart_ptr(new index_vector_type(K*3));
+        EToE = index_vec_smart_ptr(new index_vector_type(K*3));
+        EToF = index_vec_smart_ptr(new index_vector_type(K*3));
+        
 
         index_vector_type& E2V = *EToV;
 
@@ -290,9 +296,9 @@ namespace blitzdg {
         *VertexPartitionMap = 0;
 
         // Assume mesh with homogenous element type, then eptr 
-        // dictates an equal stride of size ElementType across EToV array.
+        // dictates an equal stride of size NumFaces across EToV array.
         for (index_type i = 0; i <= NumElements; ++i) {
-            eptr[i] = ElementType * i;
+            eptr[i] = NumFaces * i;
         }
 
         cout << "About to call METIS_PartMeshNodal" << endl;
@@ -326,7 +332,7 @@ namespace blitzdg {
     }
 
     void MeshManager::readElements(const string& E2VFile) {
-        EToV = csvread<index_type>(E2VFile, NumElements, ElementType);
+        EToV = csvread<index_type>(E2VFile, NumElements, NumFaces);
     }
 
     void MeshManager::printVertices() const {
@@ -334,14 +340,14 @@ namespace blitzdg {
     }
 
     void MeshManager::printElements() const {
-        printArray(*EToV, NumElements, ElementType);
+        printArray(*EToV, NumElements, NumFaces);
     }
 
     index_type MeshManager::get_Dim() const {
         return Dim;
     }
 
-    index_vector_type& MeshManager::get_BCType() const {
+    const index_vector_type& MeshManager::get_BCType() const {
         return *BCType;
     }
 
@@ -353,8 +359,8 @@ namespace blitzdg {
         return NumElements;
     }
 
-    index_type MeshManager::get_ElementType() const {
-        return ElementType;
+    index_type MeshManager::get_NumFaces() const {
+        return NumFaces;
     }
 
     const real_vector_type& MeshManager::get_Vertices() const {
@@ -363,6 +369,14 @@ namespace blitzdg {
 
     const index_vector_type& MeshManager::get_Elements() const {
         return *EToV;
+    }
+
+    const index_vector_type& MeshManager::get_EToE() const {
+        return *EToE;
+    }
+
+    const index_vector_type& MeshManager::get_EToF() const {
+        return *EToF;
     }
 
     const index_vector_type& MeshManager::get_ElementPartitionMap() const {
