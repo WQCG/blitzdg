@@ -10,6 +10,7 @@
 #include <iostream>
 #include <limits>
 #include <cmath>
+#include <memory>
 
 using blitz::firstIndex;
 using blitz::secondIndex;
@@ -17,6 +18,7 @@ using std::cout;
 using std::endl;
 using std::numeric_limits;
 using std::abs;
+using std::unique_ptr;
 
 namespace blitzdg {
     namespace TriangleNodesProvisionerTests {
@@ -25,9 +27,9 @@ namespace blitzdg {
         firstIndex ii;
         secondIndex jj;
 
-		MeshManager * meshManager = nullptr;
-        Nodes1DProvisioner * nodes1DProvisioner = nullptr;
-		TriangleNodesProvisioner * triangleNodesProvisioner = nullptr;
+		unique_ptr<MeshManager> meshManager = nullptr;
+        unique_ptr<Nodes1DProvisioner> nodes1DProvisioner = nullptr;
+		unique_ptr<TriangleNodesProvisioner> triangleNodesProvisioner = nullptr;
 
         Describe(Nodes1DProvisioner_Object) {
 			const real_type eps = 50*numeric_limits<double>::epsilon();
@@ -37,14 +39,10 @@ namespace blitzdg {
 			const index_type NumFaces = 2;
 
             void SetUp() {
-				meshManager = new MeshManager();
-				triangleNodesProvisioner = new TriangleNodesProvisioner(NOrder, NumElements, meshManager);
+				meshManager = unique_ptr<MeshManager>(new MeshManager());
+				triangleNodesProvisioner = unique_ptr<TriangleNodesProvisioner>(new TriangleNodesProvisioner(NOrder, NumElements, meshManager.get())); 
 			}
 
-			void TearDown() {
-				delete triangleNodesProvisioner;
-				delete meshManager;
-			}
 
 			It(Should_Evaluate_Orthonormal_Simplex2D_Polynomial) {
                 cout << "Should_Evaluate_Orthonormal_Simplex2D_Polynomial" << endl;

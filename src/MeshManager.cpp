@@ -28,6 +28,7 @@ using std::to_string;
 using std::unique_ptr;
 using std::vector;
 using std::stoi;
+using std::abs;
 
 namespace blitzdg {
     namespace {
@@ -41,6 +42,8 @@ namespace blitzdg {
             }
         }
     } // anonymous namespace
+
+    const real_type MeshManager::NodeTol = 1.e-10;
 
     MeshManager::MeshManager() 
         :  Dim{ 0 }, NumVerts{ 0 }, ElementType{}, NumElements{ 0 },
@@ -182,24 +185,77 @@ namespace blitzdg {
         if (quads.size() > 0)
             throw runtime_error("Quadrangle elements currently not supported by blitzdg!");
 
-        // Allocate storage EToV.
+        // Allocate storage EToV and BC Table.
         index_type K = (index_type)tris.size();
         EToV = index_vec_smart_ptr(new index_vector_type(K*3));
+        BCType = index_vec_smart_ptr(new index_vector_type(K*3));
 
         index_vector_type& E2V = *EToV;
 
         index_type ind=0;
         for (index_type i=0; i < K; ++i) {
-            E2V(ind)   = tris[i][5];
-            E2V(ind+1) = tris[i][6];
-            E2V(ind+2) = tris[i][7];
+            E2V(ind)   = tris[i][5] - 1;
+            E2V(ind+1) = tris[i][6] - 1;
+            E2V(ind+2) = tris[i][7] - 1;
 
-            std::cout << E2V(ind) << " " << E2V(ind+1) << " " << E2V(ind+1) << std::endl;
             ind += 3;
         }
 
-        //std::cout << "EToV " << std::endl << E2V << std::endl;
         NumElements = K;
+
+        buildBCTable(lines);
+    }
+
+    void MeshManager::buildBCTable(std::vector<std::vector<index_type>>& edges) {
+        index_vector_type& E2V = *EToV;
+        real_vector_type& V = *Vert;
+        index_vector_type& BCTable = *BCType;
+
+        blitz::firstIndex ii;
+        BCTable = 0*ii;
+        for (index_type k=0; k < NumElements; ++k) {
+            for (index_type f=0; f < 3; ++f) {
+
+                index_type v1 = E2V(k*3 + f);
+                index_type v2 = E2V(k*3 + ((f + 1) % 3));
+
+                real_type v1x = V(v1*3);
+                real_type v1y = V(v1*3 + 1);
+
+                real_type v2x = V(v2*3);
+                real_type v2y = V(v2*3 + 1);
+
+                real_type midx = 0.5*(v1x + v2x);
+                real_type midy = 0.5*(v1y + v2y);
+
+                // check if midpoint of the triangle edge
+                // lies on a boundary edge, if it does,
+                // then the current face is on the boundary.
+                for (index_type edge=0; edge < (index_type)edges.size(); ++edge) {
+
+                    // Look up node numbers from 'lines' table.
+                    // (make node references 1-based).
+                    index_type n1 = edges[edge][5] - 1;
+                    index_type n2 = edges[edge][6] - 1;
+
+                    index_type bcType = edges[edge][3];
+                    // Assign default to something non-zero. 3 -> Wall, in the parlance of NUDG.
+                    if (bcType == 0) {
+                        bcType = 3;
+                    }
+
+                    real_type x1 = V(n1*3), y1 = V(n1*3+1);
+                    real_type x2 = V(n2*3), y2 = V(n2*3+1);
+
+                    // Eqn of line: y - y0 = (y2-y1)/(x2-x1)*(x-x0)
+                    // => (midy-y2)*(x2-x1) - (y2-y1)(midx-x2) = 0
+                    if (std::abs((y2-midy)*(x2-x1) - (y2-y1)*(x2-midx)) < NodeTol) {
+                        BCTable(3*k + f) = bcType;
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     void MeshManager::partitionMesh(index_type numPartitions) {
@@ -283,6 +339,10 @@ namespace blitzdg {
 
     index_type MeshManager::get_Dim() const {
         return Dim;
+    }
+
+    index_vector_type& MeshManager::get_BCType() const {
+        return *BCType;
     }
 
     index_type MeshManager::get_NumVerts() const {
