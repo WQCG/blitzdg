@@ -199,8 +199,6 @@ namespace blitzdg {
         index_type K = static_cast<index_type>(tris.size());
         EToV = index_vec_smart_ptr(new index_vector_type(K*3));
         BCType = index_vec_smart_ptr(new index_vector_type(K*3));
-        EToE = index_vec_smart_ptr(new index_vector_type(K*3));
-        EToF = index_vec_smart_ptr(new index_vector_type(K*3));
 
         index_vector_type& E2V = *EToV;
 
@@ -268,44 +266,6 @@ namespace blitzdg {
                 }
             }
         }
-    }
-
-    void MeshManager::buildConnectivity() {
-        index_type totalFaces = NumFaces * NumElements;
-        index_type numVertices = NumElements + 1;
-        index_type localVertNum[3][2] = {{0, 1}, {1, 2}, {2, 0}};
-
-        // Build global face-to-vertex array. Note: we actually
-        // build its transpose for easy column access.
-        CSCMat FToVtrans(numVertices, totalFaces, totalFaces);
-        const index_vector_type& E2V = *EToV;
-        index_type globalFaceNum = 0;
-        index_type rowInd = 0;
-        for (index_type k = 0; k < NumElements; ++k) {
-            for (index_type f = 0; f < NumFaces; ++f) {
-                index_type v1 = localVertNum[f][0];
-                index_type v2 = localVertNum[f][1];
-
-                index_type v1Global = E2V(k*NumFaces + v1);
-                index_type v2Global = E2V(k*NumFaces + v2);
-                
-                // Entry for v1Global.
-                FToVtrans.colPtrs(rowInd) = globalFaceNum;
-                FToVtrans.rowInds(rowInd) = v1Global;
-                FToVtrans.elems(rowInd) = 1.0;
-                ++rowInd;
-
-                // Entry for v2Global
-                FToVtrans.colPtrs(rowInd) = globalFaceNum;
-                FToVtrans.rowInds(rowInd) = v2Global;
-                FToVtrans.elems(rowInd) = 1.0;
-                ++rowInd;
-
-                ++globalFaceNum;
-            }
-        }
-        FToVtrans.colPtrs(totalFaces) = globalFaceNum;
-        CSCMat FToF = multiply(transpose(FToVtrans), FToVtrans);
     }
 
     void MeshManager::partitionMesh(index_type numPartitions) {
