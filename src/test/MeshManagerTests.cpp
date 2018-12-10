@@ -184,9 +184,10 @@ namespace blitzdg {
                 MeshManager& mgr = *meshManager;
                 mgr.readMesh(mshFile);
 
-                cout << mgr.get_Elements()<< endl;
-
+                const index_vector_type& elements = mgr.get_Elements();
+                const index_vector_type& bcTable = mgr.get_BCType();
                 const real_vector_type& verts = mgr.get_Vertices();
+
                 index_type K = mgr.get_NumElements();
                 index_type Nv = mgr.get_NumVerts();
 
@@ -194,19 +195,24 @@ namespace blitzdg {
                 Assert::That(K, Equals(40));
 
                 real_vector_type expectedVerts(Nv*3);
+                index_vector_type expectedBcTable(K*3);
+                index_vector_type expectedElements(K*3);
 
                 expectedVerts = -1.,-1., 0., 1., -1., 0., 1., 1., 0., -1., 1., 0., -0.5, 1., 0., -2.7528e-12, 1., 0., 0.5, 1., 0., 1., 0.5, 0., 1., 2.7528e-12, 0., 1., -0.5, 0., 0.5, -1., 0., 2.7528e-12, -1., 0., -0.5, -1. , 0., -1., -0.5, 0, -1, -2.7528e-12, 0, -1, 0.5, 0, -5.41875e-18, -1.80625e-18, 0, 0.416667, 0.416667, 0, 0.416667, -0.416667, 0, -0.416667, -0.416667, 0, -0.416667, 0.416667, -0, 3.10552e-13, 0.559524, 0, 0.559524, -3.10552e-13, 0, -3.10552e-13, -0.559524, 0, -0.559524, 3.10437e-13, -0, -0.677083, 0.677083, -0, 0.677083, 0.677083, 0, 0.677083, -0.677083, 0, -0.677083, -0.677083, 0;
-
+                expectedBcTable = 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,3,0,0,3,0,0,3,0,0,3,0,0,3,0,0,3,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,3,0,0,3,0,0,3,3,0,0,3,0,0,3,0,0,3,0,0;
+                expectedElements = 7,22,17,10,23,18,4,21,20,13,24,19,15,20,24,9,18,22,12,19,23,6,17,21,4,5,21,7,8,22,10,11,23,13,14,24,5,6,21,8,9,22,11,12,23,14,15,24,16,21,17,16,20,21,16,17,22,16,18,23,16,19,24,16,22,18,16,23,19,16,24,20,7,17,26,10,18,27,13,19,28,4,20,25,6,26,17,9,27,18,12,28,19,15,25,20,0,28,12,1,27,9,2,26,6,3,25,15,0,13,28,1,10,27,2,7,26,3,4,25;
+                
                 real_vector_type vertErr(Nv*3);
-                cout << verts << endl;
+                real_vector_type bcErr(K*3);
+                real_vector_type elemErr(K*3);
 
                 vertErr = verts - expectedVerts;
-
-                cout << expectedVerts << endl; 
-                cout << verts << endl;
-                cout << "vertErr:" << vertErr << endl;
+                bcErr = bcTable - expectedBcTable;
+                elemErr = elements - expectedElements;
 
                 Assert::That(normInf(vertErr), IsLessThan(3.4e-7));
+                Assert::That(normInf(bcErr),   Equals(0.0));
+                Assert::That(normInf(elemErr), Equals(0.0));
             }
 
             It(Can_Partition_A_Mesh) {
