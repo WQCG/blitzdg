@@ -142,6 +142,10 @@ namespace blitzdg {
         std::vector<std::vector<index_type>> tris;
         std::vector<std::vector<index_type>> quads;
 
+        lines.reserve(numElementRows);
+        tris.reserve(numElementRows);
+        quads.reserve(numElementRows);
+
         for(index_type i =0; i < numElementRows; ++i) {
             csvReader.readLine(line);
             csvReader.tokenizeLine(line, elementInfo);
@@ -181,8 +185,11 @@ namespace blitzdg {
             }
         }
 
-        if (quads.size() > 0)
+        if (!quads.empty())
             throw runtime_error("Quadrangle elements currently not supported by blitzdg!");
+
+        lines.shrink_to_fit();
+        tris.shrink_to_fit();
 
         NumFaces = 3;
 
@@ -194,7 +201,6 @@ namespace blitzdg {
         BCType = index_vec_smart_ptr(new index_vector_type(K*3));
         EToE = index_vec_smart_ptr(new index_vector_type(K*3));
         EToF = index_vec_smart_ptr(new index_vector_type(K*3));
-        
 
         index_vector_type& E2V = *EToV;
 
