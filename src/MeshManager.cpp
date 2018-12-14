@@ -47,7 +47,7 @@ namespace blitzdg {
     const real_type MeshManager::NodeTol = 1.e-10;
 
     MeshManager::MeshManager() 
-        :  Dim{ 0 }, NumVerts{ 0 }, ElementType{}, NumElements{ 0 },
+        :  Dim{ 0 }, NumVerts{ 0 }, NumFaces{}, NumElements{ 0 },
         CsvDelimiters{ "\t " }, Vert{ nullptr }, EToV{ nullptr },
         ElementPartitionMap{ nullptr }, VertexPartitionMap{ nullptr }
     {}
@@ -276,12 +276,13 @@ namespace blitzdg {
 
         // Build global face-to-vertex array. Note: we actually
         // build its transpose for easy column access.
-        CSCMat FToVtrans(numVertices, totalFaces, totalFaces);
+        CSCMat VToF(numVertices, totalFaces, 2*totalFaces);
         const index_vector_type& E2V = *EToV;
         index_type globalFaceNum = 0;
-        index_type rowInd = 0;
+        index_type nnz=0;
         for (index_type k = 0; k < NumElements; ++k) {
             for (index_type f = 0; f < NumFaces; ++f) {
+                VToF.colPtrs(globalFaceNum) = nnz; 
                 index_type v1 = localVertNum[f][0];
                 index_type v2 = localVertNum[f][1];
 
@@ -289,22 +290,20 @@ namespace blitzdg {
                 index_type v2Global = E2V(k*NumFaces + v2);
 
                 // Entry for v1Global.
-                FToVtrans.colPtrs(rowInd) = globalFaceNum;
-                FToVtrans.rowInds(rowInd) = v1Global;
-                FToVtrans.elems(rowInd) = 1.0;
-                ++rowInd;
+                VToF.rowInds(nnz) = v1Global;
+                VToF.elems(nnz) = 1.0;
+                ++nnz;
 
                 // Entry for v2Global
-                FToVtrans.colPtrs(rowInd) = globalFaceNum;
-                FToVtrans.rowInds(rowInd) = v2Global;
-                FToVtrans.elems(rowInd) = 1.0;
-                ++rowInd;
+                VToF.rowInds(nnz) = v2Global;
+                VToF.elems(nnz) = 1.0;
+                ++nnz;
 
                 ++globalFaceNum;
             }
         }
-        FToVtrans.colPtrs(totalFaces) = globalFaceNum;
-        CSCMat FToF = multiply(transpose(FToVtrans), FToVtrans);
+        VToF.colPtrs(totalFaces) = globalFaceNum;
+        CSCMat FToF = multiply(transpose(VToF), VToF);
     }
 
     void MeshManager::partitionMesh(index_type numPartitions) {
@@ -339,9 +338,9 @@ namespace blitzdg {
         *VertexPartitionMap = 0;
 
         // Assume mesh with homogenous element type, then eptr 
-        // dictates an equal stride of size ElementType across EToV array.
+        // dictates an equal stride of size NumFaces across EToV array.
         for (index_type i = 0; i <= NumElements; ++i) {
-            eptr[i] = ElementType * i;
+            eptr[i] = NumFaces * i;
         }
 
         cout << "About to call METIS_PartMeshNodal" << endl;
@@ -375,7 +374,7 @@ namespace blitzdg {
     }
 
     void MeshManager::readElements(const string& E2VFile) {
-        EToV = csvread<index_type>(E2VFile, NumElements, ElementType);
+        EToV = csvread<index_type>(E2VFile, NumElements, NumFaces);
     }
 
     void MeshManager::printVertices() const {
@@ -383,7 +382,7 @@ namespace blitzdg {
     }
 
     void MeshManager::printElements() const {
-        printArray(*EToV, NumElements, ElementType);
+        printArray(*EToV, NumElements, NumFaces);
     }
 
     index_type MeshManager::get_Dim() const {
@@ -402,8 +401,8 @@ namespace blitzdg {
         return NumElements;
     }
 
-    index_type MeshManager::get_ElementType() const {
-        return ElementType;
+    index_type MeshManager::get_NumFaces() const {
+        return NumFaces;
     }
 
     const real_vector_type& MeshManager::get_Vertices() const {

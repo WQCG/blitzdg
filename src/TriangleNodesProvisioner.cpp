@@ -345,11 +345,6 @@ namespace blitzdg {
         Fm(Range::all(), 2) = fmask3;
     }
 
-    void TriangleNodesProvisioner::buildMaps() {
-        const MeshManager& meshMgr = *Mesh2D;
-
-    }
-
     void TriangleNodesProvisioner::buildLift() {
         firstIndex ii;
         secondIndex jj;

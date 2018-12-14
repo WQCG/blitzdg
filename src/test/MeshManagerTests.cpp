@@ -139,7 +139,7 @@ namespace blitzdg {
                 mgr.readElements(eToVFile);
 
                 Assert::That(mgr.get_NumElements(), Equals(2));
-                Assert::That(mgr.get_ElementType(), Equals(4));
+                Assert::That(mgr.get_NumFaces(), Equals(4));
 
                 const index_vector_type& elements = mgr.get_Elements();
 
