@@ -281,12 +281,13 @@ namespace blitzdg {
 
         // Build global face-to-vertex array. Note: we actually
         // build its transpose for easy column access.
-        CSCMat FToVtrans(numVertices, totalFaces, totalFaces);
+        CSCMat VToF(numVertices, totalFaces, 2*totalFaces);
         const index_vector_type& E2V = *EToV;
         index_type globalFaceNum = 0;
-        index_type rowInd = 0;
+        index_type nnz=0;
         for (index_type k = 0; k < NumElements; ++k) {
             for (index_type f = 0; f < NumFaces; ++f) {
+                VToF.colPtrs(globalFaceNum) = nnz; 
                 index_type v1 = localVertNum[f][0];
                 index_type v2 = localVertNum[f][1];
 
@@ -294,25 +295,20 @@ namespace blitzdg {
                 index_type v2Global = E2V(k*NumFaces + v2);
 
                 // Entry for v1Global.
-                FToVtrans.colPtrs(rowInd) = v1Global;
-                FToVtrans.rowInds(globalFaceNum) = globalFaceNum;
-                FToVtrans.elems(rowInd) = 1.0;
-                ++rowInd;
+                VToF.rowInds(nnz) = v1Global;
+                VToF.elems(nnz) = 1.0;
+                ++nnz;
 
                 // Entry for v2Global
-                FToVtrans.colPtrs(rowInd) = v2Global; 
-                FToVtrans.rowInds(globalFaceNum) = globalFaceNum; // redundant
-                FToVtrans.elems(rowInd) = 1.0;
-                ++rowInd;
+                VToF.rowInds(nnz) = v2Global;
+                VToF.elems(nnz) = 1.0;
+                ++nnz;
 
                 ++globalFaceNum;
             }
         }
-        FToVtrans.colPtrs(totalFaces) = globalFaceNum;
-        FToVtrans.removeDuplicates();
-        cout << FToVtrans << endl;
-        CSCMat FToV = transpose(FToVtrans);
-        CSCMat FToF = multiply(FToV, FToVtrans);
+        VToF.colPtrs(totalFaces) = nnz;
+        CSCMat FToF = multiply(transpose(VToF), VToF);
     }
 
     void MeshManager::partitionMesh(index_type numPartitions) {
