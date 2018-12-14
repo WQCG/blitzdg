@@ -439,6 +439,11 @@ namespace blitzdg {
         s_x =-yr/Jac;
         s_y = xr/Jac;
     }
+    
+    void TriangleNodesProvisioner::buildMaps() {
+        const MeshManager& meshMgr = *Mesh2D;
+
+    }
 
     void TriangleNodesProvisioner::buildLift() {
         firstIndex ii;
