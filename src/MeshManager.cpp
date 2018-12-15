@@ -304,6 +304,72 @@ namespace blitzdg {
         }
         VToF.colPtrs(totalFaces) = globalFaceNum;
         CSCMat FToF = multiply(transpose(VToF), VToF);
+
+        index_type FToFnnz = FToF.nnz();
+
+        index_vector_type f1(FToFnnz);
+        index_vector_type f2(FToFnnz);
+
+        f1 = 0;
+        f2 = 0;
+
+        index_type connectionsCount = 0;
+        for (index_type j = 0; j < totalFaces; ++j) {
+            for (index_type k = FToF.colPtrs(j); k < FToF.colPtrs(j + 1); ++k) {
+                index_type i = FToF.rowInds(k);
+                if (i != j && FToF.elems(k) == 2.0) {
+                    f1(connectionsCount) = i;
+                    f2(connectionsCount) = j;
+                    ++connectionsCount;
+                }
+            }
+        }
+
+        index_vector_type e1(FToFnnz);
+        index_vector_type e2(FToFnnz);
+        e1 = 0;
+        e2 = 0;
+
+        e1 = floor(f1 / NumFaces);
+        f1 = (f1 % NumFaces);
+        e2 = floor(f2 / NumFaces);
+        f2 = (f2 % NumFaces);
+
+        // Build connectivity matrices.
+        index_vector_type& E2E = *EToE;
+        index_vector_type& E2F = *EToF;
+
+        for (index_type k = 0; k < NumElements; ++k) {
+            for (index_type f = 0; f < NumFaces; ++f) {
+                E2E(k*NumFaces + f) = k;
+                E2F(k*NumFaces + f) = f;
+            }
+        }
+
+        for (index_type i = 0; i < FToFnnz; ++i) {
+            index_type ee1 = e1(i);
+            index_type ee2 = e2(i);
+            index_type ff1 = f1(i);
+            index_type ff2 = f2(i);
+            E2E(ee1*NumFaces + ff1) = ee2;
+            E2F(ee1*NumFaces + ff1) = ff2;
+        }
+
+        cout << "EToE:" << "\n";
+        for (index_type k = 0; k < NumElements; ++k) {
+            for (index_type f = 0; f < NumFaces; ++f) {
+                cout << E2E(k*NumFaces + f) << " ";
+            }
+            cout << "\n" ;
+        }
+
+        cout << "EToF:" << "\n";
+        for (index_type k = 0; k < NumElements; ++k) {
+            for (index_type f = 0; f < NumFaces; ++f) {
+                cout << E2F(k*NumFaces + f) << " ";
+            }
+            cout << "\n" ;
+        }
     }
 
     void MeshManager::partitionMesh(index_type numPartitions) {
