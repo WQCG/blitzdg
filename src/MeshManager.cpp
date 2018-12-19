@@ -325,31 +325,44 @@ namespace blitzdg {
         VToF.colPtrs(totalFaces) = nnz;
         CSCMat FToF = multiply(transpose(VToF), VToF);
 
-        index_type FToFnnz = FToF.nnz();
+        cout << FToF;
+        cout << "\n";
 
-        index_vector_type f1(FToFnnz);
-        index_vector_type f2(FToFnnz);
-
-        f1 = 0;
-        f2 = 0;
-
+        // Count the number of face-to-face connections.
         index_type connectionsCount = 0;
         for (index_type j = 0; j < totalFaces; ++j) {
             for (index_type k = FToF.colPtrs(j); k < FToF.colPtrs(j + 1); ++k) {
                 index_type i = FToF.rowInds(k);
-                if (i != j && FToF.elems(k) == 2.0) {
-                    f1(connectionsCount) = i;
-                    f2(connectionsCount) = j;
+                if (i != j && std::abs(FToF.elems(k) - 2.0) < NodeTol) {
                     ++connectionsCount;
                 }
             }
         }
 
-        index_vector_type e1(FToFnnz);
-        index_vector_type e2(FToFnnz);
+        index_vector_type e1(connectionsCount);
+        index_vector_type e2(connectionsCount);
+        index_vector_type f1(connectionsCount);
+        index_vector_type f2(connectionsCount);
+
+        f1 = 0;
+        f2 = 0;
         e1 = 0;
         e2 = 0;
 
+        // store the faces in each connection.
+        index_type c = 0;
+        for (index_type j = 0; j < totalFaces; ++j) {
+            for (index_type k = FToF.colPtrs(j); k < FToF.colPtrs(j + 1); ++k) {
+                index_type i = FToF.rowInds(k);
+                if (i != j && std::abs(FToF.elems(k) - 2.0) < NodeTol) {
+                    f1(c) = i;
+                    f2(c) = j;
+                    ++c;
+                }
+            }
+        }
+
+        // Convert from global face number to element number with local face number.
         e1 = floor(f1 / NumFaces);
         f1 = (f1 % NumFaces);
         e2 = floor(f2 / NumFaces);
@@ -359,6 +372,7 @@ namespace blitzdg {
         index_vector_type& E2E = *EToE;
         index_vector_type& E2F = *EToF;
 
+        // Populate arrays with self-connection defaults.
         for (index_type k = 0; k < NumElements; ++k) {
             for (index_type f = 0; f < NumFaces; ++f) {
                 E2E(k*NumFaces + f) = k;
@@ -366,7 +380,7 @@ namespace blitzdg {
             }
         }
 
-        for (index_type i = 0; i < FToFnnz; ++i) {
+        for (index_type i = 0; i < connectionsCount; ++i) {
             index_type ee1 = e1(i);
             index_type ee2 = e2(i);
             index_type ff1 = f1(i);
