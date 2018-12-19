@@ -416,8 +416,7 @@ namespace blitzdg {
             }
         }
         VToF.colPtrs(totalFaces) = nnz;
-        CSCMat FToV = transpose(VToF);
-        CSCMat FToF = multiply(FToV, VToF);
+        CSCMat FToF = multiply(transpose(VToF), VToF);
 
         // Count the number of face-to-face connections.
         index_type connectionsCount = 0;
@@ -454,7 +453,7 @@ namespace blitzdg {
         }
 
         // Convert from global face number to element number with local face number.
-        e1 = f1 / NumFaces;
+        e1 = floor(f1 / NumFaces);
         f1 = (f1 % NumFaces);
         e2 = f2 / NumFaces;
         f2 = (f2 % NumFaces);
