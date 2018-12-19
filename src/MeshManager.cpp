@@ -153,7 +153,6 @@ namespace blitzdg {
 
             index_type numCols = static_cast<index_type>(elementInfo.size());
 
-            // index_type elemNumber = stoi(elementInfo[0]); -- Gmsh element number, not used. Delete.
             index_type elemType   = stoi(elementInfo[1]);
             index_type numTags    = stoi(elementInfo[2]);
 
@@ -193,12 +192,16 @@ namespace blitzdg {
         lines.shrink_to_fit();
         tris.shrink_to_fit();
 
-        // Allocate storage for EToV and BC Table.
+        NumFaces = 3;
+
+        // Allocate storage EToV and BC Table.
         // Note: we are doing this here as opposed to in the initializer list,
         // since prior to this point we did not know how many elements there are.
         index_type K = static_cast<index_type>(tris.size());
         EToV = index_vec_smart_ptr(new index_vector_type(K*3));
         BCType = index_vec_smart_ptr(new index_vector_type(K*3));
+        EToE = index_vec_smart_ptr(new index_vector_type(K*3));
+        EToF = index_vec_smart_ptr(new index_vector_type(K*3));
 
         index_vector_type& E2V = *EToV;
 
@@ -285,7 +288,7 @@ namespace blitzdg {
 
     void MeshManager::buildConnectivity() {
         index_type totalFaces = NumFaces * NumElements;
-        index_type numVertices = NumElements + 1;
+        index_type numVertices = NumVerts;
         index_type localVertNum[3][2] = {{0, 1}, {1, 2}, {2, 0}};
 
         // Build global face-to-vertex array. Note: we actually
@@ -316,7 +319,7 @@ namespace blitzdg {
                 ++globalFaceNum;
             }
         }
-        VToF.colPtrs(totalFaces) = globalFaceNum;
+        VToF.colPtrs(totalFaces) = nnz;
         CSCMat FToF = multiply(transpose(VToF), VToF);
 
         // Count the number of face-to-face connections.
@@ -488,19 +491,19 @@ namespace blitzdg {
         return *EToV;
     }
 
-    const index_vector_type& MeshManager::get_ElementPartitionMap() const {
-        return *ElementPartitionMap;
-    }
-
-    const index_vector_type& MeshManager::get_VertexPartitionMap() const {
-        return *VertexPartitionMap;
-    }
-
     const index_vector_type& MeshManager::get_EToE() const {
         return *EToE;
     }
 
     const index_vector_type& MeshManager::get_EToF() const {
         return *EToF;
+    }
+
+    const index_vector_type& MeshManager::get_ElementPartitionMap() const {
+        return *ElementPartitionMap;
+    }
+
+    const index_vector_type& MeshManager::get_VertexPartitionMap() const {
+        return *VertexPartitionMap;
     }
 } // namespace blitzdg

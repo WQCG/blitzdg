@@ -55,7 +55,6 @@ namespace blitzdg {
 
       real_mat_smart_ptr Fscale;
 
-      index_mat_smart_ptr EToV;
       index_mat_smart_ptr EToE;
       index_mat_smart_ptr EToF;
 
@@ -304,14 +303,24 @@ namespace blitzdg {
       const index_vector_type & get_vmapP() const;
 
       /**
-       * Builds nodes and local operators, geometric factors.
+       * Builds nodes and local operators.
        */
       void buildNodes();
+
+      /**
+       * Build x and y coordinates and geometric factors.
+       */
+      void buildPhysicalGrid();
 
       /**
        * Builds the Surface-To-Volume Lifting Operator.
        */
       void buildLift();
+
+      /**
+       * Build volume-to-surface maps for '-' and '+' traces, as well as for BC faces.
+       */
+      void buildMaps();
       
       /**
        * Returns the number of nodes local to a 2D triangular element.

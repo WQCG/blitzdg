@@ -38,14 +38,18 @@ namespace blitzdg {
         sGrid{ new real_vector_type((_NOrder + 2)*(_NOrder+1)/2) },
         V{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) }, 
         Dr{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
+        Ds{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
         Lift{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder+1)*NumFaces) },
         J{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
         rx{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
+        sx{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
+        ry{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
+        sy{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
         nx{ new real_matrix_type((_NOrder+1)*NumFaces, NumElements) },
+        ny{ new real_matrix_type((_NOrder+1)*NumFaces, NumElements) },
         Vinv{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
         Fmask{ new index_matrix_type( _NOrder+1, NumFaces) },
         Fscale{ new real_matrix_type((_NOrder+1)*NumFaces, NumElements) },
-        EToV{ new index_matrix_type(NumElements, NumFaces) },
         EToE{ new index_matrix_type(NumElements, NumFaces) },
         EToF{ new index_matrix_type(NumElements, NumFaces) },
         vmapM{ new index_vector_type((_NOrder+1)*NumFaces*NumElements) },
@@ -147,13 +151,18 @@ namespace blitzdg {
         real_matrix_type Drtrans(numColsV, numRowsV);
         real_matrix_type Dstrans(numColsV, numRowsV);
 
-        Vtrans = V(jj, ii);
-        V2Drtrans = V2Dr(jj, ii);
-        V2Dstrans = V2Ds(jj, ii);
+        Drtrans = 0.*jj;
+        Dstrans = 0.*jj;
 
+        Vtrans = V(jj, ii);
+        V2Drtrans = V2Dr(jj,ii);
+        V2Dstrans = V2Ds(jj,ii);
 
         // Dr = V2Dr * V^{-1}
         LinSolver.solve(Vtrans, V2Drtrans, Drtrans);
+
+        // LAPACK can mangle our input.
+        Vtrans = V(jj,ii);
 
         // Ds = V2Ds / V;
         LinSolver.solve(Vtrans, V2Dstrans, Dstrans);
@@ -161,7 +170,6 @@ namespace blitzdg {
         // Take transpose.
         Dr = Drtrans(jj, ii); 
         Ds = Dstrans(jj, ii);
-
     }
 
     void TriangleNodesProvisioner::computeEquilateralNodes(real_vector_type & x, real_vector_type & y) const {
@@ -345,6 +353,98 @@ namespace blitzdg {
         Fm(Range::all(), 2) = fmask3;
     }
 
+    void TriangleNodesProvisioner::buildPhysicalGrid() {
+        firstIndex ii;
+        secondIndex jj;
+        thirdIndex kk;
+
+        // Get element data
+        const index_vector_type& EToV = Mesh2D->get_Elements();
+        const real_vector_type&  Vert = Mesh2D->get_Vertices();
+        index_type NumVertices = Mesh2D->get_NumVerts();
+
+        NumElements = Mesh2D->get_NumElements();
+
+        real_vector_type VX(NumVertices), VY(NumVertices), VZ(NumVertices);
+        index_vector_type va(NumElements), vb(NumElements), vc(NumElements);
+        index_type count=0;
+
+        // Unpack 1D arrays storing EToV and Vertex coordinates
+        for (index_type i=0; i < NumElements; ++i) {
+            va(i) = EToV(count);
+            vb(i) = EToV(count+1);
+            vc(i) = EToV(count+2);
+            count += 3;
+        }
+
+        count=0;
+        for (index_type i=0; i < NumVertices; ++i) {
+            VX(i) = Vert(count);
+            VY(i) = Vert(count+1);
+            VZ(i) = Vert(count+2);
+            count += 3;
+        }
+
+        real_vector_type VXa(NumElements), VXb(NumElements), VXc(NumElements);
+        real_vector_type VYa(NumElements), VYb(NumElements), VYc(NumElements);
+        for (index_type i=0; i < NumElements; ++i) {
+            VXa(i) = VX(va(i));
+            VXb(i) = VX(vb(i));
+            VXc(i) = VX(vc(i));
+
+            VYa(i) = VY(va(i));
+            VYb(i) = VY(vb(i));
+            VYc(i) = VY(vc(i));
+        }
+
+        const real_vector_type& r = *rGrid;
+        const real_vector_type& s = *sGrid;
+        const real_matrix_type& V2D = *V;
+
+        index_type Np = NumLocalPoints;
+        index_type K = NumElements;
+
+        real_matrix_type V2Dr(Np,Np), V2Ds(Np,Np);
+        
+        real_matrix_type& D_r = *Dr;
+        real_matrix_type& D_s = *Ds;
+        computeGradVandermondeMatrix(NOrder, r, s, V2Dr, V2Ds);
+        computeDifferentiationMatrices(V2Dr, V2Ds, V2D, D_r, D_s);
+
+        real_matrix_type& x = *xGrid;
+        real_matrix_type& y = *yGrid;
+
+        real_matrix_type& Jac = *J;
+
+        real_matrix_type& r_x = *rx;
+        real_matrix_type& r_y = *ry;
+        real_matrix_type& s_x = *sx;
+        real_matrix_type& s_y = *sy;
+
+        real_matrix_type xr(Np,K), yr(Np,K), xs(Np,K), ys(Np,K);
+
+        x = 0.5*(-(r(ii)+s(ii) + 0.*jj)*VXa(jj) + (1+r(ii) + 0.*jj)*VXb(jj) + (1+s(ii) + 0.*jj)*VXc(jj));
+        y = 0.5*(-(r(ii)+s(ii) + 0.*jj)*VYa(jj) + (1+r(ii) + 0.*jj)*VYb(jj) + (1+s(ii) + 0.*jj)*VYc(jj));
+
+        xr = sum(D_r(ii,kk)*x(kk,jj), kk);
+        yr = sum(D_r(ii,kk)*y(kk,jj), kk);
+        xs = sum(D_s(ii,kk)*x(kk,jj), kk);
+        ys = sum(D_s(ii,kk)*y(kk,jj), kk);
+
+        Jac = xr*ys - xs*yr;
+
+        // Invert the 2x2 mapping matrix.
+        r_x = ys/Jac;
+        r_y =-xs/Jac;
+        s_x =-yr/Jac;
+        s_y = xr/Jac;
+    }
+    
+    void TriangleNodesProvisioner::buildMaps() {
+        //const MeshManager& meshMgr = *Mesh2D;
+        // WIP here...
+    }
+
     void TriangleNodesProvisioner::buildLift() {
         firstIndex ii;
         secondIndex jj;
@@ -411,8 +511,8 @@ namespace blitzdg {
             }
         }
 
-        // Get the Vandermonde guy.
-        real_matrix_type V2D(NumLocalPoints, NumLocalPoints);
+        // Compute the Vandermonde guy.
+        real_matrix_type& V2D = *V;
         V2D = 0.0*jj;
         computeVandermondeMatrix(NOrder, r, s, V2D);
 
