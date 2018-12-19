@@ -63,10 +63,7 @@ int main(int argc, char **argv) {
 
 	// Build dependencies.
 	MeshManager meshManager;
-	meshManager.readVertices("input/vh_verts_z.dat");
-    meshManager.readElements("input/vh_els_0.oct");
-	// Dependency-inject mesh manager to nodes provisioner.
-	TriangleNodesProvisioner triangleNodesProvisioner(n.N, meshManager);
+	meshManager.readMesh("input/coarse_box.msh");
 
 	// Pre-processing step - build polynomial dealiasing filter.
 	triangleNodesProvisioner.buildFilter(n.filterPercent*static_cast<real_type>(n.N), n.filterOrder);
