@@ -218,14 +218,11 @@ namespace blitzdg {
 
             real_type det = (ax-cx)*(by-cy) - (bx-cx)*(ay-cy);
 
-            cout << det << "\n";       
-
             if (det < 0) {
                 // Flip the ordering.
                 index_type tmp = E2V(NumFaces*k+1);
                 E2V(NumFaces*k+1) = E2V(NumFaces*k+2);
                 E2V(NumFaces*k+2) = tmp;
-                //cout << "flip: " << k << "\n";
             }
         }
 
@@ -322,9 +319,6 @@ namespace blitzdg {
         VToF.colPtrs(totalFaces) = globalFaceNum;
         CSCMat FToF = multiply(transpose(VToF), VToF);
 
-        cout << FToF;
-        cout << "\n";
-
         // Count the number of face-to-face connections.
         index_type connectionsCount = 0;
         for (index_type j = 0; j < totalFaces; ++j) {
@@ -384,30 +378,6 @@ namespace blitzdg {
             index_type ff2 = f2(i);
             E2E(ee1*NumFaces + ff1) = ee2;
             E2F(ee1*NumFaces + ff1) = ff2;
-        }
-
-        cout << "EToV:" << "\n";
-        for (index_type k = 0; k < NumElements; ++k) {
-            for (index_type f = 0; f < NumFaces; ++f) {
-                cout << E2V(k*NumFaces + f) << " ";
-            }
-            cout << "\n" ;
-        }
-
-        cout << "EToE:" << "\n";
-        for (index_type k = 0; k < NumElements; ++k) {
-            for (index_type f = 0; f < NumFaces; ++f) {
-                cout << E2E(k*NumFaces + f) << " ";
-            }
-            cout << "\n" ;
-        }
-
-        cout << "EToF:" << "\n";
-        for (index_type k = 0; k < NumElements; ++k) {
-            for (index_type f = 0; f < NumFaces; ++f) {
-                cout << E2F(k*NumFaces + f) << " ";
-            }
-            cout << "\n" ;
         }
     }
 
@@ -524,5 +494,13 @@ namespace blitzdg {
 
     const index_vector_type& MeshManager::get_VertexPartitionMap() const {
         return *VertexPartitionMap;
+    }
+
+    const index_vector_type& MeshManager::get_EToE() const {
+        return *EToE;
+    }
+
+    const index_vector_type& MeshManager::get_EToF() const {
+        return *EToF;
     }
 } // namespace blitzdg
