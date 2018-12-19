@@ -271,51 +271,32 @@ namespace blitzdg {
         index_vector_type& E2V = *EToV;
 
         NumElements = K;
-        index_type numFacesTri = 3; // hard-code for now.
-        for (index_type k=0; k < static_cast<index_type>(tris.size()); ++k) {
+        for (index_type k=0; k < K; ++k) {
             // Subtract one to go from 1-based (Gmsh) to 0-based (us).
-            E2V(numFacesTri*k)   = tris[k][5] - 1;
-            E2V(numFacesTri*k+1) = tris[k][6] - 1;
-            E2V(numFacesTri*k+2) = tris[k][7] - 1;
+            E2V(NumFaces*k)   = tris[k][5] - 1;
+            E2V(NumFaces*k+1) = tris[k][6] - 1;
+            E2V(NumFaces*k+2) = tris[k][7] - 1;
         }
 
-        for (index_type k=0; k < static_cast<index_type>(tris.size()); ++k) {
+        for (index_type k=0; k < K; ++k) {
             // Enforce counter-clockwise ordering of vertices in EToV table.
-            real_type ax = Vref(E2V(numFacesTri*k)*3),   ay = Vref(E2V(numFacesTri*k)*3+1);
-            real_type bx = Vref(E2V(numFacesTri*k+1)*3), by = Vref(E2V(numFacesTri*k+1)*3+1);
-            real_type cx = Vref(E2V(numFacesTri*k+2)*3), cy = Vref(E2V(numFacesTri*k+2)*3+1);
+            real_type ax = Vref(E2V(NumFaces*k)*NumFaces),   ay = Vref(E2V(NumFaces*k)*NumFaces+1);
+            real_type bx = Vref(E2V(NumFaces*k+1)*NumFaces), by = Vref(E2V(NumFaces*k+1)*NumFaces+1);
+            real_type cx = Vref(E2V(NumFaces*k+2)*NumFaces), cy = Vref(E2V(NumFaces*k+2)*NumFaces+1);
 
             real_type det = (ax-cx)*(by-cy) - (bx-cx)*(ay-cy);
 
+            cout << det << "\n";       
+
             if (det < 0) {
-                using std::swap;
-                swap(E2V(numFacesTri*k+1), E2V(numFacesTri*k+2));
+                // Flip the ordering.
+                index_type tmp = E2V(NumFaces*k+1);
+                E2V(NumFaces*k+1) = E2V(NumFaces*k+2);
+                E2V(NumFaces*k+2) = tmp;
+                //cout << "flip: " << k << "\n";
             }
         }
 
-        index_type numFacesQuad = 4; // hard-code for now.
-        for (index_type k=static_cast<index_type>(tris.size()); k < static_cast<index_type>(tris.size()+quads.size()); ++k) {
-            // Subtract one to go from 1-based (Gmsh) to 0-based (us).
-            E2V(numFacesQuad*k)   = quads[k][5] - 1;
-            E2V(numFacesQuad*k+1) = quads[k][6] - 1;
-            E2V(numFacesQuad*k+2) = quads[k][7] - 1;
-            E2V(numFacesQuad*k+3) = quads[k][8] - 1;
-        }
-
-        for (index_type k=static_cast<index_type>(tris.size()); k < static_cast<index_type>(tris.size()+quads.size()); ++k) {
-            // Enforce counter-clockwise ordering of vertices in EToV table.
-            real_type ax = Vref(E2V(numFacesQuad*k)*3),   ay = Vref(E2V(numFacesQuad*k)*3+1);
-            real_type bx = Vref(E2V(numFacesQuad*k+1)*3), by = Vref(E2V(numFacesQuad*k+1)*3+1);
-            real_type cx = Vref(E2V(numFacesQuad*k+2)*3), cy = Vref(E2V(numFacesQuad*k+2)*3+1);
-
-            real_type det = (ax-cx)*(by-cy) - (bx-cx)*(ay-cy);
-
-            if (det < 0) {
-                using std::swap;
-                // [0,1,2,3] --> [0, 3, 2, 1]
-                swap(E2V(numFacesQuad*k+1), E2V(numFacesQuad*k+3));
-            }
-        }
 
         buildConnectivity();
 
@@ -497,6 +478,30 @@ namespace blitzdg {
             index_type ff2 = f2(i);
             E2E(ee1*NumFaces + ff1) = ee2;
             E2F(ee1*NumFaces + ff1) = ff2;
+        }
+
+        cout << "EToV:" << "\n";
+        for (index_type k = 0; k < NumElements; ++k) {
+            for (index_type f = 0; f < NumFaces; ++f) {
+                cout << E2V(k*NumFaces + f) << " ";
+            }
+            cout << "\n" ;
+        }
+
+        cout << "EToE:" << "\n";
+        for (index_type k = 0; k < NumElements; ++k) {
+            for (index_type f = 0; f < NumFaces; ++f) {
+                cout << E2E(k*NumFaces + f) << " ";
+            }
+            cout << "\n" ;
+        }
+
+        cout << "EToF:" << "\n";
+        for (index_type k = 0; k < NumElements; ++k) {
+            for (index_type f = 0; f < NumFaces; ++f) {
+                cout << E2F(k*NumFaces + f) << " ";
+            }
+            cout << "\n" ;
         }
     }
 
