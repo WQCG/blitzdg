@@ -205,18 +205,33 @@ namespace blitzdg {
 
         index_vector_type& E2V = *EToV;
 
-        index_type ind=0;
-        for (index_type i=0; i < K; ++i) {
-
+        NumElements = K;
+        for (index_type k=0; k < K; ++k) {
             // Subtract one to go from 1-based (Gmsh) to 0-based (us).
-            E2V(ind)   = tris[i][5] - 1;
-            E2V(ind+1) = tris[i][6] - 1;
-            E2V(ind+2) = tris[i][7] - 1;
-
-            ind += 3;
+            E2V(NumFaces*k)   = tris[k][5] - 1;
+            E2V(NumFaces*k+1) = tris[k][6] - 1;
+            E2V(NumFaces*k+2) = tris[k][7] - 1;
         }
 
-        NumElements = K;
+        for (index_type k=0; k < K; ++k) {
+            // Enforce counter-clockwise ordering of vertices in EToV table.
+            real_type ax = Vref(E2V(NumFaces*k)*NumFaces),   ay = Vref(E2V(NumFaces*k)*NumFaces+1);
+            real_type bx = Vref(E2V(NumFaces*k+1)*NumFaces), by = Vref(E2V(NumFaces*k+1)*NumFaces+1);
+            real_type cx = Vref(E2V(NumFaces*k+2)*NumFaces), cy = Vref(E2V(NumFaces*k+2)*NumFaces+1);
+
+            real_type det = (ax-cx)*(by-cy) - (bx-cx)*(ay-cy);
+
+            cout << det << "\n";       
+
+            if (det < 0) {
+                // Flip the ordering.
+                index_type tmp = E2V(NumFaces*k+1);
+                E2V(NumFaces*k+1) = E2V(NumFaces*k+2);
+                E2V(NumFaces*k+2) = tmp;
+                //cout << "flip: " << k << "\n";
+            }
+        }
+
 
         buildBCTable(lines);
         buildConnectivity();
@@ -358,6 +373,14 @@ namespace blitzdg {
             index_type ff2 = f2(i);
             E2E(ee1*NumFaces + ff1) = ee2;
             E2F(ee1*NumFaces + ff1) = ff2;
+        }
+
+        cout << "EToV:" << "\n";
+        for (index_type k = 0; k < NumElements; ++k) {
+            for (index_type f = 0; f < NumFaces; ++f) {
+                cout << E2V(k*NumFaces + f) << " ";
+            }
+            cout << "\n" ;
         }
 
         cout << "EToE:" << "\n";
