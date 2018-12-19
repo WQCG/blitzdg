@@ -38,7 +38,7 @@ int main(int argc, char **argv) {
 
 	// Build dependencies.
 	MeshManager meshManager;
-	meshManager.readMesh("input/box.msh");
+	meshManager.readMesh("input/coarse_box.msh");
 
 	const index_type K = meshManager.get_NumElements();
 
