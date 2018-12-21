@@ -47,7 +47,7 @@ namespace blitzdg {
     const real_type MeshManager::NodeTol = 1.e-10;
 
     MeshManager::MeshManager() 
-        :  Dim{ 0 }, NumVerts{ 0 }, ElementType{}, NumElements{ 0 },
+        :  Dim{ 0 }, NumVerts{ 0 }, NumFaces{}, NumElements{ 0 },
         CsvDelimiters{ "\t " }, Vert{ nullptr }, EToV{ nullptr },
         ElementPartitionMap{ nullptr }, VertexPartitionMap{ nullptr }
     {}
@@ -153,7 +153,6 @@ namespace blitzdg {
 
             index_type numCols = static_cast<index_type>(elementInfo.size());
 
-            // index_type elemNumber = stoi(elementInfo[0]); -- Gmsh element number, not used. Delete.
             index_type elemType   = stoi(elementInfo[1]);
             index_type numTags    = stoi(elementInfo[2]);
 
@@ -193,27 +192,44 @@ namespace blitzdg {
         lines.shrink_to_fit();
         tris.shrink_to_fit();
 
-        // Allocate storage for EToV and BC Table.
+        NumFaces = 3;
+
+        // Allocate storage EToV and BC Table.
         // Note: we are doing this here as opposed to in the initializer list,
         // since prior to this point we did not know how many elements there are.
         index_type K = static_cast<index_type>(tris.size());
         EToV = index_vec_smart_ptr(new index_vector_type(K*3));
         BCType = index_vec_smart_ptr(new index_vector_type(K*3));
+        EToE = index_vec_smart_ptr(new index_vector_type(K*3));
+        EToF = index_vec_smart_ptr(new index_vector_type(K*3));
 
         index_vector_type& E2V = *EToV;
 
-        index_type ind=0;
-        for (index_type i=0; i < K; ++i) {
-            E2V(ind)   = tris[i][5] - 1;
-            E2V(ind+1) = tris[i][6] - 1;
-            E2V(ind+2) = tris[i][7] - 1;
-
-            ind += 3;
+        NumElements = K;
+        for (index_type k=0; k < K; ++k) {
+            // Subtract one to go from 1-based (Gmsh) to 0-based (us).
+            E2V(NumFaces*k)   = tris[k][5] - 1;
+            E2V(NumFaces*k+1) = tris[k][6] - 1;
+            E2V(NumFaces*k+2) = tris[k][7] - 1;
         }
 
-        NumElements = K;
+        for (index_type k=0; k < K; ++k) {
+            // Enforce counter-clockwise ordering of vertices in EToV table.
+            real_type ax = Vref(E2V(NumFaces*k)*NumFaces),   ay = Vref(E2V(NumFaces*k)*NumFaces+1);
+            real_type bx = Vref(E2V(NumFaces*k+1)*NumFaces), by = Vref(E2V(NumFaces*k+1)*NumFaces+1);
+            real_type cx = Vref(E2V(NumFaces*k+2)*NumFaces), cy = Vref(E2V(NumFaces*k+2)*NumFaces+1);
+
+            real_type det = (ax-cx)*(by-cy) - (bx-cx)*(ay-cy);
+
+            if (det < 0) {
+                using std::swap;
+                swap(E2V(NumFaces*k+1), E2V(NumFaces*k+2));
+            }
+        }
+
 
         buildBCTable(lines);
+        buildConnectivity();
     }
 
     void MeshManager::buildBCTable(std::vector<std::vector<index_type>>& edges) {
@@ -268,8 +284,106 @@ namespace blitzdg {
         }
     }
 
+    void MeshManager::buildConnectivity() {
+        index_type totalFaces = NumFaces * NumElements;
+        index_type numVertices = NumVerts;
+        index_type localVertNum[3][2] = {{0, 1}, {1, 2}, {2, 0}};
+
+        // Build global face-to-vertex array. Note: we actually
+        // build its transpose for easy column access.
+        CSCMat VToF(numVertices, totalFaces, 2*totalFaces);
+        const index_vector_type& E2V = *EToV;
+        index_type globalFaceNum = 0;
+        index_type nnz=0;
+        for (index_type k = 0; k < NumElements; ++k) {
+            for (index_type f = 0; f < NumFaces; ++f) {
+                VToF.colPtrs(globalFaceNum) = nnz; 
+                index_type v1 = localVertNum[f][0];
+                index_type v2 = localVertNum[f][1];
+
+                index_type v1Global = E2V(k*NumFaces + v1);
+                index_type v2Global = E2V(k*NumFaces + v2);
+
+                // Entry for v1Global.
+                VToF.rowInds(nnz) = v1Global;
+                VToF.elems(nnz) = 1.0;
+                ++nnz;
+
+                // Entry for v2Global
+                VToF.rowInds(nnz) = v2Global;
+                VToF.elems(nnz) = 1.0;
+                ++nnz;
+
+                ++globalFaceNum;
+            }
+        }
+        VToF.colPtrs(totalFaces) = nnz;
+        CSCMat FToF = multiply(transpose(VToF), VToF);
+
+        // Count the number of face-to-face connections.
+        index_type connectionsCount = 0;
+        for (index_type j = 0; j < totalFaces; ++j) {
+            for (index_type k = FToF.colPtrs(j); k < FToF.colPtrs(j + 1); ++k) {
+                index_type i = FToF.rowInds(k);
+                if (i != j && std::abs(FToF.elems(k) - 2.0) < NodeTol) {
+                    ++connectionsCount;
+                }
+            }
+        }
+
+        index_vector_type e1(connectionsCount);
+        index_vector_type e2(connectionsCount);
+        index_vector_type f1(connectionsCount);
+        index_vector_type f2(connectionsCount);
+
+        f1 = 0;
+        f2 = 0;
+        e1 = 0;
+        e2 = 0;
+
+        // store the faces in each connection.
+        index_type c = 0;
+        for (index_type j = 0; j < totalFaces; ++j) {
+            for (index_type k = FToF.colPtrs(j); k < FToF.colPtrs(j + 1); ++k) {
+                index_type i = FToF.rowInds(k);
+                if (i != j && std::abs(FToF.elems(k) - 2.0) < NodeTol) {
+                    f1(c) = i;
+                    f2(c) = j;
+                    ++c;
+                }
+            }
+        }
+
+        // Convert from global face number to element number with local face number.
+        e1 = f1 / NumFaces;
+        f1 = (f1 % NumFaces);
+        e2 = f2 / NumFaces;
+        f2 = (f2 % NumFaces);
+
+        // Build connectivity matrices.
+        index_vector_type& E2E = *EToE;
+        index_vector_type& E2F = *EToF;
+
+        // Populate arrays with self-connection defaults.
+        for (index_type k = 0; k < NumElements; ++k) {
+            for (index_type f = 0; f < NumFaces; ++f) {
+                E2E(k*NumFaces + f) = k;
+                E2F(k*NumFaces + f) = f;
+            }
+        }
+
+        for (index_type i = 0; i < connectionsCount; ++i) {
+            index_type ee1 = e1(i);
+            index_type ee2 = e2(i);
+            index_type ff1 = f1(i);
+            index_type ff2 = f2(i);
+            E2E(ee1*NumFaces + ff1) = ee2;
+            E2F(ee1*NumFaces + ff1) = ff2;
+        }
+    }
+
     void MeshManager::partitionMesh(index_type numPartitions) {
-        unique_ptr<index_type[]> eptr(new index_type[NumElements + 1]);
+        index_vector_type eptr(NumElements + 1);
         index_type objval = 0;
         index_type NE = NumElements;
         index_type NV = NumVerts;
@@ -300,13 +414,13 @@ namespace blitzdg {
         *VertexPartitionMap = 0;
 
         // Assume mesh with homogenous element type, then eptr 
-        // dictates an equal stride of size ElementType across EToV array.
+        // dictates an equal stride of size NumFaces across EToV array.
         for (index_type i = 0; i <= NumElements; ++i) {
-            eptr[i] = ElementType * i;
+            eptr(i) = NumFaces * i;
         }
 
         cout << "About to call METIS_PartMeshNodal" << endl;
-        index_type result =  METIS_PartMeshNodal(&NE, &NV, eptr.get(), EToV->data(), 
+        index_type result =  METIS_PartMeshNodal(&NE, &NV, eptr.data(), EToV->data(),
             (idx_t*)NULL, (idx_t*)NULL, &numPartitions, (real_t*)NULL, 
             metisOptions, &objval, ElementPartitionMap->data(), 
             VertexPartitionMap->data());
@@ -336,7 +450,7 @@ namespace blitzdg {
     }
 
     void MeshManager::readElements(const string& E2VFile) {
-        EToV = csvread<index_type>(E2VFile, NumElements, ElementType);
+        EToV = csvread<index_type>(E2VFile, NumElements, NumFaces);
     }
 
     void MeshManager::printVertices() const {
@@ -344,7 +458,7 @@ namespace blitzdg {
     }
 
     void MeshManager::printElements() const {
-        printArray(*EToV, NumElements, ElementType);
+        printArray(*EToV, NumElements, NumFaces);
     }
 
     index_type MeshManager::get_Dim() const {
@@ -363,8 +477,8 @@ namespace blitzdg {
         return NumElements;
     }
 
-    index_type MeshManager::get_ElementType() const {
-        return ElementType;
+    index_type MeshManager::get_NumFaces() const {
+        return NumFaces;
     }
 
     const real_vector_type& MeshManager::get_Vertices() const {
@@ -373,6 +487,14 @@ namespace blitzdg {
 
     const index_vector_type& MeshManager::get_Elements() const {
         return *EToV;
+    }
+
+    const index_vector_type& MeshManager::get_EToE() const {
+        return *EToE;
+    }
+
+    const index_vector_type& MeshManager::get_EToF() const {
+        return *EToF;
     }
 
     const index_vector_type& MeshManager::get_ElementPartitionMap() const {
