@@ -355,9 +355,9 @@ namespace blitzdg {
         }
 
         // Convert from global face number to element number with local face number.
-        e1 = floor(f1 / NumFaces);
+        e1 = f1 / NumFaces;
         f1 = (f1 % NumFaces);
-        e2 = floor(f2 / NumFaces);
+        e2 = f2 / NumFaces;
         f2 = (f2 % NumFaces);
 
         // Build connectivity matrices.
