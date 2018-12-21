@@ -383,7 +383,7 @@ namespace blitzdg {
     }
 
     void MeshManager::partitionMesh(index_type numPartitions) {
-        unique_ptr<index_type[]> eptr(new index_type[NumElements + 1]);
+        index_vector_type eptr(NumElements + 1);
         index_type objval = 0;
         index_type NE = NumElements;
         index_type NV = NumVerts;
@@ -416,11 +416,11 @@ namespace blitzdg {
         // Assume mesh with homogenous element type, then eptr 
         // dictates an equal stride of size NumFaces across EToV array.
         for (index_type i = 0; i <= NumElements; ++i) {
-            eptr[i] = NumFaces * i;
+            eptr(i) = NumFaces * i;
         }
 
         cout << "About to call METIS_PartMeshNodal" << endl;
-        index_type result =  METIS_PartMeshNodal(&NE, &NV, eptr.get(), EToV->data(), 
+        index_type result =  METIS_PartMeshNodal(&NE, &NV, eptr.data(), EToV->data(),
             (idx_t*)NULL, (idx_t*)NULL, &numPartitions, (real_t*)NULL, 
             metisOptions, &objval, ElementPartitionMap->data(), 
             VertexPartitionMap->data());
