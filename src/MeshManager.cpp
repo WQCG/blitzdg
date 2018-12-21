@@ -222,10 +222,8 @@ namespace blitzdg {
             real_type det = (ax-cx)*(by-cy) - (bx-cx)*(ay-cy);
 
             if (det < 0) {
-                // Flip the ordering.
-                index_type tmp = E2V(NumFaces*k+1);
-                E2V(NumFaces*k+1) = E2V(NumFaces*k+2);
-                E2V(NumFaces*k+2) = tmp;
+                using std::swap;
+                swap(E2V(NumFaces*k+1), E2V(NumFaces*k+2));
             }
         }
 
