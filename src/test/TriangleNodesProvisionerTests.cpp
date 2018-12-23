@@ -5,6 +5,7 @@
 #include "TriangleNodesProvisioner.hpp"
 #include "MeshManager.hpp"
 #include "Types.hpp"
+#include <whereami.h>
 #include <igloo/igloo_alt.h>
 #include <blitz/array.h>
 #include <iostream>
@@ -12,8 +13,15 @@
 #include <cmath>
 #include <memory>
 
+using boost::algorithm::find_all;
+using boost::algorithm::join;
+using boost::algorithm::replace_last;
+using boost::algorithm::trim_right;
+using boost::iterator_range;
 using blitz::firstIndex;
 using blitz::secondIndex;
+using std::string;
+using std::vector;
 using std::cout;
 using std::endl;
 using std::numeric_limits;
@@ -37,11 +45,65 @@ namespace blitzdg {
 			const index_type NOrder = 3;
 			const index_type NumFaces = 2;
 
+			using find_vector_type = vector<iterator_range<string::iterator>>;
+
+            string PathDelimeter = "/";
+            string* ExePath = nullptr;
+            unique_ptr<vector<string>> InputPathVec = nullptr;
+
+            void TearDown() {
+                delete ExePath;
+            }
+
+            void resolveInputPath() {
+                string path(*ExePath);
+                find_vector_type FindVec;
+
+                replace_last(path, ".exe", "");
+                replace_last(path, "/bin/test", "");
+                find_all( FindVec, path, "\\" );
+                if (FindVec.size() > 0) {
+                    PathDelimeter = "\\";
+                    replace_last(path, "\\bin\\test", "");
+                }
+
+                vector<string> pathVec;
+                pathVec.push_back(path);
+                pathVec.push_back("input");
+
+                *InputPathVec = std::move(pathVec);
+            }
+
+			void get_MshFile(string& mshFile) {
+                vector<string>& pathVec = *InputPathVec;
+                pathVec.push_back("coarse_box.msh");
+                mshFile = join(pathVec, PathDelimeter);
+                pathVec.pop_back();
+            }
+
             void SetUp() {
+				if (ExePath == nullptr) {
+                    // Deal with paths to the test input files.
+                    index_type cap = 1024;
+                    char * pathBuffer = new char[cap];
+                    index_type length = wai_getExecutablePath(pathBuffer, cap, NULL);
+                    ExePath = new string();
+
+                    for(index_type i=0; i < length; i++) {
+                        *ExePath += pathBuffer[i];
+                    }
+                    trim_right(*ExePath);
+                    delete [] pathBuffer;
+                }
+                InputPathVec =  unique_ptr<vector<string>>(new vector<string>());
+                resolveInputPath();
+
 				meshManager = unique_ptr<MeshManager>(new MeshManager());
+				string mshFile;
+				get_MshFile(mshFile);
+				meshManager->readMesh(mshFile);
 				triangleNodesProvisioner = unique_ptr<TriangleNodesProvisioner>(new TriangleNodesProvisioner(NOrder, meshManager.get())); 
 			}
-
 
 			It(Should_Evaluate_Orthonormal_Simplex2D_Polynomial) {
                 cout << "Should_Evaluate_Orthonormal_Simplex2D_Polynomial" << endl;
@@ -384,13 +446,8 @@ namespace blitzdg {
 
 			It(Should_Build_Volume_To_Face_Maps) {
 				cout << "Should_Build_Volume_To_Face_Maps" << endl;
-
 				TriangleNodesProvisioner & triangleNodes = *triangleNodesProvisioner;
-				MeshManager & meshMgr = *meshManager;
 
-
-				meshMgr.readMesh("/asda");
-				//const index_type Np = (NOrder+1)*(NOrder+2)/2;
 				triangleNodes.buildNodes();
 				triangleNodes.buildPhysicalGrid();
 				triangleNodes.buildMaps();
