@@ -28,34 +28,34 @@ namespace blitzdg {
     const real_type TriangleNodesProvisioner::NodeTol = 1.e-5;
     const real_type pi = blitzdg::constants::pi;
 
-    TriangleNodesProvisioner::TriangleNodesProvisioner(index_type _NOrder, index_type _NumElements, const MeshManager * _MeshManager) 
-        : NumElements{ _NumElements }, NOrder{ _NOrder },
+    TriangleNodesProvisioner::TriangleNodesProvisioner(index_type _NOrder, const MeshManager * _MeshManager)
+        : NumElements{ _MeshManager->get_NumElements() }, NOrder{ _NOrder },
         NumLocalPoints{ (_NOrder + 2)*(_NOrder+1)/2 },
         NumFacePoints{ _NOrder + 1},
-        xGrid{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
-        yGrid{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
+        xGrid{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager->get_NumElements()) },
+        yGrid{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager->get_NumElements()) },
         rGrid{ new real_vector_type((_NOrder + 2)*(_NOrder+1)/2) },
         sGrid{ new real_vector_type((_NOrder + 2)*(_NOrder+1)/2) },
         V{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) }, 
         Dr{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
         Ds{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
         Lift{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder+1)*NumFaces) },
-        J{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
-        rx{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
-        sx{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
-        ry{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
-        sy{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
-        nx{ new real_matrix_type((_NOrder+1)*NumFaces, NumElements) },
-        ny{ new real_matrix_type((_NOrder+1)*NumFaces, NumElements) },
+        J{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager->get_NumElements()) },
+        rx{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager->get_NumElements()) },
+        sx{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager->get_NumElements()) },
+        ry{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager->get_NumElements()) },
+        sy{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager->get_NumElements()) },
+        nx{ new real_matrix_type((_NOrder+1)*NumFaces, _MeshManager->get_NumElements()) },
+        ny{ new real_matrix_type((_NOrder+1)*NumFaces, _MeshManager->get_NumElements()) },
         Vinv{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
         Fmask{ new index_matrix_type( _NOrder+1, NumFaces) },
-        Fscale{ new real_matrix_type((_NOrder+1)*NumFaces, NumElements) },
-        EToE{ new index_matrix_type(NumElements, NumFaces) },
-        EToF{ new index_matrix_type(NumElements, NumFaces) },
-        vmapM{ new index_vector_type((_NOrder+1)*NumFaces*NumElements) },
-        vmapP{ new index_vector_type((_NOrder+1)*NumFaces*NumElements) },
+        Fscale{ new real_matrix_type((_NOrder+1)*NumFaces, _MeshManager->get_NumElements()) },
+        EToE{ new index_matrix_type(_MeshManager->get_NumElements(), NumFaces) },
+        EToF{ new index_matrix_type(_MeshManager->get_NumElements(), NumFaces) },
+        vmapM{ new index_vector_type((_NOrder+1)*NumFaces*_MeshManager->get_NumElements()) },
+        vmapP{ new index_vector_type((_NOrder+1)*NumFaces*_MeshManager->get_NumElements()) },
         Mesh2D { _MeshManager },
-        Nodes1D{ new Nodes1DProvisioner(_NOrder, NumElements, -1.0, 1.0) },
+        Nodes1D{ new Nodes1DProvisioner(_NOrder, _MeshManager->get_NumElements(), -1.0, 1.0) },
 		Jacobi{}, Vandermonde{}, LinSolver{}, Inverter{}
     {}
 
@@ -441,8 +441,35 @@ namespace blitzdg {
     }
     
     void TriangleNodesProvisioner::buildMaps() {
-        //const MeshManager& meshMgr = *Mesh2D;
-        // WIP here...
+        const MeshManager& meshMgr = *Mesh2D;
+
+        firstIndex ii;
+        secondIndex jj;
+
+        index_matrix_type nodeIds(NumLocalPoints, NumElements);
+        
+        const index_matrix_type & Fmsk = *Fmask;
+        index_vector_type & vmM = *vmapM;
+        index_vector_type & vmP = *vmapP;
+
+        index_matrix_type & E2E = *EToE;
+        index_matrix_type & E2F = *EToF;
+
+        real_matrix_type xmat(NumLocalPoints, NumElements, ColumnMajorOrder());
+        real_matrix_type ymat(NumLocalPoints, NumElements, ColumnMajorOrder());
+
+        xmat = *xGrid;
+        ymat = *yGrid;
+
+        real_vector_type x(NumElements*NumLocalPoints);
+        real_vector_type y(NumElements*NumLocalPoints);
+        reshapeMatTo1D(xmat, x.data(), false);
+        reshapeMatTo1D(ymat, y.data(), false);
+
+        // Assemble global volume node numbering.
+        nodeIds = ii + NumLocalPoints*jj;
+
+        std::cout << nodeIds << "\n";
     }
 
     void TriangleNodesProvisioner::buildLift() {

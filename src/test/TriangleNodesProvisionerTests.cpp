@@ -35,12 +35,11 @@ namespace blitzdg {
 			const real_type eps = 50*numeric_limits<double>::epsilon();
 			const float epsf = 5.8e-5;
 			const index_type NOrder = 3;
-			const index_type NumElements = 5;
 			const index_type NumFaces = 2;
 
             void SetUp() {
 				meshManager = unique_ptr<MeshManager>(new MeshManager());
-				triangleNodesProvisioner = unique_ptr<TriangleNodesProvisioner>(new TriangleNodesProvisioner(NOrder, NumElements, meshManager.get())); 
+				triangleNodesProvisioner = unique_ptr<TriangleNodesProvisioner>(new TriangleNodesProvisioner(NOrder, meshManager.get())); 
 			}
 
 
@@ -381,6 +380,20 @@ namespace blitzdg {
 				Assert::That(dpds(7) - -2.168803194788500, IsLessThan(eps));
 				Assert::That(dpds(8) -  10.282642877953123, IsLessThan(eps));
 				Assert::That(dpds(9) -  12.247448713915887, IsLessThan(eps));
+			}
+
+			It(Should_Build_Volume_To_Face_Maps) {
+				cout << "Should_Build_Volume_To_Face_Maps" << endl;
+
+				TriangleNodesProvisioner & triangleNodes = *triangleNodesProvisioner;
+				MeshManager & meshMgr = *meshManager;
+
+
+				meshMgr.readMesh("/asda");
+				//const index_type Np = (NOrder+1)*(NOrder+2)/2;
+				triangleNodes.buildNodes();
+				triangleNodes.buildPhysicalGrid();
+				triangleNodes.buildMaps();
 			}
 		};
    } // namespace Nodes1DProvisionerTests

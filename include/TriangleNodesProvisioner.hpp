@@ -79,7 +79,7 @@ namespace blitzdg {
      * @param[in] MeshManager The MeshManager storing the 2D mesh.
      * @note Assumes uniform elements.
      */
-    TriangleNodesProvisioner(index_type _NOrder, index_type _NumElements, const MeshManager * _MeshManager);
+    TriangleNodesProvisioner(index_type _NOrder, const MeshManager * _MeshManager);
 
     /**
      * Copy constructor (deleted).
