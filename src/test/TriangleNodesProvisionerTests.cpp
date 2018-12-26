@@ -5,6 +5,7 @@
 #include "TriangleNodesProvisioner.hpp"
 #include "MeshManager.hpp"
 #include "Types.hpp"
+#include "PathResolver.hpp"
 #include <whereami.h>
 #include <igloo/igloo_alt.h>
 #include <blitz/array.h>
@@ -38,70 +39,28 @@ namespace blitzdg {
 		unique_ptr<MeshManager> meshManager = nullptr;
         unique_ptr<Nodes1DProvisioner> nodes1DProvisioner = nullptr;
 		unique_ptr<TriangleNodesProvisioner> triangleNodesProvisioner = nullptr;
+		unique_ptr<PathResolver> pathResolver = nullptr;
 
         Describe(Nodes1DProvisioner_Object) {
 			const real_type eps = 50*numeric_limits<double>::epsilon();
 			const float epsf = 5.8e-5;
 			const index_type NOrder = 3;
 			const index_type NumFaces = 2;
+            string PathDelimeter = "/";
 
 			using find_vector_type = vector<iterator_range<string::iterator>>;
 
-            string PathDelimeter = "/";
-            string* ExePath = nullptr;
-            unique_ptr<vector<string>> InputPathVec = nullptr;
-
-            void TearDown() {
-                delete ExePath;
-            }
-
-            void resolveInputPath() {
-                string path(*ExePath);
-                find_vector_type FindVec;
-
-                replace_last(path, ".exe", "");
-                replace_last(path, "/bin/test", "");
-                find_all( FindVec, path, "\\" );
-                if (FindVec.size() > 0) {
-                    PathDelimeter = "\\";
-                    replace_last(path, "\\bin\\test", "");
-                }
-
-                vector<string> pathVec;
-                pathVec.push_back(path);
-                pathVec.push_back("input");
-
-                *InputPathVec = std::move(pathVec);
-            }
-
-			void get_MshFile(string& mshFile) {
-                vector<string>& pathVec = *InputPathVec;
-                pathVec.push_back("coarse_box.msh");
-                mshFile = join(pathVec, PathDelimeter);
-                pathVec.pop_back();
-            }
-
             void SetUp() {
-				if (ExePath == nullptr) {
-                    // Deal with paths to the test input files.
-                    index_type cap = 1024;
-                    char * pathBuffer = new char[cap];
-                    index_type length = wai_getExecutablePath(pathBuffer, cap, NULL);
-                    ExePath = new string();
+				pathResolver = unique_ptr<PathResolver>(new PathResolver());
 
-                    for(index_type i=0; i < length; i++) {
-                        *ExePath += pathBuffer[i];
-                    }
-                    trim_right(*ExePath);
-                    delete [] pathBuffer;
-                }
-                InputPathVec =  unique_ptr<vector<string>>(new vector<string>());
-                resolveInputPath();
+				PathResolver& resolver = *pathResolver;
+
+				string root = resolver.get_RootPath();
+				string inputPath = resolver.joinPaths(root, "input");
+				string meshPath = resolver.joinPaths(inputPath, "coarse_box.msh");
 
 				meshManager = unique_ptr<MeshManager>(new MeshManager());
-				string mshFile;
-				get_MshFile(mshFile);
-				meshManager->readMesh(mshFile);
+				meshManager->readMesh(meshPath);
 				triangleNodesProvisioner = unique_ptr<TriangleNodesProvisioner>(new TriangleNodesProvisioner(NOrder, meshManager.get())); 
 			}
 
