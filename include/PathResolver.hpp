@@ -15,27 +15,11 @@
 #include <whereami.h>
 #include <boost/algorithm/string.hpp>
 
-using boost::algorithm::find_all;
-using boost::algorithm::join;
-using boost::algorithm::replace_last;
-using boost::algorithm::replace_first;
-using boost::algorithm::trim_right;
-using boost::iterator_range;
-using std::string;
-using std::vector;
-using std::cout;
-using std::endl;
-using std::numeric_limits;
-using std::abs;
-using std::shared_ptr;
-using std::unique_ptr;
-
 namespace blitzdg {
   class PathResolver {
   
-    string PathDelimeter = "/";
-    shared_ptr<string> ExePath = nullptr;
-    unique_ptr<vector<string>> InputPathVec = nullptr;
+    std::string PathDelimeter;
+    std::string ExePath;
 
     void resolveDelimeter();
 
@@ -69,11 +53,11 @@ public:
     /**
      * Returns absolute project root path.
      */
-    string get_RootPath();
+    std::string get_RootPath();
 
     /**
      * Joins to paths in a way that handles possible trailing/leading delimeters.
      */
-    string joinPaths(string path1, string path2);
+    std::string joinPaths(std::string path1, std::string path2);
   };
 }
