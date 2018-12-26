@@ -399,15 +399,18 @@ namespace blitzdg {
 
         const real_vector_type& r = *rGrid;
         const real_vector_type& s = *sGrid;
-        const real_matrix_type& V2D = *V;
+        real_matrix_type& V2D = *V;
 
         index_type Np = NumLocalPoints;
         index_type K = NumElements;
 
         real_matrix_type V2Dr(Np,Np), V2Ds(Np,Np);
         
-        real_matrix_type& D_r = *Dr;
-        real_matrix_type& D_s = *Ds;
+        real_matrix_type D_r = *Dr;
+        real_matrix_type D_s = *Ds;
+
+
+        computeVandermondeMatrix(NOrder, r, s, V2D);
         computeGradVandermondeMatrix(NOrder, r, s, V2Dr, V2Ds);
         computeDifferentiationMatrices(V2Dr, V2Ds, V2D, D_r, D_s);
 
@@ -458,13 +461,13 @@ namespace blitzdg {
         real_matrix_type xmat(NumLocalPoints, NumElements, ColumnMajorOrder());
         real_matrix_type ymat(NumLocalPoints, NumElements, ColumnMajorOrder());
 
-        xmat = *xGrid;
-        ymat = *yGrid;
-
         real_vector_type x(NumElements*NumLocalPoints);
         real_vector_type y(NumElements*NumLocalPoints);
         reshapeMatTo1D(xmat, x.data(), false);
         reshapeMatTo1D(ymat, y.data(), false);
+
+        *xGrid = xmat;
+        *yGrid = ymat;
 
         // Assemble global volume node numbering.
         nodeIds = ii + NumLocalPoints*jj;
