@@ -36,9 +36,9 @@ public:
     PathResolver(const PathResolver&) = delete;
 
     /**
-     * Copy assignment operator (deleted).
+     * Copy assignment operator
      */
-    PathResolver& operator=(const PathResolver&) = delete;
+    PathResolver& operator=(const PathResolver&) = default;
 
     /**
      * Move constructor.
