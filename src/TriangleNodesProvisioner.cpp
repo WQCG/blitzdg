@@ -18,6 +18,7 @@ using blitz::Range;
 using blitz::secondIndex;
 using blitz::sum;
 using blitz::thirdIndex;
+using blitz::Array;
 using std::numeric_limits;
 using std::unique_ptr;
 using std::abs;

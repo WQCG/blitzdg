@@ -9,15 +9,12 @@ using boost::algorithm::join;
 using boost::algorithm::replace_last;
 using boost::algorithm::replace_first;
 using boost::algorithm::trim_right;
-using boost::iterator_range;
 using std::string;
 using std::vector;
 using std::cout;
 using std::endl;
 using std::numeric_limits;
 using std::abs;
-using std::shared_ptr;
-using std::unique_ptr;
 
 namespace blitzdg{
     PathResolver::PathResolver() {
@@ -33,40 +30,32 @@ namespace blitzdg{
         }
         trim_right(ExePath);
 
-        resolveDelimeter();
+        resolveDelimiter();
     }
 
-    void PathResolver::resolveDelimeter() {
-        PathDelimeter = "/";
-        using find_vector_type = vector<iterator_range<string::iterator>>;
-        
-        string path(ExePath);
-        find_vector_type FindVec;
+    void PathResolver::resolveDelimiter() {
+        PathDelimiter = "/";
 
-        find_all( FindVec, path, "\\" );
-        if (FindVec.size() > 0) {
-            PathDelimeter = "\\";
-        }
+        if (ExePath.find('\\') != std::string::npos)
+            PathDelimiter = "\\";
     }
 
     string PathResolver::get_RootPath() {
         string path(ExePath);
         vector<string> pathVec;
         replace_last(path, ".exe", "");
-        replace_last(path, PathDelimeter + "bin" + PathDelimeter + "test", "");
+        replace_last(path, PathDelimiter + "bin" + PathDelimiter + "test", "");
 
         return path;
     }
 
     string PathResolver::joinPaths(string path1, string path2) {
 
-        char delim = *PathDelimeter.cbegin();
-        if (*path2.cbegin() == delim)
-            replace_last(path2, PathDelimeter, "");
-        
-        if (*path1.cend() == delim)
-            replace_first(path1, PathDelimeter, "");
-
-        return path1 + PathDelimeter + path2;
+        if (path2.front() != PathDelimiter.front())
+            path2 = PathDelimiter + path2;
+        if (path1.back() == PathDelimiter.front())
+            path1.pop_back();
+        path1 += path2;
+        return path1;    
     }
 }

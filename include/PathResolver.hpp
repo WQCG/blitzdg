@@ -18,15 +18,14 @@
 namespace blitzdg {
   class PathResolver {
   
-    std::string PathDelimeter;
+    std::string PathDelimiter;
     std::string ExePath;
 
-    void resolveDelimeter();
+    void resolveDelimiter();
 
 public:
     /**
      * Constructor
-     * @note Assumes uniform elements.
      */
     PathResolver();
 
