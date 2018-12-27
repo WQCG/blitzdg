@@ -464,13 +464,12 @@ namespace blitzdg {
         real_matrix_type xmat(NumLocalPoints, NumElements, ColumnMajorOrder());
         real_matrix_type ymat(NumLocalPoints, NumElements, ColumnMajorOrder());
 
+        xmat = *xGrid; ymat = *yGrid;
+
         real_vector_type x(NumElements*NumLocalPoints);
         real_vector_type y(NumElements*NumLocalPoints);
         reshapeMatTo1D(xmat, x.data(), false);
         reshapeMatTo1D(ymat, y.data(), false);
-
-        *xGrid = xmat;
-        *yGrid = ymat;
 
         // Assemble global volume node numbering.
         nodeIds = ii + NumLocalPoints*jj;
