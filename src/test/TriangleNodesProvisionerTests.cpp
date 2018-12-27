@@ -28,6 +28,7 @@ using std::endl;
 using std::numeric_limits;
 using std::abs;
 using std::unique_ptr;
+using std::shared_ptr;
 
 namespace blitzdg {
     namespace TriangleNodesProvisionerTests {
@@ -36,10 +37,8 @@ namespace blitzdg {
         firstIndex ii;
         secondIndex jj;
 
-		unique_ptr<MeshManager> meshManager = nullptr;
-        unique_ptr<Nodes1DProvisioner> nodes1DProvisioner = nullptr;
-		unique_ptr<TriangleNodesProvisioner> triangleNodesProvisioner = nullptr;
-		unique_ptr<PathResolver> pathResolver = nullptr;
+		shared_ptr<TriangleNodesProvisioner> triangleNodesProvisioner = nullptr;
+		shared_ptr<MeshManager> meshManager =  nullptr;
 
         Describe(Nodes1DProvisioner_Object) {
 			const real_type eps = 50*numeric_limits<double>::epsilon();
@@ -51,17 +50,17 @@ namespace blitzdg {
 			using find_vector_type = vector<iterator_range<string::iterator>>;
 
             void SetUp() {
-				pathResolver = unique_ptr<PathResolver>(new PathResolver());
+				PathResolver resolver;
+				meshManager = shared_ptr<MeshManager>(new MeshManager());
 
-				PathResolver& resolver = *pathResolver;
 
 				string root = resolver.get_RootPath();
 				string inputPath = resolver.joinPaths(root, "input");
 				string meshPath = resolver.joinPaths(inputPath, "coarse_box.msh");
 
-				meshManager = unique_ptr<MeshManager>(new MeshManager());
+
 				meshManager->readMesh(meshPath);
-				triangleNodesProvisioner = unique_ptr<TriangleNodesProvisioner>(new TriangleNodesProvisioner(NOrder, meshManager.get())); 
+				triangleNodesProvisioner = shared_ptr<TriangleNodesProvisioner>(new TriangleNodesProvisioner(NOrder, *meshManager)); 
 			}
 
 			It(Should_Evaluate_Orthonormal_Simplex2D_Polynomial) {
@@ -412,5 +411,5 @@ namespace blitzdg {
 				triangleNodes.buildMaps();
 			}
 		};
-   } // namespace Nodes1DProvisionerTests
+   } // namespace TriangleNodesProvisionerTests
 } // namespace blitzdg

@@ -56,6 +56,6 @@ namespace blitzdg{
         if (path1.back() == PathDelimiter.front())
             path1.pop_back();
         path1 += path2;
-        return path1;    
+        return path1;
     }
 }
