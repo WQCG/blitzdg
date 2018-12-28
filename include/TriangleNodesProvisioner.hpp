@@ -69,6 +69,11 @@ namespace blitzdg {
       DirectSolver LinSolver;
       DenseMatrixInverter Inverter;
 
+      /**
+       * Helper method for checking that two points (x1,y1) and (x2,y2) are less than a distance eps apart.
+       */
+      bool distanceLessThanEps(real_type x1, real_type y1, real_type x2, real_type y2, real_type eps);
+
   public:
       static const index_type NumFaces;
       static const real_type NodeTol;

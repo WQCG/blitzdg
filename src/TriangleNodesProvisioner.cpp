@@ -59,6 +59,13 @@ namespace blitzdg {
 		Jacobi{}, Vandermonde{}, LinSolver{}, Inverter{}
     {}
 
+    bool TriangleNodesProvisioner::distanceLessThanEps(real_type x1, real_type y1, real_type x2, real_type y2, real_type eps) {
+        if (hypot(x2-x1, y2-y1) < eps) 
+            return true;
+
+        return false;
+    }
+
 
 	void TriangleNodesProvisioner::evaluateSimplexPolynomial(const real_vector_type & a, const real_vector_type & b, index_type i, index_type j, real_vector_type & p) const {
 		real_vector_type h1(a.length(0));
@@ -512,7 +519,7 @@ namespace blitzdg {
                         index_type vidP = vmapM3(nP,f2,k2);
                         real_type x2 = x(vidP), y2 = y(vidP);
 
-                        if (hypot(x2-x1, y2-y1) < refd*NodeTol) {
+                        if (distanceLessThanEps(x1,y1,x2,y2, refd*NodeTol)) {
                             vmapP3(n,f,k) = vidP;
                             mapP3(n,f,k) = nP + f2*NumFacePoints+k2*NumFaces*NumFacePoints;
                         }
