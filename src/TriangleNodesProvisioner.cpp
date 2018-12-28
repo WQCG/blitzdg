@@ -406,8 +406,8 @@ namespace blitzdg {
 
         real_matrix_type V2Dr(Np,Np), V2Ds(Np,Np);
         
-        real_matrix_type D_r = *Dr;
-        real_matrix_type D_s = *Ds;
+        real_matrix_type& D_r = *Dr;
+        real_matrix_type& D_s = *Ds;
 
 
         computeVandermondeMatrix(NOrder, r, s, V2D);
