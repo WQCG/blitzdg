@@ -50,12 +50,13 @@ namespace blitzdg{
     }
 
     string PathResolver::joinPaths(string path1, string path2) {
-
-        if (path2.front() != PathDelimiter.front())
-            path2 = PathDelimiter + path2;
-        if (path1.back() == PathDelimiter.front())
+        char d = PathDelimiter.at(0);
+        if (path1.back() == d && path2.front() == d)
             path1.pop_back();
+        else if (path1.back() != d && path2.front() != d)
+            path1.push_back(d);
         path1 += path2;
+
         return path1;
     }
 }
