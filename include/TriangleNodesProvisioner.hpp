@@ -293,6 +293,16 @@ namespace blitzdg {
       const index_vector_type & get_vmapP() const;
 
       /**
+       * Returns a reference to the volume to surface map for boundary traces.
+       */
+      const index_vector_type & get_vmapB() const;
+
+      /**
+       * Returns a reference to the surface to surface map from 'minus' traces to boundary traces.
+       */
+      const index_vector_type & get_mapB() const;
+
+      /**
        * Builds nodes and local operators.
        */
       void buildNodes();

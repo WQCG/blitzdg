@@ -369,8 +369,6 @@ namespace blitzdg {
         index_vector_type va(NumElements), vb(NumElements), vc(NumElements);
         index_type count=0;
 
-        std::cout << EToV << std::endl;
-
         // Unpack 1D arrays storing EToV and Vertex coordinates
         for (index_type i=0; i < NumElements; ++i) {
             va(i) = EToV(count);
@@ -536,10 +534,6 @@ namespace blitzdg {
             }
         }
 
-        std::cout << "vmapM:\n" << vmM << "\n";
-        std::cout << "vmapP:\n" << vmP << "\n";
-
-
         // identify all boundary nodes
         index_vector_type tmpMapB(NumElements*NumFaces*NumFacePoints);
         index_type numBoundaryNodes = 0;
@@ -686,6 +680,14 @@ namespace blitzdg {
 
     const index_vector_type& TriangleNodesProvisioner::get_vmapP() const {
         return *vmapP;
+    }
+
+    const index_vector_type& TriangleNodesProvisioner::get_vmapB() const {
+        return *vmapB;
+    }
+
+    const index_vector_type& TriangleNodesProvisioner::get_mapB() const {
+        return *mapB;
     }
 
 }
