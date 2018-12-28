@@ -15,10 +15,16 @@ namespace blitzdg {
     template <typename T>
     using matrix_type = blitz::Array<T, 2>;
 
+    template <typename T>
+    using tensor3_type = blitz::Array<T, 3>;
+
     using index_type = int;
     using real_type = double;
     using real_vector_type = vector_type<double>;
     using real_matrix_type = matrix_type<double>;
     using index_vector_type = vector_type<int>;
     using index_matrix_type = matrix_type<int>;
+    using index_tensor3_type = tensor3_type<index_type>;
+    using real_tensor3_type = tensor3_type<real_type>;
+
 }

@@ -18,7 +18,6 @@ using blitz::Range;
 using blitz::secondIndex;
 using blitz::sum;
 using blitz::thirdIndex;
-using blitz::Array;
 using std::numeric_limits;
 using std::unique_ptr;
 using std::abs;
@@ -479,9 +478,9 @@ namespace blitzdg {
         // Assemble global volume node numbering.
         nodeIds = ii + NumLocalPoints*jj;
 
-        Array<index_type, 3> vmapM3(NumFacePoints, NumFaces, NumElements);
-        Array<index_type, 3> vmapP3(NumFacePoints, NumFaces, NumElements);
-        Array<index_type, 3> mapP3(NumFacePoints, NumFaces, NumElements);
+        index_tensor3_type vmapM3(NumFacePoints, NumFaces, NumElements);
+        index_tensor3_type vmapP3(NumFacePoints, NumFaces, NumElements);
+        index_tensor3_type mapP3(NumFacePoints, NumFaces, NumElements);
 
         vmapM3 = 0*kk; vmapP3 = 0*kk; mapP3 = 0*kk;
 
