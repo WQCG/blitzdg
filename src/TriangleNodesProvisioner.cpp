@@ -536,6 +536,10 @@ namespace blitzdg {
             }
         }
 
+        std::cout << "vmapM:\n" << vmM << "\n";
+        std::cout << "vmapP:\n" << vmP << "\n";
+
+
         // identify all boundary nodes
         index_vector_type tmpMapB(NumElements*NumFaces*NumFacePoints);
         index_type numBoundaryNodes = 0;
@@ -674,6 +678,14 @@ namespace blitzdg {
 
     index_type TriangleNodesProvisioner::get_NumLocalPoints() const {
         return NumLocalPoints;
+    }
+
+    const index_vector_type& TriangleNodesProvisioner::get_vmapM() const {
+        return *vmapM;
+    }
+
+    const index_vector_type& TriangleNodesProvisioner::get_vmapP() const {
+        return *vmapP;
     }
 
 }
