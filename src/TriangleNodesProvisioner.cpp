@@ -493,9 +493,9 @@ namespace blitzdg {
         }
 
         // Find index of face nodes with respect to volume node ordering.
-        for (index_type k=0; k <  NumElements; ++k) {
+        for (index_type n=0; n < NumFacePoints; ++n) {
             for (index_type f=0; f < NumFaces; ++f) {
-                for (index_type n=0; n < NumFacePoints; ++n) {
+                for (index_type k=0; k < NumElements; ++k) {
                     // find neighbor.
                     index_type k2 = E2E(NumFaces*k + f);
                     index_type f2 = E2F(NumFaces*k + f);
@@ -529,7 +529,7 @@ namespace blitzdg {
 
         // reshape to 1D.
         index_type count = 0;
-        for (index_type k=0; k <  NumElements; ++k) {
+        for (index_type k=0; k < NumElements; ++k) {
             for (index_type f=0; f < NumFaces; ++f) {
                 for (index_type n=0; n < NumFacePoints; ++n) {
                     vmM(count) = vmapM3(n,f,k);
