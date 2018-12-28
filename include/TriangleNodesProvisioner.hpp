@@ -55,19 +55,24 @@ namespace blitzdg {
 
       real_mat_smart_ptr Fscale;
 
-      index_mat_smart_ptr EToE;
-      index_mat_smart_ptr EToF;
-
       index_vec_smart_ptr vmapM;
       index_vec_smart_ptr vmapP;
+      index_vec_smart_ptr vmapB;
+      index_vec_smart_ptr mapP;
+      index_vec_smart_ptr mapB;
 
-      const MeshManager * Mesh2D;
+      const MeshManager& Mesh2D;
 
       std::unique_ptr<Nodes1DProvisioner> Nodes1D;
 	  JacobiBuilders Jacobi;
       VandermondeBuilders Vandermonde;
       DirectSolver LinSolver;
       DenseMatrixInverter Inverter;
+
+      /**
+       * Helper method for checking that two points (x1,y1) and (x2,y2) are less than a distance eps apart.
+       */
+      bool distanceLessThanEps(real_type x1, real_type y1, real_type x2, real_type y2, real_type eps);
 
   public:
       static const index_type NumFaces;
@@ -79,7 +84,7 @@ namespace blitzdg {
      * @param[in] MeshManager The MeshManager storing the 2D mesh.
      * @note Assumes uniform elements.
      */
-    TriangleNodesProvisioner(index_type _NOrder, index_type _NumElements, const MeshManager * _MeshManager);
+    TriangleNodesProvisioner(index_type _NOrder, const MeshManager& _MeshManager);
 
     /**
      * Copy constructor (deleted).
@@ -281,16 +286,6 @@ namespace blitzdg {
        * Returns a reference to the MeshManager.
        */
       const index_matrix_type & get_MeshManager() const;
-    
-      /**
-       * Returns a reference to the Element-To-Element connectivity table.
-       */
-      const index_matrix_type & get_EToE() const;
-
-      /**
-       * Returns a reference to the Element-to-Face connectivity table.
-       */
-      const index_matrix_type & get_EToF() const;
 
       /**
        * Returns a refernce to the volume to surface map, 'minus' traces.
@@ -301,6 +296,16 @@ namespace blitzdg {
        * Returns a reference to the volume to surface map, 'plus' traces.
        */
       const index_vector_type & get_vmapP() const;
+
+      /**
+       * Returns a reference to the volume to surface map for boundary traces.
+       */
+      const index_vector_type & get_vmapB() const;
+
+      /**
+       * Returns a reference to the surface to surface map from 'minus' traces to boundary traces.
+       */
+      const index_vector_type & get_mapB() const;
 
       /**
        * Builds nodes and local operators.

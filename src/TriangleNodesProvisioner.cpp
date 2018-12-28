@@ -28,36 +28,42 @@ namespace blitzdg {
     const real_type TriangleNodesProvisioner::NodeTol = 1.e-5;
     const real_type pi = blitzdg::constants::pi;
 
-    TriangleNodesProvisioner::TriangleNodesProvisioner(index_type _NOrder, index_type _NumElements, const MeshManager * _MeshManager) 
-        : NumElements{ _NumElements }, NOrder{ _NOrder },
+    TriangleNodesProvisioner::TriangleNodesProvisioner(index_type _NOrder, const MeshManager& _MeshManager)
+        : NumElements{ _MeshManager.get_NumElements() }, NOrder{ _NOrder },
         NumLocalPoints{ (_NOrder + 2)*(_NOrder+1)/2 },
         NumFacePoints{ _NOrder + 1},
-        xGrid{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
-        yGrid{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
+        xGrid{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements()) },
+        yGrid{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements()) },
         rGrid{ new real_vector_type((_NOrder + 2)*(_NOrder+1)/2) },
         sGrid{ new real_vector_type((_NOrder + 2)*(_NOrder+1)/2) },
         V{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) }, 
         Dr{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
         Ds{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
         Lift{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder+1)*NumFaces) },
-        J{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
-        rx{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
-        sx{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
-        ry{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
-        sy{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, NumElements) },
-        nx{ new real_matrix_type((_NOrder+1)*NumFaces, NumElements) },
-        ny{ new real_matrix_type((_NOrder+1)*NumFaces, NumElements) },
+        J{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements()) },
+        rx{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements()) },
+        sx{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements()) },
+        ry{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements()) },
+        sy{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements()) },
+        nx{ new real_matrix_type((_NOrder+1)*NumFaces, _MeshManager.get_NumElements()) },
+        ny{ new real_matrix_type((_NOrder+1)*NumFaces, _MeshManager.get_NumElements()) },
         Vinv{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
         Fmask{ new index_matrix_type( _NOrder+1, NumFaces) },
-        Fscale{ new real_matrix_type((_NOrder+1)*NumFaces, NumElements) },
-        EToE{ new index_matrix_type(NumElements, NumFaces) },
-        EToF{ new index_matrix_type(NumElements, NumFaces) },
-        vmapM{ new index_vector_type((_NOrder+1)*NumFaces*NumElements) },
-        vmapP{ new index_vector_type((_NOrder+1)*NumFaces*NumElements) },
+        Fscale{ new real_matrix_type((_NOrder+1)*NumFaces, _MeshManager.get_NumElements()) },
+        vmapM{ new index_vector_type((_NOrder+1)*NumFaces*_MeshManager.get_NumElements()) },
+        vmapP{ new index_vector_type((_NOrder+1)*NumFaces*_MeshManager.get_NumElements()) },
+        mapP{ new index_vector_type((_NOrder+1)*NumFaces*_MeshManager.get_NumElements()) },
         Mesh2D { _MeshManager },
-        Nodes1D{ new Nodes1DProvisioner(_NOrder, NumElements, -1.0, 1.0) },
+        Nodes1D{ new Nodes1DProvisioner(_NOrder, 5, -1.0, 1.0) },
 		Jacobi{}, Vandermonde{}, LinSolver{}, Inverter{}
     {}
+
+    bool TriangleNodesProvisioner::distanceLessThanEps(real_type x1, real_type y1, real_type x2, real_type y2, real_type eps) {
+        if (hypot(x2-x1, y2-y1) < eps) 
+            return true;
+
+        return false;
+    }
 
 
 	void TriangleNodesProvisioner::evaluateSimplexPolynomial(const real_vector_type & a, const real_vector_type & b, index_type i, index_type j, real_vector_type & p) const {
@@ -359,11 +365,11 @@ namespace blitzdg {
         thirdIndex kk;
 
         // Get element data
-        const index_vector_type& EToV = Mesh2D->get_Elements();
-        const real_vector_type&  Vert = Mesh2D->get_Vertices();
-        index_type NumVertices = Mesh2D->get_NumVerts();
+        const index_vector_type& EToV = Mesh2D.get_Elements();
+        const real_vector_type&  Vert = Mesh2D.get_Vertices();
+        index_type NumVertices = Mesh2D.get_NumVerts();
 
-        NumElements = Mesh2D->get_NumElements();
+        NumElements = Mesh2D.get_NumElements();
 
         real_vector_type VX(NumVertices), VY(NumVertices), VZ(NumVertices);
         index_vector_type va(NumElements), vb(NumElements), vc(NumElements);
@@ -399,7 +405,7 @@ namespace blitzdg {
 
         const real_vector_type& r = *rGrid;
         const real_vector_type& s = *sGrid;
-        const real_matrix_type& V2D = *V;
+        real_matrix_type& V2D = *V;
 
         index_type Np = NumLocalPoints;
         index_type K = NumElements;
@@ -408,6 +414,9 @@ namespace blitzdg {
         
         real_matrix_type& D_r = *Dr;
         real_matrix_type& D_s = *Ds;
+
+
+        computeVandermondeMatrix(NOrder, r, s, V2D);
         computeGradVandermondeMatrix(NOrder, r, s, V2Dr, V2Ds);
         computeDifferentiationMatrices(V2Dr, V2Ds, V2D, D_r, D_s);
 
@@ -441,8 +450,116 @@ namespace blitzdg {
     }
     
     void TriangleNodesProvisioner::buildMaps() {
-        //const MeshManager& meshMgr = *Mesh2D;
-        // WIP here...
+        firstIndex ii;
+        secondIndex jj;
+        thirdIndex kk;
+
+        index_matrix_type nodeIds(NumLocalPoints, NumElements);
+        
+        const index_matrix_type& Fmsk = *Fmask;
+        index_vector_type& vmM = *vmapM;
+        index_vector_type& vmP = *vmapP;
+        index_vector_type& mP = *mapP;
+
+        const index_vector_type& E2E = Mesh2D.get_EToE();
+        const index_vector_type& E2F = Mesh2D.get_EToF();
+        const index_vector_type& E2V = Mesh2D.get_Elements(); 
+
+        real_matrix_type xmat(NumLocalPoints, NumElements, ColumnMajorOrder());
+        real_matrix_type ymat(NumLocalPoints, NumElements, ColumnMajorOrder());
+
+        xmat = *xGrid; ymat = *yGrid;
+
+        real_vector_type x(NumElements*NumLocalPoints);
+        real_vector_type y(NumElements*NumLocalPoints);
+        reshapeMatTo1D(xmat, x.data(), false);
+        reshapeMatTo1D(ymat, y.data(), false);
+
+        // Assemble global volume node numbering.
+        nodeIds = ii + NumLocalPoints*jj;
+
+        index_tensor3_type vmapM3(NumFacePoints, NumFaces, NumElements);
+        index_tensor3_type vmapP3(NumFacePoints, NumFaces, NumElements);
+        index_tensor3_type mapP3(NumFacePoints, NumFaces, NumElements);
+
+        vmapM3 = 0*kk; vmapP3 = 0*kk; mapP3 = 0*kk;
+
+        for (index_type k=0; k < NumElements; ++k) {
+            for (index_type f=0; f < NumFaces; ++f) {
+                for (index_type n=0; n < NumFacePoints; ++n) {
+                    vmapM3(n,f,k) = nodeIds(Fmsk(n,f), k);
+                }
+            }
+        }
+
+        // Find index of face nodes with respect to volume node ordering.
+        for (index_type n=0; n < NumFacePoints; ++n) {
+            for (index_type f=0; f < NumFaces; ++f) {
+                for (index_type k=0; k < NumElements; ++k) {
+                    // find neighbor.
+                    index_type k2 = E2E(NumFaces*k + f);
+                    index_type f2 = E2F(NumFaces*k + f);
+                    const real_vector_type Vert = Mesh2D.get_Vertices();                    
+
+                    index_type v1 = E2V(k*NumFaces + f); 
+                    index_type v2 = E2V(k*NumFaces + ((f+1) % NumFaces));
+
+                    // Compute reference length of edge.
+                    real_type vx1 = Vert(3*v1), vy1 = Vert(3*v1 + 1);
+                    real_type vx2 = Vert(3*v2), vy2 = Vert(3*v2 + 1);
+
+                    real_type refd = hypot(vx1-vx2, vy1-vy2);
+
+                    // find find volume node numbers of left and right nodes 
+                    index_type vidM = vmapM3(n,f,k);
+                    real_type x1 = x(vidM), y1 = y(vidM);
+                    
+                    for (index_type nP=0; nP < NumFacePoints; ++nP) {
+                        index_type vidP = vmapM3(nP,f2,k2);
+                        real_type x2 = x(vidP), y2 = y(vidP);
+
+                        if (distanceLessThanEps(x1,y1,x2,y2, refd*NodeTol)) {
+                            vmapP3(n,f,k) = vidP;
+                            mapP3(n,f,k) = nP + f2*NumFacePoints+k2*NumFaces*NumFacePoints;
+                        }
+                    }
+                }
+            }
+        }
+
+        // reshape to 1D.
+        index_type count = 0;
+        for (index_type k=0; k < NumElements; ++k) {
+            for (index_type f=0; f < NumFaces; ++f) {
+                for (index_type n=0; n < NumFacePoints; ++n) {
+                    vmM(count) = vmapM3(n,f,k);
+                    vmP(count) = vmapP3(n,f,k);
+                    mP(count) = mapP3(n,f,k);
+                    ++count;
+                }
+            }
+        }
+
+        // identify all boundary nodes
+        index_vector_type tmpMapB(NumElements*NumFaces*NumFacePoints);
+        index_type numBoundaryNodes = 0;
+        for (index_type i=0; i< NumElements*NumFaces*NumFacePoints; ++i) {
+            if (vmP(i) == vmM(i)) {
+                tmpMapB(numBoundaryNodes) = i;
+                ++numBoundaryNodes;
+            }
+        }
+
+        
+        mapB = unique_ptr<index_vector_type>(new index_vector_type(numBoundaryNodes));
+        vmapB = unique_ptr<index_vector_type>(new index_vector_type(numBoundaryNodes));
+
+        index_vector_type& mB = *mapB;
+        index_vector_type& vmB = *vmapB;
+        for (index_type i=0; i < numBoundaryNodes; ++i)  {
+            mB(i) = tmpMapB(i);
+            vmB(i) = vmM(mB(i));
+        }
     }
 
     void TriangleNodesProvisioner::buildLift() {
@@ -561,6 +678,22 @@ namespace blitzdg {
 
     index_type TriangleNodesProvisioner::get_NumLocalPoints() const {
         return NumLocalPoints;
+    }
+
+    const index_vector_type& TriangleNodesProvisioner::get_vmapM() const {
+        return *vmapM;
+    }
+
+    const index_vector_type& TriangleNodesProvisioner::get_vmapP() const {
+        return *vmapP;
+    }
+
+    const index_vector_type& TriangleNodesProvisioner::get_vmapB() const {
+        return *vmapB;
+    }
+
+    const index_vector_type& TriangleNodesProvisioner::get_mapB() const {
+        return *mapB;
     }
 
 }

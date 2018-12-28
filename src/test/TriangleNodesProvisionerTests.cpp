@@ -5,6 +5,8 @@
 #include "TriangleNodesProvisioner.hpp"
 #include "MeshManager.hpp"
 #include "Types.hpp"
+#include "PathResolver.hpp"
+#include <whereami.h>
 #include <igloo/igloo_alt.h>
 #include <blitz/array.h>
 #include <iostream>
@@ -12,13 +14,21 @@
 #include <cmath>
 #include <memory>
 
+using boost::algorithm::find_all;
+using boost::algorithm::join;
+using boost::algorithm::replace_last;
+using boost::algorithm::trim_right;
+using boost::iterator_range;
 using blitz::firstIndex;
 using blitz::secondIndex;
+using std::string;
+using std::vector;
 using std::cout;
 using std::endl;
 using std::numeric_limits;
 using std::abs;
 using std::unique_ptr;
+using std::shared_ptr;
 
 namespace blitzdg {
     namespace TriangleNodesProvisionerTests {
@@ -27,22 +37,31 @@ namespace blitzdg {
         firstIndex ii;
         secondIndex jj;
 
-		unique_ptr<MeshManager> meshManager = nullptr;
-        unique_ptr<Nodes1DProvisioner> nodes1DProvisioner = nullptr;
-		unique_ptr<TriangleNodesProvisioner> triangleNodesProvisioner = nullptr;
+		shared_ptr<TriangleNodesProvisioner> triangleNodesProvisioner = nullptr;
+		shared_ptr<MeshManager> meshManager =  nullptr;
 
         Describe(Nodes1DProvisioner_Object) {
 			const real_type eps = 50*numeric_limits<double>::epsilon();
 			const float epsf = 5.8e-5;
 			const index_type NOrder = 3;
-			const index_type NumElements = 5;
 			const index_type NumFaces = 2;
+            string PathDelimeter = "/";
+
+			using find_vector_type = vector<iterator_range<string::iterator>>;
 
             void SetUp() {
-				meshManager = unique_ptr<MeshManager>(new MeshManager());
-				triangleNodesProvisioner = unique_ptr<TriangleNodesProvisioner>(new TriangleNodesProvisioner(NOrder, NumElements, meshManager.get())); 
-			}
+				PathResolver resolver;
+				meshManager = shared_ptr<MeshManager>(new MeshManager());
 
+
+				string root = resolver.get_RootPath();
+				string inputPath = resolver.joinPaths(root, "input");
+				string meshPath = resolver.joinPaths(inputPath, "coarse_box.msh");
+
+
+				meshManager->readMesh(meshPath);
+				triangleNodesProvisioner = shared_ptr<TriangleNodesProvisioner>(new TriangleNodesProvisioner(NOrder, *meshManager)); 
+			}
 
 			It(Should_Evaluate_Orthonormal_Simplex2D_Polynomial) {
                 cout << "Should_Evaluate_Orthonormal_Simplex2D_Polynomial" << endl;
@@ -78,9 +97,6 @@ namespace blitzdg {
 				real_vector_type b(3);
 
 				triangleNodes.rsToab(r, s, a, b);
-
-				cout << "a: " << a << endl;
-				cout << "b: " << b << endl;
 
 				Assert::That(abs(b(0) - 0.2), IsLessThan(eps));
 				Assert::That(abs(b(1) - 0.3), IsLessThan(eps));
@@ -138,7 +154,6 @@ namespace blitzdg {
 				real_matrix_type res(Np, totalNfp);
 				res = Lift-Lift_expected;
 
-				cout << "Lift: " << Lift << endl;
 				Assert::That(normFro(res), IsLessThan(epsf));
 			}
 
@@ -156,10 +171,6 @@ namespace blitzdg {
 				Assert::That(abs(warp(0) - -0.0384345884812357), IsLessThan(eps));
 				Assert::That(abs(warp(1) -  0.0384345884812359), IsLessThan(eps));
 				Assert::That(abs(warp(2) -  0.0768691769624717), IsLessThan(eps));
-
-				cout << warp(0) << endl;
-				cout << warp(1) << endl;
-				cout << warp(2) << endl;
 			}
 
 			It(Should_Compute_Vandermode_Matrix) {
@@ -216,9 +227,6 @@ namespace blitzdg {
 
 				triangleNodes.computeGradVandermondeMatrix(NOrder, r, s, VDr, VDs);
 
-				cout << "VDr: " << VDr << endl;
-				cout << "VDs: " << VDs << endl;
-
 				VDrexpected =   0.00000,0.00000,-0.00000,-0.00000,1.73205,3.71231,1.84324,5.34029,17.57436,10.71985,
 								0.00000,0.00000,-0.00000,-0.00000,1.73205,4.24264,3.33131,6.57267,24.28629,17.06196,
 								0.00000,0.00000,0.00000,-0.00000,1.73205,4.77297,5.07657,7.80505,31.99434,24.63881,
@@ -269,9 +277,6 @@ namespace blitzdg {
 				triangleNodes.computeVandermondeMatrix(NOrder, r, s, V);
 				triangleNodes.computeGradVandermondeMatrix(NOrder, r, s, V2Dr, V2Ds);
 				triangleNodes.computeDifferentiationMatrices(V2Dr, V2Ds, V, Dr, Ds);
-
-				cout << "Dr:" << endl << Dr << endl;
-				cout << "Ds:" << endl << Ds << endl;
 
 				expectedDr =-3.00000,4.04508,-1.54508,0.50000,-0.00000,-0.00000,-0.00000,-0.00000,-0.00000,0.00000,
 							-0.80902,0.00000,1.11803,-0.30902,-0.00000,-0.00000,0.00000,-0.00000,0.00000,0.00000,
@@ -382,6 +387,40 @@ namespace blitzdg {
 				Assert::That(dpds(8) -  10.282642877953123, IsLessThan(eps));
 				Assert::That(dpds(9) -  12.247448713915887, IsLessThan(eps));
 			}
+
+			It(Should_Build_Volume_To_Face_Maps) {
+				cout << "Should_Build_Volume_To_Face_Maps" << endl;
+				TriangleNodesProvisioner & triangleNodes = *triangleNodesProvisioner;
+
+				triangleNodes.buildNodes();
+				triangleNodes.buildPhysicalGrid();
+				triangleNodes.buildMaps();
+
+				const index_vector_type vmapM = triangleNodes.get_vmapM();
+				const index_vector_type vmapP = triangleNodes.get_vmapP();
+				const index_vector_type vmapB = triangleNodes.get_vmapB();
+				const index_vector_type mapB = triangleNodes.get_mapB();
+
+				index_vector_type expectedvmapM(480), expectedvmapP(480);
+				index_vector_type expectedvmapB(64), expectedmapB(64);
+
+				expectedvmapM = 0,1,2,3,3,6,8,9,0,4,7,9,10,11,12,13,13,16,18,19,10,14,17,19,20,21,22,23,23,26,28,29,20,24,27,29,30,31,32,33,33,36,38,39,30,34,37,39,40,41,42,43,43,46,48,49,40,44,47,49,50,51,52,53,53,56,58,59,50,54,57,59,60,61,62,63,63,66,68,69,60,64,67,69,70,71,72,73,73,76,78,79,70,74,77,79,80,81,82,83,83,86,88,89,80,84,87,89,90,91,92,93,93,96,98,99,90,94,97,99,100,101,102,103,103,106,108,109,100,104,107,109,110,111,112,113,113,116,118,119,110,114,117,119,120,121,122,123,123,126,128,129,120,124,127,129,130,131,132,133,133,136,138,139,130,134,137,139,140,141,142,143,143,146,148,149,140,144,147,149,150,151,152,153,153,156,158,159,150,154,157,159,160,161,162,163,163,166,168,169,160,164,167,169,170,171,172,173,173,176,178,179,170,174,177,179,180,181,182,183,183,186,188,189,180,184,187,189,190,191,192,193,193,196,198,199,190,194,197,199,200,201,202,203,203,206,208,209,200,204,207,209,210,211,212,213,213,216,218,219,210,214,217,219,220,221,222,223,223,226,228,229,220,224,227,229,230,231,232,233,233,236,238,239,230,234,237,239,240,241,242,243,243,246,248,249,240,244,247,249,250,251,252,253,253,256,258,259,250,254,257,259,260,261,262,263,263,266,268,269,260,264,267,269,270,271,272,273,273,276,278,279,270,274,277,279,280,281,282,283,283,286,288,289,280,284,287,289,290,291,292,293,293,296,298,299,290,294,297,299,300,301,302,303,303,306,308,309,300,304,307,309,310,311,312,313,313,316,318,319,310,314,317,319,320,321,322,323,323,326,328,329,320,324,327,329,330,331,332,333,333,336,338,339,330,334,337,339,340,341,342,343,343,346,348,349,340,344,347,349,350,351,352,353,353,356,358,359,350,354,357,359,360,361,362,363,363,366,368,369,360,364,367,369,370,371,372,373,373,376,378,379,370,374,377,379,380,381,382,383,383,386,388,389,380,384,387,389,390,391,392,393,393,396,398,399,390,394,397,399;
+				expectedvmapP = 240,244,247,249,189,188,186,183,90,91,92,93,250,254,257,259,199,198,196,193,100,101,102,103,270,274,277,279,179,178,176,173,80,81,82,83,260,264,267,269,209,208,206,203,110,111,112,113,159,158,156,153,239,238,236,233,310,311,312,313,139,138,136,133,219,218,216,213,290,291,292,293,149,148,146,143,229,228,226,223,300,301,302,303,129,128,126,123,169,168,166,163,280,281,282,283,20,24,27,29,123,122,121,120,80,84,87,89,0,4,7,9,133,132,131,130,90,94,97,99,10,14,17,19,143,142,141,140,100,104,107,109,30,34,37,39,153,152,151,150,110,114,117,119,89,88,86,83,73,72,71,70,120,124,127,129,99,98,96,93,53,52,51,50,130,134,137,139,109,108,106,103,63,62,61,60,140,144,147,149,119,118,116,113,43,42,41,40,150,154,157,159,180,184,187,189,79,78,76,73,170,171,172,173,160,164,167,169,29,28,26,23,230,231,232,233,210,214,217,219,9,8,6,3,160,161,162,163,220,224,227,229,19,18,16,13,210,211,212,213,230,234,237,239,39,38,36,33,220,221,222,223,190,194,197,199,59,58,56,53,180,181,182,183,200,204,207,209,69,68,66,63,190,191,192,193,170,174,177,179,49,48,46,43,200,201,202,203,389,388,386,383,289,288,286,283,0,1,2,3,379,378,376,373,299,298,296,293,10,11,12,13,369,368,366,363,309,308,306,303,30,31,32,33,399,398,396,393,319,318,316,313,20,21,22,23,70,74,77,79,249,248,246,243,343,346,348,349,50,54,57,59,259,258,256,253,333,336,338,339,60,64,67,69,269,268,266,263,323,326,328,329,40,44,47,49,279,278,276,273,353,356,358,359,320,321,322,323,300,304,307,309,360,361,362,363,330,331,332,333,290,294,297,299,370,371,372,373,340,341,342,343,280,284,287,289,380,381,382,383,350,351,352,353,310,314,317,319,390,391,392,393,320,324,327,329,263,262,261,260,360,364,367,369,330,334,337,339,253,252,251,250,370,374,377,379,340,344,347,349,243,242,241,240,380,384,387,389,350,354,357,359,273,272,271,270,390,394,397,399;
+				expectedvmapB = 80,84,87,89,90,94,97,99,100,104,107,109,110,114,117,119,120,124,127,129,130,134,137,139,140,144,147,149,150,154,157,159,320,321,322,323,330,331,332,333,340,341,342,343,350,351,352,353,360,364,367,369,370,374,377,379,380,384,387,389,390,394,397,399;
+				expectedmapB = 104,105,106,107,116,117,118,119,128,129,130,131,140,141,142,143,152,153,154,155,164,165,166,167,176,177,178,179,188,189,190,191,384,385,386,387,396,397,398,399,408,409,410,411,420,421,422,423,440,441,442,443,452,453,454,455,464,465,466,467,476,477,478,479;
+
+				index_vector_type resM(480), resP(480), resB(64), resmB(64);
+				
+				resM =  vmapM - expectedvmapM;
+				resP =  vmapP - expectedvmapP;
+				resB =  vmapB - expectedvmapB;
+				resmB =  mapB - expectedmapB;
+
+				Assert::That(normInf(resM), Equals(0));
+				Assert::That(normInf(resP), Equals(0));
+				Assert::That(normInf(resB), Equals(0));
+				Assert::That(normInf(resmB), Equals(0));
+			}
 		};
-   } // namespace Nodes1DProvisionerTests
+   } // namespace TriangleNodesProvisionerTests
 } // namespace blitzdg
