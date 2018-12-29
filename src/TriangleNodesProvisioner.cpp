@@ -12,6 +12,7 @@
 #include <cmath>
 #include <limits>
 #include <memory>
+#include <unordered_map>
 
 using blitz::firstIndex;
 using blitz::Range;
@@ -22,6 +23,7 @@ using std::numeric_limits;
 using std::unique_ptr;
 using std::abs;
 using std::sqrt;
+using std::vector;
 
 namespace blitzdg {
     const index_type TriangleNodesProvisioner::NumFaces = 3;
@@ -53,6 +55,7 @@ namespace blitzdg {
         vmapM{ new index_vector_type((_NOrder+1)*NumFaces*_MeshManager.get_NumElements()) },
         vmapP{ new index_vector_type((_NOrder+1)*NumFaces*_MeshManager.get_NumElements()) },
         mapP{ new index_vector_type((_NOrder+1)*NumFaces*_MeshManager.get_NumElements()) },
+        BCmap{ new index_hashmap()},
         Mesh2D { _MeshManager },
         Nodes1D{ new Nodes1DProvisioner(_NOrder, 5, -1.0, 1.0) },
 		Jacobi{}, Vandermonde{}, LinSolver{}, Inverter{}
@@ -560,6 +563,40 @@ namespace blitzdg {
             mB(i) = tmpMapB(i);
             vmB(i) = vmM(mB(i));
         }
+
+        buildBCHash();
+    }
+
+    void TriangleNodesProvisioner::buildBCHash() {
+        firstIndex ii;
+        secondIndex jj;
+        index_vector_type bcVec = Mesh2D.get_BCType();
+
+        // allocate correct storage for boundary node indices of each type.
+        index_hashmap& bcMap = *BCmap;
+
+        // create boundary face nodes global numbering.
+        index_matrix_type boundaryNodesMat(NumFacePoints, NumFaces*NumElements);
+
+        index_vector_type ones(NumFacePoints);
+        ones = 0*ii + 1;
+        boundaryNodesMat = ones(ii)*bcVec(jj);
+
+        index_type count=0;
+        for (index_type f=0; f < NumFaces*NumElements; ++f) {
+            for (index_type n=0; n < NumFacePoints; ++n) {
+                index_type bct = boundaryNodesMat(n, f);
+
+                if (bct != 0) {
+                    auto search = bcMap.find(bct);
+                    if (search == bcMap.end())
+                        bcMap.insert({ bct, vector<index_type>{ count } });
+                    else
+                        search->second.push_back(count);
+                }
+                ++count;
+            }
+        }
     }
 
     void TriangleNodesProvisioner::buildLift() {
@@ -696,4 +733,7 @@ namespace blitzdg {
         return *mapB;
     }
 
+    const index_hashmap& TriangleNodesProvisioner::get_bcMap() const{
+        return *BCmap;
+    }
 }

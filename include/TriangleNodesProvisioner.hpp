@@ -60,6 +60,7 @@ namespace blitzdg {
       index_vec_smart_ptr vmapB;
       index_vec_smart_ptr mapP;
       index_vec_smart_ptr mapB;
+      std::unique_ptr<index_hashmap> BCmap;
 
       const MeshManager& Mesh2D;
 
@@ -308,6 +309,11 @@ namespace blitzdg {
       const index_vector_type & get_mapB() const;
 
       /**
+       * Returns a reference to the hashmap mapping boundary types to list of corresponding boundary nodes.
+       */
+      const index_hashmap & get_bcMap() const;
+
+      /**
        * Builds nodes and local operators.
        */
       void buildNodes();
@@ -326,6 +332,11 @@ namespace blitzdg {
        * Build volume-to-surface maps for '-' and '+' traces, as well as for BC faces.
        */
       void buildMaps();
+
+      /**
+       *  Build hashmap mapping BCTypes to node indices that are on that boundary.
+       */
+      void buildBCHash();
       
       /**
        * Returns the number of nodes local to a 2D triangular element.
