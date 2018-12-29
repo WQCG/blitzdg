@@ -23,6 +23,7 @@ using std::numeric_limits;
 using std::unique_ptr;
 using std::abs;
 using std::sqrt;
+using std::vector;
 
 namespace blitzdg {
     const index_type TriangleNodesProvisioner::NumFaces = 3;
@@ -570,30 +571,9 @@ namespace blitzdg {
         firstIndex ii;
         secondIndex jj;
         index_vector_type bcVec = Mesh2D.get_BCType();
-        index_type maxBCTag = max(bcVec);
-
-        // Do a 'bucket'-style count on the various non-zero BC Types.
-        index_vector_type bcTypeCount(maxBCTag+1);
-        bcTypeCount = 0*ii;
-        for(index_type k=0; k<NumElements; ++k) {
-            for (index_type f=0; f<NumFaces; ++f) {
-                index_type bct = bcVec(k*NumFaces + f);
-
-                // We assume we do not change boundary type across a single face.
-                if (bct != 0)
-                    bcTypeCount(bct) += NumFacePoints;
-            }
-        }
 
         // allocate correct storage for boundary node indices of each type.
         index_hashmap& bcMap = *BCmap;
-        std::vector<index_type*> mapItrs(maxBCTag+1);
-
-        for(index_type t=0; t<=maxBCTag; ++t) {
-            bcMap.insert( {t, index_vector_type(bcTypeCount(t))} );
-            bcMap[t] = 0*ii;
-            mapItrs[t] = bcMap[t].data();
-        }
 
         // create boundary face nodes global numbering.
         index_matrix_type boundaryNodesMat(NumFacePoints, NumFaces*NumElements);
@@ -607,8 +587,13 @@ namespace blitzdg {
             for (index_type n=0; n < NumFacePoints; ++n) {
                 index_type bct = boundaryNodesMat(n, f);
 
-                if (bct != 0)
-                    *mapItrs[bct]++ = count;
+                if (bct != 0) {
+                    auto search = bcMap.find(bct);
+                    if (search == bcMap.end())
+                        bcMap.insert({ bct, vector<index_type>{ count } });
+                    else
+                        search->second.push_back(count);
+                }
                 ++count;
             }
         }

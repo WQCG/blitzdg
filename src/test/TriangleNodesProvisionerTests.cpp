@@ -13,6 +13,7 @@
 #include <limits>
 #include <cmath>
 #include <memory>
+#include <vector>
 
 using boost::algorithm::find_all;
 using boost::algorithm::join;
@@ -22,13 +23,13 @@ using boost::iterator_range;
 using blitz::firstIndex;
 using blitz::secondIndex;
 using std::string;
-using std::vector;
 using std::cout;
 using std::endl;
 using std::numeric_limits;
 using std::abs;
 using std::unique_ptr;
 using std::shared_ptr;
+using std::vector;
 
 namespace blitzdg {
     namespace TriangleNodesProvisionerTests {
@@ -411,14 +412,20 @@ namespace blitzdg {
 				expectedmapB = 104,105,106,107,116,117,118,119,128,129,130,131,140,141,142,143,152,153,154,155,164,165,166,167,176,177,178,179,188,189,190,191,384,385,386,387,396,397,398,399,408,409,410,411,420,421,422,423,440,441,442,443,452,453,454,455,464,465,466,467,476,477,478,479;
 				expectedmapW = 104,105,106,107,116,117,118,119,128,129,130,131,140,141,142,143,152,153,154,155,164,165,166,167,176,177,178,179,188,189,190,191,384,385,386,387,396,397,398,399,408,409,410,411,420,421,422,423,440,441,442,443,452,453,454,455,464,465,466,467,476,477,478,479;
 
-
 				index_vector_type resM(480), resP(480), resB(64), resmB(64), resmapW(64);
 				
+				index_vector_type mapW(64);
+				const vector<index_type>& mapWvec = bcMap.at(3);
+
+				// copy to blitz array from std::vector.
+				for (index_type i=0; i<64; ++i)
+					mapW(i) = mapWvec[i];
+
 				resM =  vmapM - expectedvmapM;
 				resP =  vmapP - expectedvmapP;
 				resB =  vmapB - expectedvmapB;
 				resmB =  mapB - expectedmapB;
-				resmapW = bcMap.at(3) - expectedmapW;
+				resmapW = mapW - expectedmapW;
 
 				Assert::That(normInf(resM), Equals(0));
 				Assert::That(normInf(resP), Equals(0));
