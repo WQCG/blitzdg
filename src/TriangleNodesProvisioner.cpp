@@ -596,21 +596,21 @@ namespace blitzdg {
         }
 
         // create boundary face nodes global numbering.
-        index_type numFaceNodes = NumFacePoints*NumFaces*NumElements;
-        index_vector_type boundaryNodes(numFaceNodes);
         index_matrix_type boundaryNodesMat(NumFacePoints, NumFaces*NumElements);
 
-        index_matrix_type ones(NumFacePoints);
+        index_vector_type ones(NumFacePoints);
         ones = 0*ii + 1;
         boundaryNodesMat = ones(ii)*bcVec(jj);
 
-        reshapeMatTo1D(boundaryNodesMat, boundaryNodes.data(), false);
+        index_type count=0;
+        for (index_type f=0; f < NumFaces*NumElements; ++f) {
+            for (index_type n=0; n < NumFacePoints; ++n) {
+                index_type bct = boundaryNodesMat(n, f);
 
-        for(index_type n=0; n < numFaceNodes; ++n) {
-            index_type bct = boundaryNodes(n);
-
-            if (bct != 0)
-                *mapItrs[bct]++ = n;
+                if (bct != 0)
+                    *mapItrs[bct]++ = count;
+                ++count;
+            }
         }
     }
 
