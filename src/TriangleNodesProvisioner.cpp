@@ -12,6 +12,7 @@
 #include <cmath>
 #include <limits>
 #include <memory>
+#include <unordered_map>
 
 using blitz::firstIndex;
 using blitz::Range;
@@ -53,6 +54,7 @@ namespace blitzdg {
         vmapM{ new index_vector_type((_NOrder+1)*NumFaces*_MeshManager.get_NumElements()) },
         vmapP{ new index_vector_type((_NOrder+1)*NumFaces*_MeshManager.get_NumElements()) },
         mapP{ new index_vector_type((_NOrder+1)*NumFaces*_MeshManager.get_NumElements()) },
+        BCmap{ new index_hashmap()},
         Mesh2D { _MeshManager },
         Nodes1D{ new Nodes1DProvisioner(_NOrder, 5, -1.0, 1.0) },
 		Jacobi{}, Vandermonde{}, LinSolver{}, Inverter{}
@@ -560,6 +562,56 @@ namespace blitzdg {
             mB(i) = tmpMapB(i);
             vmB(i) = vmM(mB(i));
         }
+
+        buildBCHash();
+    }
+
+    void TriangleNodesProvisioner::buildBCHash() {
+        firstIndex ii;
+        secondIndex jj;
+        index_vector_type bcVec = Mesh2D.get_BCType();
+        index_type maxBCTag = max(bcVec);
+
+        // Do a 'bucket'-style count on the various non-zero BC Types.
+        index_vector_type bcTypeCount(maxBCTag+1);
+        bcTypeCount = 0*ii;
+        for(index_type k=0; k<NumElements; ++k) {
+            for (index_type f=0; f<NumFaces; ++f) {
+                index_type bct = bcVec(k*NumFaces + f);
+
+                // We assume we do not change boundary type across a single face.
+                if (bct != 0)
+                    bcTypeCount(bct) += NumFacePoints;
+            }
+        }
+
+        // allocate correct storage for boundary node indices of each type.
+        index_hashmap& bcMap = *BCmap;
+        std::vector<index_type*> mapItrs(maxBCTag+1);
+
+        for(index_type t=0; t<=maxBCTag; ++t) {
+            bcMap.insert( {t, index_vector_type(bcTypeCount(t))} );
+            bcMap[t] = 0*ii;
+            mapItrs[t] = bcMap[t].data();
+        }
+
+        // create boundary face nodes global numbering.
+        index_type numFaceNodes = NumFacePoints*NumFaces*NumElements;
+        index_vector_type boundaryNodes(numFaceNodes);
+        index_matrix_type boundaryNodesMat(NumFacePoints, NumFaces*NumElements);
+
+        index_matrix_type ones(NumFacePoints);
+        ones = 0*ii + 1;
+        boundaryNodesMat = ones(ii)*bcVec(jj);
+
+        reshapeMatTo1D(boundaryNodesMat, boundaryNodes.data(), false);
+
+        for(index_type n=0; n < numFaceNodes; ++n) {
+            index_type bct = boundaryNodes(n);
+
+            if (bct != 0)
+                *mapItrs[bct]++ = n;
+        }
     }
 
     void TriangleNodesProvisioner::buildLift() {
@@ -696,4 +748,7 @@ namespace blitzdg {
         return *mapB;
     }
 
+    const index_hashmap& TriangleNodesProvisioner::get_bcMap() const{
+        return *BCmap;
+    }
 }

@@ -7,6 +7,7 @@
  */
 #pragma once
 #include <blitz/array.h>
+#include <unordered_map>
 
 namespace blitzdg {
     template <typename T>
@@ -27,4 +28,5 @@ namespace blitzdg {
     using index_tensor3_type = tensor3_type<index_type>;
     using real_tensor3_type = tensor3_type<real_type>;
 
+    using index_hashmap = std::unordered_map<blitzdg::index_type, blitzdg::index_vector_type>;
 }
