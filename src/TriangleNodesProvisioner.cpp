@@ -465,7 +465,6 @@ namespace blitzdg {
             index_type count=0;
             for (index_type f=0; f < NumFaces; ++f) {
                 for (index_type n=0; n < NumFacePoints; ++n) {
-                    std::cout << Fmsk << std::endl;
                     fxr(count, k) = xr(Fmsk(n, f), k);
                     fxs(count, k) = xs(Fmsk(n, f), k);
                     fyr(count, k) = yr(Fmsk(n, f), k);
