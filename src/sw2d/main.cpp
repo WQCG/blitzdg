@@ -83,11 +83,12 @@ int main(int argc, char **argv) {
 	hv = h*v;
 
 	real_matrix_type Fscale = triangleNodesProvisioner.get_Fscale();
+	cout << Fscale << endl;
+	return 0;
+
 	const real_type dt = CFL/max((N+1)*(N+1)*0.5*abs(Fscale)*sqrt(g*h));
 
 	cout << dt << endl;
-
-	return 0;
 
 	RHS1 = 0*jj;
 	RHS2 = 0*jj;
