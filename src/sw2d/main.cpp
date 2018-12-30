@@ -19,6 +19,7 @@ using blitz::firstIndex;
 using blitz::secondIndex;
 using blitz::thirdIndex;
 using blitz::sum;
+using blitz::sqrt;
 using std::abs;
 using std::string;
 using std::cout;
@@ -256,15 +257,11 @@ namespace blitzdg {
 			real_vector_type spdP(numFaceNodes), spdP2(numFaceNodes);
 			real_vector_type spdMax(numFaceNodes);
 
-			spdM2 = uM*uM + vM*vM;
-			spdP2 = uP*uP + vP*vP;
+			spdM = sqrt(uM*uM + vM*vM) + sqrt(g*hM);
+			spdP = sqrt(uP*uP + vP*vP) + sqrt(g*hP);
+
+			// Compute 'trace maximum' over '-' and '+'.
 			for (index_type i=0; i < numFaceNodes; ++i) {
-				spdM(i) = sqrt(spdM2(i));
-				spdM(i)+= sqrt(g*hM(i));
-
-				spdP(i) = sqrt(spdP2(i));
-				spdP(i)+= sqrt(g*hP(i));
-
 				spdMax(i) = max(spdM(i), spdP(i));
 			}
 
