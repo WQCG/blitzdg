@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
 	// Physical parameters
 	const real_type g = 9.81;
 
-	const real_type finalTime = 20.0;
+	const real_type finalTime = 2.0;
 	real_type t = 0.0;
 
 	// Numerical parameters (N = Order of polynomials)
@@ -54,6 +54,7 @@ int main(int argc, char **argv) {
 	triangleNodesProvisioner.buildNodes();
 	triangleNodesProvisioner.buildLift();
 	triangleNodesProvisioner.buildPhysicalGrid();
+	triangleNodesProvisioner.buildMaps();
 
 	CsvOutputter outputter;
 
@@ -84,12 +85,10 @@ int main(int argc, char **argv) {
 	hv = h*v;
 
 	real_matrix_type Fscale = triangleNodesProvisioner.get_Fscale();
-	cout << Fscale << endl;
-	return 0;
-
+	
 	const real_type dt = CFL/max((N+1)*(N+1)*0.5*abs(Fscale)*sqrt(g*h));
 
-	cout << dt << endl;
+	cout << "dt=" << dt << endl;
 
 	RHS1 = 0*jj;
 	RHS2 = 0*jj;
@@ -107,6 +106,7 @@ int main(int argc, char **argv) {
 
 	while (t < finalTime) {
 		if ((count % 10) == 0) {
+			eta = h-H;
 			string fileName = outputter.generateFileName("eta", count);
 			outputter.writeFieldToFile(fileName, eta, delim);
 		}	
@@ -136,6 +136,7 @@ int main(int argc, char **argv) {
 		count++;
 	}
 	real_matrix_type etafinal(Np, K);
+	etafinal = h - H;
 
 	return 0;
 } // end main
