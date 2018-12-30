@@ -6,12 +6,12 @@
  * @brief Short header file for 2D shallow water solver's main.cpp file.
  */
 #pragma once
-#include "Nodes1DProvisioner.hpp"
+#include "TriangleNodesProvisioner.hpp"
 #include "Types.hpp"
 #include <string>
 
 namespace blitzdg {
 	namespace sw2d {
-		void computeRHS(const real_matrix_type & u, real_type g, Nodes1DProvisioner & nodes1D, real_matrix_type & RHS);
+		void computeRHS(real_matrix_type h, real_matrix_type hu, real_matrix_type hv, real_type g, TriangleNodesProvisioner& triangleNodesProvisioner, real_matrix_type& RHS1, real_matrix_type& RHS2, real_matrix_type& RHS3);
 	}
 }

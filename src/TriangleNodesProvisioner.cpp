@@ -717,6 +717,10 @@ namespace blitzdg {
         return NumLocalPoints;
     }
 
+    index_type TriangleNodesProvisioner::get_NumFacePoints() const {
+        return NumFacePoints;
+    }
+
     const index_vector_type& TriangleNodesProvisioner::get_vmapM() const {
         return *vmapM;
     }
@@ -733,7 +737,25 @@ namespace blitzdg {
         return *mapB;
     }
 
-    const index_hashmap& TriangleNodesProvisioner::get_bcMap() const{
+    const index_hashmap& TriangleNodesProvisioner::get_bcMap() const {
         return *BCmap;
     }
+
+    const real_matrix_type& TriangleNodesProvisioner::get_Fscale() const {
+        return *Fscale;
+    }
+
+    const real_matrix_type& TriangleNodesProvisioner::get_nx() const {
+        return *nx;
+    }
+
+    const real_matrix_type& TriangleNodesProvisioner::get_ny() const {
+        return *ny;
+    }
+
+    int TriangleNodesProvisioner::get_NumElements() const {
+        return NumElements;
+    }
+
+
 }
