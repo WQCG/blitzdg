@@ -344,6 +344,11 @@ namespace blitzdg {
       index_type get_NumLocalPoints() const;
 
       /**
+       * Returns the number of nodes along a triangle face.
+       */
+      index_type get_NumFacePoints() const;
+
+      /**
        * Returns the number of elements in the 2D grid.
        */
       index_type get_NumElements() const;
