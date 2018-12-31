@@ -638,26 +638,24 @@ namespace blitzdg {
         index_hashmap& bcMap = *BCmap;
 
         // create boundary face nodes global numbering.
-        index_matrix_type boundaryNodesMat(NumFacePoints, NumFaces*NumElements);
+        index_matrix_type boundaryNodesMat(NumFacePoints, NumFaces*NumElements, ColumnMajorOrder());
 
         index_vector_type ones(NumFacePoints);
         ones = 0*ii + 1;
         boundaryNodesMat = ones(ii)*bcVec(jj);
 
         index_type count=0;
-        for (index_type f=0; f < NumFaces*NumElements; ++f) {
-            for (index_type n=0; n < NumFacePoints; ++n) {
-                index_type bct = boundaryNodesMat(n, f);
+        for (auto itr = boundaryNodesMat.begin(); itr != boundaryNodesMat.end(); ++itr) {
+            index_type bct = *itr;
 
-                if (bct != 0) {
-                    auto search = bcMap.find(bct);
-                    if (search == bcMap.end())
-                        bcMap.insert({ bct, vector<index_type>{ count } });
-                    else
-                        search->second.push_back(count);
-                }
-                ++count;
+            if (bct != 0) {
+                auto search = bcMap.find(bct);
+                if (search == bcMap.end())
+                    bcMap.insert({ bct, vector<index_type>{ count } });
+                else
+                    search->second.push_back(count);
             }
+            ++count;
         }
     }
 
