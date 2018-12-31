@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
 
 	// Numerical parameters (N = Order of polynomials)
 	const index_type N = 4;
-	const real_type CFL = 0.8;
+	const real_type CFL = 0.85;
 
 	// Build dependencies.
 	MeshManager meshManager;
@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
 
 	// Intialize fields.
 	H = 10.0 + 0*jj;
-	eta = exp(-10.0*(x*x));
+	eta = 1.e-5*exp(-3.0*(x*x + y*y));
 	u = 0*jj;
 	v = 0*jj;
 	h = H + eta;
@@ -85,8 +85,9 @@ int main(int argc, char **argv) {
 	hv = h*v;
 
 	real_matrix_type Fscale = triangleNodesProvisioner.get_Fscale();
-	
-	const real_type dt = CFL/max((N+1)*(N+1)*0.5*abs(Fscale)*sqrt(g*h));
+
+	real_type Fsc_max = max(abs(Fscale));
+	const real_type dt = CFL/max((N+1)*(N+1)*0.5*Fsc_max*sqrt(g*h));
 
 	cout << "dt=" << dt << endl;
 
@@ -107,6 +108,9 @@ int main(int argc, char **argv) {
 	while (t < finalTime) {
 		if ((count % 10) == 0) {
 			eta = h-H;
+			u = hu/h;
+			v = hv/h;
+			cout << "t=" << t << ", eta_max=" << max(eta) << endl;
 			string fileName = outputter.generateFileName("eta", count);
 			outputter.writeFieldToFile(fileName, eta, delim);
 		}	
@@ -127,10 +131,9 @@ int main(int argc, char **argv) {
 			hv += LSERK4::rk4b[i]*resRK3;
 		}
 
-		real_type u_max = normMax(u);
-		if ( u_max > 1e8  || std::isnan(u_max) ) {
+		real_type eta_max = normMax(eta);
+		if ( std::abs(eta_max) > 1e8  || std::isnan(eta_max) )
 			throw std::runtime_error("A numerical instability has occurred!");
-		}
 
 		t += dt;
 		count++;
@@ -218,8 +221,8 @@ namespace blitzdg {
 			// BC's - no flow through walls.
 			for (index_type i=0; i < static_cast<index_type>(mapW.size()); ++i) {
 				index_type w = mapW[i];
-				huP(w) = huM(w) - 2*(huM(w)*nx(w) + hvM(w)*ny(w));
-				hvP(w) = hvM(w) - 2*(huM(w)*nx(w) + hvM(w)*ny(w));
+				huP(w) = huM(w) - 2*nxVec(w)*(huM(w)*nxVec(w) + hvM(w)*nyVec(w));
+				hvP(w) = hvM(w) - 2*nyVec(w)*(huM(w)*nxVec(w) + hvM(w)*nyVec(w));
 			}
 
 			// Compute jump in state vector
@@ -243,7 +246,7 @@ namespace blitzdg {
 
 			// Full fields
 			real_matrix_type& F1 = hu, G1 = hv;
-			real_matrix_type F2(numFaceNodes), G2(numFaceNodes), G3(numFaceNodes);
+			real_matrix_type F2(Np, K), G2(Np, K), G3(Np, K);
 
 			F2 = (hu*hu)/h + 0.5*g*h*h; G2 = (hu*hv)/h;
 			real_matrix_type& F3 = G2;  G3 = (hv*hv)/h + 0.5*g*h*h;
@@ -252,19 +255,18 @@ namespace blitzdg {
 			real_vector_type uM(numFaceNodes), vM(numFaceNodes);
 			real_vector_type uP(numFaceNodes), vP(numFaceNodes);
 
-			uM = huM/hM; vM= hvM/hM;
+			uM = huM/hM; vM = hvM/hM;
+			uP = huP/hP; vP = hvP/hP;
 
-			real_vector_type spdM(numFaceNodes), spdM2(numFaceNodes);
-			real_vector_type spdP(numFaceNodes), spdP2(numFaceNodes);
+			real_vector_type spdM(numFaceNodes), spdP(numFaceNodes);
 			real_vector_type spdMax(numFaceNodes);
 
 			spdM = sqrt(uM*uM + vM*vM) + sqrt(g*hM);
 			spdP = sqrt(uP*uP + vP*vP) + sqrt(g*hP);
 
-			// Compute 'trace maximum' over '-' and '+'.
-			for (index_type i=0; i < numFaceNodes; ++i) {
+			// Compute 'trace max' over '-' and '+'.
+			for (index_type i=0; i < numFaceNodes; ++i)
 				spdMax(i) = max(spdM(i), spdP(i));
-			}
 
 			real_vector_type dFlux1(numFaceNodes), dFlux2(numFaceNodes), dFlux3(numFaceNodes);
 
@@ -285,13 +287,13 @@ namespace blitzdg {
 
 			// Flux divergence:
 			RHS1 = -(rx*sum(Dr(ii,kk)*F1(kk,jj), kk) + sx*sum(Ds(ii,kk)*F1(kk,jj), kk));
-			RHS1+= -(ry*sum(Dr(ii,kk)*F1(kk,jj), kk) + sy*sum(Ds(ii,kk)*F1(kk,jj), kk));
+			RHS1+= -(ry*sum(Dr(ii,kk)*G1(kk,jj), kk) + sy*sum(Ds(ii,kk)*G1(kk,jj), kk));
 
 			RHS2 = -(rx*sum(Dr(ii,kk)*F2(kk,jj), kk) + sx*sum(Ds(ii,kk)*F2(kk,jj), kk));
-			RHS2+= -(ry*sum(Dr(ii,kk)*F2(kk,jj), kk) + sy*sum(Ds(ii,kk)*F2(kk,jj), kk));
+			RHS2+= -(ry*sum(Dr(ii,kk)*G2(kk,jj), kk) + sy*sum(Ds(ii,kk)*G2(kk,jj), kk));
 
 			RHS3 = -(rx*sum(Dr(ii,kk)*F3(kk,jj), kk) + sx*sum(Ds(ii,kk)*F3(kk,jj), kk));
-			RHS3+= -(ry*sum(Dr(ii,kk)*F3(kk,jj), kk) + sy*sum(Ds(ii,kk)*F3(kk,jj), kk));
+			RHS3+= -(ry*sum(Dr(ii,kk)*G3(kk,jj), kk) + sy*sum(Ds(ii,kk)*G3(kk,jj), kk));
 
 			// Surface integral contributions
 			const real_matrix_type& Fscale = triangleNodesProvisioner.get_Fscale();
