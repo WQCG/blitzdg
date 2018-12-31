@@ -12,7 +12,6 @@
 #include <cmath>
 #include <limits>
 #include <memory>
-#include <unordered_map>
 
 using blitz::firstIndex;
 using blitz::Range;
@@ -50,7 +49,7 @@ namespace blitzdg {
         nx{ new real_matrix_type((_NOrder+1)*NumFaces, _MeshManager.get_NumElements()) },
         ny{ new real_matrix_type((_NOrder+1)*NumFaces, _MeshManager.get_NumElements()) },
         Vinv{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
-        Fmask{ new index_matrix_type( _NOrder+1, NumFaces) },
+        Fmask{ new index_matrix_type( _NOrder+1, NumFaces, ColumnMajorOrder()) },
         Fscale{ new real_matrix_type((_NOrder+1)*NumFaces, _MeshManager.get_NumElements()) },
         vmapM{ new index_vector_type((_NOrder+1)*NumFaces*_MeshManager.get_NumElements()) },
         vmapP{ new index_vector_type((_NOrder+1)*NumFaces*_MeshManager.get_NumElements()) },
@@ -418,7 +417,6 @@ namespace blitzdg {
         real_matrix_type& D_r = *Dr;
         real_matrix_type& D_s = *Ds;
 
-
         computeVandermondeMatrix(NOrder, r, s, V2D);
         computeGradVandermondeMatrix(NOrder, r, s, V2Dr, V2Ds);
         computeDifferentiationMatrices(V2Dr, V2Ds, V2D, D_r, D_s);
@@ -450,6 +448,69 @@ namespace blitzdg {
         r_y =-xs/Jac;
         s_x =-yr/Jac;
         s_y = xr/Jac;
+
+        // Normals and Face scalings:
+
+        const index_matrix_type& Fmsk = *Fmask;
+        real_matrix_type& Fscal = *Fscale;
+
+        // interpolate geometric factors to face nodes
+        index_type numLocalFaceNodes = NumFaces*NumFacePoints;
+
+        real_matrix_type fxr(numLocalFaceNodes, NumElements), fxs(numLocalFaceNodes, NumElements);
+        real_matrix_type fyr(numLocalFaceNodes, NumElements), fys(numLocalFaceNodes, NumElements);
+
+        for (index_type k=0; k < NumElements; ++k) {
+            index_type count=0;
+            for (index_type f=0; f < NumFaces; ++f) {
+                for (index_type n=0; n < NumFacePoints; ++n) {
+                    fxr(count, k) = xr(Fmsk(n, f), k);
+                    fxs(count, k) = xs(Fmsk(n, f), k);
+                    fyr(count, k) = yr(Fmsk(n, f), k);
+                    fys(count, k) = ys(Fmsk(n, f), k);
+                    ++count;
+                }
+            }
+        }
+
+        // build normals.
+        real_matrix_type& n_x = *nx, n_y = *ny;
+
+        real_matrix_type norm(numLocalFaceNodes, NumElements);
+
+        index_vector_type fid1(NumFacePoints), fid2(NumFacePoints), fid3(NumFacePoints);
+
+        fid1 = ii;
+        fid2 = ii + NumFacePoints;
+        fid3 = ii + 2*NumFacePoints;
+
+        for(index_type k=0; k < NumElements; ++k) {
+            for (index_type i=0; i < NumFacePoints; i++) {
+                // face 1
+                n_x(fid1(i), k) =  fyr(fid1(i), k);
+                n_y(fid1(i), k) = -fxr(fid1(i), k);
+
+                // face 2
+                n_x(fid2(i), k) =  fys(fid2(i), k)-fyr(fid2(i), k);
+                n_y(fid2(i), k) = -fxs(fid2(i), k)+fxr(fid2(i), k);
+
+                // face 3
+                n_x(fid3(i), k) = -fys(fid3(i), k);
+                n_y(fid3(i), k) =  fxs(fid3(i), k);
+            }
+        }
+
+        // normalise
+        norm = sqrt(n_x*n_x + n_y*n_y);
+
+        n_x = n_x/norm;
+        n_y = n_y/norm;
+
+        for(index_type k=0; k < NumElements; ++k) {
+            for (index_type i=0; i < NumFacePoints; i++) {
+                Fscal = norm/(Jac(Fmsk(i),k));
+            }
+        }
     }
     
     void TriangleNodesProvisioner::buildMaps() {
@@ -576,26 +637,24 @@ namespace blitzdg {
         index_hashmap& bcMap = *BCmap;
 
         // create boundary face nodes global numbering.
-        index_matrix_type boundaryNodesMat(NumFacePoints, NumFaces*NumElements);
+        index_matrix_type boundaryNodesMat(NumFacePoints, NumFaces*NumElements, ColumnMajorOrder());
 
         index_vector_type ones(NumFacePoints);
         ones = 0*ii + 1;
         boundaryNodesMat = ones(ii)*bcVec(jj);
 
         index_type count=0;
-        for (index_type f=0; f < NumFaces*NumElements; ++f) {
-            for (index_type n=0; n < NumFacePoints; ++n) {
-                index_type bct = boundaryNodesMat(n, f);
+        for (auto itr = boundaryNodesMat.begin(); itr != boundaryNodesMat.end(); ++itr) {
+            index_type bct = *itr;
 
-                if (bct != 0) {
-                    auto search = bcMap.find(bct);
-                    if (search == bcMap.end())
-                        bcMap.insert({ bct, vector<index_type>{ count } });
-                    else
-                        search->second.push_back(count);
-                }
-                ++count;
+            if (bct != 0) {
+                auto search = bcMap.find(bct);
+                if (search == bcMap.end())
+                    bcMap.insert({ bct, vector<index_type>{ count } });
+                else
+                    search->second.push_back(count);
             }
+            ++count;
         }
     }
 
@@ -717,6 +776,10 @@ namespace blitzdg {
         return NumLocalPoints;
     }
 
+    index_type TriangleNodesProvisioner::get_NumFacePoints() const {
+        return NumFacePoints;
+    }
+
     const index_vector_type& TriangleNodesProvisioner::get_vmapM() const {
         return *vmapM;
     }
@@ -733,7 +796,25 @@ namespace blitzdg {
         return *mapB;
     }
 
-    const index_hashmap& TriangleNodesProvisioner::get_bcMap() const{
+    const index_hashmap& TriangleNodesProvisioner::get_bcMap() const {
         return *BCmap;
     }
+
+    const real_matrix_type& TriangleNodesProvisioner::get_Fscale() const {
+        return *Fscale;
+    }
+
+    const real_matrix_type& TriangleNodesProvisioner::get_nx() const {
+        return *nx;
+    }
+
+    const real_matrix_type& TriangleNodesProvisioner::get_ny() const {
+        return *ny;
+    }
+
+    int TriangleNodesProvisioner::get_NumElements() const {
+        return NumElements;
+    }
+
+
 }
