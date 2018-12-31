@@ -12,7 +12,6 @@
 #include <cmath>
 #include <limits>
 #include <memory>
-#include <unordered_map>
 
 using blitz::firstIndex;
 using blitz::Range;
