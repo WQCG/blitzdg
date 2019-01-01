@@ -40,7 +40,7 @@ Dependency installation is outlined in `pull-deps.sh` (tested on Ubuntu and Mac 
 
 ### Windows Dependencies
 
-The Windows build requires [MinGW/MinGW64](http://www.mingw.org/wiki/Getting_Started "MinGW Installation Instructions"). We are testing the windows build in AppVeyor using the `mingw64-x86_64-7.3.0-posix-seh-rt_v5-rev0` distribution of MinGW. There is currently not a Visual Studio/MSVC build.
+The Windows build requires [MinGW/MinGW64](http://www.mingw.org/wiki/Getting_Started "MinGW Installation Instructions"). We are currently building windows binaries via cross-compile, targeting the `mingw64-x86_64-7.3.0-posix-seh-rt_v5-rev0` distribution of MinGW. There is currently not a Visual Studio/MSVC build.
 
 Run `.\pull-deps.ps1` in Powershell (4+ or Powershell Core (`pwsh`)).
 
