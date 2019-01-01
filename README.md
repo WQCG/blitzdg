@@ -3,7 +3,7 @@
 blitzdg is an open-source project aiming to implement parallel discontinuous Galerkin (dg) solvers for common partial differential equations systems using blitz++ for array and tensor manipulations and MPI for distributed parallelism.
 
 <img alt="shallow water wave example" src="https://raw.githubusercontent.com/WQCG/blitzdg/master/example/sw_coarsebox.gif" />
-Shallow Water Wave Example `blitzdg` output
+Shallow Water Wave Example ```blitzdg``` output
 
 [![Build Status](https://travis-ci.org/dsteinmo/blitzdg.svg?branch=master)](https://travis-ci.org/WQCG/blitzdg) [![Coverage Status](https://coveralls.io/repos/github/WQCG/blitzdg/badge.svg?branch=master)](https://coveralls.io/github/WQCG/blitzdg?branch=master)
 
