@@ -227,9 +227,25 @@ namespace blitzdg {
             }
         }
 
-
         buildBCTable(lines);
         buildConnectivity();
+    }
+
+    void MeshManager::buildBCTable(index_type tagNumber) {
+        index_vector_type& E2E = *EToE;
+        index_vector_type& BCTable = *BCType;
+
+        blitz::firstIndex ii;
+        BCTable = 0*ii;
+        for (index_type k=0; k < NumElements; ++k) {
+            for (index_type f=0; f < 3; ++f) {
+                index_type k2 = E2E(k*NumFaces + f);
+
+                // self-referencing elements are boundary elements.
+                if (k2 == k)
+                    BCTable(3*k + f) = tagNumber;
+            }
+        }
     }
 
     void MeshManager::buildBCTable(std::vector<std::vector<index_type>>& edges) {
@@ -451,6 +467,12 @@ namespace blitzdg {
 
     void MeshManager::readElements(const string& E2VFile) {
         EToV = csvread<index_type>(E2VFile, NumElements, NumFaces);
+
+        BCType = index_vec_smart_ptr(new index_vector_type(NumElements*NumFaces));
+        EToE = index_vec_smart_ptr(new index_vector_type(NumElements*NumFaces));
+        EToF = index_vec_smart_ptr(new index_vector_type(NumElements*NumFaces));
+        buildConnectivity();
+        buildBCTable(3);
     }
 
     void MeshManager::printVertices() const {
