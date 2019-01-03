@@ -507,8 +507,12 @@ namespace blitzdg {
         n_y = n_y/norm;
 
         for(index_type k=0; k < NumElements; ++k) {
-            for (index_type i=0; i < NumFacePoints; i++) {
-                Fscal = norm/(Jac(Fmsk(i),k));
+            index_type count=0;
+            for (index_type f=0; f < NumFaces; ++f) {
+                for (index_type n=0; n < NumFacePoints; n++) {
+                    Fscal(count,k) = norm(count,k)/(Jac(Fmsk(n,f),k));
+                    ++count;
+                }
             }
         }
     }
