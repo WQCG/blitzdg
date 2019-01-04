@@ -339,6 +339,12 @@ namespace blitzdg {
       void buildBCHash();
       
       /**
+       *  Build hashmap mapping BCTypes to node indices that are on that boundary using the
+       *  input BCType table.
+       */
+      void buildBCHash(const index_vector_type& bcType);
+
+      /**
        * Returns the number of nodes local to a 2D triangular element.
        */
       index_type get_NumLocalPoints() const;

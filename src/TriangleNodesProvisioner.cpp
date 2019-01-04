@@ -617,7 +617,6 @@ namespace blitzdg {
                 ++numBoundaryNodes;
             }
         }
-
         
         mapB = unique_ptr<index_vector_type>(new index_vector_type(numBoundaryNodes));
         vmapB = unique_ptr<index_vector_type>(new index_vector_type(numBoundaryNodes));
@@ -633,11 +632,15 @@ namespace blitzdg {
     }
 
     void TriangleNodesProvisioner::buildBCHash() {
+        const index_vector_type& bcVec = Mesh2D.get_BCType();
+
+        buildBCHash(bcVec);
+    }
+
+    void TriangleNodesProvisioner::buildBCHash(const index_vector_type& bcType) {
         firstIndex ii;
         secondIndex jj;
-        index_vector_type bcVec = Mesh2D.get_BCType();
-
-        // allocate correct storage for boundary node indices of each type.
+    
         index_hashmap& bcMap = *BCmap;
 
         // create boundary face nodes global numbering.
@@ -645,7 +648,7 @@ namespace blitzdg {
 
         index_vector_type ones(NumFacePoints);
         ones = 0*ii + 1;
-        boundaryNodesMat = ones(ii)*bcVec(jj);
+        boundaryNodesMat = ones(ii)*bcType(jj);
 
         index_type count=0;
         for (auto itr = boundaryNodesMat.begin(); itr != boundaryNodesMat.end(); ++itr) {
@@ -661,6 +664,7 @@ namespace blitzdg {
             ++count;
         }
     }
+
 
     void TriangleNodesProvisioner::buildLift() {
         firstIndex ii;
