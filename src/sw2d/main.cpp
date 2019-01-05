@@ -11,22 +11,27 @@
 #include "LSERK4.hpp"
 #include "LinAlgHelpers.hpp"
 #include "TriangleNodesProvisioner.hpp"
+#include "Constants.hpp"
 #include <blitz/array.h>
 #include <math.h>
 #include <string>
 #include <stdexcept>
+#include <unordered_set>
 
 using blitz::firstIndex;
 using blitz::secondIndex;
 using blitz::thirdIndex;
 using blitz::sum;
 using blitz::sqrt;
+using blitzdg::constants::pi;
 using std::abs;
 using std::string;
 using std::cout;
 using std::endl;
 using std::sqrt;
 using std::max;
+using std::unordered_set;
+using std::cos;
 
 int main(int argc, char **argv) {
 	using namespace blitzdg;
@@ -63,35 +68,27 @@ int main(int argc, char **argv) {
 	const real_matrix_type& y = triangleNodesProvisioner.get_yGrid();
 	index_type Np = triangleNodesProvisioner.get_NumLocalPoints();
 
-	real_matrix_type H(Np,K);
-	real_matrix_type eta(Np, K);
-	real_matrix_type h(Np, K);
-	real_matrix_type u(Np, K);
-	real_matrix_type v(Np, K);
-	real_matrix_type hu(Np, K);
-	real_matrix_type hv(Np, K);
+	real_matrix_type H(Np,K), eta(Np, K), h(Np, K), u(Np, K), v(Np, K), hu(Np, K), hv(Np, K);
 	real_matrix_type RHS1(Np, K), RHS2(Np, K), RHS3(Np, K);
 	real_matrix_type resRK1(Np, K), resRK2(Np, K), resRK3(Np, K);
+
+	unordered_set<index_type> obcNodes = {0,1,2,3,5,6,8,11,12,15,19,20,25,28,31,37,39,44,51,52,60,65,69,78,81,88,98,99,110,117,122,137,157,178,199,220,242,264,287,310,334,358,383,409,435,461,488,516,544,573,602,631,660,690,721,753,784,816,849,933,1018,1106,1193,1281,1369,1455,1538,1619,1699,1781,1813,1846,1879,1912,1946,1980,2014,2049,2084,2120,2156,2192,2228,2265,2302,2340,2374,2412,2448,2488,2526,2565,2603,2642,2682,2723,2765,2804,2845,2886,2929,2972,3014,3054,3097,3144,3190,3236,3284,3329,3376,3492,3607,3724,3835,3953,4074,4192,4321,4461,4625,4691,4759,4829,4900,4971,5039,5107,5175,5253,5319,5383,5440,5494,5562,5620,5681,5746,5904,6064,6221,6374,6541,6704,6872,7028,7186,7374,7580,7788,8009,8233,8482,8783,9138,9587,9762,9920,10068,10202,10338,10461,10582,10699,10817,10918,11015,11118,11217,11310,11564,11829,12073,12326,12584,12866,13191,13559,14017,14554,15146,15717,16037,16309,16533,16750,16878,17009,17147,17280,17554,17870,18093,18276,18471,18712,18940,19142,19294,19424,19540,19652,19740,19836,19929,20013,20111,20216,20341,20465,20605,20733,20852,20970,21066,21157,21246,21345,21469,21591,21726,21847,21952,22043,22127,22195,22257,22308,22351,22391,22429,22467,22500,22529,22557,22586,22617};
 
 	firstIndex ii;
 	secondIndex jj;
 
 	// Intialize fields.
 	H = 10.0 + 0*jj;
-	eta = 1.e-5*exp(-3.0*(x*x + y*y));
+	eta = 0*jj;
 	u = 0*jj;
 	v = 0*jj;
 	h = H + eta;
 	hu = h*u;
 	hv = h*v;
 
-	real_matrix_type Fscale = triangleNodesProvisioner.get_Fscale();
-
+	const real_matrix_type& Fscale = triangleNodesProvisioner.get_Fscale();
 	real_type Fsc_max = max(abs(Fscale));
-	const real_type dt = CFL/max((N+1)*(N+1)*0.5*Fsc_max*sqrt(g*h));
-
-	cout << "dt=" << dt << endl;
-
+		
 	RHS1 = 0*jj;
 	RHS2 = 0*jj;
 	RHS3 = 0*jj;
@@ -106,8 +103,36 @@ int main(int argc, char **argv) {
 	outputter.writeFieldToFile("x.dat", x, delim);
 	outputter.writeFieldToFile("y.dat", y, delim);
 
+	const index_vector_type& EToV = meshManager.get_Elements();
+
+	// Make copy of bcMap, for hacking it.
+    index_vector_type bcType = meshManager.get_BCType();
+
+	// deal with open boundary conditions.
+	for (index_type k=0; k < K; ++k) {
+			index_type v1 = EToV(3*k);
+			index_type v2 = EToV(3*k+1);
+			index_type v3 = EToV(3*k+2);
+
+			if (obcNodes.count(v1) > 0 && obcNodes.count(v2) > 0)
+				bcType(3*k) = 2;
+			if (obcNodes.count(v2) > 0 && obcNodes.count(v3) > 0)
+				bcType(3*k+1) = 2;
+			if (obcNodes.count(v3) > 0 && obcNodes.count(v1) > 0)
+				bcType(3*k+2) = 2;
+	}
+
+	triangleNodesProvisioner.buildBCHash(bcType);
+
+	real_type dt;
 	while (t < finalTime) {
-		if ((count % 10) == 0) {
+		real_matrix_type u(Np,K), v(Np,K);
+		u = hu/h; v = hv/h;
+		real_type spdmax = blitz::max(blitz::sqrt(u*u+v*v) + sqrt(g*h));
+		dt = CFL/((N+1)*(N+1)*0.5*Fsc_max*spdmax);
+
+		if ((count % 50) == 0) {
+			cout << "dt=" << dt << endl;
 			eta = h-H;
 			u = hu/h;
 			v = hv/h;
@@ -119,7 +144,7 @@ int main(int argc, char **argv) {
 		for (index_type i=0; i < LSERK4::numStages;  i++ ) {
 
 			// Calculate Right-hand side.
-			sw2d::computeRHS(h, hu, hv, g, triangleNodesProvisioner, RHS1, RHS2, RHS3);
+			sw2d::computeRHS(h, hu, hv, g, H, CD, f, triangleNodesProvisioner, RHS1, RHS2, RHS3, t);
 
 			// Compute Runge-Kutta Residual.
 			resRK1 = LSERK4::rk4a[i]*resRK1 + dt*RHS1;
@@ -147,7 +172,12 @@ int main(int argc, char **argv) {
 
 namespace blitzdg {
 	namespace sw2d {
-		void computeRHS(real_matrix_type h, real_matrix_type hu, real_matrix_type hv, real_type g, TriangleNodesProvisioner& triangleNodesProvisioner, real_matrix_type& RHS1, real_matrix_type& RHS2, real_matrix_type& RHS3) {
+		void computeRHS(real_matrix_type& h, real_matrix_type& hu, real_matrix_type& hv, real_type g, real_matrix_type& H, real_type CD, real_type f, TriangleNodesProvisioner& triangleNodesProvisioner, real_matrix_type& RHS1, real_matrix_type& RHS2, real_matrix_type& RHS3, real_type t) {
+
+			real_type T_tide = 3600*8; // or something?
+			real_type om_tide = 2.0*pi/T_tide;
+			real_type amp_tide = 1.0;
+
 			// Blitz indices
 			firstIndex ii;
 			secondIndex jj;
@@ -170,8 +200,9 @@ namespace blitzdg {
 			const index_vector_type& vmapP = triangleNodesProvisioner.get_vmapP();
 
 			// boundary indices.
-			const index_hashmap bcHash = triangleNodesProvisioner.get_bcMap();
-			const std::vector<index_type> mapW = bcHash.at(3);
+			const index_hashmap& bcHash = triangleNodesProvisioner.get_bcMap();
+			const std::vector<index_type>& mapW = bcHash.at(3);
+			const std::vector<index_type>& mapO = bcHash.at(2);
 
 			index_type numFaces = triangleNodesProvisioner.NumFaces;
 			index_type Nfp = triangleNodesProvisioner.get_NumFacePoints();
@@ -183,13 +214,13 @@ namespace blitzdg {
 
 			real_vector_type dh(numFaceNodes), dhu(numFaceNodes), dhv(numFaceNodes);
 
-			real_vector_type hM(numFaceNodes), hP(numFaceNodes);
+			real_vector_type hM(numFaceNodes), hP(numFaceNodes), HM(numFaceNodes), HP(numFaceNodes);
 			real_vector_type huM(numFaceNodes), huP(numFaceNodes);
 			real_vector_type hvM(numFaceNodes), hvP(numFaceNodes);
 
 			real_vector_type nxVec(numFaceNodes), nyVec(numFaceNodes);
 
-			real_vector_type hVec(numTotalNodes), huVec(numTotalNodes), hvVec(numTotalNodes);
+			real_vector_type hVec(numTotalNodes), huVec(numTotalNodes), hvVec(numTotalNodes), Hvec(numTotalNodes);
 
 			dh = 0.*ii;
 			dhu = 0.*ii;
@@ -210,6 +241,8 @@ namespace blitzdg {
 			fullToVector(hu, huVec, byRowsOpt);
 			fullToVector(hv, hvVec, byRowsOpt);
 
+			fullToVector(H, Hvec, byRowsOpt);
+
 			applyIndexMap(hVec, vmapM, hM);
 			applyIndexMap(hVec, vmapP, hP);
 
@@ -219,11 +252,22 @@ namespace blitzdg {
 			applyIndexMap(hvVec, vmapM, hvM);
 			applyIndexMap(hvVec, vmapP, hvP);
 
+			applyIndexMap(Hvec, vmapM, HM);
+			applyIndexMap(Hvec, vmapP, HP);
+
 			// BC's - no flow through walls.
 			for (index_type i=0; i < static_cast<index_type>(mapW.size()); ++i) {
 				index_type w = mapW[i];
 				huP(w) = huM(w) - 2*nxVec(w)*(huM(w)*nxVec(w) + hvM(w)*nyVec(w));
 				hvP(w) = hvM(w) - 2*nyVec(w)*(huM(w)*nxVec(w) + hvM(w)*nyVec(w));
+			}
+
+			// OBC's - free surface moves up and down according to the tidal forcing.
+			for (index_type i=0; i < static_cast<index_type>(mapO.size()); ++i) {
+				index_type o = mapO[i];
+				huP(o) = huM(o);
+				hvP(o) = hvM(o);
+				hP(o) = HM(o) + amp_tide*std::cos(om_tide*t);
 			}
 
 			// Compute jump in state vector
