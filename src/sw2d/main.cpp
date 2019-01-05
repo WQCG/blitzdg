@@ -358,6 +358,19 @@ namespace blitzdg {
 			RHS1+= sum(Lift(ii,kk)*surfaceRHS1(kk,jj), kk);
 			RHS2+= sum(Lift(ii,kk)*surfaceRHS2(kk,jj), kk);
 			RHS3+= sum(Lift(ii,kk)*surfaceRHS3(kk,jj), kk);
+
+			// Add source terms
+			real_matrix_type u(Np, K), v(Np, K); 
+			u = hu/h;
+			v = hv/h;
+
+			// bottom drag
+			RHS2+= -CD*u*blitz::abs(u);
+			RHS3+= -CD*v*blitz::abs(v);
+
+			// Coriolis force
+			RHS2+=  f*hv;
+			RHS3+= -f*hu;
 		} // computeRHS
 	} // namespace advec1d
 } // namespace blitzdg
