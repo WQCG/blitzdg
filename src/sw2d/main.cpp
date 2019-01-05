@@ -40,17 +40,20 @@ int main(int argc, char **argv) {
 
 	// Physical parameters
 	const real_type g = 9.81;
+	const real_type CD = 2.5e-3;
+	const real_type f = 1.0070e-4;
 
-	const real_type finalTime = 2.0;
+	const real_type finalTime = 24.0*3600;
 	real_type t = 0.0;
 
 	// Numerical parameters (N = Order of polynomials)
-	const index_type N = 4;
+	const index_type N = 1;
 	const real_type CFL = 0.85;
 
 	// Build dependencies.
 	MeshManager meshManager;
-	meshManager.readMesh("input/coarse_box.msh");
+	meshManager.readVertices("input/vh_verts_z.dat");
+	meshManager.readElements("input/vh_els_0.oct");
 	const index_type K = meshManager.get_NumElements();
 
 	// Dependency-inject mesh manager to nodes provisioner.
