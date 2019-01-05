@@ -71,7 +71,7 @@ int main(int argc, char **argv) {
 	const real_matrix_type& y = triangleNodesProvisioner.get_yGrid();
 	index_type Np = triangleNodesProvisioner.get_NumLocalPoints();
 
-	real_matrix_type H(Np,K), eta(Np, K), h(Np, K), u(Np, K), v(Np, K), hu(Np, K), hv(Np, K);
+	real_matrix_type H(Np,K), eta(Np, K), h(Np, K), u(Np, K), v(Np, K), hu(Np, K), hv(Np, K), Hx(Np, K), Hy(Np, K);
 	real_matrix_type RHS1(Np, K), RHS2(Np, K), RHS3(Np, K);
 	real_matrix_type resRK1(Np, K), resRK2(Np, K), resRK3(Np, K);
 
@@ -79,6 +79,7 @@ int main(int argc, char **argv) {
 
 	firstIndex ii;
 	secondIndex jj;
+	thirdIndex kk;
 
 	// Intialize fields.
 	H = 10.0 + 0*jj;
@@ -110,6 +111,18 @@ int main(int argc, char **argv) {
 
 	// Make copy of bcMap, for hacking it.
     index_vector_type bcType = meshManager.get_BCType();
+
+	// Differentiation matrices and scaling factors - for getting bed slopes.
+	const real_matrix_type& Dr = triangleNodesProvisioner.get_Dr();
+	const real_matrix_type& Ds = triangleNodesProvisioner.get_Ds();
+
+	const real_matrix_type& rx = triangleNodesProvisioner.get_rx();
+	const real_matrix_type& ry = triangleNodesProvisioner.get_ry();
+	const real_matrix_type& sx = triangleNodesProvisioner.get_sx();
+	const real_matrix_type& sy = triangleNodesProvisioner.get_sy();
+	
+	Hx = -(rx*sum(Dr(ii,kk)*H(kk,jj), kk) + sx*sum(Ds(ii,kk)*H(kk,jj), kk));
+	Hy = -(ry*sum(Dr(ii,kk)*H(kk,jj), kk) + sy*sum(Ds(ii,kk)*H(kk,jj), kk));
 
 	// deal with open boundary conditions.
 	for (index_type k=0; k < K; ++k) {
@@ -147,7 +160,7 @@ int main(int argc, char **argv) {
 		for (index_type i=0; i < LSERK4::numStages;  i++ ) {
 
 			// Calculate Right-hand side.
-			sw2d::computeRHS(h, hu, hv, g, H, CD, f, triangleNodesProvisioner, RHS1, RHS2, RHS3, t);
+			sw2d::computeRHS(h, hu, hv, g, H, Hx, Hy, CD, f, triangleNodesProvisioner, RHS1, RHS2, RHS3, t);
 
 			// Compute Runge-Kutta Residual.
 			resRK1 = LSERK4::rk4a[i]*resRK1 + dt*RHS1;
@@ -175,7 +188,7 @@ int main(int argc, char **argv) {
 
 namespace blitzdg {
 	namespace sw2d {
-		void computeRHS(real_matrix_type& h, real_matrix_type& hu, real_matrix_type& hv, real_type g, real_matrix_type& H, real_type CD, real_type f, TriangleNodesProvisioner& triangleNodesProvisioner, real_matrix_type& RHS1, real_matrix_type& RHS2, real_matrix_type& RHS3, real_type t) {
+		void computeRHS(real_matrix_type& h, real_matrix_type& hu, real_matrix_type& hv, real_type g, real_matrix_type& H, real_matrix_type& Hx, real_matrix_type& Hy, real_type CD, real_type f, TriangleNodesProvisioner& triangleNodesProvisioner, real_matrix_type& RHS1, real_matrix_type& RHS2, real_matrix_type& RHS3, real_type t) {
 
 			real_type T_tide = 3600*8; // or something?
 			real_type om_tide = 2.0*pi/T_tide;
@@ -364,9 +377,13 @@ namespace blitzdg {
 			u = hu/h;
 			v = hv/h;
 
+			// bottom topography
+			RHS2+= g*h*Hx;
+			RHS3+= g*h*Hy;
+
 			// bottom drag
-			RHS2+= -CD*u*blitz::abs(u);
-			RHS3+= -CD*v*blitz::abs(v);
+			RHS2+= -CD*u*abs(u);
+			RHS3+= -CD*v*abs(v);
 
 			// Coriolis force
 			RHS2+=  f*hv;
