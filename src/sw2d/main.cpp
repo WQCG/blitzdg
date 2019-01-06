@@ -12,6 +12,7 @@
 #include "LinAlgHelpers.hpp"
 #include "TriangleNodesProvisioner.hpp"
 #include "Constants.hpp"
+#include "CSVFileReader.hpp"
 #include <blitz/array.h>
 #include <math.h>
 #include <string>
@@ -76,17 +77,43 @@ int main(int argc, char **argv) {
 	real_matrix_type resRK1(Np, K), resRK2(Np, K), resRK3(Np, K);
 
 	unordered_set<index_type> obcNodes = {0,1,2,3,5,6,8,11,12,15,19,20,25,28,31,37,39,44,51,52,60,65,69,78,81,88,98,99,110,117,122,137,157,178,199,220,242,264,287,310,334,358,383,409,435,461,488,516,544,573,602,631,660,690,721,753,784,816,849,933,1018,1106,1193,1281,1369,1455,1538,1619,1699,1781,1813,1846,1879,1912,1946,1980,2014,2049,2084,2120,2156,2192,2228,2265,2302,2340,2374,2412,2448,2488,2526,2565,2603,2642,2682,2723,2765,2804,2845,2886,2929,2972,3014,3054,3097,3144,3190,3236,3284,3329,3376,3492,3607,3724,3835,3953,4074,4192,4321,4461,4625,4691,4759,4829,4900,4971,5039,5107,5175,5253,5319,5383,5440,5494,5562,5620,5681,5746,5904,6064,6221,6374,6541,6704,6872,7028,7186,7374,7580,7788,8009,8233,8482,8783,9138,9587,9762,9920,10068,10202,10338,10461,10582,10699,10817,10918,11015,11118,11217,11310,11564,11829,12073,12326,12584,12866,13191,13559,14017,14554,15146,15717,16037,16309,16533,16750,16878,17009,17147,17280,17554,17870,18093,18276,18471,18712,18940,19142,19294,19424,19540,19652,19740,19836,19929,20013,20111,20216,20341,20465,20605,20733,20852,20970,21066,21157,21246,21345,21469,21591,21726,21847,21952,22043,22127,22195,22257,22308,22351,22391,22429,22467,22500,22529,22557,22586,22617};
+	real_vector_type depthData(Np*K);
 
 	firstIndex ii;
 	secondIndex jj;
 	thirdIndex kk;
 
+	depthData = 0*ii;
+	H = 0*jj;
+
+	string depthFile = "input/H0_try2.oct";
+	CSVFileReader reader(depthFile);
+	string line;
+	index_type count = 0;
+	real_type val;
+	while (reader.parseRowValues(val)) {
+		depthData(count) = val;
+		++count;
+	}
+
+	count = 0;
+	for (index_type k=0; k < K; ++k) {
+		for (index_type n=0; n < Np; ++n) {
+			real_type val = depthData(count);
+
+			if (val < 5.0)
+				val = 5.0;
+
+			H(n,k) = val;
+			++count;
+		}
+	}
+
 	// Intialize fields.
-	H = 10.0 + 0*jj;
 	eta = 0*jj;
+	h = H + eta;
 	u = 0*jj;
 	v = 0*jj;
-	h = H + eta;
 	hu = h*u;
 	hv = h*v;
 
@@ -101,11 +128,12 @@ int main(int argc, char **argv) {
 	resRK2= 0*jj;
 	resRK3= 0*jj;
 
-	index_type count = 0;
+	count = 0;
 
 	const char delim = ' ';
 	outputter.writeFieldToFile("x.dat", x, delim);
 	outputter.writeFieldToFile("y.dat", y, delim);
+	outputter.writeFieldToFile("H.dat", H, delim);
 
 	const index_vector_type& EToV = meshManager.get_Elements();
 
@@ -121,8 +149,8 @@ int main(int argc, char **argv) {
 	const real_matrix_type& sx = triangleNodesProvisioner.get_sx();
 	const real_matrix_type& sy = triangleNodesProvisioner.get_sy();
 	
-	Hx = -(rx*sum(Dr(ii,kk)*H(kk,jj), kk) + sx*sum(Ds(ii,kk)*H(kk,jj), kk));
-	Hy = -(ry*sum(Dr(ii,kk)*H(kk,jj), kk) + sy*sum(Ds(ii,kk)*H(kk,jj), kk));
+	Hx = (rx*sum(Dr(ii,kk)*H(kk,jj), kk) + sx*sum(Ds(ii,kk)*H(kk,jj), kk));
+	Hy = (ry*sum(Dr(ii,kk)*H(kk,jj), kk) + sy*sum(Ds(ii,kk)*H(kk,jj), kk));
 
 	// deal with open boundary conditions.
 	for (index_type k=0; k < K; ++k) {
@@ -144,15 +172,12 @@ int main(int argc, char **argv) {
 	while (t < finalTime) {
 		real_matrix_type u(Np,K), v(Np,K);
 		u = hu/h; v = hv/h;
-		real_type spdmax = blitz::max(blitz::sqrt(u*u+v*v) + sqrt(g*h));
+		real_type spdmax = blitz::max(blitz::sqrt(u*u+v*v) + blitz::sqrt(g*h));
 		dt = CFL/((N+1)*(N+1)*0.5*Fsc_max*spdmax);
 
-		if ((count % 50) == 0) {
+		if ((count % 200) == 0) {
 			cout << "dt=" << dt << endl;
-			eta = h-H;
-			u = hu/h;
-			v = hv/h;
-			cout << "t=" << t << ", eta_max=" << max(eta) << endl;
+			cout << "t=" << t << ", h_max=" << normMax(h) << ", hu_max=" << normMax(hu) << ", hv_max=" << normMax(hv) << endl;
 			string fileName = outputter.generateFileName("eta", count);
 			outputter.writeFieldToFile(fileName, eta, delim);
 		}	
@@ -173,6 +198,7 @@ int main(int argc, char **argv) {
 			hv += LSERK4::rk4b[i]*resRK3;
 		}
 
+		eta = h-H;
 		real_type eta_max = normMax(eta);
 		if ( std::abs(eta_max) > 1e8  || std::isnan(eta_max) )
 			throw std::runtime_error("A numerical instability has occurred!");
@@ -190,9 +216,9 @@ namespace blitzdg {
 	namespace sw2d {
 		void computeRHS(real_matrix_type& h, real_matrix_type& hu, real_matrix_type& hv, real_type g, real_matrix_type& H, real_matrix_type& Hx, real_matrix_type& Hy, real_type CD, real_type f, TriangleNodesProvisioner& triangleNodesProvisioner, real_matrix_type& RHS1, real_matrix_type& RHS2, real_matrix_type& RHS3, real_type t) {
 
-			real_type T_tide = 3600*8; // or something?
+			real_type T_tide = 3600*12.42; // or something?
 			real_type om_tide = 2.0*pi/T_tide;
-			real_type amp_tide = 1.0;
+			real_type amp_tide = 3.0; // 3.
 
 			// Blitz indices
 			firstIndex ii;
@@ -283,7 +309,7 @@ namespace blitzdg {
 				index_type o = mapO[i];
 				huP(o) = huM(o);
 				hvP(o) = hvM(o);
-				hP(o) = HM(o) + amp_tide*std::cos(om_tide*t);
+				hP(o) = HM(o) + amp_tide*std::cos(om_tide*t)*0.5*(std::tanh(0.15/3600*(t-T_tide))+1);
 			}
 
 			// Compute jump in state vector
@@ -382,8 +408,10 @@ namespace blitzdg {
 			RHS3+= g*h*Hy;
 
 			// bottom drag
-			RHS2+= -CD*u*abs(u);
-			RHS3+= -CD*v*abs(v);
+			real_matrix_type norm_u(Np,K);
+			norm_u = blitz::sqrt(u*u + v*v);
+			RHS2+= -CD*u*norm_u;
+			RHS3+= -CD*v*norm_u;
 
 			// Coriolis force
 			RHS2+=  f*hv;
