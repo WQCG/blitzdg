@@ -237,15 +237,15 @@ namespace blitzdg {
 
         blitz::firstIndex ii;
         BCTable = 0*ii;
-        for (index_type k=0; k < NumElements; ++k) {
-            for (index_type f=0; f < 3; ++f) {
-                index_type k2 = E2E(k*NumFaces + f);
+        //k2 == k you could use k2 == k / NumFaces, where k now ranges over 0,...,NumFaces*NumElements-1
+        for (index_type f=0; f < NumFaces*NumElements; ++f) {
+            index_type k2 = E2E(f);
 
-                // self-referencing elements are boundary elements.
-                if (k2 == k)
-                    BCTable(3*k + f) = tagNumber;
-            }
+            // self-referencing elements are boundary elements.
+            if (k2 == (f / NumFaces))
+                BCTable(f) = tagNumber;
         }
+        
     }
 
     void MeshManager::buildBCTable(std::vector<std::vector<index_type>>& edges) {
@@ -256,16 +256,16 @@ namespace blitzdg {
         blitz::firstIndex ii;
         BCTable = 0*ii;
         for (index_type k=0; k < NumElements; ++k) {
-            for (index_type f=0; f < 3; ++f) {
+            for (index_type f=0; f < NumFaces; ++f) {
 
-                index_type v1 = E2V(k*3 + f);
-                index_type v2 = E2V(k*3 + ((f + 1) % 3));
+                index_type v1 = E2V(k*NumFaces + f);
+                index_type v2 = E2V(k*NumFaces + ((f + 1) % NumFaces));
 
-                real_type v1x = V(v1*3);
-                real_type v1y = V(v1*3 + 1);
+                real_type v1x = V(v1*NumFaces);
+                real_type v1y = V(v1*NumFaces + 1);
 
-                real_type v2x = V(v2*3);
-                real_type v2y = V(v2*3 + 1);
+                real_type v2x = V(v2*NumFaces);
+                real_type v2y = V(v2*NumFaces + 1);
 
                 real_type midx = 0.5*(v1x + v2x);
                 real_type midy = 0.5*(v1y + v2y);
@@ -286,13 +286,13 @@ namespace blitzdg {
                         bcType = 3;
                     }
 
-                    real_type x1 = V(n1*3), y1 = V(n1*3+1);
-                    real_type x2 = V(n2*3), y2 = V(n2*3+1);
+                    real_type x1 = V(n1*NumFaces), y1 = V(n1*NumFaces+1);
+                    real_type x2 = V(n2*NumFaces), y2 = V(n2*NumFaces+1);
 
                     // Eqn of line: y - y0 = (y2-y1)/(x2-x1)*(x-x0)
                     // => (midy-y2)*(x2-x1) - (y2-y1)(midx-x2) = 0
                     if (std::abs((y2-midy)*(x2-x1) - (y2-y1)*(x2-midx)) < NodeTol) {
-                        BCTable(3*k + f) = bcType;
+                        BCTable(NumFaces*k + f) = bcType;
                         break;
                     }
                 }
@@ -471,8 +471,12 @@ namespace blitzdg {
         BCType = index_vec_smart_ptr(new index_vector_type(NumElements*NumFaces));
         EToE = index_vec_smart_ptr(new index_vector_type(NumElements*NumFaces));
         EToF = index_vec_smart_ptr(new index_vector_type(NumElements*NumFaces));
-        buildConnectivity();
-        buildBCTable(3);
+
+        // Below is only working for triangles at the moment.
+        if (NumFaces == 3) {
+            buildConnectivity();
+            buildBCTable(3);
+        }
     }
 
     void MeshManager::printVertices() const {
