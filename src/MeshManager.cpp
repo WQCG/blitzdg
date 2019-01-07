@@ -5,6 +5,7 @@
 #include "CSVFileReader.hpp"
 #include "Types.hpp"
 #include "CSCMatrix.hpp"
+#include "BCtypes.hpp"
 #include <boost/algorithm/string.hpp>
 #include <metis.h>
 #include <cmath>
@@ -105,7 +106,8 @@ namespace blitzdg {
         csvReader.setNumCols(4);
 
         // Allocate storage for Vertices.
-        Vert = real_vec_smart_ptr(new real_vector_type(NumVerts*3));
+        index_type Dim = 3;
+        Vert = real_vec_smart_ptr(new real_vector_type(NumVerts*Dim));
 
         real_vector_type& Vref = *Vert;
 
@@ -116,9 +118,9 @@ namespace blitzdg {
             real_type vx, vy, vz;
 
             csvReader.parseRowValues(nodeNum, vx, vy, vz);
-            Vref((nodeNum-1)*3)   = vx;
-            Vref((nodeNum-1)*3+1) = vy;
-            Vref((nodeNum-1)*3+2) = vz;
+            Vref((nodeNum-1)*Dim)   = vx;
+            Vref((nodeNum-1)*Dim+1) = vy;
+            Vref((nodeNum-1)*Dim+2) = vz;
         }
 
         // This should skip the '$EndNodes' line.
@@ -192,8 +194,6 @@ namespace blitzdg {
         lines.shrink_to_fit();
         tris.shrink_to_fit();
 
-        NumFaces = 3;
-
         // Allocate storage EToV and BC Table.
         // Note: we are doing this here as opposed to in the initializer list,
         // since prior to this point we did not know how many elements there are.
@@ -206,6 +206,7 @@ namespace blitzdg {
         index_vector_type& E2V = *EToV;
 
         NumElements = K;
+        NumFaces = 3; // hard-code for now.
         for (index_type k=0; k < K; ++k) {
             // Subtract one to go from 1-based (Gmsh) to 0-based (us).
             E2V(NumFaces*k)   = tris[k][5] - 1;
@@ -283,7 +284,7 @@ namespace blitzdg {
                     index_type bcType = edges[edge][3];
                     // Assign default to something non-zero. 3 -> Wall, in the parlance of NUDG.
                     if (bcType == 0) {
-                        bcType = 3;
+                        bcType = BCTag::Wall;
                     }
 
                     real_type x1 = V(n1*NumFaces), y1 = V(n1*NumFaces+1);
@@ -475,7 +476,7 @@ namespace blitzdg {
         // Below is only working for triangles at the moment.
         if (NumFaces == 3) {
             buildConnectivity();
-            buildBCTable(3);
+            buildBCTable(BCTag::Wall);
         }
     }
 

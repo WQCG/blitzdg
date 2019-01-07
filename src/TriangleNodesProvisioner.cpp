@@ -22,6 +22,7 @@ using std::numeric_limits;
 using std::unique_ptr;
 using std::abs;
 using std::sqrt;
+using std::log;
 using std::vector;
 
 namespace blitzdg {
@@ -41,7 +42,7 @@ namespace blitzdg {
         Dr{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
         Ds{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
         Lift{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder+1)*NumFaces) },
-        J{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements()) },
+        J{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements(), ColumnMajorOrder()) },
         rx{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements()) },
         sx{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements()) },
         ry{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements()) },
@@ -49,8 +50,9 @@ namespace blitzdg {
         nx{ new real_matrix_type((_NOrder+1)*NumFaces, _MeshManager.get_NumElements()) },
         ny{ new real_matrix_type((_NOrder+1)*NumFaces, _MeshManager.get_NumElements()) },
         Vinv{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
+        Filter{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
         Fmask{ new index_matrix_type( _NOrder+1, NumFaces, ColumnMajorOrder()) },
-        Fscale{ new real_matrix_type((_NOrder+1)*NumFaces, _MeshManager.get_NumElements()) },
+        Fscale{ new real_matrix_type((_NOrder+1)*NumFaces, _MeshManager.get_NumElements(), ColumnMajorOrder()) },
         vmapM{ new index_vector_type((_NOrder+1)*NumFaces*_MeshManager.get_NumElements()) },
         vmapP{ new index_vector_type((_NOrder+1)*NumFaces*_MeshManager.get_NumElements()) },
         mapP{ new index_vector_type((_NOrder+1)*NumFaces*_MeshManager.get_NumElements()) },
@@ -178,6 +180,27 @@ namespace blitzdg {
         // Take transpose.
         Dr = Drtrans(jj, ii); 
         Ds = Dstrans(jj, ii);
+    }
+
+    void TriangleNodesProvisioner::buildFilter(index_type Nc) {
+        real_type alpha = -std::log(1.e-15);
+
+        real_matrix_type F = *Filter;   
+
+        /*
+        // build exponential filter
+        index_type count = 0;
+        for (index_type i=0; i <= NOrder; ++i) {
+            for (index_type j=0; j <= Norder-i; ++j) {
+            if ( i+j >= Nc) {
+                filterdiag(sk) = exp(-alpha*((i+j - Nc)/(Norder-Nc))^sp);
+            }
+            ++count;
+        end
+        }
+        F = V*diag(filterdiag)*invV;
+
+        */
     }
 
     void TriangleNodesProvisioner::computeEquilateralNodes(real_vector_type & x, real_vector_type & y) const {
@@ -476,7 +499,7 @@ namespace blitzdg {
         // build normals.
         real_matrix_type& n_x = *nx, n_y = *ny;
 
-        real_matrix_type norm(numLocalFaceNodes, NumElements);
+        real_matrix_type norm(numLocalFaceNodes, NumElements, ColumnMajorOrder());
 
         index_vector_type fid1(NumFacePoints), fid2(NumFacePoints), fid3(NumFacePoints);
 

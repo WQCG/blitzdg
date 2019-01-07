@@ -48,6 +48,7 @@ namespace blitzdg {
       real_mat_smart_ptr nx;
       real_mat_smart_ptr ny;
       real_mat_smart_ptr Vinv;
+      real_mat_smart_ptr Filter;
 
       index_mat_smart_ptr Fmask;
       real_mat_smart_ptr Fx;
@@ -222,6 +223,11 @@ namespace blitzdg {
       const real_matrix_type & get_Vinv() const;
 
       /**
+       * Returns a refernece to an exponential cutoff filter built with buildFilter().
+       */
+      const real_matrix_type & get_Filter() const;
+
+      /**
        * Returns a reference to the Jacobian scaling matrix.
        */
       const real_matrix_type & get_J() const;
@@ -343,6 +349,11 @@ namespace blitzdg {
        *  input BCType table.
        */
       void buildBCHash(const index_vector_type& bcType);
+
+      /**
+       * Build exponential cut-off filter, where cut-off order is specified by Nc.
+       */
+      void buildFilter(index_type Nc);
 
       /**
        * Returns the number of nodes local to a 2D triangular element.
