@@ -223,7 +223,7 @@ namespace blitzdg {
       const real_matrix_type & get_Vinv() const;
 
       /**
-       * Returns a refernece to an exponential cutoff filter built with buildFilter().
+       * Returns a reference to an exponential cutoff filter built with buildFilter().
        */
       const real_matrix_type & get_Filter() const;
 
@@ -351,9 +351,10 @@ namespace blitzdg {
       void buildBCHash(const index_vector_type& bcType);
 
       /**
-       * Build exponential cut-off filter, where cut-off order is specified by Nc.
+       * Build exponential cut-off filter, where cut-off order is specified by Nc, and 
+       * exponential power is determined by s.
        */
-      void buildFilter(index_type Nc);
+      void buildFilter(index_type Nc, index_type s);
 
       /**
        * Returns the number of nodes local to a 2D triangular element.

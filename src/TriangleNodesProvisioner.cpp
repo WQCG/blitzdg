@@ -24,6 +24,8 @@ using std::abs;
 using std::sqrt;
 using std::log;
 using std::vector;
+using std::pow;
+using std::exp;
 
 namespace blitzdg {
     const index_type TriangleNodesProvisioner::NumFaces = 3;
@@ -182,25 +184,31 @@ namespace blitzdg {
         Ds = Dstrans(jj, ii);
     }
 
-    void TriangleNodesProvisioner::buildFilter(index_type Nc) {
+    void TriangleNodesProvisioner::buildFilter(index_type Nc, index_type s) {
+        secondIndex jj;
         real_type alpha = -std::log(1.e-15);
 
-        real_matrix_type F = *Filter;   
+        real_matrix_type& F = *Filter;
+        real_matrix_type& Vref = *V;
+        real_matrix_type& Vinvref = *Vinv;
 
-        /*
+        real_matrix_type Fdiag(NumLocalPoints, NumLocalPoints);
+        Fdiag = 0.0*jj; 
+
         // build exponential filter
         index_type count = 0;
         for (index_type i=0; i <= NOrder; ++i) {
-            for (index_type j=0; j <= Norder-i; ++j) {
-            if ( i+j >= Nc) {
-                filterdiag(sk) = exp(-alpha*((i+j - Nc)/(Norder-Nc))^sp);
+            for (index_type j=0; j <= NOrder-i; ++j) {
+                if ( i+j >= Nc) {
+                    Fdiag(count, count) = std::exp(-alpha*std::pow((i+j - Nc)/(NOrder-Nc),s));
+                } else {
+                    Fdiag(count, count) = 1.0;
+                }
+                ++count;
             }
-            ++count;
-        end
         }
-        F = V*diag(filterdiag)*invV;
+        F = Vref*Fdiag*Vinvref;
 
-        */
     }
 
     void TriangleNodesProvisioner::computeEquilateralNodes(real_vector_type & x, real_vector_type & y) const {
