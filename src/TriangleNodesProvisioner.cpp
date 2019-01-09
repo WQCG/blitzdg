@@ -834,7 +834,9 @@ namespace blitzdg {
     const index_vector_type& TriangleNodesProvisioner::get_mapB() const {
         return *mapB;
     }
-
+    const real_matrix_type& TriangleNodesProvisioner::get_Filter() const{
+        return *Filter;
+    }
     const index_hashmap& TriangleNodesProvisioner::get_bcMap() const {
         return *BCmap;
     }

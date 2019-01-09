@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
 
 	// Numerical parameters (N = Order of polynomials)
 	const index_type N = 1;
-	const real_type CFL = 0.85;
+	const real_type CFL = 0.55;
 
 	// Build dependencies.
 	MeshManager meshManager;
@@ -67,6 +67,9 @@ int main(int argc, char **argv) {
 	triangleNodesProvisioner.buildLift();
 	triangleNodesProvisioner.buildPhysicalGrid();
 	triangleNodesProvisioner.buildMaps();
+	//triangleNodesProvisioner.buildFilter(1, 4);
+	
+	const real_matrix_type& Filt = triangleNodesProvisioner.get_Filter();
 
 	CsvOutputter outputter;
 
@@ -75,6 +78,7 @@ int main(int argc, char **argv) {
 	index_type Np = triangleNodesProvisioner.get_NumLocalPoints();
 
 	real_matrix_type H(Np,K), eta(Np, K), h(Np, K), u(Np, K), v(Np, K), hu(Np, K), hv(Np, K), Hx(Np, K), Hy(Np, K);
+	real_matrix_type h1(Np,K), hu1(Np,K), hv1(Np,K);
 	real_matrix_type RHS1(Np, K), RHS2(Np, K), RHS3(Np, K);
 	real_matrix_type resRK1(Np, K), resRK2(Np, K), resRK3(Np, K);
 
@@ -103,8 +107,8 @@ int main(int argc, char **argv) {
 		for (index_type n=0; n < Np; ++n) {
 			real_type val = depthData(count);
 
-			if (val < 5.0)
-				val = 5.0;
+			if (val < 250.0)
+				val = 250.0;
 
 			H(n,k) = val;
 			++count;
@@ -190,7 +194,7 @@ int main(int argc, char **argv) {
 
 	// sponge layer -- build that wall!
 	real_type radInfl = 10000.0;
-	real_type spongeStrength = 1.0;
+	real_type spongeStrength = 100.0;
 	real_matrix_type spongeCoeff(Np, K);
 	spongeCoeff = 0.0*jj;
 
@@ -215,8 +219,6 @@ int main(int argc, char **argv) {
 	}
 
 	outputter.writeFieldToFile("sponge.dat", spongeCoeff, delim);
-	return 0;
-
 
 	real_type dt;
 	while (t < finalTime) {
@@ -232,6 +234,23 @@ int main(int argc, char **argv) {
 			outputter.writeFieldToFile(fileName, eta, delim);
 		}	
 
+		// 2nd order SSP Runge-Kutta
+		sw2d::computeRHS(h, hu, hv, g, H, Hx, Hy, CD, f, triangleNodesProvisioner, RHS1, RHS2, RHS3, t);
+		// Update solution.
+		h1  = h + dt*RHS1;
+		hu1 = hu + dt*RHS2;
+		hv1 = hv + dt*RHS3;
+
+
+		sw2d::computeRHS(h1, hu1, hv1, g, H, Hx, Hy, CD, f, triangleNodesProvisioner, RHS1, RHS2, RHS3, t);
+		h  = 0.5*(h  + h1  + dt*RHS1);
+		hu = 0.5*(hu + hu1 + dt*RHS2);
+		hv = 0.5*(hv + hv1 + dt*RHS3);
+
+		// sponge layer relaxation -- to control insane velocities near the open boundary.
+		hu /= (1.0 + spongeCoeff*hu*hu);
+		hv /= (1.0 + spongeCoeff*hv*hv);
+	/*
 		for (index_type i=0; i < LSERK4::numStages;  i++ ) {
 
 			// Calculate Right-hand side.
@@ -250,7 +269,11 @@ int main(int argc, char **argv) {
 			// sponge layer relaxation -- to control insane velocities near the open boundary.
 			hu /= (1.0 + spongeCoeff*hu*hu);
 			hv /= (1.0 + spongeCoeff*hv*hv);
-		}
+
+			// h  = sum(Filt(ii,kk)*h(kk,jj), kk);
+			// hu = sum(Filt(ii,kk)*hu(kk,jj), kk);
+			// hv = sum(Filt(ii,kk)*hv(kk,jj), kk); 
+		} */
 
 		eta = h-H;
 		real_type eta_max = normMax(eta);
