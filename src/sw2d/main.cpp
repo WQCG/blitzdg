@@ -13,6 +13,7 @@
 #include "TriangleNodesProvisioner.hpp"
 #include "Constants.hpp"
 #include "CSVFileReader.hpp"
+#include "BCtypes.hpp"
 #include <blitz/array.h>
 #include <math.h>
 #include <string>
@@ -33,6 +34,7 @@ using std::sqrt;
 using std::max;
 using std::unordered_set;
 using std::cos;
+using std::hypot;
 
 int main(int argc, char **argv) {
 	using namespace blitzdg;
@@ -159,14 +161,62 @@ int main(int argc, char **argv) {
 			index_type v3 = EToV(3*k+2);
 
 			if (obcNodes.count(v1) > 0 && obcNodes.count(v2) > 0)
-				bcType(3*k) = 2;
+				bcType(3*k) = BCTag::Out;
 			if (obcNodes.count(v2) > 0 && obcNodes.count(v3) > 0)
-				bcType(3*k+1) = 2;
+				bcType(3*k+1) = BCTag::Out;
 			if (obcNodes.count(v3) > 0 && obcNodes.count(v1) > 0)
-				bcType(3*k+2) = 2;
+				bcType(3*k+2) = BCTag::Out;
 	}
 
 	triangleNodesProvisioner.buildBCHash(bcType);
+
+	// set up sponge region.
+	const index_hashmap& bcHash = triangleNodesProvisioner.get_bcMap();
+	const std::vector<index_type>& mapO = bcHash.at(BCTag::Out);
+	index_type outLength = static_cast<index_type>(mapO.size());
+
+	index_vector_type vmapO(outLength);
+	const index_vector_type& vmapM = triangleNodesProvisioner.get_vmapM();
+
+	index_type numFaces = triangleNodesProvisioner.NumFaces;
+	index_type Nfp = triangleNodesProvisioner.get_NumFacePoints();
+	index_type numFaceNodes = numFaces*Nfp*K;
+
+	real_vector_type xVec(numFaceNodes), yVec(numFaceNodes);
+
+	const bool byRowsOpt = false;
+	fullToVector(x, xVec, byRowsOpt);
+	fullToVector(y, yVec, byRowsOpt);
+
+	// sponge layer -- build that wall!
+	real_type radInfl = 10000.0;
+	real_type spongeStrength = 1.0;
+	real_matrix_type spongeCoeff(Np, K);
+	spongeCoeff = 0.0*jj;
+
+	for(index_type k=0; k < K; ++k) {
+		for(index_type n=0; n < Np; ++n) {
+			
+			real_type x0 = x(n,k), y0 = y(n,k);
+			real_type closestDist = 1.0e12;
+
+			for (index_type i=0; i < outLength; ++i) {
+				index_type o = vmapM(mapO[i]);
+				real_type dist = std::hypot(x0-xVec(o), y0-yVec(o));
+				if ( dist < radInfl && dist < closestDist )
+					closestDist = dist;				
+			}
+
+			if (closestDist < 1.0e12) {
+				real_type c_sponge = spongeStrength*(1.0-(closestDist/radInfl));
+				spongeCoeff(n, k) = c_sponge;
+			}
+		}
+	}
+
+	outputter.writeFieldToFile("sponge.dat", spongeCoeff, delim);
+	return 0;
+
 
 	real_type dt;
 	while (t < finalTime) {
@@ -196,6 +246,10 @@ int main(int argc, char **argv) {
 			h  += LSERK4::rk4b[i]*resRK1;
 			hu += LSERK4::rk4b[i]*resRK2;
 			hv += LSERK4::rk4b[i]*resRK3;
+
+			// sponge layer relaxation -- to control insane velocities near the open boundary.
+			hu /= (1.0 + spongeCoeff*hu*hu);
+			hv /= (1.0 + spongeCoeff*hv*hv);
 		}
 
 		eta = h-H;
@@ -243,8 +297,8 @@ namespace blitzdg {
 
 			// boundary indices.
 			const index_hashmap& bcHash = triangleNodesProvisioner.get_bcMap();
-			const std::vector<index_type>& mapW = bcHash.at(3);
-			const std::vector<index_type>& mapO = bcHash.at(2);
+			const std::vector<index_type>& mapW = bcHash.at(BCTag::Wall);
+			const std::vector<index_type>& mapO = bcHash.at(BCTag::Out);
 
 			index_type numFaces = triangleNodesProvisioner.NumFaces;
 			index_type Nfp = triangleNodesProvisioner.get_NumFacePoints();
