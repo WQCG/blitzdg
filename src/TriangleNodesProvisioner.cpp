@@ -193,7 +193,7 @@ namespace blitzdg {
         real_matrix_type& Vinvref = *Vinv;
 
         real_matrix_type Fdiag(NumLocalPoints, NumLocalPoints);
-        Fdiag = 0.0*jj; 
+        Fdiag = 0.0*jj + 1.0;
 
         // build exponential filter
         index_type count = 0;
@@ -201,14 +201,11 @@ namespace blitzdg {
             for (index_type j=0; j <= NOrder-i; ++j) {
                 if ( i+j >= Nc) {
                     Fdiag(count, count) = std::exp(-alpha*std::pow((i+j - Nc)/(NOrder-Nc),s));
-                } else {
-                    Fdiag(count, count) = 1.0;
-                }
+                } 
                 ++count;
             }
         }
         F = Vref*Fdiag*Vinvref;
-
     }
 
     void TriangleNodesProvisioner::computeEquilateralNodes(real_vector_type & x, real_vector_type & y) const {
