@@ -185,7 +185,10 @@ namespace blitzdg {
     }
 
     void TriangleNodesProvisioner::buildFilter(index_type Nc, index_type s) {
+        firstIndex ii;
         secondIndex jj;
+        thirdIndex kk;
+
         real_type alpha = -std::log(1.e-15);
 
         real_matrix_type& F = *Filter;
@@ -193,7 +196,7 @@ namespace blitzdg {
         real_matrix_type& Vinvref = *Vinv;
 
         real_matrix_type Fdiag(NumLocalPoints, NumLocalPoints);
-        Fdiag = 0.0*jj + 1.0;
+        Fdiag = 0.0*jj;
 
         // build exponential filter
         index_type count = 0;
@@ -201,11 +204,14 @@ namespace blitzdg {
             for (index_type j=0; j <= NOrder-i; ++j) {
                 if ( i+j >= Nc) {
                     Fdiag(count, count) = std::exp(-alpha*std::pow((i+j - Nc)/(NOrder-Nc),s));
-                } 
+                } else {
+                    Fdiag(count, count) = 1.0;
+                }
                 ++count;
             }
         }
-        F = Vref*Fdiag*Vinvref;
+        F = sum(Fdiag(ii,kk)*Vinvref(kk,jj), kk);
+        F = sum(Vref(ii,kk)*F(kk,jj), kk);
     }
 
     void TriangleNodesProvisioner::computeEquilateralNodes(real_vector_type & x, real_vector_type & y) const {

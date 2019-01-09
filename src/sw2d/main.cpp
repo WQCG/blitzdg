@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
 	triangleNodesProvisioner.buildLift();
 	triangleNodesProvisioner.buildPhysicalGrid();
 	triangleNodesProvisioner.buildMaps();
-	//triangleNodesProvisioner.buildFilter(1, 4);
+	triangleNodesProvisioner.buildFilter(1, 4);
 	
 	const real_matrix_type& Filt = triangleNodesProvisioner.get_Filter();
 
