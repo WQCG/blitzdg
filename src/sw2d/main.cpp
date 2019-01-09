@@ -118,7 +118,6 @@ int main(int argc, char **argv) {
 	hv = h*v;
 
 	const real_matrix_type& Fscale = triangleNodesProvisioner.get_Fscale();
-	real_type Fsc_max = max(abs(Fscale));
 		
 	RHS1 = 0*jj;
 	RHS2 = 0*jj;
@@ -133,6 +132,7 @@ int main(int argc, char **argv) {
 	const char delim = ' ';
 	outputter.writeFieldToFile("x.dat", x, delim);
 	outputter.writeFieldToFile("y.dat", y, delim);
+
 	outputter.writeFieldToFile("H.dat", H, delim);
 
 	const index_vector_type& EToV = meshManager.get_Elements();
@@ -172,12 +172,12 @@ int main(int argc, char **argv) {
 	while (t < finalTime) {
 		real_matrix_type u(Np,K), v(Np,K);
 		u = hu/h; v = hv/h;
-		real_type spdmax = blitz::max(blitz::sqrt(u*u+v*v) + blitz::sqrt(g*h));
-		dt = CFL/((N+1)*(N+1)*0.5*Fsc_max*spdmax);
+		real_type spdFscaleMax = blitz::max((blitz::sqrt(u*u+v*v) + blitz::sqrt(g*h))*Fscale);
+		dt = CFL/((N+1)*(N+1)*0.5*spdFscaleMax);
 
-		if ((count % 200) == 0) {
+		if ((count % 20) == 0) {
 			cout << "dt=" << dt << endl;
-			cout << "t=" << t << ", h_max=" << normMax(h) << ", hu_max=" << normMax(hu) << ", hv_max=" << normMax(hv) << endl;
+			cout << "t=" << t << ", h_min=" << blitz::min(h) << ", h_max=" << normMax(h) << ", hu_max=" << normMax(hu) << ", hv_max=" << normMax(hv) << endl;
 			string fileName = outputter.generateFileName("eta", count);
 			outputter.writeFieldToFile(fileName, eta, delim);
 		}	
@@ -312,6 +312,21 @@ namespace blitzdg {
 				hP(o) = HM(o) + amp_tide*std::cos(om_tide*t)*0.5*(std::tanh(0.15/3600*(t-T_tide))+1);
 			}
 
+			// well-balancing scheme (star variables).
+			real_vector_type hMstar(numFaceNodes), hPstar(numFaceNodes),
+				bM(numFaceNodes), bP(numFaceNodes);
+
+			bM = -HM; bP = -HP;
+
+			for (index_type i=0; i < numFaceNodes; ++i) {
+				hMstar(i) = std::max(0.0, hM(i) + bM(i) - std::max(bP(i), bM(i)));
+				hPstar(i) = std::max(0.0, hP(i) + bP(i) - std::max(bP(i), bM(i)));
+			}
+
+			hM = hMstar; hP = hPstar;
+			huM = hMstar*(huM/hM); huP = hPstar*(huP/hP);
+			hvM = hMstar*(hvM/hM); hvP = hPstar*(hvP/hP);
+
 			// Compute jump in state vector
 			dh = hM - hP;
 			dhu = huM - huP;
@@ -359,8 +374,8 @@ namespace blitzdg {
 
 			// strong form: Compute flux jump vector. (fluxM - numericalFlux ) dot n
 			dFlux1 = 0.5*((F1M - F1P)*nxVec + (G1M-G1P)*nyVec - spdMax*dh);
-			dFlux2 = 0.5*((F2M - F2P)*nxVec + (G2M-G2P)*nyVec - spdMax*dhu);
-			dFlux3 = 0.5*((F3M - F3P)*nxVec + (G2M-G2P)*nyVec - spdMax*dhv);
+			dFlux2 = 0.5*((F2M - F2P)*nxVec + (G2M-G2P)*nyVec - spdMax*dhu - (0.5*g*hM*hM - 0.5*g*hMstar*hMstar)*nxVec);
+			dFlux3 = 0.5*((F3M - F3P)*nxVec + (G2M-G2P)*nyVec - spdMax*dhv - (0.5*g*hM*hM - 0.5*g*hMstar*hMstar)*nyVec);
 
 			real_matrix_type dFlux1Mat(Nfp*numFaces, K), dFlux2Mat(Nfp*numFaces, K), dFlux3Mat(Nfp*numFaces, K);
 
