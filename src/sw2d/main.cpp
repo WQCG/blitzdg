@@ -14,6 +14,7 @@
 #include "Constants.hpp"
 #include "CSVFileReader.hpp"
 #include "BCtypes.hpp"
+#include "VtkOutputter.hpp"
 #include <blitz/array.h>
 #include <math.h>
 #include <string>
@@ -67,7 +68,9 @@ int main(int argc, char **argv) {
 	triangleNodesProvisioner.buildLift();
 	triangleNodesProvisioner.buildPhysicalGrid();
 	triangleNodesProvisioner.buildMaps();
-	triangleNodesProvisioner.buildFilter(1, 4);
+	triangleNodesProvisioner.buildFilter(0.95*N, 4);
+
+	VtkOutputter vtkOutputter(triangleNodesProvisioner);
 	
 	const real_matrix_type& Filt = triangleNodesProvisioner.get_Filter();
 
@@ -107,15 +110,23 @@ int main(int argc, char **argv) {
 		for (index_type n=0; n < Np; ++n) {
 			real_type val = depthData(count);
 
-			if (val < 250.0)
-				val = 250.0;
+			if (val < 300.0)
+				val = 300.0;
 
 			H(n,k) = val;
 			++count;
 		}
 	}
 
+
+	string vtkFileName = vtkOutputter.generateFileName("H", 0);
+
+	vtkOutputter.writeFieldToFile(vtkFileName, H);
+
+	return 0;
+
 	// Intialize fields.
+	// H = 0*jj + 300.0;
 	eta = 0*jj;
 	h = H + eta;
 	u = 0*jj;
@@ -227,7 +238,7 @@ int main(int argc, char **argv) {
 		real_type spdFscaleMax = blitz::max((blitz::sqrt(u*u+v*v) + blitz::sqrt(g*h))*Fscale);
 		dt = CFL/((N+1)*(N+1)*0.5*spdFscaleMax);
 
-		if ((count % 20) == 0) {
+		if ((count % outputInterval) == 0) {
 			cout << "dt=" << dt << endl;
 			cout << "t=" << t << ", h_min=" << blitz::min(h) << ", h_max=" << normMax(h) << ", hu_max=" << normMax(hu) << ", hv_max=" << normMax(hv) << endl;
 			string fileName = outputter.generateFileName("eta", count);
@@ -235,14 +246,18 @@ int main(int argc, char **argv) {
 		}	
 
 		// 2nd order SSP Runge-Kutta
-		sw2d::computeRHS(h, hu, hv, g, H, Hx, Hy, CD, f, triangleNodesProvisioner, RHS1, RHS2, RHS3, t);
+		sw2d::computeRHS(h, hu, hv, g, H, Hx, Hy, CD, f, triangleNodesProvisioner, RHS1, RHS2, RHS3, t, Filt);
+
 		// Update solution.
 		h1  = h + dt*RHS1;
 		hu1 = hu + dt*RHS2;
 		hv1 = hv + dt*RHS3;
 
+		hu /= (1.0 + spongeCoeff*hu*hu);
+		hv /= (1.0 + spongeCoeff*hv*hv);
 
-		sw2d::computeRHS(h1, hu1, hv1, g, H, Hx, Hy, CD, f, triangleNodesProvisioner, RHS1, RHS2, RHS3, t);
+		sw2d::computeRHS(h1, hu1, hv1, g, H, Hx, Hy, CD, f, triangleNodesProvisioner, RHS1, RHS2, RHS3, t, Filt);
+
 		h  = 0.5*(h  + h1  + dt*RHS1);
 		hu = 0.5*(hu + hu1 + dt*RHS2);
 		hv = 0.5*(hv + hv1 + dt*RHS3);
@@ -250,30 +265,6 @@ int main(int argc, char **argv) {
 		// sponge layer relaxation -- to control insane velocities near the open boundary.
 		hu /= (1.0 + spongeCoeff*hu*hu);
 		hv /= (1.0 + spongeCoeff*hv*hv);
-	/*
-		for (index_type i=0; i < LSERK4::numStages;  i++ ) {
-
-			// Calculate Right-hand side.
-			sw2d::computeRHS(h, hu, hv, g, H, Hx, Hy, CD, f, triangleNodesProvisioner, RHS1, RHS2, RHS3, t);
-
-			// Compute Runge-Kutta Residual.
-			resRK1 = LSERK4::rk4a[i]*resRK1 + dt*RHS1;
-			resRK2 = LSERK4::rk4a[i]*resRK2 + dt*RHS2;
-			resRK3 = LSERK4::rk4a[i]*resRK3 + dt*RHS3;
-
-			// Update solution.
-			h  += LSERK4::rk4b[i]*resRK1;
-			hu += LSERK4::rk4b[i]*resRK2;
-			hv += LSERK4::rk4b[i]*resRK3;
-
-			// sponge layer relaxation -- to control insane velocities near the open boundary.
-			hu /= (1.0 + spongeCoeff*hu*hu);
-			hv /= (1.0 + spongeCoeff*hv*hv);
-
-			// h  = sum(Filt(ii,kk)*h(kk,jj), kk);
-			// hu = sum(Filt(ii,kk)*hu(kk,jj), kk);
-			// hv = sum(Filt(ii,kk)*hv(kk,jj), kk); 
-		} */
 
 		eta = h-H;
 		real_type eta_max = normMax(eta);
