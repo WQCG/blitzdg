@@ -184,7 +184,7 @@ namespace blitzdg {
         Ds = Dstrans(jj, ii);
     }
 
-    void TriangleNodesProvisioner::buildFilter(index_type Nc, index_type s) {
+    void TriangleNodesProvisioner::buildFilter(real_type Nc, index_type s) {
         firstIndex ii;
         secondIndex jj;
         thirdIndex kk;
