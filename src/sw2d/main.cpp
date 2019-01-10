@@ -121,11 +121,9 @@ int main(int argc, char **argv) {
 	}
 
 
-	string vtkFileName = vtkOutputter.generateFileName("H", 0);
-
+	string vtkFileName = "H.vtu";
 	vtkOutputter.writeFieldToFile(vtkFileName, H);
 
-	return 0;
 
 	// Intialize fields.
 	// H = 0*jj + 300.0;
@@ -246,8 +244,8 @@ int main(int argc, char **argv) {
 		if ((count % outputInterval) == 0) {
 			cout << "dt=" << dt << endl;
 			cout << "t=" << t << ", h_min=" << blitz::min(h) << ", h_max=" << normMax(h) << ", hu_max=" << normMax(hu) << ", hv_max=" << normMax(hv) << endl;
-			string fileName = outputter.generateFileName("eta", count);
-			outputter.writeFieldToFile(fileName, eta, delim);
+			string fileName = vtkOutputter.generateFileName("eta", count);
+			vtkOutputter.writeFieldToFile(vtkFileName, eta);
 		}	
 
 		// 2nd order SSP Runge-Kutta
