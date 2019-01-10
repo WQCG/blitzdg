@@ -3,7 +3,7 @@
 
 /**
  * @file TriangleNodesProvisioner.hpp
- * @brief Defines the TriangleNodesProvisioner class that provides a construcletion
+ * @brief Defines the TriangleNodesProvisioner class that provides a construction
  * of 2D nodal points on the triangle.
  */
 
@@ -354,7 +354,7 @@ namespace blitzdg {
        * Build exponential cut-off filter, where cut-off order is specified by Nc, and 
        * exponential power is determined by s.
        */
-      void buildFilter(index_type Nc, index_type s);
+      void buildFilter(real_type Nc, index_type s);
 
       /**
        * Returns the number of nodes local to a 2D triangular element.

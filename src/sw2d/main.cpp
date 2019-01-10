@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
 
 	// Physical parameters
 	const real_type g = 9.81;
-	const real_type CD = 2.5e-3;
+	const real_type CD = 0.0;
 	const real_type f = 1.0070e-4;
 
 	const real_type finalTime = 24.0*3600;
@@ -52,6 +52,8 @@ int main(int argc, char **argv) {
 	// Numerical parameters (N = Order of polynomials)
 	const index_type N = 1;
 	const real_type CFL = 0.55;
+
+	const index_type outputInterval = 20;
 
 	// Build dependencies.
 	MeshManager meshManager;
@@ -158,6 +160,9 @@ int main(int argc, char **argv) {
 	Hx = (rx*sum(Dr(ii,kk)*H(kk,jj), kk) + sx*sum(Ds(ii,kk)*H(kk,jj), kk));
 	Hy = (ry*sum(Dr(ii,kk)*H(kk,jj), kk) + sy*sum(Ds(ii,kk)*H(kk,jj), kk));
 
+	Hx = sum(Filt(ii,kk)*Hx(kk,jj), kk);
+	Hy = sum(Filt(ii,kk)*Hy(kk,jj), kk);
+
 	// deal with open boundary conditions.
 	for (index_type k=0; k < K; ++k) {
 			index_type v1 = EToV(3*k);
@@ -194,7 +199,7 @@ int main(int argc, char **argv) {
 
 	// sponge layer -- build that wall!
 	real_type radInfl = 10000.0;
-	real_type spongeStrength = 100.0;
+	real_type spongeStrength = 1000.0;
 	real_matrix_type spongeCoeff(Np, K);
 	spongeCoeff = 0.0*jj;
 
@@ -291,7 +296,7 @@ int main(int argc, char **argv) {
 
 namespace blitzdg {
 	namespace sw2d {
-		void computeRHS(real_matrix_type& h, real_matrix_type& hu, real_matrix_type& hv, real_type g, real_matrix_type& H, real_matrix_type& Hx, real_matrix_type& Hy, real_type CD, real_type f, TriangleNodesProvisioner& triangleNodesProvisioner, real_matrix_type& RHS1, real_matrix_type& RHS2, real_matrix_type& RHS3, real_type t) {
+		void computeRHS(real_matrix_type& h, real_matrix_type& hu, real_matrix_type& hv, real_type g, real_matrix_type& H, real_matrix_type& Hx, real_matrix_type& Hy, real_type CD, real_type f, TriangleNodesProvisioner& triangleNodesProvisioner, real_matrix_type& RHS1, real_matrix_type& RHS2, real_matrix_type& RHS3, real_type t, const real_matrix_type& Filt) {
 
 			real_type T_tide = 3600*12.42; // or something?
 			real_type om_tide = 2.0*pi/T_tide;
@@ -496,8 +501,14 @@ namespace blitzdg {
 			v = hv/h;
 
 			// bottom topography
-			RHS2+= g*h*Hx;
-			RHS3+= g*h*Hy;
+			real_matrix_type sourcex(Np, K);
+			real_matrix_type sourcey(Np, K);
+
+			sourcex = g*h*Hx;
+			sourcey = g*h*Hy;
+
+			RHS2+= sum(Filt(ii,kk)*sourcex(kk,jj), kk);
+			RHS3+= sum(Filt(ii,kk)*sourcey(kk,jj), kk);
 
 			// bottom drag
 			real_matrix_type norm_u(Np,K);
