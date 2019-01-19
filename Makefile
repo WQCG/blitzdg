@@ -17,7 +17,7 @@ OBJECT := o
 TARGETS := $(patsubst src/,,$(patsubst src/%/,bin/%,$(sort $(dir $(wildcard src/**/)))))
 BUILDDIRS := $(subst bin,build,$(TARGETS))
 ALLVALGRINDTARGETS :=$(patsubst bin/%,artifacts/%,$(TARGETS:%=%.log))
-VALGRINDTARGETS := $(patsubst artifacts/%2d%.log,,$(ALLVALGRINDTARGETS))
+VALGRINDTARGETS := artifacts/test.log artifacts/advec1d.log artifacts/burgers1d.log artifacts/poisson1d.log
 
 COMMONSOURCES := $(wildcard $(SRCDIR)/*.$(SRCEXT))
 COMMONOBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(COMMONSOURCES:.$(SRCEXT)=.o))
