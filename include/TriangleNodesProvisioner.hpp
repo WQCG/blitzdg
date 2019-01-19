@@ -3,7 +3,7 @@
 
 /**
  * @file TriangleNodesProvisioner.hpp
- * @brief Defines the TriangleNodesProvisioner class that provides a construcletion
+ * @brief Defines the TriangleNodesProvisioner class that provides a construction
  * of 2D nodal points on the triangle.
  */
 
@@ -48,6 +48,7 @@ namespace blitzdg {
       real_mat_smart_ptr nx;
       real_mat_smart_ptr ny;
       real_mat_smart_ptr Vinv;
+      real_mat_smart_ptr Filter;
 
       index_mat_smart_ptr Fmask;
       real_mat_smart_ptr Fx;
@@ -222,6 +223,11 @@ namespace blitzdg {
       const real_matrix_type & get_Vinv() const;
 
       /**
+       * Returns a reference to an exponential cutoff filter built with buildFilter().
+       */
+      const real_matrix_type & get_Filter() const;
+
+      /**
        * Returns a reference to the Jacobian scaling matrix.
        */
       const real_matrix_type & get_J() const;
@@ -338,6 +344,18 @@ namespace blitzdg {
        */
       void buildBCHash();
       
+      /**
+       *  Build hashmap mapping BCTypes to node indices that are on that boundary using the
+       *  input BCType table.
+       */
+      void buildBCHash(const index_vector_type& bcType);
+
+      /**
+       * Build exponential cut-off filter, where cut-off order is specified by Nc, and 
+       * exponential power is determined by s.
+       */
+      void buildFilter(real_type Nc, index_type s);
+
       /**
        * Returns the number of nodes local to a 2D triangular element.
        */

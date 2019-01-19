@@ -5,6 +5,7 @@
 #include "CSVFileReader.hpp"
 #include "Types.hpp"
 #include "CSCMatrix.hpp"
+#include "BCtypes.hpp"
 #include <boost/algorithm/string.hpp>
 #include <metis.h>
 #include <cmath>
@@ -105,7 +106,8 @@ namespace blitzdg {
         csvReader.setNumCols(4);
 
         // Allocate storage for Vertices.
-        Vert = real_vec_smart_ptr(new real_vector_type(NumVerts*3));
+        index_type Dim = 3;
+        Vert = real_vec_smart_ptr(new real_vector_type(NumVerts*Dim));
 
         real_vector_type& Vref = *Vert;
 
@@ -116,9 +118,9 @@ namespace blitzdg {
             real_type vx, vy, vz;
 
             csvReader.parseRowValues(nodeNum, vx, vy, vz);
-            Vref((nodeNum-1)*3)   = vx;
-            Vref((nodeNum-1)*3+1) = vy;
-            Vref((nodeNum-1)*3+2) = vz;
+            Vref((nodeNum-1)*Dim)   = vx;
+            Vref((nodeNum-1)*Dim+1) = vy;
+            Vref((nodeNum-1)*Dim+2) = vz;
         }
 
         // This should skip the '$EndNodes' line.
@@ -192,8 +194,6 @@ namespace blitzdg {
         lines.shrink_to_fit();
         tris.shrink_to_fit();
 
-        NumFaces = 3;
-
         // Allocate storage EToV and BC Table.
         // Note: we are doing this here as opposed to in the initializer list,
         // since prior to this point we did not know how many elements there are.
@@ -206,6 +206,7 @@ namespace blitzdg {
         index_vector_type& E2V = *EToV;
 
         NumElements = K;
+        NumFaces = 3; // hard-code for now.
         for (index_type k=0; k < K; ++k) {
             // Subtract one to go from 1-based (Gmsh) to 0-based (us).
             E2V(NumFaces*k)   = tris[k][5] - 1;
@@ -227,9 +228,25 @@ namespace blitzdg {
             }
         }
 
-
         buildBCTable(lines);
         buildConnectivity();
+    }
+
+    void MeshManager::buildBCTable(index_type tagNumber) {
+        index_vector_type& E2E = *EToE;
+        index_vector_type& BCTable = *BCType;
+
+        blitz::firstIndex ii;
+        BCTable = 0*ii;
+        //k2 == k you could use k2 == k / NumFaces, where k now ranges over 0,...,NumFaces*NumElements-1
+        for (index_type f=0; f < NumFaces*NumElements; ++f) {
+            index_type k2 = E2E(f);
+
+            // self-referencing elements are boundary elements.
+            if (k2 == (f / NumFaces))
+                BCTable(f) = tagNumber;
+        }
+        
     }
 
     void MeshManager::buildBCTable(std::vector<std::vector<index_type>>& edges) {
@@ -240,16 +257,16 @@ namespace blitzdg {
         blitz::firstIndex ii;
         BCTable = 0*ii;
         for (index_type k=0; k < NumElements; ++k) {
-            for (index_type f=0; f < 3; ++f) {
+            for (index_type f=0; f < NumFaces; ++f) {
 
-                index_type v1 = E2V(k*3 + f);
-                index_type v2 = E2V(k*3 + ((f + 1) % 3));
+                index_type v1 = E2V(k*NumFaces + f);
+                index_type v2 = E2V(k*NumFaces + ((f + 1) % NumFaces));
 
-                real_type v1x = V(v1*3);
-                real_type v1y = V(v1*3 + 1);
+                real_type v1x = V(v1*NumFaces);
+                real_type v1y = V(v1*NumFaces + 1);
 
-                real_type v2x = V(v2*3);
-                real_type v2y = V(v2*3 + 1);
+                real_type v2x = V(v2*NumFaces);
+                real_type v2y = V(v2*NumFaces + 1);
 
                 real_type midx = 0.5*(v1x + v2x);
                 real_type midy = 0.5*(v1y + v2y);
@@ -267,16 +284,16 @@ namespace blitzdg {
                     index_type bcType = edges[edge][3];
                     // Assign default to something non-zero. 3 -> Wall, in the parlance of NUDG.
                     if (bcType == 0) {
-                        bcType = 3;
+                        bcType = BCTag::Wall;
                     }
 
-                    real_type x1 = V(n1*3), y1 = V(n1*3+1);
-                    real_type x2 = V(n2*3), y2 = V(n2*3+1);
+                    real_type x1 = V(n1*NumFaces), y1 = V(n1*NumFaces+1);
+                    real_type x2 = V(n2*NumFaces), y2 = V(n2*NumFaces+1);
 
                     // Eqn of line: y - y0 = (y2-y1)/(x2-x1)*(x-x0)
                     // => (midy-y2)*(x2-x1) - (y2-y1)(midx-x2) = 0
                     if (std::abs((y2-midy)*(x2-x1) - (y2-y1)*(x2-midx)) < NodeTol) {
-                        BCTable(3*k + f) = bcType;
+                        BCTable(NumFaces*k + f) = bcType;
                         break;
                     }
                 }
@@ -451,6 +468,16 @@ namespace blitzdg {
 
     void MeshManager::readElements(const string& E2VFile) {
         EToV = csvread<index_type>(E2VFile, NumElements, NumFaces);
+
+        BCType = index_vec_smart_ptr(new index_vector_type(NumElements*NumFaces));
+        EToE = index_vec_smart_ptr(new index_vector_type(NumElements*NumFaces));
+        EToF = index_vec_smart_ptr(new index_vector_type(NumElements*NumFaces));
+
+        // Below is only working for triangles at the moment.
+        if (NumFaces == 3) {
+            buildConnectivity();
+            buildBCTable(BCTag::Wall);
+        }
     }
 
     void MeshManager::printVertices() const {

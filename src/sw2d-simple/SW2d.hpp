@@ -12,6 +12,6 @@
 
 namespace blitzdg {
 	namespace sw2d {
-		void computeRHS(real_matrix_type& h, real_matrix_type& hu, real_matrix_type& hv, real_type g, real_matrix_type& H, real_matrix_type& Hx, real_matrix_type& Hy, real_type CD, real_type f, TriangleNodesProvisioner& triangleNodesProvisioner, real_matrix_type& RHS1, real_matrix_type& RHS2, real_matrix_type& RHS3, real_type t, const real_matrix_type& Filt);
+		void computeRHS(real_matrix_type h, real_matrix_type hu, real_matrix_type hv, real_type g, TriangleNodesProvisioner& triangleNodesProvisioner, real_matrix_type& RHS1, real_matrix_type& RHS2, real_matrix_type& RHS3);
 	}
 }

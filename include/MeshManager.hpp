@@ -40,6 +40,10 @@ namespace blitzdg {
       // and edge tables have been parsed.
       void buildBCTable(std::vector<std::vector<index_type>>& edges);
 
+      // Builds BC table using self-referencing elements from EToE
+      // rather than from edges list. Gives all boundary faces the same tag/type.
+      void buildBCTable(index_type tagNumber);
+
     public:
       /**
        * Default constructor.
@@ -116,7 +120,7 @@ namespace blitzdg {
        /**
         * Build EToE and EToF connectivity tables.
         */
-       void buildConnectivity();
+      void buildConnectivity();
 
       /**
        * Returns the dimension of a vertex, typically 2 or 3.
