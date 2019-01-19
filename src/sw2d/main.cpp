@@ -250,7 +250,6 @@ int main(int argc, char **argv) {
 
 		// 2nd order SSP Runge-Kutta
 		sw2d::computeRHS(h, hu, hv, g, H, Hx, Hy, CD, f, triangleNodesProvisioner, RHS1, RHS2, RHS3, t, Filt);
-
 		// Update solution.
 		h1  = h + dt*RHS1;
 		hu1 = hu + dt*RHS2;
