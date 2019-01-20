@@ -25,7 +25,9 @@ namespace blitzdg {
 
 public:
 	VtkOutputter(TriangleNodesProvisioner & _NodesProvisioner);
+
 	std::string generateFileName(const std::string & fieldName, const index_type fileNumber);
-	void writeFieldToFile(const std::string & fileName, const real_matrix_type & field);
+
+	void writeFieldToFile(const std::string & fileName, const real_matrix_type & field, const std::string & fieldName);
   };
 }

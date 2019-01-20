@@ -51,7 +51,7 @@ namespace blitzdg{
      * @param[in] field Two-dimensional blitz array to be written to the file. Usually a 'field' of the PDE (system) being solved.
      * @param[in] delimeter Character that will be used to separate columns. Rows are always separated by line-endings.
      */
-    void VtkOutputter::writeFieldToFile(const string & fileName, const real_matrix_type & field) {
+    void VtkOutputter::writeFieldToFile(const string & fileName, const real_matrix_type & field, const string & fieldName) {
 
 		const real_matrix_type& x = NodesProvisioner.get_xGrid(), y = NodesProvisioner.get_yGrid();
 
@@ -66,8 +66,8 @@ namespace blitzdg{
 
 		vtkSmartPointer<vtkUnstructuredGrid> unstructuredGrid = vtkSmartPointer<vtkUnstructuredGrid>::New();
 
-		// vtkSmartPointer<vtkFieldData> fieldData = vtkSmartPointer<vtkFieldData>::New();
-		array->SetName("H");
+		const char* fieldNameChar = fieldName.c_str();
+		array->SetName(fieldNameChar);
 		array->SetNumberOfValues(Np*K);
 
 		unstructuredGrid->Allocate(K);
@@ -89,7 +89,7 @@ namespace blitzdg{
 
 		unstructuredGrid->SetPoints(points);
 		unstructuredGrid->GetPointData()->SetScalars(array);
-		unstructuredGrid->GetPointData()->SetActiveScalars("H");
+		unstructuredGrid->GetPointData()->SetActiveScalars(fieldNameChar);
 
 		// Write file
 		vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer =
