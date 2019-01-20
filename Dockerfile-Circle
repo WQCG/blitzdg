@@ -9,6 +9,7 @@ RUN update-alternatives --install /usr/bin/gfortran gfortran /usr/local/bin/gfor
 RUN apt-get -y install libsuitesparse-dev
 RUN apt-get -y install libmetis-dev
 RUN apt-get -y install libboost-dev
+RUN apt-get -y install libvtk7.1 libtvtk7-dev
 RUN apt-get -y install valgrind
 RUN apt-get -y install clang
 RUN apt-get -y install python3-pip
