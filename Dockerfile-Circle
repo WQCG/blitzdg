@@ -1,21 +1,22 @@
-FROM gcc:7.4.0
+FROM ubuntu:18.04
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV TERM linux 
 RUN apt-get -y update
 RUN apt-get -y install apt-utils
 RUN apt-get -y install curl
-RUN update-alternatives --install /usr/bin/gfortran gfortran /usr/local/bin/gfortran 999
+RUN apt-get -y install gfortran gcc
 RUN apt-get -y install libsuitesparse-dev
 RUN apt-get -y install libmetis-dev
 RUN apt-get -y install libboost-dev
-RUN apt-get -y install libvtk6-dev libvtk6.3
+RUN apt-get -y install libvtk7-dev libvtk7.1
 RUN apt-get -y install valgrind
 RUN apt-get -y install clang
 RUN apt-get -y install python3-pip
 RUN pip3 install cpp-coveralls
 RUN apt-get -y install g++-mingw-w64 g++-mingw-w64-x86-64 mingw-w64-tools mingw-w64 mingw-w64-i686-dev binutils-mingw-w64
 RUN apt-get -y install zip
+RUN apt-get -y install git
 
 # Pull in blitz.
 RUN curl -fsL https://github.com/blitzpp/blitz/archive/1.0.1.tar.gz -o /blitzpp-1.0.1.tar.gz
