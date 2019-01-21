@@ -14,7 +14,7 @@ RUN apt-get -y install valgrind
 RUN apt-get -y install clang
 RUN apt-get -y install python3-pip
 RUN pip3 install cpp-coveralls
-RUN apt-get -y install g++-mingw-w64 g++-mingw-w64-x86-64 mingw-w64-tools mingw-w64 mingw-w64-i686-dev binutils-mingw-w64
+RUN apt-get -y install g++-mingw-w64 g++-mingw-w64-x86-64 mingw-w64-tools mingw-w64 mingw-w64-i686-dev binutils-mingw-w64 gfortran-mingw-w64-x86-64
 RUN apt-get -y install zip
 RUN apt-get -y install git
 
