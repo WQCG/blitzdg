@@ -25,6 +25,9 @@ jobs:
             rm -rf mingw-include/igloo
             curl https://s3.amazonaws.com/dsteinmo-libs/deps-win-mingw64-gcc7.zip -o deps-win-mingw64.zip
             unzip -qq deps-win-mingw64.zip -d lib/
+            curl https://s3.amazonaws.com/dsteinmo-libs/vtklibs-mingw.zip -o vtklibs-mingw.zip
+            unzip -qq vtklibs-mingw.zip -d lib/
+            cp -r /usr/include/vtk-7.1 mingw-include/.
             CXX=x86_64-w64-mingw32-g++-posix INC="$INC -I mingw-include/" LIB="-L lib" make -j4 && make clean
       - run:
           name: Build (gcc)
