@@ -56,7 +56,7 @@ endif
 ifeq ($(CXX), x86_64-w64-mingw32-g++-posix)
 	INC += -I /usr/lib/gcc/x86_64-w64-mingw32/6.3-posix/include/c++/parallel/ -I /opt/blitzpp-mingw64/blitz-1.0.1
 	LIB += $(EXPLICITLIBS)
-	CFLAGS += -Wa,-mbig-obj
+	CFLAGS += -D_win32 -Wa,-mbig-obj
 endif
 
 all: $(TARGETS)
