@@ -45,8 +45,8 @@ endif
 CFLAGS := -g -Wall -std=c++0x -fprofile-arcs -ftest-coverage -DBZ_DEBUG
 LINKERFLAGS := -fprofile-arcs
 INC += -I include/igloo -I include
-LIB += -lvtkIOXML-7.1 -lvtkCommonCore-7.1 -lvtkCommonExecutionModel-7.1 -lvtkCommonDataModel-7.1 -lblitz -lmetis -lumfpack -lcxsparse -llapack -lblas
-EXPLICITLIBS := -lvtkIOXMLParser-7.1 -lvtkCommonMisc-7.1 -lvtkCommonSystem-7.1 -lvtkIOCore-7.1 -lvtkCommonTransforms-7.1 -lvtkCommonCore-7.1 -lvtkCommonMath-7.1 -lvtkexpat-7.1 -lvtksys-7.1 -lvtkzlib-7.1 -lgfortran -lcholmod -lamd -lcolamd -lquadmath -lsuitesparseconfig -lcrtdll
+LIB += -lblitz -lmetis -lumfpack -lcxsparse -llapack -lblas
+EXPLICITLIBS := -lgfortran -lcholmod -lamd -lcolamd -lquadmath -lsuitesparseconfig -lcrtdll
 VALGRIND := valgrind --error-exitcode=1 --leak-check=full --track-origins=yes
 
 ifeq ($(OS), Windows_NT)
@@ -57,6 +57,8 @@ ifeq ($(CXX), x86_64-w64-mingw32-g++-posix)
 	INC += -I /usr/lib/gcc/x86_64-w64-mingw32/6.3-posix/include/c++/parallel/ -I /opt/blitzpp-mingw64/blitz-1.0.1
 	LIB += $(EXPLICITLIBS)
 	CFLAGS += -D_win32 -Wa,-mbig-obj
+else
+	LIB += -lvtkIOXML-7.1 -lvtkCommonCore-7.1 -lvtkCommonExecutionModel-7.1 -lvtkCommonDataModel-7.1
 endif
 
 all: $(TARGETS)

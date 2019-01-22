@@ -1,3 +1,5 @@
+#ifndef _WIN32
+
 #include "Types.hpp"
 #include "VtkOutputter.hpp"
 #include <vtk-7.1/vtkXMLUnstructuredGridWriter.h>
@@ -103,3 +105,4 @@ namespace blitzdg{
 		writer->Write();
     }
 }
+#endif

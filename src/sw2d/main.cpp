@@ -14,7 +14,9 @@
 #include "Constants.hpp"
 #include "CSVFileReader.hpp"
 #include "BCtypes.hpp"
+#ifndef __MINGW32__
 #include "VtkOutputter.hpp"
+#endif
 #include <blitz/array.h>
 #include <math.h>
 #include <string>
@@ -72,7 +74,9 @@ int main(int argc, char **argv) {
 	triangleNodesProvisioner.buildMaps();
 	triangleNodesProvisioner.buildFilter(0.95*N, 4);
 
+#ifndef __MINGW32__
 	VtkOutputter vtkOutputter(triangleNodesProvisioner);
+#endif
 	
 	const real_matrix_type& Filt = triangleNodesProvisioner.get_Filter();
 
@@ -120,9 +124,10 @@ int main(int argc, char **argv) {
 		}
 	}
 
-
+#ifndef __MINGW32__
 	string vtkFileName = "H.vtu";
 	vtkOutputter.writeFieldToFile(vtkFileName, H, "H");
+#endif
 
 
 	// Intialize fields.
@@ -244,8 +249,10 @@ int main(int argc, char **argv) {
 		if ((count % outputInterval) == 0) {
 			cout << "dt=" << dt << endl;
 			cout << "t=" << t << ", h_min=" << blitz::min(h) << ", h_max=" << normMax(h) << ", hu_max=" << normMax(hu) << ", hv_max=" << normMax(hv) << endl;
+#ifndef __MINGW32__
 			string fileName = vtkOutputter.generateFileName("eta", count);
 			vtkOutputter.writeFieldToFile(vtkFileName, eta, "eta");
+#endif
 		}	
 
 		// 2nd order SSP Runge-Kutta
