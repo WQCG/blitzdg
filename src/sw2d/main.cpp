@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
 	// Dependency-inject mesh manager to nodes provisioner.
 	TriangleNodesProvisioner triangleNodesProvisioner(N, meshManager);
 
-	// Pre-processing steps.
+	// Pre-processing step - build polynomial dealiasing filter.
 	triangleNodesProvisioner.buildFilter(0.95*N, 4);
 
 #ifndef __MINGW32__
@@ -268,12 +268,12 @@ int main(int argc, char **argv) {
 		hv = 0.5*(hv + hv1 + dt*RHS3);
 
 		// sponge layer relaxation -- to control insane velocities near the open boundary.
-		hu /= (1.0 + spongeCoeff*hu*hu);
-		hv /= (1.0 + spongeCoeff*hv*hv);
+		//hu /= (1.0 + spongeCoeff*hu*hu);
+		//hv /= (1.0 + spongeCoeff*hv*hv);
 
 		eta = h-H;
 		real_type eta_max = normMax(eta);
-		if ( std::abs(eta_max) > 1e8  || std::isnan(eta_max) )
+		if ( std::abs(eta_max) > 1e8  || blitz::any(blitz::blitz_isnan<real_matrix_type>(eta)) )
 			throw std::runtime_error("A numerical instability has occurred!");
 
 		t += dt;
