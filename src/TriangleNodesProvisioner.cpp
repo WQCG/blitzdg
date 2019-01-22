@@ -36,8 +36,8 @@ namespace blitzdg {
         : NumElements{ _MeshManager.get_NumElements() }, NOrder{ _NOrder },
         NumLocalPoints{ (_NOrder + 2)*(_NOrder+1)/2 },
         NumFacePoints{ _NOrder + 1},
-        xGrid{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements()) },
-        yGrid{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements()) },
+        xGrid{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements(), ColumnMajorOrder()) },
+        yGrid{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements(), ColumnMajorOrder()) },
         rGrid{ new real_vector_type((_NOrder + 2)*(_NOrder+1)/2) },
         sGrid{ new real_vector_type((_NOrder + 2)*(_NOrder+1)/2) },
         V{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) }, 
@@ -62,7 +62,13 @@ namespace blitzdg {
         Mesh2D { _MeshManager },
         Nodes1D{ new Nodes1DProvisioner(_NOrder, 5, -1.0, 1.0) },
 		Jacobi{}, Vandermonde{}, LinSolver{}, Inverter{}
-    {}
+    {
+        // Nodal construction required for physical simulations.
+        buildNodes();
+        buildLift();
+        buildPhysicalGrid();
+        buildMaps();
+    }
 
     bool TriangleNodesProvisioner::distanceLessThanEps(real_type x1, real_type y1, real_type x2, real_type y2, real_type eps) {
         if (hypot(x2-x1, y2-y1) < eps) 

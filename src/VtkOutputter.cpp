@@ -1,4 +1,4 @@
-#ifndef _WIN32
+#ifndef __MINGW32__
 
 #include "Types.hpp"
 #include "VtkOutputter.hpp"

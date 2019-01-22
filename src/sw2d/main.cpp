@@ -68,10 +68,6 @@ int main(int argc, char **argv) {
 	TriangleNodesProvisioner triangleNodesProvisioner(N, meshManager);
 
 	// Pre-processing steps.
-	triangleNodesProvisioner.buildNodes();
-	triangleNodesProvisioner.buildLift();
-	triangleNodesProvisioner.buildPhysicalGrid();
-	triangleNodesProvisioner.buildMaps();
 	triangleNodesProvisioner.buildFilter(0.95*N, 4);
 
 #ifndef __MINGW32__
@@ -251,7 +247,7 @@ int main(int argc, char **argv) {
 			cout << "t=" << t << ", h_min=" << blitz::min(h) << ", h_max=" << normMax(h) << ", hu_max=" << normMax(hu) << ", hv_max=" << normMax(hv) << endl;
 #ifndef __MINGW32__
 			string fileName = vtkOutputter.generateFileName("eta", count);
-			vtkOutputter.writeFieldToFile(vtkFileName, eta, "eta");
+			vtkOutputter.writeFieldToFile(fileName, eta, "eta");
 #endif
 		}	
 
