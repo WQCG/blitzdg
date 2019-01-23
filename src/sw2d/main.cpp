@@ -273,7 +273,7 @@ int main(int argc, char **argv) {
 
 		eta = h-H;
 		real_type eta_max = normMax(eta);
-		if ( std::abs(eta_max) > 1e8  || blitz::any(blitz_isnan(eta)) )
+		if ( std::abs(eta_max) > 1e8  || std::isnan(sum(eta)))
 			throw std::runtime_error("A numerical instability has occurred!");
 
 		t += dt;
