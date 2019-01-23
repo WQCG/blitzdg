@@ -14,15 +14,36 @@
 #include <memory>
 
 namespace blitzdg {
+    using real_mat_smart_ptr = std::unique_ptr<real_matrix_type>;
+    using real_vec_smart_ptr = std::unique_ptr<real_vector_type>;
+
+    struct DGContext2D {
+        const index_type& Np;
+        const index_type& Nfp;
+        const index_type& NumFaces;
+        const real_matrix_type& Filt;
+        const real_matrix_type& x;
+        const real_matrix_type& y;
+        const real_matrix_type& Fscale;
+        const real_matrix_type& J;
+        const real_matrix_type& rx;
+        const real_matrix_type& sx;
+        const real_matrix_type& ry;
+        const real_matrix_type& sy;
+        const real_matrix_type& nx;
+        const real_matrix_type& ny;
+        const real_matrix_type& Dr;
+        const real_matrix_type& Ds;
+        const index_hashmap& bcHash;
+    };
+
   /**
    * Provides facilities for the construction of two-dimensional
    * nodes, operators, and geometric factors on triangles.
    * @note This class is moveable but not copyable.
    */ 
   class TriangleNodesProvisioner {
-      using real_mat_smart_ptr = std::unique_ptr<real_matrix_type>;
       using index_mat_smart_ptr = std::unique_ptr<index_matrix_type>;
-      using real_vec_smart_ptr = std::unique_ptr<real_vector_type>;
       using index_vec_smart_ptr = std::unique_ptr<index_vector_type>;
 
       index_type NumElements;
@@ -70,6 +91,9 @@ namespace blitzdg {
       VandermondeBuilders Vandermonde;
       DirectSolver LinSolver;
       DenseMatrixInverter Inverter;
+
+      DGContext2D DGContext;
+
 
       /**
        * Helper method for checking that two points (x1,y1) and (x2,y2) are less than a distance eps apart.
@@ -318,6 +342,8 @@ namespace blitzdg {
        * Returns a reference to the hashmap mapping boundary types to list of corresponding boundary nodes.
        */
       const index_hashmap & get_bcMap() const;
+
+      const DGContext2D& get_DGContext() const;
 
       /**
        * Builds nodes and local operators.

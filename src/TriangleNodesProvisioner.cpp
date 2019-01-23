@@ -61,7 +61,25 @@ namespace blitzdg {
         BCmap{ new index_hashmap()},
         Mesh2D { _MeshManager },
         Nodes1D{ new Nodes1DProvisioner(_NOrder, 5, -1.0, 1.0) },
-		Jacobi{}, Vandermonde{}, LinSolver{}, Inverter{}
+		Jacobi{}, Vandermonde{}, LinSolver{}, Inverter{}, DGContext{
+            Np: NumLocalPoints,
+            Nfp: NumFacePoints,
+            NumFaces: NumFaces,
+            Filt: *Filter,
+            x: *xGrid,
+            y: *yGrid,
+            Fscale: *Fscale,
+            J: *J,
+            rx: *rx,
+            sx: *sx,
+            ry: *ry,
+            sy: *sy,
+            nx: *nx,
+            ny: *ny,
+            Dr: *Dr,
+            Ds: *Ds,
+            bcHash: *BCmap
+        }
     {
         // Nodal construction required for physical simulations.
         buildNodes();
@@ -866,5 +884,7 @@ namespace blitzdg {
         return NumElements;
     }
 
-
+    const DGContext2D& TriangleNodesProvisioner::get_DGContext() const {
+        return DGContext;
+    }
 }

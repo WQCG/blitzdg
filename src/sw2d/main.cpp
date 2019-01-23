@@ -15,7 +15,7 @@
 #include "CSVFileReader.hpp"
 #include "BCtypes.hpp"
 #ifndef __MINGW32__
-#include "VtkOutputter.hpp"
+	#include "VtkOutputter.hpp"
 #endif
 #include <blitz/array.h>
 #include <math.h>
@@ -44,137 +44,148 @@ int main(int argc, char **argv) {
 
 	printDisclaimer();
 
-	// Physical parameters
-	const real_type g = 9.81;
-	const real_type CD = 0.0;
-	const real_type f = 1.0070e-4;
+	struct physParams {
+		const real_type g = 9.81;
+		const real_type CD = 2.5e-3;
+		const real_type f = 1.0070e-4;
+		const real_type initTime = 0.0;
+		const real_type finalTime = 24.0*3600;
+	};
 
-	const real_type finalTime = 24.0*3600;
-	real_type t = 0.0;
+	// Numerical parameters 
+	struct numParams {
+		const index_type N = 1; // N = Order of polynomials
+		index_type K;			// K = Number of Elements (computed)
+		index_type Np;			// Np = Number of points per element (computed)
+		const real_type CFL = 0.55;
+		const index_type outputInterval = 20;
+		const index_type filterPercent = 0.95;
+		const index_type filterOrder = 4;
+	};
 
-	// Numerical parameters (N = Order of polynomials)
-	const index_type N = 1;
-	const real_type CFL = 0.55;
+	// Physical fields
+	struct fields {
+		real_matrix_type h;
+		real_matrix_type hu;
+		real_matrix_type hv;
+		real_matrix_type H;
+		real_matrix_type Hx;
+		real_matrix_type Hy;
+		
+		// 'non-conservative' variables.
+		real_matrix_type eta;
+		real_matrix_type u;
+		real_matrix_type v;
 
-	const index_type outputInterval = 20;
+		// RHS and RK Residual storage
+		real_matrix_type RHS1, RHS2, RHS3;
+		real_matrix_type resRK1, resRK2, resRK3;
+	};
+
+	const index_type rkStages = 2;
+
+	physParams p;
+	numParams n;
+	fields fds[2];
+
+	real_type t = p.initTime;
 
 	// Build dependencies.
 	MeshManager meshManager;
 	meshManager.readVertices("input/vh_verts_z.dat");
 	meshManager.readElements("input/vh_els_0.oct");
-	const index_type K = meshManager.get_NumElements();
-
 	// Dependency-inject mesh manager to nodes provisioner.
-	TriangleNodesProvisioner triangleNodesProvisioner(N, meshManager);
+	TriangleNodesProvisioner triangleNodesProvisioner(n.N, meshManager);
+
+	n.K = meshManager.get_NumElements();
 
 	// Pre-processing step - build polynomial dealiasing filter.
-	triangleNodesProvisioner.buildFilter(0.95*N, 4);
+	triangleNodesProvisioner.buildFilter(n.filterPercent*n.N, n.filterOrder);
+
+	DGContext2D dg = triangleNodesProvisioner.get_DGContext();
+
 
 #ifndef __MINGW32__
 	VtkOutputter vtkOutputter(triangleNodesProvisioner);
 #endif
 	
-	const real_matrix_type& Filt = triangleNodesProvisioner.get_Filter();
-
 	CsvOutputter outputter;
 
-	const real_matrix_type& x = triangleNodesProvisioner.get_xGrid();
-	const real_matrix_type& y = triangleNodesProvisioner.get_yGrid();
-	index_type Np = triangleNodesProvisioner.get_NumLocalPoints();
+	// Allocate memory for fields.
+	for (index_type i=0; i < rkStages; ++i) {
+		fds[i].h   = real_matrix_type(n.Np, n.K);
+		fds[i].hu  = real_matrix_type(n.Np, n.K);
+		fds[i].hv  = real_matrix_type(n.Np, n.K);
+		fds[i].eta = real_matrix_type(n.Np, n.K);
+		fds[i].Hx  = real_matrix_type(n.Np, n.K);
+		fds[i].Hy  = real_matrix_type(n.Np, n.K);
+		fds[i].u   = real_matrix_type(n.Np, n.K);
+		fds[i].v   = real_matrix_type(n.Np, n.K);
+		fds[i].RHS1 = real_matrix_type(n.Np, n.K);
+		fds[i].RHS2 = real_matrix_type(n.Np, n.K);
+		fds[i].RHS3 = real_matrix_type(n.Np, n.K);
+		fds[i].resRK1 = real_matrix_type(n.Np, n.K);
+		fds[i].resRK2 = real_matrix_type(n.Np, n.K);
+	}
 
-	real_matrix_type H(Np,K), eta(Np, K), h(Np, K), u(Np, K), v(Np, K), hu(Np, K), hv(Np, K), Hx(Np, K), Hy(Np, K);
-	real_matrix_type h1(Np,K), hu1(Np,K), hv1(Np,K);
-	real_matrix_type RHS1(Np, K), RHS2(Np, K), RHS3(Np, K);
-	real_matrix_type resRK1(Np, K), resRK2(Np, K), resRK3(Np, K);
+	// Make amazing references to the fields at different time-levels.
+	fields& fields_n = fds[0];
+	fields& fields_np1 = fds[1];
 
 	unordered_set<index_type> obcNodes = {0,1,2,3,5,6,8,11,12,15,19,20,25,28,31,37,39,44,51,52,60,65,69,78,81,88,98,99,110,117,122,137,157,178,199,220,242,264,287,310,334,358,383,409,435,461,488,516,544,573,602,631,660,690,721,753,784,816,849,933,1018,1106,1193,1281,1369,1455,1538,1619,1699,1781,1813,1846,1879,1912,1946,1980,2014,2049,2084,2120,2156,2192,2228,2265,2302,2340,2374,2412,2448,2488,2526,2565,2603,2642,2682,2723,2765,2804,2845,2886,2929,2972,3014,3054,3097,3144,3190,3236,3284,3329,3376,3492,3607,3724,3835,3953,4074,4192,4321,4461,4625,4691,4759,4829,4900,4971,5039,5107,5175,5253,5319,5383,5440,5494,5562,5620,5681,5746,5904,6064,6221,6374,6541,6704,6872,7028,7186,7374,7580,7788,8009,8233,8482,8783,9138,9587,9762,9920,10068,10202,10338,10461,10582,10699,10817,10918,11015,11118,11217,11310,11564,11829,12073,12326,12584,12866,13191,13559,14017,14554,15146,15717,16037,16309,16533,16750,16878,17009,17147,17280,17554,17870,18093,18276,18471,18712,18940,19142,19294,19424,19540,19652,19740,19836,19929,20013,20111,20216,20341,20465,20605,20733,20852,20970,21066,21157,21246,21345,21469,21591,21726,21847,21952,22043,22127,22195,22257,22308,22351,22391,22429,22467,22500,22529,22557,22586,22617};
-	real_vector_type depthData(Np*K);
 
 	firstIndex ii;
 	secondIndex jj;
 	thirdIndex kk;
 
-	depthData = 0*ii;
-	H = 0*jj;
 
-	string depthFile = "input/H0_try2.oct";
-	CSVFileReader reader(depthFile);
-	string line;
-	index_type count = 0;
-	real_type val;
-	while (reader.parseRowValues(val)) {
-		depthData(count) = val;
-		++count;
-	}
 
-	count = 0;
-	for (index_type k=0; k < K; ++k) {
-		for (index_type n=0; n < Np; ++n) {
-			real_type val = depthData(count);
-
-			if (val < 300.0)
-				val = 300.0;
-
-			H(n,k) = val;
-			++count;
-		}
-	}
+	const string depthFile = "input/H0_try2.oct";
+	sw2d::readDepthData(depthFile, fields_n.H);
 
 #ifndef __MINGW32__
 	string vtkFileName = "H.vtu";
-	vtkOutputter.writeFieldToFile(vtkFileName, H, "H");
+	vtkOutputter.writeFieldToFile(vtkFileName, fields_n.H, "H");
 #endif
 
-
-	// Intialize fields.
-	// H = 0*jj + 300.0;
-	eta = 0*jj;
-	h = H + eta;
-	u = 0*jj;
-	v = 0*jj;
-	hu = h*u;
-	hv = h*v;
-
-	const real_matrix_type& Fscale = triangleNodesProvisioner.get_Fscale();
+	// Set initial values for fields
+	fields_n.eta = 0*jj;
+	fields_n.h = fields_n.H + fields_n.eta;
+	fields_n.u = 0*jj;
+	fields_n.v = 0*jj;
+	fields_n.hu = fields_n.h*fields_n.u;
+	fields_n.hv = fields_n.h*fields_n.v;
 		
-	RHS1 = 0*jj;
-	RHS2 = 0*jj;
-	RHS3 = 0*jj;
+	fields_n.RHS1 = 0*jj;
+	fields_n.RHS2 = 0*jj;
+	fields_n.RHS3 = 0*jj;
 
-	resRK1= 0*jj;
-	resRK2= 0*jj;
-	resRK3= 0*jj;
+	fields_n.resRK1= 0*jj;
+	fields_n.resRK2= 0*jj;
+	fields_n.resRK3= 0*jj;
 
-	count = 0;
+	index_type count = 0;
 
 	const char delim = ' ';
-	outputter.writeFieldToFile("x.dat", x, delim);
-	outputter.writeFieldToFile("y.dat", y, delim);
+	outputter.writeFieldToFile("x.dat", dg.x, delim);
+	outputter.writeFieldToFile("y.dat", dg.y, delim);
 
-	outputter.writeFieldToFile("H.dat", H, delim);
+	outputter.writeFieldToFile("H.dat", fields_n.H, delim);
 
 	const index_vector_type& EToV = meshManager.get_Elements();
 
 	// Make copy of bcMap, for hacking it.
     index_vector_type bcType = meshManager.get_BCType();
 
-	// Differentiation matrices and scaling factors - for getting bed slopes.
-	const real_matrix_type& Dr = triangleNodesProvisioner.get_Dr();
-	const real_matrix_type& Ds = triangleNodesProvisioner.get_Ds();
+	// Get bed slopes
+	Hx = (dg.rx*sum(dg.Dr(ii,kk)*fields_n.H(kk,jj), kk) + dg.sx*sum(dg.Ds(ii,kk)*fields_n.H(kk,jj), kk));
+	Hy = (dg.ry*sum(dg.Dr(ii,kk)*fields_n.H(kk,jj), kk) + dg.sy*sum(dg.Ds(ii,kk)*fields_n.H(kk,jj), kk));
 
-	const real_matrix_type& rx = triangleNodesProvisioner.get_rx();
-	const real_matrix_type& ry = triangleNodesProvisioner.get_ry();
-	const real_matrix_type& sx = triangleNodesProvisioner.get_sx();
-	const real_matrix_type& sy = triangleNodesProvisioner.get_sy();
-	
-	Hx = (rx*sum(Dr(ii,kk)*H(kk,jj), kk) + sx*sum(Ds(ii,kk)*H(kk,jj), kk));
-	Hy = (ry*sum(Dr(ii,kk)*H(kk,jj), kk) + sy*sum(Ds(ii,kk)*H(kk,jj), kk));
-
-	Hx = sum(Filt(ii,kk)*Hx(kk,jj), kk);
-	Hy = sum(Filt(ii,kk)*Hy(kk,jj), kk);
+	Hx = sum(dg.Filt(ii,kk)*fields_n.Hx(kk,jj), kk);
+	Hy = sum(dg.Filt(ii,kk)*fields_n.Hy(kk,jj), kk);
 
 	// deal with open boundary conditions.
-	for (index_type k=0; k < K; ++k) {
+	for (index_type k=0; k < n.K; ++k) {
 			index_type v1 = EToV(3*k);
 			index_type v2 = EToV(3*k+1);
 			index_type v3 = EToV(3*k+2);
@@ -204,13 +215,13 @@ int main(int argc, char **argv) {
 	real_vector_type xVec(numFaceNodes), yVec(numFaceNodes);
 
 	const bool byRowsOpt = false;
-	fullToVector(x, xVec, byRowsOpt);
-	fullToVector(y, yVec, byRowsOpt);
+	fullToVector(dg.x, xVec, byRowsOpt);
+	fullToVector(dg.y, yVec, byRowsOpt);
 
 	// sponge layer -- build that wall!
 	real_type radInfl = 10000.0;
 	real_type spongeStrength = 1000.0;
-	real_matrix_type spongeCoeff(Np, K);
+	real_matrix_type spongeCoeff(dg.Np, n.K);
 	spongeCoeff = 0.0*jj;
 
 	for(index_type k=0; k < K; ++k) {
@@ -236,10 +247,23 @@ int main(int argc, char **argv) {
 	outputter.writeFieldToFile("sponge.dat", spongeCoeff, delim);
 
 	real_type dt;
-	while (t < finalTime) {
+	while (t < p.finalTime) {
 		real_matrix_type u(Np,K), v(Np,K);
+		real_vector_type uVec(Np*K), vVec(Np*K), hVec(Np*K);
+		real_vector_type uM(numFaceNodes), vM(numFaceNodes), hM(numFaceNodes), fsVec(numFaceNodes);
+
 		u = hu/h; v = hv/h;
-		real_type spdFscaleMax = blitz::max((blitz::sqrt(u*u+v*v) + blitz::sqrt(g*h))*Fscale);
+		
+		fullToVector(u, uVec, false);
+		fullToVector(v, vVec, false);
+		fullToVector(h, hVec, false);
+		fullToVector(Fscale, fsVec, false);
+		applyIndexMap(uVec, vmapM, uM);
+		applyIndexMap(vVec, vmapM, vM);
+		applyIndexMap(hVec, vmapM, hM);
+		real_vector_type spd(numFaceNodes);
+		spd = blitz::sqrt(uM*uM + vM*vM) + blitz::sqrt(g*hM);
+		real_type spdFscaleMax = blitz::max(fsVec*spd);
 		dt = CFL/((N+1)*(N+1)*0.5*spdFscaleMax);
 
 		if ((count % outputInterval) == 0) {
@@ -252,14 +276,14 @@ int main(int argc, char **argv) {
 		}	
 
 		// 2nd order SSP Runge-Kutta
-		sw2d::computeRHS(h, hu, hv, g, H, Hx, Hy, CD, f, triangleNodesProvisioner, RHS1, RHS2, RHS3, t, Filt);
+		sw2d::computeRHS(h, hu, hv, p.g, H, Hx, Hy, CD, p.f, triangleNodesProvisioner, RHS1, RHS2, RHS3, t, Filt);
 		// Update solution.
 		h1  = h + dt*RHS1;
 		hu1 = hu + dt*RHS2;
 		hv1 = hv + dt*RHS3;
 
-		hu /= (1.0 + spongeCoeff*hu*hu);
-		hv /= (1.0 + spongeCoeff*hv*hv);
+		//hu /= (1.0 + spongeCoeff*hu*hu);
+		//hv /= (1.0 + spongeCoeff*hv*hv);
 
 		sw2d::computeRHS(h1, hu1, hv1, g, H, Hx, Hy, CD, f, triangleNodesProvisioner, RHS1, RHS2, RHS3, t, Filt);
 
@@ -291,7 +315,7 @@ namespace blitzdg {
 
 			real_type T_tide = 3600*12.42; // or something?
 			real_type om_tide = 2.0*pi/T_tide;
-			real_type amp_tide = 3.0; // 3.
+			real_type amp_tide = 0*3.e-4; // 3.
 
 			// Blitz indices
 			firstIndex ii;
@@ -380,9 +404,11 @@ namespace blitzdg {
 			// OBC's - free surface moves up and down according to the tidal forcing.
 			for (index_type i=0; i < static_cast<index_type>(mapO.size()); ++i) {
 				index_type o = mapO[i];
-				huP(o) = huM(o);
-				hvP(o) = hvM(o);
-				hP(o) = HM(o) + amp_tide*std::cos(om_tide*t)*0.5*(std::tanh(0.15/3600*(t-T_tide))+1);
+				huP(o) = huM(o) - 2*nxVec(o)*(huM(o)*nxVec(o) + hvM(o)*nyVec(o));
+				hvP(o) = hvM(o) - 2*nyVec(o)*(huM(o)*nxVec(o) + hvM(o)*nyVec(o));
+				//huP(o) = huM(o);
+				//hvP(o) = hvM(o);
+				//hP(o) = HM(o) + amp_tide*std::cos(om_tide*t)*0.5*(std::tanh(0.15/3600*(t-T_tide))+1);
 			}
 
 			// well-balancing scheme (star variables).
@@ -498,8 +524,8 @@ namespace blitzdg {
 			sourcex = g*h*Hx;
 			sourcey = g*h*Hy;
 
-			RHS2+= sum(Filt(ii,kk)*sourcex(kk,jj), kk);
-			RHS3+= sum(Filt(ii,kk)*sourcey(kk,jj), kk);
+			RHS2+= sourcex;
+			RHS3+= sourcey;
 
 			// bottom drag
 			real_matrix_type norm_u(Np,K);
@@ -511,5 +537,36 @@ namespace blitzdg {
 			RHS2+=  f*hv;
 			RHS3+= -f*hu;
 		} // computeRHS
-	} // namespace advec1d
+
+		void readDepthData(const std::string& depthFile, real_matrix_type& H) {
+			firstIndex ii;
+			CSVFileReader reader(depthFile);
+
+			string line;
+			index_type count = 0;
+			index_type K = H.cols();
+			index_type Np = H.rows();
+			real_type val;
+			real_vector_type depthData(Np*K);
+			depthData = 0*ii;
+
+			while (reader.parseRowValues(val)) {
+				depthData(count) = val;
+				++count;
+			}
+
+			count = 0;
+			for (index_type k=0; k < K; ++k) {
+				for (index_type n=0; n < Np; ++n) {
+					real_type val = depthData(count);
+
+					if (val < 300.0)
+						val = 300.0;
+
+					H(n,k) = val;
+					++count;
+				}
+			}
+		}
+	} // namespace sw2d
 } // namespace blitzdg
