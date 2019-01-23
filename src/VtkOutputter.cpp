@@ -74,7 +74,9 @@ namespace blitzdg{
 
 		unstructuredGrid->Allocate(K);
 
-		vtkIdType nodes[K][3];
+		// '3' because this will only work for linear elements until we interpolate
+		// to a finer (uniform) triangular mesh at higher order.
+		vtkIdType nodes[3];
 
 		for (index_type k=0; k < K; ++k) {
 			for (index_type n=0; n < Np; ++n) {
@@ -82,11 +84,11 @@ namespace blitzdg{
 				
 				array->SetValue(nodeId, field(n,k));
 
-				nodes[k][n] = nodeId;
+				nodes[n] = nodeId;
 				++nodeId;
 			}
 
-			unstructuredGrid->InsertNextCell(VTK_TRIANGLE, 3, nodes[k]);
+			unstructuredGrid->InsertNextCell(VTK_TRIANGLE, 3, nodes);
 		}
 
 		unstructuredGrid->SetPoints(points);
