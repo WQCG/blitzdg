@@ -5,7 +5,7 @@ jobs:
       ignore:
         - gh-pages
     docker:
-      - image: dsteinmoeller/blitzdg-circle:0.12
+      - image: dsteinmoeller/blitzdg-circle:0.13
 
     steps:
       - checkout
@@ -19,6 +19,7 @@ jobs:
       - run:
           name: Build (mingw)
           command: |
+            apt-get -y install gfortran-mingw-w64-x86-64
             curl https://s3.amazonaws.com/dsteinmo-libs/include-deps.zip -o include-deps.zip
             mkdir -p mingw-include
             unzip -qq include-deps.zip -d mingw-include/

@@ -14,6 +14,9 @@
 #include "Constants.hpp"
 #include "CSVFileReader.hpp"
 #include "BCtypes.hpp"
+#ifndef __MINGW32__
+#include "VtkOutputter.hpp"
+#endif
 #include <blitz/array.h>
 #include <math.h>
 #include <string>
@@ -64,12 +67,12 @@ int main(int argc, char **argv) {
 	// Dependency-inject mesh manager to nodes provisioner.
 	TriangleNodesProvisioner triangleNodesProvisioner(N, meshManager);
 
-	// Pre-processing steps.
-	triangleNodesProvisioner.buildNodes();
-	triangleNodesProvisioner.buildLift();
-	triangleNodesProvisioner.buildPhysicalGrid();
-	triangleNodesProvisioner.buildMaps();
-	triangleNodesProvisioner.buildFilter(1, 4);
+	// Pre-processing step - build polynomial dealiasing filter.
+	triangleNodesProvisioner.buildFilter(0.95*N, 4);
+
+#ifndef __MINGW32__
+	VtkOutputter vtkOutputter(triangleNodesProvisioner);
+#endif
 	
 	const real_matrix_type& Filt = triangleNodesProvisioner.get_Filter();
 
@@ -109,15 +112,22 @@ int main(int argc, char **argv) {
 		for (index_type n=0; n < Np; ++n) {
 			real_type val = depthData(count);
 
-			if (val < 250.0)
-				val = 250.0;
+			if (val < 300.0)
+				val = 300.0;
 
 			H(n,k) = val;
 			++count;
 		}
 	}
 
+#ifndef __MINGW32__
+	string vtkFileName = "H.vtu";
+	vtkOutputter.writeFieldToFile(vtkFileName, H, "H");
+#endif
+
+
 	// Intialize fields.
+	// H = 0*jj + 300.0;
 	eta = 0*jj;
 	h = H + eta;
 	u = 0*jj;
@@ -235,8 +245,10 @@ int main(int argc, char **argv) {
 		if ((count % outputInterval) == 0) {
 			cout << "dt=" << dt << endl;
 			cout << "t=" << t << ", h_min=" << blitz::min(h) << ", h_max=" << normMax(h) << ", hu_max=" << normMax(hu) << ", hv_max=" << normMax(hv) << endl;
-			string fileName = outputter.generateFileName("eta", count);
-			outputter.writeFieldToFile(fileName, eta, delim);
+#ifndef __MINGW32__
+			string fileName = vtkOutputter.generateFileName("eta", count);
+			vtkOutputter.writeFieldToFile(fileName, eta, "eta");
+#endif
 		}	
 
 		// 2nd order SSP Runge-Kutta
@@ -246,19 +258,22 @@ int main(int argc, char **argv) {
 		hu1 = hu + dt*RHS2;
 		hv1 = hv + dt*RHS3;
 
+		hu /= (1.0 + spongeCoeff*hu*hu);
+		hv /= (1.0 + spongeCoeff*hv*hv);
 
 		sw2d::computeRHS(h1, hu1, hv1, g, H, Hx, Hy, CD, f, triangleNodesProvisioner, RHS1, RHS2, RHS3, t, Filt);
+
 		h  = 0.5*(h  + h1  + dt*RHS1);
 		hu = 0.5*(hu + hu1 + dt*RHS2);
 		hv = 0.5*(hv + hv1 + dt*RHS3);
 
 		// sponge layer relaxation -- to control insane velocities near the open boundary.
-		hu /= (1.0 + spongeCoeff*hu*hu);
-		hv /= (1.0 + spongeCoeff*hv*hv);
+		//hu /= (1.0 + spongeCoeff*hu*hu);
+		//hv /= (1.0 + spongeCoeff*hv*hv);
 
 		eta = h-H;
 		real_type eta_max = normMax(eta);
-		if ( std::abs(eta_max) > 1e8  || std::isnan(eta_max) )
+		if ( std::abs(eta_max) > 1e8  || std::isnan(sum(eta)))
 			throw std::runtime_error("A numerical instability has occurred!");
 
 		t += dt;
