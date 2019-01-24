@@ -169,47 +169,12 @@ int main(int argc, char **argv) {
 
 	triangleNodesProvisioner.buildBCHash(bcType);
 
-	// set up sponge region.
-	const index_hashmap& bcHash = triangleNodesProvisioner.get_bcMap();
-	const std::vector<index_type>& mapO = bcHash.at(BCTag::Out);
-	index_type outLength = static_cast<index_type>(mapO.size());
 
-	index_vector_type vmapO(outLength);
-	const index_vector_type& vmapM = triangleNodesProvisioner.get_vmapM();
-
-	index_type numFaceNodes = dg.NumFaces*dg.Nfp*dg.K;
-
-	real_vector_type xVec(numFaceNodes), yVec(numFaceNodes);
-
-	const bool byRowsOpt = false;
-	fullToVector(dg.x, xVec, byRowsOpt);
-	fullToVector(dg.y, yVec, byRowsOpt);
 
 	// sponge layer -- build that wall!
-	real_type radInfl = 10000.0;
-	real_type spongeStrength = 1000.0;
 	real_matrix_type spongeCoeff(dg.Np, dg.K);
 	spongeCoeff = 0.0*jj;
-
-	for(index_type k=0; k < dg.K; ++k) {
-		for(index_type n=0; n < dg.Np; ++n) {
-			
-			real_type x0 = dg.x(n,k), y0 = dg.y(n,k);
-			real_type closestDist = 1.0e12;
-
-			for (index_type i=0; i < outLength; ++i) {
-				index_type o = vmapM(mapO[i]);
-				real_type dist = std::hypot(x0-xVec(o), y0-yVec(o));
-				if ( dist < radInfl && dist < closestDist )
-					closestDist = dist;				
-			}
-
-			if (closestDist < 1.0e12) {
-				real_type c_sponge = spongeStrength*(1.0-(closestDist/radInfl));
-				spongeCoeff(n, k) = c_sponge;
-			}
-		}
-	}
+	sw2d::buildSpongeCoeff(dg, 10000.0, 1000.0, spongeCoeff);
 
 	outputter.writeFieldToFile("sponge.dat", spongeCoeff, delim);
 
@@ -278,7 +243,7 @@ int main(int argc, char **argv) {
 
 namespace blitzdg {
 	namespace sw2d {
-		void computeRHS(fields fds, numParams num, physParams phys, DGContext2D dg, real_type t) {
+		void computeRHS(fields fds, const numParams& num, const physParams& phys, const DGContext2D& dg, real_type t) {
 
 			real_type T_tide = 3600*12.42; // or something?
 			real_type om_tide = 2.0*pi/T_tide;
@@ -515,6 +480,42 @@ namespace blitzdg {
 
 					H(n,k) = val;
 					++count;
+				}
+			}
+		}
+
+		void buildSpongeCoeff(const DGContext2D& dg, real_type spongeStrength, real_type radInfl, real_matrix_type& spongeCoeff) {
+
+			const index_hashmap& bcHash = dg.bcHash;
+			const std::vector<index_type>& mapO = bcHash.at(BCTag::Out);
+			index_type outLength = static_cast<index_type>(mapO.size());
+
+			index_vector_type vmapO(outLength);
+			const index_vector_type& vmapM = dg.vmapM;
+
+			index_type numFaceNodes = dg.NumFaces*dg.Nfp*dg.K;
+
+			real_vector_type xVec(numFaceNodes), yVec(numFaceNodes);
+
+			fullToVector(dg.x, xVec, false);
+			fullToVector(dg.y, yVec, false);
+
+			for(index_type k=0; k < dg.K; ++k) {
+				for(index_type n=0; n < dg.Np; ++n) {
+					real_type x0 = dg.x(n,k), y0 = dg.y(n,k);
+					real_type closestDist = 1.0e12;
+
+					for (index_type i=0; i < outLength; ++i) {
+						index_type o = vmapM(mapO[i]);
+						real_type dist = std::hypot(x0-xVec(o), y0-yVec(o));
+						if ( dist < radInfl && dist < closestDist )
+							closestDist = dist;
+					}
+
+					if (closestDist < 1.0e12) {
+						real_type c_sponge = spongeStrength*(1.0-(closestDist/radInfl));
+						spongeCoeff(n, k) = c_sponge;
+					}
 				}
 			}
 		}

@@ -48,7 +48,8 @@ namespace blitzdg {
 			real_matrix_type resRK1, resRK2, resRK3;
 		};
 
-		void computeRHS(fields fds, numParams num, physParams phys, DGContext2D dg, real_type t);
+		void computeRHS(fields fds, const numParams& num, const physParams& phys, const DGContext2D& dg, real_type t);
 		void readDepthData(const std::string& depthFile, real_matrix_type& H);
+		void buildSpongeCoeff(const DGContext2D& dg, real_type spongeStrength, real_type radInfl, real_matrix_type& spongeCoeff);
 	}
 }
