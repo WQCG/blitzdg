@@ -178,6 +178,7 @@ int main(int argc, char **argv) {
 
 	outputter.writeFieldToFile("sponge.dat", spongeCoeff, delim);
 
+	index_type numFaceNodes = dg.NumFaces*dg.Nfp*dg.K;
 	real_type dt;
 	while (t < p.finalTime) {
 		real_vector_type uVec(dg.Np*dg.K), vVec(dg.Np*dg.K), hVec(dg.Np*dg.K);
@@ -190,9 +191,9 @@ int main(int argc, char **argv) {
 		fullToVector(fields_n.v, vVec, false);
 		fullToVector(fields_n.h, hVec, false);
 		fullToVector(dg.Fscale , fsVec, false);
-		applyIndexMap(uVec, vmapM, uM);
-		applyIndexMap(vVec, vmapM, vM);
-		applyIndexMap(hVec, vmapM, hM);
+		applyIndexMap(uVec, dg.vmapM, uM);
+		applyIndexMap(vVec, dg.vmapM, vM);
+		applyIndexMap(hVec, dg.vmapM, hM);
 		real_vector_type spd(numFaceNodes);
 		spd = blitz::sqrt(uM*uM + vM*vM) + blitz::sqrt(p.g*hM);
 		real_type spdFscaleMax = blitz::max(fsVec*spd);
