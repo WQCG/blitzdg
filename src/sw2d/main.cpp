@@ -169,8 +169,6 @@ int main(int argc, char **argv) {
 
 	triangleNodesProvisioner.buildBCHash(bcType);
 
-
-
 	// sponge layer -- build that wall!
 	real_matrix_type spongeCoeff(dg.Np, dg.K);
 	spongeCoeff = 0.0*jj;
@@ -178,26 +176,10 @@ int main(int argc, char **argv) {
 
 	outputter.writeFieldToFile("sponge.dat", spongeCoeff, delim);
 
-	index_type numFaceNodes = dg.NumFaces*dg.Nfp*dg.K;
 	real_type dt;
 	while (t < p.finalTime) {
-		real_vector_type uVec(dg.Np*dg.K), vVec(dg.Np*dg.K), hVec(dg.Np*dg.K);
-		real_vector_type uM(numFaceNodes), vM(numFaceNodes), hM(numFaceNodes), fsVec(numFaceNodes);
 
-		fields_n.u = fields_n.hu/fields_n.h; 
-		fields_n.v = fields_n.hv/fields_n.h;
-
-		fullToVector(fields_n.u, uVec, false);
-		fullToVector(fields_n.v, vVec, false);
-		fullToVector(fields_n.h, hVec, false);
-		fullToVector(dg.Fscale , fsVec, false);
-		applyIndexMap(uVec, dg.vmapM, uM);
-		applyIndexMap(vVec, dg.vmapM, vM);
-		applyIndexMap(hVec, dg.vmapM, hM);
-		real_vector_type spd(numFaceNodes);
-		spd = blitz::sqrt(uM*uM + vM*vM) + blitz::sqrt(p.g*hM);
-		real_type spdFscaleMax = blitz::max(fsVec*spd);
-		dt = n.CFL/((n.N+1)*(n.N+1)*0.5*spdFscaleMax);
+		dt = computeTimeStep(fields_n, p, n, dg);
 
 		if ((count % n.outputInterval) == 0) {
 			cout << "dt=" << dt << endl;
@@ -244,6 +226,29 @@ int main(int argc, char **argv) {
 
 namespace blitzdg {
 	namespace sw2d {
+		double computeTimeStep(fields& fds, const physParams& phys, const numParams& num, const DGContext2D& dg) {
+			index_type numFaceNodes = dg.NumFaces*dg.Nfp*dg.K;
+			real_vector_type uVec(dg.Np*dg.K), vVec(dg.Np*dg.K), hVec(dg.Np*dg.K);
+			real_vector_type uM(numFaceNodes), vM(numFaceNodes), hM(numFaceNodes), fsVec(numFaceNodes);
+
+			fds.u = fds.hu/fds.h; 
+			fds.v = fds.hv/fds.h;
+
+			fullToVector(fds.u, uVec, false);
+			fullToVector(fds.v, vVec, false);
+			fullToVector(fds.h, hVec, false);
+			fullToVector(dg.Fscale , fsVec, false);
+			applyIndexMap(uVec, dg.vmapM, uM);
+			applyIndexMap(vVec, dg.vmapM, vM);
+			applyIndexMap(hVec, dg.vmapM, hM);
+
+			real_vector_type spd(numFaceNodes);
+			spd = blitz::sqrt(uM*uM + vM*vM) + blitz::sqrt(phys.g*hM);
+			real_type spdFscaleMax = blitz::max(fsVec*spd);
+
+			return num.CFL/((num.N+1)*(num.N+1)*0.5*spdFscaleMax);	
+		}
+
 		void computeRHS(fields fds, const numParams& num, const physParams& phys, const DGContext2D& dg, real_type t) {
 
 			real_type T_tide = 3600*12.42; // or something?
@@ -286,17 +291,14 @@ namespace blitzdg {
 			nxVec = 0.*ii;
 			nyVec = 0.*ii;
 
-			// We want to apply maps to column-wise ordering of the nodes.
-			const bool byRowsOpt = false;
+			fullToVector(dg.nx, nxVec, false);
+			fullToVector(dg.ny, nyVec, false);
 
-			fullToVector(dg.nx, nxVec, byRowsOpt);
-			fullToVector(dg.ny, nyVec, byRowsOpt);
+			fullToVector(fds.h, hVec, false);
+			fullToVector(fds.hu, huVec, false);
+			fullToVector(fds.hv, hvVec, false);
 
-			fullToVector(fds.h, hVec, byRowsOpt);
-			fullToVector(fds.hu, huVec, byRowsOpt);
-			fullToVector(fds.hv, hvVec, byRowsOpt);
-
-			fullToVector(fds.H, Hvec, byRowsOpt);
+			fullToVector(fds.H, Hvec, false);
 
 			applyIndexMap(hVec, dg.vmapM, hM);
 			applyIndexMap(hVec, dg.vmapP, hP);
@@ -394,9 +396,9 @@ namespace blitzdg {
 
 			real_matrix_type dFlux1Mat(Nfp*numFaces, K), dFlux2Mat(Nfp*numFaces, K), dFlux3Mat(Nfp*numFaces, K);
 
-			vectorToFull(dFlux1, dFlux1Mat, byRowsOpt);
-			vectorToFull(dFlux2, dFlux2Mat, byRowsOpt);
-			vectorToFull(dFlux3, dFlux3Mat, byRowsOpt);
+			vectorToFull(dFlux1, dFlux1Mat, false);
+			vectorToFull(dFlux2, dFlux2Mat, false);
+			vectorToFull(dFlux3, dFlux3Mat, false);
 
 			// Assumes PDE has been left-multiplied by local inverse mass matrix, so all we have left
 			// is the differentiation matrix contribution, and the surface integral.
