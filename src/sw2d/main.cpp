@@ -44,49 +44,22 @@ int main(int argc, char **argv) {
 
 	printDisclaimer();
 
-	struct physParams {
-		const real_type g = 9.81;
-		const real_type CD = 2.5e-3;
-		const real_type f = 1.0070e-4;
-		const real_type initTime = 0.0;
-		const real_type finalTime = 24.0*3600;
-	};
-
-	// Numerical parameters 
-	struct numParams {
-		const index_type N = 1; // N = Order of polynomials
-		index_type K;			// K = Number of Elements (computed)
-		index_type Np;			// Np = Number of points per element (computed)
-		const real_type CFL = 0.55;
-		const index_type outputInterval = 20;
-		const index_type filterPercent = 0.95;
-		const index_type filterOrder = 4;
-	};
-
-	// Physical fields
-	struct fields {
-		real_matrix_type h;
-		real_matrix_type hu;
-		real_matrix_type hv;
-		real_matrix_type H;
-		real_matrix_type Hx;
-		real_matrix_type Hy;
-		
-		// 'non-conservative' variables.
-		real_matrix_type eta;
-		real_matrix_type u;
-		real_matrix_type v;
-
-		// RHS and RK Residual storage
-		real_matrix_type RHS1, RHS2, RHS3;
-		real_matrix_type resRK1, resRK2, resRK3;
-	};
-
 	const index_type rkStages = 2;
 
-	physParams p;
-	numParams n;
-	fields fds[2];
+	sw2d::physParams p; 
+	p.CD = 2.5e-3;
+	p.f = 1.0070e-4;
+	p.initTime = 0.0;
+	p.finalTime = 24.0*3600;
+
+	sw2d::numParams n;
+	n.N = 1;
+	n.CFL = 0.6;
+	n.outputInterval = 20;
+	n.filterPercent = 0.95;
+	n.filterOrder = 4;
+
+	sw2d::fields fds[2];
 
 	real_type t = p.initTime;
 
@@ -96,8 +69,6 @@ int main(int argc, char **argv) {
 	meshManager.readElements("input/vh_els_0.oct");
 	// Dependency-inject mesh manager to nodes provisioner.
 	TriangleNodesProvisioner triangleNodesProvisioner(n.N, meshManager);
-
-	n.K = meshManager.get_NumElements();
 
 	// Pre-processing step - build polynomial dealiasing filter.
 	triangleNodesProvisioner.buildFilter(n.filterPercent*n.N, n.filterOrder);
@@ -113,32 +84,30 @@ int main(int argc, char **argv) {
 
 	// Allocate memory for fields.
 	for (index_type i=0; i < rkStages; ++i) {
-		fds[i].h   = real_matrix_type(n.Np, n.K);
-		fds[i].hu  = real_matrix_type(n.Np, n.K);
-		fds[i].hv  = real_matrix_type(n.Np, n.K);
-		fds[i].eta = real_matrix_type(n.Np, n.K);
-		fds[i].Hx  = real_matrix_type(n.Np, n.K);
-		fds[i].Hy  = real_matrix_type(n.Np, n.K);
-		fds[i].u   = real_matrix_type(n.Np, n.K);
-		fds[i].v   = real_matrix_type(n.Np, n.K);
-		fds[i].RHS1 = real_matrix_type(n.Np, n.K);
-		fds[i].RHS2 = real_matrix_type(n.Np, n.K);
-		fds[i].RHS3 = real_matrix_type(n.Np, n.K);
-		fds[i].resRK1 = real_matrix_type(n.Np, n.K);
-		fds[i].resRK2 = real_matrix_type(n.Np, n.K);
+		fds[i].h   = real_matrix_type(dg.Np, dg.K);
+		fds[i].hu  = real_matrix_type(dg.Np, dg.K);
+		fds[i].hv  = real_matrix_type(dg.Np, dg.K);
+		fds[i].eta = real_matrix_type(dg.Np, dg.K);
+		fds[i].Hx  = real_matrix_type(dg.Np, dg.K);
+		fds[i].Hy  = real_matrix_type(dg.Np, dg.K);
+		fds[i].u   = real_matrix_type(dg.Np, dg.K);
+		fds[i].v   = real_matrix_type(dg.Np, dg.K);
+		fds[i].RHS1 = real_matrix_type(dg.Np, dg.K);
+		fds[i].RHS2 = real_matrix_type(dg.Np, dg.K);
+		fds[i].RHS3 = real_matrix_type(dg.Np, dg.K);
+		fds[i].resRK1 = real_matrix_type(dg.Np, dg.K);
+		fds[i].resRK2 = real_matrix_type(dg.Np, dg.K);
 	}
 
 	// Make amazing references to the fields at different time-levels.
-	fields& fields_n = fds[0];
-	fields& fields_np1 = fds[1];
+	sw2d::fields& fields_n = fds[0];
+	sw2d::fields& fields_np1 = fds[1];
 
 	unordered_set<index_type> obcNodes = {0,1,2,3,5,6,8,11,12,15,19,20,25,28,31,37,39,44,51,52,60,65,69,78,81,88,98,99,110,117,122,137,157,178,199,220,242,264,287,310,334,358,383,409,435,461,488,516,544,573,602,631,660,690,721,753,784,816,849,933,1018,1106,1193,1281,1369,1455,1538,1619,1699,1781,1813,1846,1879,1912,1946,1980,2014,2049,2084,2120,2156,2192,2228,2265,2302,2340,2374,2412,2448,2488,2526,2565,2603,2642,2682,2723,2765,2804,2845,2886,2929,2972,3014,3054,3097,3144,3190,3236,3284,3329,3376,3492,3607,3724,3835,3953,4074,4192,4321,4461,4625,4691,4759,4829,4900,4971,5039,5107,5175,5253,5319,5383,5440,5494,5562,5620,5681,5746,5904,6064,6221,6374,6541,6704,6872,7028,7186,7374,7580,7788,8009,8233,8482,8783,9138,9587,9762,9920,10068,10202,10338,10461,10582,10699,10817,10918,11015,11118,11217,11310,11564,11829,12073,12326,12584,12866,13191,13559,14017,14554,15146,15717,16037,16309,16533,16750,16878,17009,17147,17280,17554,17870,18093,18276,18471,18712,18940,19142,19294,19424,19540,19652,19740,19836,19929,20013,20111,20216,20341,20465,20605,20733,20852,20970,21066,21157,21246,21345,21469,21591,21726,21847,21952,22043,22127,22195,22257,22308,22351,22391,22429,22467,22500,22529,22557,22586,22617};
 
 	firstIndex ii;
 	secondIndex jj;
 	thirdIndex kk;
-
-
 
 	const string depthFile = "input/H0_try2.oct";
 	sw2d::readDepthData(depthFile, fields_n.H);
@@ -178,14 +147,14 @@ int main(int argc, char **argv) {
     index_vector_type bcType = meshManager.get_BCType();
 
 	// Get bed slopes
-	Hx = (dg.rx*sum(dg.Dr(ii,kk)*fields_n.H(kk,jj), kk) + dg.sx*sum(dg.Ds(ii,kk)*fields_n.H(kk,jj), kk));
-	Hy = (dg.ry*sum(dg.Dr(ii,kk)*fields_n.H(kk,jj), kk) + dg.sy*sum(dg.Ds(ii,kk)*fields_n.H(kk,jj), kk));
+	fields_n.Hx = (dg.rx*sum(dg.Dr(ii,kk)*fields_n.H(kk,jj), kk) + dg.sx*sum(dg.Ds(ii,kk)*fields_n.H(kk,jj), kk));
+	fields_n.Hy = (dg.ry*sum(dg.Dr(ii,kk)*fields_n.H(kk,jj), kk) + dg.sy*sum(dg.Ds(ii,kk)*fields_n.H(kk,jj), kk));
 
-	Hx = sum(dg.Filt(ii,kk)*fields_n.Hx(kk,jj), kk);
-	Hy = sum(dg.Filt(ii,kk)*fields_n.Hy(kk,jj), kk);
+	fields_n.Hx = sum(dg.Filt(ii,kk)*fields_n.Hx(kk,jj), kk);
+	fields_n.Hy = sum(dg.Filt(ii,kk)*fields_n.Hy(kk,jj), kk);
 
 	// deal with open boundary conditions.
-	for (index_type k=0; k < n.K; ++k) {
+	for (index_type k=0; k < dg.K; ++k) {
 			index_type v1 = EToV(3*k);
 			index_type v2 = EToV(3*k+1);
 			index_type v3 = EToV(3*k+2);
@@ -208,9 +177,7 @@ int main(int argc, char **argv) {
 	index_vector_type vmapO(outLength);
 	const index_vector_type& vmapM = triangleNodesProvisioner.get_vmapM();
 
-	index_type numFaces = triangleNodesProvisioner.NumFaces;
-	index_type Nfp = triangleNodesProvisioner.get_NumFacePoints();
-	index_type numFaceNodes = numFaces*Nfp*K;
+	index_type numFaceNodes = dg.NumFaces*dg.Nfp*dg.K;
 
 	real_vector_type xVec(numFaceNodes), yVec(numFaceNodes);
 
@@ -221,13 +188,13 @@ int main(int argc, char **argv) {
 	// sponge layer -- build that wall!
 	real_type radInfl = 10000.0;
 	real_type spongeStrength = 1000.0;
-	real_matrix_type spongeCoeff(dg.Np, n.K);
+	real_matrix_type spongeCoeff(dg.Np, dg.K);
 	spongeCoeff = 0.0*jj;
 
-	for(index_type k=0; k < K; ++k) {
-		for(index_type n=0; n < Np; ++n) {
+	for(index_type k=0; k < dg.K; ++k) {
+		for(index_type n=0; n < dg.Np; ++n) {
 			
-			real_type x0 = x(n,k), y0 = y(n,k);
+			real_type x0 = dg.x(n,k), y0 = dg.y(n,k);
 			real_type closestDist = 1.0e12;
 
 			for (index_type i=0; i < outLength; ++i) {
@@ -248,117 +215,100 @@ int main(int argc, char **argv) {
 
 	real_type dt;
 	while (t < p.finalTime) {
-		real_matrix_type u(Np,K), v(Np,K);
-		real_vector_type uVec(Np*K), vVec(Np*K), hVec(Np*K);
+		real_vector_type uVec(dg.Np*dg.K), vVec(dg.Np*dg.K), hVec(dg.Np*dg.K);
 		real_vector_type uM(numFaceNodes), vM(numFaceNodes), hM(numFaceNodes), fsVec(numFaceNodes);
 
-		u = hu/h; v = hv/h;
-		
-		fullToVector(u, uVec, false);
-		fullToVector(v, vVec, false);
-		fullToVector(h, hVec, false);
-		fullToVector(Fscale, fsVec, false);
+		fields_n.u = fields_n.hu/fields_n.h; 
+		fields_n.v = fields_n.hv/fields_n.h;
+
+		fullToVector(fields_n.u, uVec, false);
+		fullToVector(fields_n.v, vVec, false);
+		fullToVector(fields_n.h, hVec, false);
+		fullToVector(dg.Fscale , fsVec, false);
 		applyIndexMap(uVec, vmapM, uM);
 		applyIndexMap(vVec, vmapM, vM);
 		applyIndexMap(hVec, vmapM, hM);
 		real_vector_type spd(numFaceNodes);
-		spd = blitz::sqrt(uM*uM + vM*vM) + blitz::sqrt(g*hM);
+		spd = blitz::sqrt(uM*uM + vM*vM) + blitz::sqrt(p.g*hM);
 		real_type spdFscaleMax = blitz::max(fsVec*spd);
-		dt = CFL/((N+1)*(N+1)*0.5*spdFscaleMax);
+		dt = n.CFL/((n.N+1)*(n.N+1)*0.5*spdFscaleMax);
 
-		if ((count % outputInterval) == 0) {
+		if ((count % n.outputInterval) == 0) {
 			cout << "dt=" << dt << endl;
-			cout << "t=" << t << ", h_min=" << blitz::min(h) << ", h_max=" << normMax(h) << ", hu_max=" << normMax(hu) << ", hv_max=" << normMax(hv) << endl;
+			cout << "t=" << t << ", h_min=" << blitz::min(fields_n.h) << ", h_max=" << normMax(fields_n.h) << ", hu_max=" << normMax(fields_n.hu) << ", hv_max=" << normMax(fields_n.hv) << endl;
 #ifndef __MINGW32__
 			string fileName = vtkOutputter.generateFileName("eta", count);
-			vtkOutputter.writeFieldToFile(fileName, eta, "eta");
+			vtkOutputter.writeFieldToFile(fileName, fields_n.eta, "eta");
 #endif
 		}	
 
 		// 2nd order SSP Runge-Kutta
-		sw2d::computeRHS(h, hu, hv, p.g, H, Hx, Hy, CD, p.f, triangleNodesProvisioner, RHS1, RHS2, RHS3, t, Filt);
+		sw2d::computeRHS(fields_n, n, p, dg, t);
 		// Update solution.
-		h1  = h + dt*RHS1;
-		hu1 = hu + dt*RHS2;
-		hv1 = hv + dt*RHS3;
+		fields_np1.h  = fields_n.h  + dt*fields_n.RHS1;
+		fields_np1.hu = fields_n.hu + dt*fields_n.RHS2;
+		fields_np1.hv = fields_n.hv + dt*fields_n.RHS3;
 
-		//hu /= (1.0 + spongeCoeff*hu*hu);
-		//hv /= (1.0 + spongeCoeff*hv*hv);
+		// sponge layer relaxation -- to control insane velocities near the open boundary.		
+		fields_np1.hu /= (1.0 + spongeCoeff*fields_np1.hu*fields_np1.hu);
+		fields_np1.hv /= (1.0 + spongeCoeff*fields_np1.hv*fields_np1.hv);
 
-		sw2d::computeRHS(h1, hu1, hv1, g, H, Hx, Hy, CD, f, triangleNodesProvisioner, RHS1, RHS2, RHS3, t, Filt);
+		sw2d::computeRHS(fields_np1, n, p, dg, t);
 
-		h  = 0.5*(h  + h1  + dt*RHS1);
-		hu = 0.5*(hu + hu1 + dt*RHS2);
-		hv = 0.5*(hv + hv1 + dt*RHS3);
+		fields_n.h  = 0.5*(fields_n.h  + fields_np1.h  + dt*fields_np1.RHS1);
+		fields_n.hu = 0.5*(fields_n.hu + fields_np1.hu + dt*fields_np1.RHS2);
+		fields_n.hv = 0.5*(fields_n.hv + fields_np1.hv + dt*fields_np1.RHS3);
 
-		// sponge layer relaxation -- to control insane velocities near the open boundary.
-		//hu /= (1.0 + spongeCoeff*hu*hu);
-		//hv /= (1.0 + spongeCoeff*hv*hv);
+		fields_n.hu /= (1.0 + spongeCoeff*fields_n.hu*fields_n.hu);
+		fields_n.hv /= (1.0 + spongeCoeff*fields_n.hv*fields_n.hv);
 
-		eta = h-H;
-		real_type eta_max = normMax(eta);
-		if ( std::abs(eta_max) > 1e8  || std::isnan(sum(eta)))
+		fields_n.eta = fields_n.h-fields_n.H;
+		real_type eta_max = normMax(fields_n.eta);
+		if ( std::abs(eta_max) > 1e8  || std::isnan(sum(fields_n.eta)))
 			throw std::runtime_error("A numerical instability has occurred!");
 
 		t += dt;
 		count++;
 	}
-	real_matrix_type etafinal(Np, K);
-	etafinal = h - H;
+	real_matrix_type etafinal(dg.Np, dg.K);
+	etafinal = fields_n.h - fields_n.H;
 
 	return 0;
 } // end main
 
 namespace blitzdg {
 	namespace sw2d {
-		void computeRHS(real_matrix_type& h, real_matrix_type& hu, real_matrix_type& hv, real_type g, real_matrix_type& H, real_matrix_type& Hx, real_matrix_type& Hy, real_type CD, real_type f, TriangleNodesProvisioner& triangleNodesProvisioner, real_matrix_type& RHS1, real_matrix_type& RHS2, real_matrix_type& RHS3, real_type t, const real_matrix_type& Filt) {
+		void computeRHS(fields fds, numParams num, physParams phys, DGContext2D dg, real_type t) {
 
 			real_type T_tide = 3600*12.42; // or something?
 			real_type om_tide = 2.0*pi/T_tide;
 			real_type amp_tide = 0*3.e-4; // 3.
+			real_type g = phys.g;
 
 			// Blitz indices
 			firstIndex ii;
 			secondIndex jj;
 			thirdIndex kk;
 
-			// Differentiation matrices and scaling factors.
-			const real_matrix_type& Dr = triangleNodesProvisioner.get_Dr();
-			const real_matrix_type& Ds = triangleNodesProvisioner.get_Ds();
-
-			const real_matrix_type& rx = triangleNodesProvisioner.get_rx();
-			const real_matrix_type& ry = triangleNodesProvisioner.get_ry();
-			const real_matrix_type& sx = triangleNodesProvisioner.get_sx();
-			const real_matrix_type& sy = triangleNodesProvisioner.get_sy();
-
-			const real_matrix_type &nx = triangleNodesProvisioner.get_nx();
-			const real_matrix_type &ny = triangleNodesProvisioner.get_ny();
-
-			// Get volume to surface maps.
-			const index_vector_type& vmapM = triangleNodesProvisioner.get_vmapM();
-			const index_vector_type& vmapP = triangleNodesProvisioner.get_vmapP();
-
 			// boundary indices.
-			const index_hashmap& bcHash = triangleNodesProvisioner.get_bcMap();
+			const index_hashmap& bcHash = dg.bcHash;
 			const std::vector<index_type>& mapW = bcHash.at(BCTag::Wall);
 			const std::vector<index_type>& mapO = bcHash.at(BCTag::Out);
 
-			index_type numFaces = triangleNodesProvisioner.NumFaces;
-			index_type Nfp = triangleNodesProvisioner.get_NumFacePoints();
-			index_type Np = triangleNodesProvisioner.get_NumLocalPoints();
-			index_type K = triangleNodesProvisioner.get_NumElements();
+			index_type numFaces = dg.NumFaces;
+			index_type Nfp = dg.Nfp;
+			index_type Np = dg.Np;
+			index_type K = dg.K;
 
 			index_type numFaceNodes = numFaces*Nfp*K;
 			index_type numTotalNodes = Np*K;
 
 			real_vector_type dh(numFaceNodes), dhu(numFaceNodes), dhv(numFaceNodes);
-
 			real_vector_type hM(numFaceNodes), hP(numFaceNodes), HM(numFaceNodes), HP(numFaceNodes);
 			real_vector_type huM(numFaceNodes), huP(numFaceNodes);
 			real_vector_type hvM(numFaceNodes), hvP(numFaceNodes);
 
 			real_vector_type nxVec(numFaceNodes), nyVec(numFaceNodes);
-
 			real_vector_type hVec(numTotalNodes), huVec(numTotalNodes), hvVec(numTotalNodes), Hvec(numTotalNodes);
 
 			dh = 0.*ii;
@@ -373,26 +323,26 @@ namespace blitzdg {
 			// We want to apply maps to column-wise ordering of the nodes.
 			const bool byRowsOpt = false;
 
-			fullToVector(nx, nxVec, byRowsOpt);
-			fullToVector(ny, nyVec, byRowsOpt);
+			fullToVector(dg.nx, nxVec, byRowsOpt);
+			fullToVector(dg.ny, nyVec, byRowsOpt);
 
-			fullToVector(h, hVec, byRowsOpt);
-			fullToVector(hu, huVec, byRowsOpt);
-			fullToVector(hv, hvVec, byRowsOpt);
+			fullToVector(fds.h, hVec, byRowsOpt);
+			fullToVector(fds.hu, huVec, byRowsOpt);
+			fullToVector(fds.hv, hvVec, byRowsOpt);
 
-			fullToVector(H, Hvec, byRowsOpt);
+			fullToVector(fds.H, Hvec, byRowsOpt);
 
-			applyIndexMap(hVec, vmapM, hM);
-			applyIndexMap(hVec, vmapP, hP);
+			applyIndexMap(hVec, dg.vmapM, hM);
+			applyIndexMap(hVec, dg.vmapP, hP);
 
-			applyIndexMap(huVec, vmapM, huM);
-			applyIndexMap(huVec, vmapP, huP);
+			applyIndexMap(huVec, dg.vmapM, huM);
+			applyIndexMap(huVec, dg.vmapP, huP);
 
-			applyIndexMap(hvVec, vmapM, hvM);
-			applyIndexMap(hvVec, vmapP, hvP);
+			applyIndexMap(hvVec, dg.vmapM, hvM);
+			applyIndexMap(hvVec, dg.vmapP, hvP);
 
-			applyIndexMap(Hvec, vmapM, HM);
-			applyIndexMap(Hvec, vmapP, HP);
+			applyIndexMap(Hvec, dg.vmapM, HM);
+			applyIndexMap(Hvec, dg.vmapP, HP);
 
 			// BC's - no flow through walls.
 			for (index_type i=0; i < static_cast<index_type>(mapW.size()); ++i) {
@@ -446,11 +396,11 @@ namespace blitzdg {
 			real_vector_type& F3P = G2P;  G3P = (hvP*hvP)/hP + 0.5*g*hM*hM;
 
 			// Full fields
-			real_matrix_type& F1 = hu, G1 = hv;
+			real_matrix_type& F1 = fds.hu, G1 = fds.hv;
 			real_matrix_type F2(Np, K), G2(Np, K), G3(Np, K);
 
-			F2 = (hu*hu)/h + 0.5*g*h*h; G2 = (hu*hv)/h;
-			real_matrix_type& F3 = G2;  G3 = (hv*hv)/h + 0.5*g*h*h;
+			F2 = (fds.hu*fds.hu)/fds.h + 0.5*g*fds.h*fds.h; G2 = (fds.hu*fds.hv)/fds.h;
+			real_matrix_type& F3 = G2;  G3 = (fds.hv*fds.hv)/fds.h + 0.5*g*fds.h*fds.h;
 
 			// compute maximum linearized wave-speed - for numerical flux stabilization.
 			real_vector_type uM(numFaceNodes), vM(numFaceNodes);
@@ -487,18 +437,18 @@ namespace blitzdg {
 			// RHS == -Flux divergence + surface integral contributions.
 
 			// Flux divergence:
-			RHS1 = -(rx*sum(Dr(ii,kk)*F1(kk,jj), kk) + sx*sum(Ds(ii,kk)*F1(kk,jj), kk));
-			RHS1+= -(ry*sum(Dr(ii,kk)*G1(kk,jj), kk) + sy*sum(Ds(ii,kk)*G1(kk,jj), kk));
+			fds.RHS1 = -(dg.rx*sum(dg.Dr(ii,kk)*F1(kk,jj), kk) + dg.sx*sum(dg.Ds(ii,kk)*F1(kk,jj), kk));
+			fds.RHS1+= -(dg.ry*sum(dg.Dr(ii,kk)*G1(kk,jj), kk) + dg.sy*sum(dg.Ds(ii,kk)*G1(kk,jj), kk));
 
-			RHS2 = -(rx*sum(Dr(ii,kk)*F2(kk,jj), kk) + sx*sum(Ds(ii,kk)*F2(kk,jj), kk));
-			RHS2+= -(ry*sum(Dr(ii,kk)*G2(kk,jj), kk) + sy*sum(Ds(ii,kk)*G2(kk,jj), kk));
+			fds.RHS2 = -(dg.rx*sum(dg.Dr(ii,kk)*F2(kk,jj), kk) + dg.sx*sum(dg.Ds(ii,kk)*F2(kk,jj), kk));
+			fds.RHS2+= -(dg.ry*sum(dg.Dr(ii,kk)*G2(kk,jj), kk) + dg.sy*sum(dg.Ds(ii,kk)*G2(kk,jj), kk));
 
-			RHS3 = -(rx*sum(Dr(ii,kk)*F3(kk,jj), kk) + sx*sum(Ds(ii,kk)*F3(kk,jj), kk));
-			RHS3+= -(ry*sum(Dr(ii,kk)*G3(kk,jj), kk) + sy*sum(Ds(ii,kk)*G3(kk,jj), kk));
+			fds.RHS3 = -(dg.rx*sum(dg.Dr(ii,kk)*F3(kk,jj), kk) + dg.sx*sum(dg.Ds(ii,kk)*F3(kk,jj), kk));
+			fds.RHS3+= -(dg.ry*sum(dg.Dr(ii,kk)*G3(kk,jj), kk) + dg.sy*sum(dg.Ds(ii,kk)*G3(kk,jj), kk));
 
 			// Surface integral contributions
-			const real_matrix_type& Fscale = triangleNodesProvisioner.get_Fscale();
-			const real_matrix_type& Lift   = triangleNodesProvisioner.get_Lift();
+			const real_matrix_type& Fscale = dg.Fscale;
+			const real_matrix_type& Lift   = dg.Lift;
 
 			real_matrix_type surfaceRHS1(Nfp*numFaces, K), surfaceRHS2(Nfp*numFaces, K), surfaceRHS3(Nfp*numFaces, K);
 
@@ -508,34 +458,34 @@ namespace blitzdg {
 			surfaceRHS3 = Fscale*dFlux3Mat;
 
 			// Integrate using Lifting operator, add to RHS
-			RHS1+= sum(Lift(ii,kk)*surfaceRHS1(kk,jj), kk);
-			RHS2+= sum(Lift(ii,kk)*surfaceRHS2(kk,jj), kk);
-			RHS3+= sum(Lift(ii,kk)*surfaceRHS3(kk,jj), kk);
+			fds.RHS1+= sum(Lift(ii,kk)*surfaceRHS1(kk,jj), kk);
+			fds.RHS2+= sum(Lift(ii,kk)*surfaceRHS2(kk,jj), kk);
+			fds.RHS3+= sum(Lift(ii,kk)*surfaceRHS3(kk,jj), kk);
 
 			// Add source terms
 			real_matrix_type u(Np, K), v(Np, K); 
-			u = hu/h;
-			v = hv/h;
+			u = fds.hu/fds.h;
+			v = fds.hv/fds.h;
 
 			// bottom topography
 			real_matrix_type sourcex(Np, K);
 			real_matrix_type sourcey(Np, K);
 
-			sourcex = g*h*Hx;
-			sourcey = g*h*Hy;
+			sourcex = g*fds.h*fds.Hx;
+			sourcey = g*fds.h*fds.Hy;
 
-			RHS2+= sourcex;
-			RHS3+= sourcey;
+			fds.RHS2+= sourcex;
+			fds.RHS3+= sourcey;
 
 			// bottom drag
 			real_matrix_type norm_u(Np,K);
 			norm_u = blitz::sqrt(u*u + v*v);
-			RHS2+= -CD*u*norm_u;
-			RHS3+= -CD*v*norm_u;
+			fds.RHS2+= -phys.CD*u*norm_u;
+			fds.RHS3+= -phys.CD*v*norm_u;
 
 			// Coriolis force
-			RHS2+=  f*hv;
-			RHS3+= -f*hu;
+			fds.RHS2+=  phys.f*fds.hv;
+			fds.RHS3+= -phys.f*fds.hu;
 		} // computeRHS
 
 		void readDepthData(const std::string& depthFile, real_matrix_type& H) {

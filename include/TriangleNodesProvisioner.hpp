@@ -20,6 +20,7 @@ namespace blitzdg {
     struct DGContext2D {
         const index_type& Np;
         const index_type& Nfp;
+        const index_type& K;
         const index_type& NumFaces;
         const real_matrix_type& Filt;
         const real_matrix_type& x;
@@ -35,6 +36,9 @@ namespace blitzdg {
         const real_matrix_type& Dr;
         const real_matrix_type& Ds;
         const index_hashmap& bcHash;
+        const index_vector_type& vmapM;
+        const index_vector_type& vmapP;
+        const real_matrix_type& Lift;
     };
 
   /**

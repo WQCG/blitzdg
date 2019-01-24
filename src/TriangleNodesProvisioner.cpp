@@ -64,6 +64,7 @@ namespace blitzdg {
 		Jacobi{}, Vandermonde{}, LinSolver{}, Inverter{}, DGContext{
             Np: NumLocalPoints,
             Nfp: NumFacePoints,
+            K: NumElements,
             NumFaces: NumFaces,
             Filt: *Filter,
             x: *xGrid,
@@ -78,7 +79,10 @@ namespace blitzdg {
             ny: *ny,
             Dr: *Dr,
             Ds: *Ds,
-            bcHash: *BCmap
+            bcHash: *BCmap,
+            vmapM: *vmapM,
+            vmapP: *vmapP,
+            Lift: *Lift
         }
     {
         // Nodal construction required for physical simulations.
