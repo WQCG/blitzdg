@@ -44,8 +44,6 @@ int main(int argc, char **argv) {
 
 	printDisclaimer();
 
-	const index_type rkStages = 2;
-
 	sw2d::physParams p; 
 	p.CD = 2.5e-3;
 	p.f = 1.0070e-4;
@@ -54,12 +52,10 @@ int main(int argc, char **argv) {
 
 	sw2d::numParams n;
 	n.N = 1;
-	n.CFL = 0.6;
+	n.CFL = 0.55;
 	n.outputInterval = 20;
 	n.filterPercent = 0.95;
 	n.filterOrder = 4;
-
-	sw2d::fields fds[2];
 
 	real_type t = p.initTime;
 
@@ -83,25 +79,25 @@ int main(int argc, char **argv) {
 	CsvOutputter outputter;
 
 	// Allocate memory for fields.
-	for (index_type i=0; i < rkStages; ++i) {
-		fds[i].h   = real_matrix_type(dg.Np, dg.K);
-		fds[i].hu  = real_matrix_type(dg.Np, dg.K);
-		fds[i].hv  = real_matrix_type(dg.Np, dg.K);
-		fds[i].eta = real_matrix_type(dg.Np, dg.K);
-		fds[i].Hx  = real_matrix_type(dg.Np, dg.K);
-		fds[i].Hy  = real_matrix_type(dg.Np, dg.K);
-		fds[i].u   = real_matrix_type(dg.Np, dg.K);
-		fds[i].v   = real_matrix_type(dg.Np, dg.K);
-		fds[i].RHS1 = real_matrix_type(dg.Np, dg.K);
-		fds[i].RHS2 = real_matrix_type(dg.Np, dg.K);
-		fds[i].RHS3 = real_matrix_type(dg.Np, dg.K);
-		fds[i].resRK1 = real_matrix_type(dg.Np, dg.K);
-		fds[i].resRK2 = real_matrix_type(dg.Np, dg.K);
-	}
+	sw2d::fields fields_n {
+			h:   real_matrix_type(dg.Np, dg.K),
+			hu:  real_matrix_type(dg.Np, dg.K),
+			hv:  real_matrix_type(dg.Np, dg.K),
+		    H:   real_matrix_type(dg.Np, dg.K),
+			Hx:  real_matrix_type(dg.Np, dg.K),
+		    Hy:  real_matrix_type(dg.Np, dg.K),
+			eta: real_matrix_type(dg.Np, dg.K),
+			u: real_matrix_type(dg.Np, dg.K),
+			v: real_matrix_type(dg.Np, dg.K),
+			RHS1: real_matrix_type(dg.Np, dg.K),
+			RHS2: real_matrix_type(dg.Np, dg.K),
+			RHS3: real_matrix_type(dg.Np, dg.K),
+			resRK1: real_matrix_type(dg.Np, dg.K),
+			resRK2: real_matrix_type(dg.Np, dg.K)
+		};
 
-	// Make amazing references to the fields at different time-levels.
-	sw2d::fields& fields_n = fds[0];
-	sw2d::fields& fields_np1 = fds[1];
+	// copy for next time-step.
+	sw2d::fields fields_np1 = fields_n;
 
 	unordered_set<index_type> obcNodes = {0,1,2,3,5,6,8,11,12,15,19,20,25,28,31,37,39,44,51,52,60,65,69,78,81,88,98,99,110,117,122,137,157,178,199,220,242,264,287,310,334,358,383,409,435,461,488,516,544,573,602,631,660,690,721,753,784,816,849,933,1018,1106,1193,1281,1369,1455,1538,1619,1699,1781,1813,1846,1879,1912,1946,1980,2014,2049,2084,2120,2156,2192,2228,2265,2302,2340,2374,2412,2448,2488,2526,2565,2603,2642,2682,2723,2765,2804,2845,2886,2929,2972,3014,3054,3097,3144,3190,3236,3284,3329,3376,3492,3607,3724,3835,3953,4074,4192,4321,4461,4625,4691,4759,4829,4900,4971,5039,5107,5175,5253,5319,5383,5440,5494,5562,5620,5681,5746,5904,6064,6221,6374,6541,6704,6872,7028,7186,7374,7580,7788,8009,8233,8482,8783,9138,9587,9762,9920,10068,10202,10338,10461,10582,10699,10817,10918,11015,11118,11217,11310,11564,11829,12073,12326,12584,12866,13191,13559,14017,14554,15146,15717,16037,16309,16533,16750,16878,17009,17147,17280,17554,17870,18093,18276,18471,18712,18940,19142,19294,19424,19540,19652,19740,19836,19929,20013,20111,20216,20341,20465,20605,20733,20852,20970,21066,21157,21246,21345,21469,21591,21726,21847,21952,22043,22127,22195,22257,22308,22351,22391,22429,22467,22500,22529,22557,22586,22617};
 
@@ -112,19 +108,13 @@ int main(int argc, char **argv) {
 	const string depthFile = "input/H0_try2.oct";
 	sw2d::readDepthData(depthFile, fields_n.H);
 
+
 #ifndef __MINGW32__
 	string vtkFileName = "H.vtu";
 	vtkOutputter.writeFieldToFile(vtkFileName, fields_n.H, "H");
 #endif
 
 	// Set initial values for fields
-	fields_n.eta = 0*jj;
-	fields_n.h = fields_n.H + fields_n.eta;
-	fields_n.u = 0*jj;
-	fields_n.v = 0*jj;
-	fields_n.hu = fields_n.h*fields_n.u;
-	fields_n.hv = fields_n.h*fields_n.v;
-		
 	fields_n.RHS1 = 0*jj;
 	fields_n.RHS2 = 0*jj;
 	fields_n.RHS3 = 0*jj;
@@ -153,6 +143,23 @@ int main(int argc, char **argv) {
 	fields_n.Hx = sum(dg.Filt(ii,kk)*fields_n.Hx(kk,jj), kk);
 	fields_n.Hy = sum(dg.Filt(ii,kk)*fields_n.Hy(kk,jj), kk);
 
+	// zero them out.
+	fields_n.H = 0*jj + 400.0;
+	fields_n.Hx = 0*jj;
+	fields_n.Hy = 0*jj;
+
+	// TODO: replace H with references on the structs, so we don't have these copies.
+	fields_np1.H = fields_n.H;
+	fields_np1.Hx = fields_n.Hx;
+	fields_np1.Hy = fields_n.Hy;
+
+	fields_n.eta = 0*jj;
+	fields_n.h = fields_n.H;
+	fields_n.u = 0*jj;
+	fields_n.v = 0*jj;
+	fields_n.hu = fields_n.h*fields_n.u;
+	fields_n.hv = fields_n.h*fields_n.v;
+
 	// deal with open boundary conditions.
 	for (index_type k=0; k < dg.K; ++k) {
 			index_type v1 = EToV(3*k);
@@ -178,7 +185,7 @@ int main(int argc, char **argv) {
 
 	real_type dt;
 	while (t < p.finalTime) {
-
+		fields_n.eta = fields_n.h-fields_n.H;
 		dt = computeTimeStep(fields_n, p, n, dg);
 
 		if ((count % n.outputInterval) == 0) {
@@ -210,7 +217,6 @@ int main(int argc, char **argv) {
 		fields_n.hu /= (1.0 + spongeCoeff*fields_n.hu*fields_n.hu);
 		fields_n.hv /= (1.0 + spongeCoeff*fields_n.hv*fields_n.hv);
 
-		fields_n.eta = fields_n.h-fields_n.H;
 		real_type eta_max = normMax(fields_n.eta);
 		if ( std::abs(eta_max) > 1e8  || std::isnan(sum(fields_n.eta)))
 			throw std::runtime_error("A numerical instability has occurred!");
@@ -253,7 +259,7 @@ namespace blitzdg {
 
 			real_type T_tide = 3600*12.42; // or something?
 			real_type om_tide = 2.0*pi/T_tide;
-			real_type amp_tide = 0*3.e-4; // 3.
+			real_type amp_tide = 3.0; // 3.
 			real_type g = phys.g;
 
 			// Blitz indices
@@ -322,11 +328,11 @@ namespace blitzdg {
 			// OBC's - free surface moves up and down according to the tidal forcing.
 			for (index_type i=0; i < static_cast<index_type>(mapO.size()); ++i) {
 				index_type o = mapO[i];
-				huP(o) = huM(o) - 2*nxVec(o)*(huM(o)*nxVec(o) + hvM(o)*nyVec(o));
-				hvP(o) = hvM(o) - 2*nyVec(o)*(huM(o)*nxVec(o) + hvM(o)*nyVec(o));
-				//huP(o) = huM(o);
-				//hvP(o) = hvM(o);
-				//hP(o) = HM(o) + amp_tide*std::cos(om_tide*t)*0.5*(std::tanh(0.15/3600*(t-T_tide))+1);
+				//huP(o) = huM(o) - 2*nxVec(o)*(huM(o)*nxVec(o) + hvM(o)*nyVec(o));
+				//hvP(o) = hvM(o) - 2*nyVec(o)*(huM(o)*nxVec(o) + hvM(o)*nyVec(o));
+				huP(o) = huM(o);
+				hvP(o) = hvM(o);
+				hP(o) = HM(o) + amp_tide*std::cos(om_tide*t)*0.5*(std::tanh(0.15/3600*(t-T_tide))+1);
 			}
 
 			// well-balancing scheme (star variables).
