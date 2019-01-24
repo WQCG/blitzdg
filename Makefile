@@ -42,8 +42,14 @@ ifneq ($(MAKECMDGOALS), clean)
 -include $(DEPS)
 endif
 
-CFLAGS := -g -Wall -std=c++0x -fprofile-arcs -ftest-coverage -DBZ_DEBUG
-LINKERFLAGS := -fprofile-arcs
+ifeq ($(DEBUG), 1)
+	CFLAGS :=-g -Wall -std=c++0x -fprofile-arcs -ftest-coverage -DBZ_DEBUG
+	LINKERFLAGS := -fprofile-arcs
+else
+	CFLAGS := -Wall -std=c++0x -O2
+	LINKERFLAGS := 
+endif
+
 INC += -I include/igloo -I include
 LIB += -lblitz -lmetis -lumfpack -lcxsparse -llapack -lblas
 EXPLICITLIBS := -lgfortran -lcholmod -lamd -lcolamd -lquadmath -lsuitesparseconfig -lcrtdll
