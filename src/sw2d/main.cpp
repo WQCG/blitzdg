@@ -1,4 +1,3 @@
-
 // Copyright (C) 2017-2019  Waterloo Quantitative Consulting Group, Inc.
 // See COPYING and LICENSE files at project root for more details.
 
@@ -80,20 +79,20 @@ int main(int argc, char **argv) {
 
 	// Allocate memory for fields.
 	sw2d::fields fields_n {
-			h:   real_matrix_type(dg.Np, dg.K),
-			hu:  real_matrix_type(dg.Np, dg.K),
-			hv:  real_matrix_type(dg.Np, dg.K),
-		    H:   real_matrix_type(dg.Np, dg.K),
-			Hx:  real_matrix_type(dg.Np, dg.K),
-		    Hy:  real_matrix_type(dg.Np, dg.K),
-			eta: real_matrix_type(dg.Np, dg.K),
-			u: real_matrix_type(dg.Np, dg.K),
-			v: real_matrix_type(dg.Np, dg.K),
-			RHS1: real_matrix_type(dg.Np, dg.K),
-			RHS2: real_matrix_type(dg.Np, dg.K),
-			RHS3: real_matrix_type(dg.Np, dg.K),
-			resRK1: real_matrix_type(dg.Np, dg.K),
-			resRK2: real_matrix_type(dg.Np, dg.K)
+			real_matrix_type(dg.Np, dg.K),
+			real_matrix_type(dg.Np, dg.K),
+			real_matrix_type(dg.Np, dg.K),
+		    real_matrix_type(dg.Np, dg.K),
+			real_matrix_type(dg.Np, dg.K),
+		    real_matrix_type(dg.Np, dg.K),
+			real_matrix_type(dg.Np, dg.K),
+			real_matrix_type(dg.Np, dg.K),
+			real_matrix_type(dg.Np, dg.K),
+			real_matrix_type(dg.Np, dg.K),
+			real_matrix_type(dg.Np, dg.K),
+			real_matrix_type(dg.Np, dg.K),
+			real_matrix_type(dg.Np, dg.K),
+			real_matrix_type(dg.Np, dg.K)
 		};
 
 	// copy for next time-step.
