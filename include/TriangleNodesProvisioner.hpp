@@ -9,36 +9,12 @@
 
 #pragma once
 #include "Nodes1DProvisioner.hpp"
+#include "DGContext2D.hpp"
 #include "MeshManager.hpp"
 #include "Types.hpp"
 #include <memory>
 
 namespace blitzdg {
-
-    struct DGContext2D {
-        const index_type& Np;
-        const index_type& Nfp;
-        const index_type& K;
-        const index_type& NumFaces;
-        const real_matrix_type& Filt;
-        const real_matrix_type& x;
-        const real_matrix_type& y;
-        const real_matrix_type& Fscale;
-        const real_matrix_type& J;
-        const real_matrix_type& rx;
-        const real_matrix_type& sx;
-        const real_matrix_type& ry;
-        const real_matrix_type& sy;
-        const real_matrix_type& nx;
-        const real_matrix_type& ny;
-        const real_matrix_type& Dr;
-        const real_matrix_type& Ds;
-        const index_hashmap& bcHash;
-        const index_vector_type& vmapM;
-        const index_vector_type& vmapP;
-        const real_matrix_type& Lift;
-    };
-
   /**
    * Provides facilities for the construction of two-dimensional
    * nodes, operators, and geometric factors on triangles.
@@ -93,9 +69,6 @@ namespace blitzdg {
       VandermondeBuilders Vandermonde;
       DirectSolver LinSolver;
       DenseMatrixInverter Inverter;
-
-      DGContext2D DGContext;
-
 
       /**
        * Helper method for checking that two points (x1,y1) and (x2,y2) are less than a distance eps apart.
