@@ -14,8 +14,6 @@
 #include <memory>
 
 namespace blitzdg {
-    using real_mat_smart_ptr = std::unique_ptr<real_matrix_type>;
-    using real_vec_smart_ptr = std::unique_ptr<real_vector_type>;
 
     struct DGContext2D {
         const index_type& Np;
