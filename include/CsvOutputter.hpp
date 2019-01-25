@@ -7,13 +7,15 @@
  */
 #pragma once
 #include "Types.hpp"
+#include "OutputterBase.hpp"
 #include <string>
 
 namespace blitzdg {
-    class CsvOutputter {
+    class CsvOutputter : OutputterBase {
 
     public:
         void writeFieldToFile(const std::string & fileName, const real_matrix_type & field, const char delimeter);
         std::string generateFileName(const std::string & fieldName, const index_type fileNumber);
+        void writeFieldsToFiles(std::unordered_map<std::string, real_matrix_type>, index_type tstep);
     };
 }
