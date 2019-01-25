@@ -29,7 +29,7 @@ jobs:
             DEBUG=1 CXX=x86_64-w64-mingw32-g++-posix INC="$INC -I mingw-include/" LIB="-L lib" make -j4 && make clean
       - run:
           name: Build (gcc)
-          command: DEBUG =1 CXX='g++ -Og' INC="-I /opt/blitzpp/blitz-1.0.1" make -j4
+          command: DEBUG=1 CXX='g++ -Og' INC="-I /opt/blitzpp/blitz-1.0.1" make -j4
       - run:
           name: Test
           command: make test
