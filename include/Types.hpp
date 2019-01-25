@@ -29,5 +29,8 @@ namespace blitzdg {
     using index_tensor3_type = tensor3_type<index_type>;
     using real_tensor3_type = tensor3_type<real_type>;
 
+    using real_mat_smart_ptr = std::unique_ptr<real_matrix_type>;
+    using real_vec_smart_ptr = std::unique_ptr<real_vector_type>;
+
     using index_hashmap = std::unordered_map<index_type, std::vector<index_type>>;
 }
