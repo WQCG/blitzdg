@@ -867,7 +867,7 @@ namespace blitzdg {
         return NumElements;
     }
 
-    const DGContext2D TriangleNodesProvisioner::get_DGContext() const {
+    DGContext2D TriangleNodesProvisioner::get_DGContext() const {
         return DGContext2D {
             NumLocalPoints,
             NumFacePoints,
