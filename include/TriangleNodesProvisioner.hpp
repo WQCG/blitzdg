@@ -318,7 +318,7 @@ namespace blitzdg {
        */
       const index_hashmap & get_bcMap() const;
 
-      const DGContext2D& get_DGContext() const;
+      const DGContext2D get_DGContext() const;
 
       /**
        * Builds nodes and local operators.

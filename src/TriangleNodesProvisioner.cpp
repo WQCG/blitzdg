@@ -867,8 +867,8 @@ namespace blitzdg {
         return NumElements;
     }
 
-    const DGContext2D& TriangleNodesProvisioner::get_DGContext() const {
-        DGContext2D* dgContext = new DGContext2D(
+    const DGContext2D TriangleNodesProvisioner::get_DGContext() const {
+        return DGContext2D {
             NumLocalPoints,
             NumFacePoints,
             NumElements,
@@ -890,8 +890,7 @@ namespace blitzdg {
             vmapM.get(),
             vmapP.get(),
             BCmap.get()
-        );
+        };
 
-        return *dgContext;
     }
 }
