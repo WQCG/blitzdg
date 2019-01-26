@@ -77,22 +77,25 @@ int main(int argc, char **argv) {
 	
 	CsvOutputter outputter;
 
+	index_type Np = dg.numLocalPoints();
+	index_type K = dg.numElements();
+
 	// Allocate memory for fields.
 	sw2d::fields fields_n {
-			real_matrix_type(dg.Np, dg.K),
-			real_matrix_type(dg.Np, dg.K),
-			real_matrix_type(dg.Np, dg.K),
-		    real_matrix_type(dg.Np, dg.K),
-			real_matrix_type(dg.Np, dg.K),
-		    real_matrix_type(dg.Np, dg.K),
-			real_matrix_type(dg.Np, dg.K),
-			real_matrix_type(dg.Np, dg.K),
-			real_matrix_type(dg.Np, dg.K),
-			real_matrix_type(dg.Np, dg.K),
-			real_matrix_type(dg.Np, dg.K),
-			real_matrix_type(dg.Np, dg.K),
-			real_matrix_type(dg.Np, dg.K),
-			real_matrix_type(dg.Np, dg.K)
+			real_matrix_type(Np, K),
+			real_matrix_type(Np, K),
+			real_matrix_type(Np, K),
+		    real_matrix_type(Np, K),
+			real_matrix_type(Np, K),
+		    real_matrix_type(Np, K),
+			real_matrix_type(Np, K),
+			real_matrix_type(Np, K),
+			real_matrix_type(Np, K),
+			real_matrix_type(Np, K),
+			real_matrix_type(Np, K),
+			real_matrix_type(Np, K),
+			real_matrix_type(Np, K),
+			real_matrix_type(Np, K)
 		};
 
 	// copy for next time-step.
@@ -125,8 +128,8 @@ int main(int argc, char **argv) {
 	index_type count = 0;
 
 	const char delim = ' ';
-	outputter.writeFieldToFile("x.dat", dg.x, delim);
-	outputter.writeFieldToFile("y.dat", dg.y, delim);
+	outputter.writeFieldToFile("x.dat", dg.x(), delim);
+	outputter.writeFieldToFile("y.dat", dg.y(), delim);
 
 	outputter.writeFieldToFile("H.dat", fields_n.H, delim);
 
@@ -135,17 +138,14 @@ int main(int argc, char **argv) {
 	// Make copy of bcMap, for hacking it.
     index_vector_type bcType = meshManager.get_BCType();
 
+	const real_matrix_type& Dr = dg.Dr(), Ds = dg.Ds(), Filt = dg.filter();
+
 	// Get bed slopes
-	fields_n.Hx = (dg.rx*sum(dg.Dr(ii,kk)*fields_n.H(kk,jj), kk) + dg.sx*sum(dg.Ds(ii,kk)*fields_n.H(kk,jj), kk));
-	fields_n.Hy = (dg.ry*sum(dg.Dr(ii,kk)*fields_n.H(kk,jj), kk) + dg.sy*sum(dg.Ds(ii,kk)*fields_n.H(kk,jj), kk));
+	fields_n.Hx = (dg.rx()*sum(Dr(ii,kk)*fields_n.H(kk,jj), kk) + dg.sx()*sum(Ds(ii,kk)*fields_n.H(kk,jj), kk));
+	fields_n.Hy = (dg.ry()*sum(Dr(ii,kk)*fields_n.H(kk,jj), kk) + dg.sy()*sum(Ds(ii,kk)*fields_n.H(kk,jj), kk));
 
-	fields_n.Hx = sum(dg.Filt(ii,kk)*fields_n.Hx(kk,jj), kk);
-	fields_n.Hy = sum(dg.Filt(ii,kk)*fields_n.Hy(kk,jj), kk);
-
-	// zero them out.
-	fields_n.H = 0*jj + 400.0;
-	fields_n.Hx = 0*jj;
-	fields_n.Hy = 0*jj;
+	fields_n.Hx = sum(Filt(ii,kk)*fields_n.Hx(kk,jj), kk);
+	fields_n.Hy = sum(Filt(ii,kk)*fields_n.Hy(kk,jj), kk);
 
 	// TODO: replace H with references on the structs, so we don't have these copies.
 	fields_np1.H = fields_n.H;
@@ -160,7 +160,7 @@ int main(int argc, char **argv) {
 	fields_n.hv = fields_n.h*fields_n.v;
 
 	// deal with open boundary conditions.
-	for (index_type k=0; k < dg.K; ++k) {
+	for (index_type k=0; k < K; ++k) {
 			index_type v1 = EToV(3*k);
 			index_type v2 = EToV(3*k+1);
 			index_type v3 = EToV(3*k+2);
@@ -176,7 +176,7 @@ int main(int argc, char **argv) {
 	triangleNodesProvisioner.buildBCHash(bcType);
 
 	// sponge layer -- build that wall!
-	real_matrix_type spongeCoeff(dg.Np, dg.K);
+	real_matrix_type spongeCoeff(Np, K);
 	spongeCoeff = 0.0*jj;
 	sw2d::buildSpongeCoeff(dg, 10000.0, 1000.0, spongeCoeff);
 
@@ -223,7 +223,7 @@ int main(int argc, char **argv) {
 		t += dt;
 		count++;
 	}
-	real_matrix_type etafinal(dg.Np, dg.K);
+	real_matrix_type etafinal(Np, K);
 	etafinal = fields_n.h - fields_n.H;
 
 	return 0;
@@ -232,8 +232,9 @@ int main(int argc, char **argv) {
 namespace blitzdg {
 	namespace sw2d {
 		double computeTimeStep(fields& fds, const physParams& phys, const numParams& num, const DGContext2D& dg) {
-			index_type numFaceNodes = dg.NumFaces*dg.Nfp*dg.K;
-			real_vector_type uVec(dg.Np*dg.K), vVec(dg.Np*dg.K), hVec(dg.Np*dg.K);
+			index_type numFaceNodes = dg.numFaces()*dg.numFaces()*dg.numElements();
+			index_type numTotalNodes = dg.numLocalPoints()*dg.numElements();
+			real_vector_type uVec(numTotalNodes), vVec(numTotalNodes), hVec(numTotalNodes);
 			real_vector_type uM(numFaceNodes), vM(numFaceNodes), hM(numFaceNodes), fsVec(numFaceNodes);
 
 			fds.u = fds.hu/fds.h; 
@@ -242,10 +243,10 @@ namespace blitzdg {
 			fullToVector(fds.u, uVec, false);
 			fullToVector(fds.v, vVec, false);
 			fullToVector(fds.h, hVec, false);
-			fullToVector(dg.Fscale , fsVec, false);
-			applyIndexMap(uVec, dg.vmapM, uM);
-			applyIndexMap(vVec, dg.vmapM, vM);
-			applyIndexMap(hVec, dg.vmapM, hM);
+			fullToVector(dg.fscale() , fsVec, false);
+			applyIndexMap(uVec, dg.vmapM(), uM);
+			applyIndexMap(vVec, dg.vmapM(), vM);
+			applyIndexMap(hVec, dg.vmapM(), hM);
 
 			real_vector_type spd(numFaceNodes);
 			spd = blitz::sqrt(uM*uM + vM*vM) + blitz::sqrt(phys.g*hM);
@@ -267,14 +268,11 @@ namespace blitzdg {
 			thirdIndex kk;
 
 			// boundary indices.
-			const index_hashmap& bcHash = dg.bcHash;
+			const index_hashmap& bcHash = dg.bcmap();
 			const std::vector<index_type>& mapW = bcHash.at(BCTag::Wall);
 			const std::vector<index_type>& mapO = bcHash.at(BCTag::Out);
 
-			index_type numFaces = dg.NumFaces;
-			index_type Nfp = dg.Nfp;
-			index_type Np = dg.Np;
-			index_type K = dg.K;
+			index_type numFaces = dg.numFaces(), Nfp = dg.numFacePoints(), Np=dg.numLocalPoints(), K = dg.numElements();
 
 			index_type numFaceNodes = numFaces*Nfp*K;
 			index_type numTotalNodes = Np*K;
@@ -296,8 +294,8 @@ namespace blitzdg {
 			nxVec = 0.*ii;
 			nyVec = 0.*ii;
 
-			fullToVector(dg.nx, nxVec, false);
-			fullToVector(dg.ny, nyVec, false);
+			fullToVector(dg.nx(), nxVec, false);
+			fullToVector(dg.ny(), nyVec, false);
 
 			fullToVector(fds.h, hVec, false);
 			fullToVector(fds.hu, huVec, false);
@@ -305,17 +303,17 @@ namespace blitzdg {
 
 			fullToVector(fds.H, Hvec, false);
 
-			applyIndexMap(hVec, dg.vmapM, hM);
-			applyIndexMap(hVec, dg.vmapP, hP);
+			applyIndexMap(hVec, dg.vmapM(), hM);
+			applyIndexMap(hVec, dg.vmapP(), hP);
 
-			applyIndexMap(huVec, dg.vmapM, huM);
-			applyIndexMap(huVec, dg.vmapP, huP);
+			applyIndexMap(huVec, dg.vmapM(), huM);
+			applyIndexMap(huVec, dg.vmapP(), huP);
 
-			applyIndexMap(hvVec, dg.vmapM, hvM);
-			applyIndexMap(hvVec, dg.vmapP, hvP);
+			applyIndexMap(hvVec, dg.vmapM(), hvM);
+			applyIndexMap(hvVec, dg.vmapP(), hvP);
 
-			applyIndexMap(Hvec, dg.vmapM, HM);
-			applyIndexMap(Hvec, dg.vmapP, HP);
+			applyIndexMap(Hvec, dg.vmapM(), HM);
+			applyIndexMap(Hvec, dg.vmapP(), HP);
 
 			// BC's - no flow through walls.
 			for (index_type i=0; i < static_cast<index_type>(mapW.size()); ++i) {
@@ -410,18 +408,19 @@ namespace blitzdg {
 			// RHS == -Flux divergence + surface integral contributions.
 
 			// Flux divergence:
-			fds.RHS1 = -(dg.rx*sum(dg.Dr(ii,kk)*F1(kk,jj), kk) + dg.sx*sum(dg.Ds(ii,kk)*F1(kk,jj), kk));
-			fds.RHS1+= -(dg.ry*sum(dg.Dr(ii,kk)*G1(kk,jj), kk) + dg.sy*sum(dg.Ds(ii,kk)*G1(kk,jj), kk));
+			const real_matrix_type& Dr = dg.Dr(), Ds = dg.Ds();
+			fds.RHS1 = -(dg.rx()*sum(Dr(ii,kk)*F1(kk,jj), kk) + dg.sx()*sum(Ds(ii,kk)*F1(kk,jj), kk));
+			fds.RHS1+= -(dg.ry()*sum(Dr(ii,kk)*G1(kk,jj), kk) + dg.sy()*sum(Ds(ii,kk)*G1(kk,jj), kk));
 
-			fds.RHS2 = -(dg.rx*sum(dg.Dr(ii,kk)*F2(kk,jj), kk) + dg.sx*sum(dg.Ds(ii,kk)*F2(kk,jj), kk));
-			fds.RHS2+= -(dg.ry*sum(dg.Dr(ii,kk)*G2(kk,jj), kk) + dg.sy*sum(dg.Ds(ii,kk)*G2(kk,jj), kk));
+			fds.RHS2 = -(dg.rx()*sum(Dr(ii,kk)*F2(kk,jj), kk) + dg.sx()*sum(Ds(ii,kk)*F2(kk,jj), kk));
+			fds.RHS2+= -(dg.ry()*sum(Dr(ii,kk)*G2(kk,jj), kk) + dg.sy()*sum(Ds(ii,kk)*G2(kk,jj), kk));
 
-			fds.RHS3 = -(dg.rx*sum(dg.Dr(ii,kk)*F3(kk,jj), kk) + dg.sx*sum(dg.Ds(ii,kk)*F3(kk,jj), kk));
-			fds.RHS3+= -(dg.ry*sum(dg.Dr(ii,kk)*G3(kk,jj), kk) + dg.sy*sum(dg.Ds(ii,kk)*G3(kk,jj), kk));
+			fds.RHS3 = -(dg.rx()*sum(Dr(ii,kk)*F3(kk,jj), kk) + dg.sx()*sum(Ds(ii,kk)*F3(kk,jj), kk));
+			fds.RHS3+= -(dg.ry()*sum(Dr(ii,kk)*G3(kk,jj), kk) + dg.sy()*sum(Ds(ii,kk)*G3(kk,jj), kk));
 
 			// Surface integral contributions
-			const real_matrix_type& Fscale = dg.Fscale;
-			const real_matrix_type& Lift   = dg.Lift;
+			const real_matrix_type& Fscale = dg.fscale();
+			const real_matrix_type& Lift   = dg.lift();
 
 			real_matrix_type surfaceRHS1(Nfp*numFaces, K), surfaceRHS2(Nfp*numFaces, K), surfaceRHS3(Nfp*numFaces, K);
 
@@ -494,23 +493,25 @@ namespace blitzdg {
 
 		void buildSpongeCoeff(const DGContext2D& dg, real_type spongeStrength, real_type radInfl, real_matrix_type& spongeCoeff) {
 
-			const index_hashmap& bcHash = dg.bcHash;
+			const index_hashmap& bcHash = dg.bcmap();
 			const std::vector<index_type>& mapO = bcHash.at(BCTag::Out);
 			index_type outLength = static_cast<index_type>(mapO.size());
 
 			index_vector_type vmapO(outLength);
-			const index_vector_type& vmapM = dg.vmapM;
+			const index_vector_type& vmapM = dg.vmapM();
 
-			index_type numFaceNodes = dg.NumFaces*dg.Nfp*dg.K;
+			index_type numFaceNodes = dg.numFaces()*dg.numFacePoints()*dg.numElements();
 
 			real_vector_type xVec(numFaceNodes), yVec(numFaceNodes);
 
-			fullToVector(dg.x, xVec, false);
-			fullToVector(dg.y, yVec, false);
+			const real_matrix_type& x = dg.x(), y = dg.y();
 
-			for(index_type k=0; k < dg.K; ++k) {
-				for(index_type n=0; n < dg.Np; ++n) {
-					real_type x0 = dg.x(n,k), y0 = dg.y(n,k);
+			fullToVector(x, xVec, false);
+			fullToVector(y, yVec, false);
+
+			for(index_type k=0; k < dg.numElements(); ++k) {
+				for(index_type n=0; n < dg.numLocalPoints(); ++n) {
+					real_type x0 = x(n,k), y0 = y(n,k);
 					real_type closestDist = 1.0e12;
 
 					for (index_type i=0; i < outLength; ++i) {

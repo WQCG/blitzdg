@@ -2,6 +2,7 @@
 // See COPYING and LICENSE files at project root for more details.
 
 #include "TriangleNodesProvisioner.hpp"
+#include "DGContext2D.hpp"
 #include "CSCMatrix.hpp"
 #include "BlitzHelpers.hpp"
 #include "DenseMatrixInverter.hpp"
@@ -61,29 +62,7 @@ namespace blitzdg {
         BCmap{ new index_hashmap()},
         Mesh2D { _MeshManager },
         Nodes1D{ new Nodes1DProvisioner(_NOrder, 5, -1.0, 1.0) },
-		Jacobi{}, Vandermonde{}, LinSolver{}, Inverter{}, DGContext{
-            NumLocalPoints,
-            NumFacePoints,
-            NumElements,
-            NumFaces,
-            *Filter,
-            *xGrid,
-            *yGrid,
-            *Fscale,
-            *J,
-            *rx,
-            *sx,
-            *ry,
-            *sy,
-            *nx,
-            *ny,
-            *Dr,
-            *Ds,
-            *BCmap,
-            *vmapM,
-            *vmapP,
-            *Lift
-        }
+		Jacobi{}, Vandermonde{}, LinSolver{}, Inverter{}
     {
         // Nodal construction required for physical simulations.
         buildNodes();
@@ -888,7 +867,30 @@ namespace blitzdg {
         return NumElements;
     }
 
-    const DGContext2D& TriangleNodesProvisioner::get_DGContext() const {
-        return DGContext;
+    DGContext2D TriangleNodesProvisioner::get_DGContext() const {
+        return DGContext2D {
+            NumLocalPoints,
+            NumFacePoints,
+            NumElements,
+            NumFaces,
+            Filter.get(),
+            xGrid.get(),
+            yGrid.get(),
+            Fscale.get(),
+            J.get(),
+            rx.get(),
+            ry.get(),
+            sx.get(),
+            sy.get(),
+            nx.get(),
+            ny.get(),
+            Dr.get(),
+            Ds.get(),
+            Lift.get(),
+            vmapM.get(),
+            vmapP.get(),
+            BCmap.get()
+        };
+
     }
 }
