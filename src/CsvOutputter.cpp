@@ -48,4 +48,15 @@ namespace blitzdg {
         fileNameStrm << fieldName << setfill('0') << setw(7) << fileNumber << ".dat";
         return fileNameStrm.str();
     }
+
+    void CsvOutputter::writeFieldsToFiles(std::map<std::string, real_matrix_type>& fields, index_type tstep) {
+        for (auto kv : fields) {
+            const string& fieldName = kv.first;
+            const real_matrix_type& field = kv.second;
+
+            string fileName = generateFileName(fieldName, tstep);
+
+            writeFieldToFile(fileName, field, ' ');
+        }
+    }
 }

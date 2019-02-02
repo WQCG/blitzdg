@@ -12,12 +12,13 @@
 #include <memory>
 #include "Types.hpp"
 #include "TriangleNodesProvisioner.hpp"
+#include "OutputterBase.hpp"
 
 namespace blitzdg {
   /**
    * Outputter class for vtk files.
    */ 
-  class VtkOutputter {
+  class VtkOutputter : OutputterBase {
 
 	vtkSmartPointer<vtkXMLUnstructuredGridWriter> GridWriter;
 	const TriangleNodesProvisioner& NodesProvisioner;
@@ -26,8 +27,10 @@ namespace blitzdg {
 public:
 	VtkOutputter(TriangleNodesProvisioner & _NodesProvisioner);
 
-	std::string generateFileName(const std::string & fieldName, const index_type fileNumber);
+	std::string generateFileName(const std::string & fieldName, const index_type fileNumber) const;
 
-	void writeFieldToFile(const std::string & fileName, const real_matrix_type & field, const std::string & fieldName);
+	void writeFieldToFile(const std::string & fileName, const real_matrix_type & field, const std::string & fieldName) const;
+	void writeFieldsToFiles(std::map<std::string, real_matrix_type>& fields, index_type tstep);
+
   };
 }

@@ -26,8 +26,9 @@ using std::ostream;
 using std::ios;
 using std::filebuf;
 using std::string;
+using std::vector;
 
-namespace blitzdg{
+namespace blitzdg {
 	VtkOutputter::VtkOutputter(TriangleNodesProvisioner & _NodesProvisioner)
 		: GridWriter { vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New() },
 			NodesProvisioner { _NodesProvisioner } 
@@ -40,12 +41,11 @@ namespace blitzdg{
 		 * @param[in] fieldName Name of field from the PDE (system), e.g., "u".
 		 * @param[in] fileNumber An integral intex indicating a logical ordering on the output files. It is usually related to time-level.
 		 */
-		string VtkOutputter::generateFileName(const string & fieldName, const index_type fileNumber) {
+		string VtkOutputter::generateFileName(const string & fieldName, const index_type fileNumber) const {
 			stringstream fileNameStrm;
         	fileNameStrm << fieldName << setfill('0') << setw(7) << fileNumber << "." << FileExtension;
         	return fileNameStrm.str();
 		}
-
 
 	/**
      * Writes a blitz array to plain-text file.
@@ -53,7 +53,7 @@ namespace blitzdg{
      * @param[in] field Two-dimensional blitz array to be written to the file. Usually a 'field' of the PDE (system) being solved.
      * @param[in] delimeter Character that will be used to separate columns. Rows are always separated by line-endings.
      */
-    void VtkOutputter::writeFieldToFile(const string & fileName, const real_matrix_type & field, const string & fieldName) {
+    void VtkOutputter::writeFieldToFile(const string & fileName, const real_matrix_type & field, const string & fieldName) const {
 
 		const real_matrix_type& x = NodesProvisioner.get_xGrid(), y = NodesProvisioner.get_yGrid();
 
@@ -106,5 +106,14 @@ namespace blitzdg{
 #endif
 		writer->Write();
     }
+
+	void VtkOutputter::writeFieldsToFiles(std::map<std::string, real_matrix_type>& fields, index_type tstep) {
+		for (auto kv : fields) {
+            const string& fieldName = kv.first;
+			const real_matrix_type& field = kv.second;
+			string fileName = generateFileName(fieldName, tstep);
+			writeFieldToFile(fileName, field, fieldName);
+        }
+	}
 }
 #endif
