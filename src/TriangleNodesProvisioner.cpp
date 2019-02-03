@@ -775,8 +775,13 @@ namespace blitzdg {
 
         // Compute the Vandermonde guy.
         real_matrix_type& V2D = *V;
+        real_matrix_type& V2Dinv = *Vinv;
+
         V2D = 0.0*jj;
+        V2Dinv = 0.0*jj;
+
         computeVandermondeMatrix(NOrder, r, s, V2D);
+        Inverter.computeInverse(V2D, V2Dinv);
 
         MassInv = 0.0*jj;
         MassInv = sum(V2D(ii,kk)*V2D(jj,kk), kk);
@@ -861,6 +866,18 @@ namespace blitzdg {
 
     const real_matrix_type& TriangleNodesProvisioner::get_ny() const {
         return *ny;
+    }
+
+    const real_matrix_type& TriangleNodesProvisioner::get_Vinv() const {
+        return *Vinv;
+    }
+
+    const real_vector_type& TriangleNodesProvisioner::get_rGrid() const {
+        return *rGrid;
+    }
+
+    const real_vector_type& TriangleNodesProvisioner::get_sGrid() const {
+        return *sGrid;
     }
 
     int TriangleNodesProvisioner::get_NumElements() const {

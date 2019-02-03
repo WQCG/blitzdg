@@ -50,7 +50,7 @@ namespace blitzdg {
 
 		// helper declarations.
 		double computeTimeStep(fields& fds, const physParams& phys, const numParams& num, const DGContext2D& dg);
-		void computeRHS(fields fds, const numParams& num, const physParams& phys, const DGContext2D& dg, real_type t);
+		void computeRHS(fields fds, const numParams& num, const physParams& phys, const DGContext2D& dg, real_type t, const real_matrix_type& coarseMat, const real_matrix_type& fineMat, index_type NpFine, const real_matrix_type& Filt);
 		void readDepthData(const std::string& depthFile, real_matrix_type& H);
 		void buildSpongeCoeff(const DGContext2D& dg, real_type spongeStrength, real_type radInfl, real_matrix_type& spongeCoeff);
 	}

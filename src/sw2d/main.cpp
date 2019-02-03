@@ -54,9 +54,9 @@ int main(int argc, char **argv) {
 
 	sw2d::numParams n;
 	n.N = 1;
-	n.CFL = 0.55;
+	n.CFL = 0.15;
 	n.outputInterval = 20;
-	n.filterPercent = 0.95;
+	n.filterPercent = 0.65;
 	n.filterOrder = 4;
 
 	real_type t = p.initTime;
@@ -69,10 +69,43 @@ int main(int argc, char **argv) {
 	// Dependency-inject mesh manager to nodes provisioner.
 	TriangleNodesProvisioner triangleNodesProvisioner(n.N, meshManager);
 
-	// Pre-processing step - build polynomial dealiasing filter.
-	triangleNodesProvisioner.buildFilter(n.filterPercent*n.N, n.filterOrder);
 
 	DGContext2D dg = triangleNodesProvisioner.get_DGContext();
+
+	// build higher-order provisioner for completely removing aliasing.
+	firstIndex ii;
+	secondIndex jj;
+	thirdIndex kk;
+
+	TriangleNodesProvisioner fineProvisioner(2*n.N, meshManager);
+	const real_matrix_type& Vinv = triangleNodesProvisioner.get_Vinv();
+	const real_vector_type& r = triangleNodesProvisioner.get_rGrid();
+	const real_vector_type& s = triangleNodesProvisioner.get_sGrid();
+
+	index_type Np = triangleNodesProvisioner.get_NumLocalPoints();
+	index_type NpFine = fineProvisioner.get_NumLocalPoints();
+
+	const real_matrix_type& VinvFine  = fineProvisioner.get_Vinv();
+	const real_vector_type& rFine = fineProvisioner.get_rGrid();
+	const real_vector_type& sFine = fineProvisioner.get_sGrid();
+
+	real_matrix_type Vout(NpFine,Np), VoutFine(Np,NpFine);
+	triangleNodesProvisioner.computeVandermondeMatrix(n.N, rFine, sFine, Vout);
+	fineProvisioner.computeVandermondeMatrix(2*n.N, r, s, VoutFine);
+
+	real_matrix_type InterpMat(NpFine,Np), CoarseMat(Np,NpFine);
+	InterpMat = blitz::sum(Vout(ii,kk)*Vinv(kk,jj),kk);
+
+	fineProvisioner.computeVandermondeMatrix(n.N, r, s, VoutFine);
+	CoarseMat = blitz::sum(VoutFine(ii,kk)*VinvFine(kk,jj),kk);
+
+	// Pre-processing step - build polynomial dealiasing filter 
+	fineProvisioner.buildFilter(n.filterPercent*n.N, n.filterOrder);
+
+	const real_matrix_type& Filt = fineProvisioner.get_Filter();
+
+
+
 
 #ifndef __MINGW32__
 	VtkOutputter outputter(triangleNodesProvisioner);
@@ -80,7 +113,6 @@ int main(int argc, char **argv) {
 	CsvOutputter outputter;
 #endif
 	
-	index_type Np = dg.numLocalPoints();
 	index_type K = dg.numElements();
 
 	// Allocate memory for fields.
@@ -106,10 +138,6 @@ int main(int argc, char **argv) {
 
 	unordered_set<index_type> obcNodes = {0,1,2,3,5,6,8,11,12,15,19,20,25,28,31,37,39,44,51,52,60,65,69,78,81,88,98,99,110,117,122,137,157,178,199,220,242,264,287,310,334,358,383,409,435,461,488,516,544,573,602,631,660,690,721,753,784,816,849,933,1018,1106,1193,1281,1369,1455,1538,1619,1699,1781,1813,1846,1879,1912,1946,1980,2014,2049,2084,2120,2156,2192,2228,2265,2302,2340,2374,2412,2448,2488,2526,2565,2603,2642,2682,2723,2765,2804,2845,2886,2929,2972,3014,3054,3097,3144,3190,3236,3284,3329,3376,3492,3607,3724,3835,3953,4074,4192,4321,4461,4625,4691,4759,4829,4900,4971,5039,5107,5175,5253,5319,5383,5440,5494,5562,5620,5681,5746,5904,6064,6221,6374,6541,6704,6872,7028,7186,7374,7580,7788,8009,8233,8482,8783,9138,9587,9762,9920,10068,10202,10338,10461,10582,10699,10817,10918,11015,11118,11217,11310,11564,11829,12073,12326,12584,12866,13191,13559,14017,14554,15146,15717,16037,16309,16533,16750,16878,17009,17147,17280,17554,17870,18093,18276,18471,18712,18940,19142,19294,19424,19540,19652,19740,19836,19929,20013,20111,20216,20341,20465,20605,20733,20852,20970,21066,21157,21246,21345,21469,21591,21726,21847,21952,22043,22127,22195,22257,22308,22351,22391,22429,22467,22500,22529,22557,22586,22617};
 
-	firstIndex ii;
-	secondIndex jj;
-	thirdIndex kk;
-
 	const string depthFile = "input/H0_try2.oct";
 	sw2d::readDepthData(depthFile, fields_n.H);
 
@@ -129,14 +157,11 @@ int main(int argc, char **argv) {
 	// Make copy of bcMap, for hacking it.
     index_vector_type bcType = meshManager.get_BCType();
 
-	const real_matrix_type& Dr = dg.Dr(), Ds = dg.Ds(), Filt = dg.filter();
+	const real_matrix_type& Dr = dg.Dr(), Ds = dg.Ds();
 
 	// Get bed slopes
 	fields_n.Hx = (dg.rx()*sum(Dr(ii,kk)*fields_n.H(kk,jj), kk) + dg.sx()*sum(Ds(ii,kk)*fields_n.H(kk,jj), kk));
 	fields_n.Hy = (dg.ry()*sum(Dr(ii,kk)*fields_n.H(kk,jj), kk) + dg.sy()*sum(Ds(ii,kk)*fields_n.H(kk,jj), kk));
-
-	fields_n.Hx = sum(Filt(ii,kk)*fields_n.Hx(kk,jj), kk);
-	fields_n.Hy = sum(Filt(ii,kk)*fields_n.Hy(kk,jj), kk);
 
 	// TODO: replace H with references on the structs, so we don't have these copies.
 	fields_np1.H = fields_n.H;
@@ -192,8 +217,8 @@ int main(int argc, char **argv) {
 
 	real_type dt;
 	while (t < p.finalTime) {
+		dt = std::max(computeTimeStep(fields_n, p, n, dg), 1e-3);
 		fields_n.eta = fields_n.h-fields_n.H;
-		dt = computeTimeStep(fields_n, p, n, dg);
 
 		if ((count % n.outputInterval) == 0) {
 			cout << "dt=" << dt << endl;
@@ -210,7 +235,7 @@ int main(int argc, char **argv) {
 		}	
 
 		// 2nd order SSP Runge-Kutta
-		sw2d::computeRHS(fields_n, n, p, dg, t);
+		sw2d::computeRHS(fields_n, n, p, dg, t, CoarseMat, InterpMat, NpFine, Filt);
 		// Update solution.
 		fields_np1.h  = fields_n.h  + dt*fields_n.RHS1;
 		fields_np1.hu = fields_n.hu + dt*fields_n.RHS2;
@@ -220,7 +245,7 @@ int main(int argc, char **argv) {
 		fields_np1.hu /= (1.0 + spongeCoeff*fields_np1.hu*fields_np1.hu);
 		fields_np1.hv /= (1.0 + spongeCoeff*fields_np1.hv*fields_np1.hv);
 
-		sw2d::computeRHS(fields_np1, n, p, dg, t);
+		sw2d::computeRHS(fields_np1, n, p, dg, t, CoarseMat, InterpMat, NpFine, Filt);
 
 		fields_n.h  = 0.5*(fields_n.h  + fields_np1.h  + dt*fields_np1.RHS1);
 		fields_n.hu = 0.5*(fields_n.hu + fields_np1.hu + dt*fields_np1.RHS2);
@@ -228,6 +253,8 @@ int main(int argc, char **argv) {
 
 		fields_n.hu /= (1.0 + spongeCoeff*fields_n.hu*fields_n.hu);
 		fields_n.hv /= (1.0 + spongeCoeff*fields_n.hv*fields_n.hv);
+
+		//fields_n = fields_np1;
 
 		real_type eta_max = normMax(fields_n.eta);
 		if ( std::abs(eta_max) > 1e8  || std::isnan(sum(fields_n.eta)))
@@ -263,16 +290,17 @@ namespace blitzdg {
 
 			real_vector_type spd(numFaceNodes);
 			spd = blitz::sqrt(uM*uM + vM*vM) + blitz::sqrt(phys.g*hM);
+			//spd = blitz::sqrt(phys.g*hM);
 			real_type spdFscaleMax = blitz::max(fsVec*spd);
 
 			return num.CFL/((num.N+1)*(num.N+1)*0.5*spdFscaleMax);	
 		}
 
-		void computeRHS(fields fds, const numParams& num, const physParams& phys, const DGContext2D& dg, real_type t) {
+		void computeRHS(fields fds, const numParams& num, const physParams& phys, const DGContext2D& dg, real_type t, const real_matrix_type& coarseMat, const real_matrix_type& fineMat, index_type NpFine, const real_matrix_type& Filt) {
 
-			real_type T_tide = 3600*12.42; // or something?
+			real_type T_tide = 3600; //3600*12.42; // or something?
 			real_type om_tide = 2.0*pi/T_tide;
-			real_type amp_tide = 3.0; // 3.
+			real_type amp_tide = 3e0; // 3.
 			real_type g = phys.g;
 
 			// Blitz indices
@@ -342,7 +370,8 @@ namespace blitzdg {
 				//hvP(o) = hvM(o) - 2*nyVec(o)*(huM(o)*nxVec(o) + hvM(o)*nyVec(o));
 				huP(o) = huM(o);
 				hvP(o) = hvM(o);
-				hP(o) = HM(o) + amp_tide*std::cos(om_tide*t)*0.5*(std::tanh(0.15/3600*(t-T_tide))+1);
+				//huP(o) = om_tide*amp_tide*std::sin(om_tide*t);
+				hP(o) = HM(o) + amp_tide*std::cos(om_tide*t); //*0.5*(std::tanh(0.15/3600*(t-T_tide))+1);
 			}
 
 			// well-balancing scheme (star variables).
@@ -453,14 +482,27 @@ namespace blitzdg {
 			v = fds.hv/fds.h;
 
 			// bottom topography
-			real_matrix_type sourcex(Np, K);
-			real_matrix_type sourcey(Np, K);
+			real_matrix_type sourcex(Np, K), sourceFinex(NpFine,K);
+			real_matrix_type sourcey(Np, K), sourceFiney(NpFine,K);
 
-			sourcex = g*fds.h*fds.Hx;
-			sourcey = g*fds.h*fds.Hy;
+			real_matrix_type HxFine(NpFine,K), HyFine(NpFine,K), hFine(NpFine,K);
+
+			hFine = blitz::sum(fineMat(ii,kk)*fds.h(kk,jj),kk);
+			HxFine = blitz::sum(fineMat(ii,kk)*fds.Hx(kk,jj),kk);
+			HyFine = blitz::sum(fineMat(ii,kk)*fds.Hy(kk,jj),kk);
+
+			sourceFinex = g*hFine*HxFine;
+			sourceFiney = g*hFine*HyFine;
+
+			//sourceFinex = blitz::sum(Filt(ii,kk)*sourceFinex(kk,jj), kk);
+			//sourceFiney = blitz::sum(Filt(ii,kk)*sourceFiney(kk,jj), kk);
+
+			sourcex = blitz::sum(coarseMat(ii,kk)*sourceFinex(kk,jj),kk);
+			sourcey = blitz::sum(coarseMat(ii,kk)*sourceFiney(kk,jj),kk);
 
 			fds.RHS2+= sourcex;
 			fds.RHS3+= sourcey;
+
 
 			// bottom drag
 			real_matrix_type norm_u(Np,K);
@@ -495,8 +537,8 @@ namespace blitzdg {
 				for (index_type n=0; n < Np; ++n) {
 					real_type val = depthData(count);
 
-					if (val < 300.0)
-						val = 300.0;
+					if (val < 5.0)
+						val = 5.0;
 
 					H(n,k) = val;
 					++count;
