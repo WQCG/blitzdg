@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
 	secondIndex jj;
 	thirdIndex kk;
 
-	TriangleNodesProvisioner fineProvisioner(2*n.N, meshManager);
+	TriangleNodesProvisioner fineProvisioner(4*n.N, meshManager);
 	const real_matrix_type& Vinv = triangleNodesProvisioner.get_Vinv();
 	const real_vector_type& r = triangleNodesProvisioner.get_rGrid();
 	const real_vector_type& s = triangleNodesProvisioner.get_sGrid();
@@ -91,7 +91,7 @@ int main(int argc, char **argv) {
 
 	real_matrix_type Vout(NpFine,Np), VoutFine(Np,NpFine);
 	triangleNodesProvisioner.computeVandermondeMatrix(n.N, rFine, sFine, Vout);
-	fineProvisioner.computeVandermondeMatrix(2*n.N, r, s, VoutFine);
+	fineProvisioner.computeVandermondeMatrix(4*n.N, r, s, VoutFine);
 
 	real_matrix_type InterpMat(NpFine,Np), CoarseMat(Np,NpFine);
 	InterpMat = blitz::sum(Vout(ii,kk)*Vinv(kk,jj),kk);
@@ -103,9 +103,6 @@ int main(int argc, char **argv) {
 	fineProvisioner.buildFilter(n.filterPercent*n.N, n.filterOrder);
 
 	const real_matrix_type& Filt = fineProvisioner.get_Filter();
-
-
-
 
 #ifndef __MINGW32__
 	VtkOutputter outputter(triangleNodesProvisioner);
@@ -216,8 +213,9 @@ int main(int argc, char **argv) {
 	outputter.writeFieldsToFiles(staticFields, 0);
 
 	real_type dt;
+	//dt = std::max(computeTimeStep(fields_n, p, n, dg), 1e-3);
+	dt = 0.15;
 	while (t < p.finalTime) {
-		dt = std::max(computeTimeStep(fields_n, p, n, dg), 1e-3);
 		fields_n.eta = fields_n.h-fields_n.H;
 
 		if ((count % n.outputInterval) == 0) {
@@ -242,19 +240,19 @@ int main(int argc, char **argv) {
 		fields_np1.hv = fields_n.hv + dt*fields_n.RHS3;
 
 		// sponge layer relaxation -- to control insane velocities near the open boundary.		
-		fields_np1.hu /= (1.0 + spongeCoeff*fields_np1.hu*fields_np1.hu);
-		fields_np1.hv /= (1.0 + spongeCoeff*fields_np1.hv*fields_np1.hv);
+		//fields_np1.hu /= (1.0 + spongeCoeff*fields_np1.hu*fields_np1.hu);
+		//fields_np1.hv /= (1.0 + spongeCoeff*fields_np1.hv*fields_np1.hv);
 
 		sw2d::computeRHS(fields_np1, n, p, dg, t, CoarseMat, InterpMat, NpFine, Filt);
 
-		fields_n.h  = 0.5*(fields_n.h  + fields_np1.h  + dt*fields_np1.RHS1);
-		fields_n.hu = 0.5*(fields_n.hu + fields_np1.hu + dt*fields_np1.RHS2);
-		fields_n.hv = 0.5*(fields_n.hv + fields_np1.hv + dt*fields_np1.RHS3);
+		//fields_n.h  = 0.5*(fields_n.h  + fields_np1.h  + dt*fields_np1.RHS1);
+		//fields_n.hu = 0.5*(fields_n.hu + fields_np1.hu + dt*fields_np1.RHS2);
+		//fields_n.hv = 0.5*(fields_n.hv + fields_np1.hv + dt*fields_np1.RHS3);
 
-		fields_n.hu /= (1.0 + spongeCoeff*fields_n.hu*fields_n.hu);
-		fields_n.hv /= (1.0 + spongeCoeff*fields_n.hv*fields_n.hv);
+		fields_np1.hu /= (1.0 + spongeCoeff*fields_n.hu*fields_n.hu);
+		fields_np1.hv /= (1.0 + spongeCoeff*fields_n.hv*fields_n.hv);
 
-		//fields_n = fields_np1;
+		fields_n = fields_np1;
 
 		real_type eta_max = normMax(fields_n.eta);
 		if ( std::abs(eta_max) > 1e8  || std::isnan(sum(fields_n.eta)))
@@ -298,9 +296,9 @@ namespace blitzdg {
 
 		void computeRHS(fields fds, const numParams& num, const physParams& phys, const DGContext2D& dg, real_type t, const real_matrix_type& coarseMat, const real_matrix_type& fineMat, index_type NpFine, const real_matrix_type& Filt) {
 
-			real_type T_tide = 3600; //3600*12.42; // or something?
+			real_type T_tide = 3600*12.42; //3600*12.42; // or something?
 			real_type om_tide = 2.0*pi/T_tide;
-			real_type amp_tide = 3e0; // 3.
+			real_type amp_tide = 3; // 3.
 			real_type g = phys.g;
 
 			// Blitz indices
@@ -366,12 +364,12 @@ namespace blitzdg {
 			// OBC's - free surface moves up and down according to the tidal forcing.
 			for (index_type i=0; i < static_cast<index_type>(mapO.size()); ++i) {
 				index_type o = mapO[i];
-				//huP(o) = huM(o) - 2*nxVec(o)*(huM(o)*nxVec(o) + hvM(o)*nyVec(o));
-				//hvP(o) = hvM(o) - 2*nyVec(o)*(huM(o)*nxVec(o) + hvM(o)*nyVec(o));
-				huP(o) = huM(o);
-				hvP(o) = hvM(o);
-				//huP(o) = om_tide*amp_tide*std::sin(om_tide*t);
-				hP(o) = HM(o) + amp_tide*std::cos(om_tide*t); //*0.5*(std::tanh(0.15/3600*(t-T_tide))+1);
+				huP(o) = huM(o) - 2*nxVec(o)*(huM(o)*nxVec(o) + hvM(o)*nyVec(o));
+				hvP(o) = hvM(o) - 2*nyVec(o)*(huM(o)*nxVec(o) + hvM(o)*nyVec(o));
+				//huP(o) = huM(o);
+				//hvP(o) = hvM(o);
+				//huP(o) = -om_tide*amp_tide*std::sin(om_tide*t);
+				hP(o) = hM(o) + amp_tide*std::cos(om_tide*t)*0.5*(std::tanh(0.15/3600*(t-T_tide))+1);
 			}
 
 			// well-balancing scheme (star variables).
@@ -436,8 +434,8 @@ namespace blitzdg {
 
 			// strong form: Compute flux jump vector. (fluxM - numericalFlux ) dot n
 			dFlux1 = 0.5*((F1M - F1P)*nxVec + (G1M-G1P)*nyVec - spdMax*dh);
-			dFlux2 = 0.5*((F2M - F2P)*nxVec + (G2M-G2P)*nyVec - spdMax*dhu - (0.5*g*hM*hM - 0.5*g*hMstar*hMstar)*nxVec);
-			dFlux3 = 0.5*((F3M - F3P)*nxVec + (G2M-G2P)*nyVec - spdMax*dhv - (0.5*g*hM*hM - 0.5*g*hMstar*hMstar)*nyVec);
+			dFlux2 = 0.5*((F2M - F2P)*nxVec + (G2M-G2P)*nyVec - spdMax*dhu - 0*(0.5*g*hM*hM - 0.5*g*hMstar*hMstar)*nxVec);
+			dFlux3 = 0.5*((F3M - F3P)*nxVec + (G2M-G2P)*nyVec - spdMax*dhv - 0*(0.5*g*hM*hM - 0.5*g*hMstar*hMstar)*nyVec);
 
 			real_matrix_type dFlux1Mat(Nfp*numFaces, K), dFlux2Mat(Nfp*numFaces, K), dFlux3Mat(Nfp*numFaces, K);
 
@@ -513,6 +511,111 @@ namespace blitzdg {
 			// Coriolis force
 			fds.RHS2+=  phys.f*fds.hv;
 			fds.RHS3+= -phys.f*fds.hu;
+
+			// viscousness
+			real_type nu = 1e2;
+			real_matrix_type qx(Np,K), qy(Np,K);
+
+			dFlux2 = dhu*nxVec;
+			dFlux3 = dhu*nyVec;
+
+			vectorToFull(dFlux2, dFlux2Mat, false);
+			vectorToFull(dFlux3, dFlux3Mat, false);
+
+			surfaceRHS2 = Fscale*dFlux2Mat;
+			surfaceRHS3 = Fscale*dFlux3Mat;
+
+			// let \vec{q} = grad hu
+
+			real_vector_type dqx(numFaceNodes), dqy(numFaceNodes), qxM(numFaceNodes), qxP(numFaceNodes);
+			real_vector_type qyM(numFaceNodes), qyP(numFaceNodes), qxVec(numFaceNodes), qyVec(numFaceNodes);
+
+			qx = std::sqrt(nu)*(dg.rx()*sum(Dr(ii,kk)*fds.hu(kk,jj), kk) + dg.sx()*sum(Ds(ii,kk)*fds.hu(kk,jj),kk));
+			qx-= std::sqrt(nu)*sum(Lift(ii,kk)*surfaceRHS2(kk,jj), kk);
+			
+			qy = std::sqrt(nu)*(dg.ry()*sum(Dr(ii,kk)*fds.hu(kk,jj), kk) + dg.sy()*sum(Ds(ii,kk)*fds.hu(kk,jj),kk));
+			qy-= std::sqrt(nu)*sum(Lift(ii,kk)*surfaceRHS3(kk,jj), kk);
+
+			fullToVector(qx, qxVec, false);
+			applyIndexMap(qxVec, dg.vmapM(), qxM);
+			applyIndexMap(qxVec, dg.vmapP(), qxP);
+
+			fullToVector(qy, qyVec, false);
+			applyIndexMap(qyVec, dg.vmapM(), qyM);
+			applyIndexMap(qyVec, dg.vmapP(), qyP);
+
+			for (index_type i=0; i < static_cast<index_type>(mapW.size()); ++i) {
+				qxP(mapW[i]) = -qxM(mapW[i]);
+				qyP(mapW[i]) = -qyM(mapW[i]);
+			}
+
+			dqx = qxM - qxP;
+			dqy = qyM - qyP;
+
+			dFlux2 = dqx*nxVec;
+			dFlux3 = dqy*nyVec;
+
+			vectorToFull(dFlux2, dFlux2Mat, false);
+			vectorToFull(dFlux3, dFlux3Mat, false);
+
+			surfaceRHS2 = Fscale*dFlux2Mat;
+			surfaceRHS3 = Fscale*dFlux3Mat;
+
+			fds.RHS2 += std::sqrt(nu)*(dg.rx()*sum(Dr(ii,kk)*qx(kk,jj), kk) + dg.sx()*sum(Ds(ii,kk)*qx(kk,jj),kk));
+			fds.RHS2 -= std::sqrt(nu)*sum(Lift(ii,kk)*surfaceRHS2(kk,jj), kk);
+
+			fds.RHS2 += std::sqrt(nu)*(dg.ry()*sum(Dr(ii,kk)*qy(kk,jj), kk) + dg.sy()*sum(Ds(ii,kk)*qy(kk,jj),kk));
+			fds.RHS2 -= std::sqrt(nu)*sum(Lift(ii,kk)*surfaceRHS3(kk,jj), kk);
+
+			// let \vec{q} = grad hv
+
+			dFlux2 = dhv*nxVec;
+			dFlux3 = dhv*nyVec;
+
+			vectorToFull(dFlux2, dFlux2Mat, false);
+			vectorToFull(dFlux3, dFlux3Mat, false);
+
+			surfaceRHS2 = Fscale*dFlux2Mat;
+			surfaceRHS3 = Fscale*dFlux3Mat;
+
+			qx = std::sqrt(nu)*(dg.rx()*sum(Dr(ii,kk)*fds.hv(kk,jj), kk) + dg.sx()*sum(Ds(ii,kk)*fds.hv(kk,jj),kk));
+			qx-= std::sqrt(nu)*sum(Lift(ii,kk)*surfaceRHS2(kk,jj), kk);
+			
+			qy = std::sqrt(nu)*(dg.ry()*sum(Dr(ii,kk)*fds.hv(kk,jj), kk) + dg.sy()*sum(Ds(ii,kk)*fds.hv(kk,jj),kk));
+			qy-= std::sqrt(nu)*sum(Lift(ii,kk)*surfaceRHS3(kk,jj), kk);
+
+			fullToVector(qx, qxVec, false);
+			applyIndexMap(qxVec, dg.vmapM(), qxM);
+			applyIndexMap(qxVec, dg.vmapP(), qxP);
+
+			fullToVector(qy, qyVec, false);
+			applyIndexMap(qyVec, dg.vmapM(), qyM);
+			applyIndexMap(qyVec, dg.vmapP(), qyP);
+
+			for (index_type i=0; i < static_cast<index_type>(mapW.size()); ++i) {
+				qxP(mapW[i]) = -qxM(mapW[i]);
+				qyP(mapW[i]) = -qyM(mapW[i]);
+			}
+
+			dqx = qxM - qxP;
+			dqy = qyM - qyP;
+
+			dFlux2 = dqx*nxVec;
+			dFlux3 = dqy*nyVec;
+
+			vectorToFull(dFlux2, dFlux2Mat, false);
+			vectorToFull(dFlux3, dFlux3Mat, false);
+
+			surfaceRHS2 = Fscale*dFlux2Mat;
+			surfaceRHS3 = Fscale*dFlux3Mat;
+
+			fds.RHS3 += std::sqrt(nu)*(dg.rx()*sum(Dr(ii,kk)*qx(kk,jj), kk) + dg.sx()*sum(Ds(ii,kk)*qx(kk,jj),kk));
+			fds.RHS3 -= std::sqrt(nu)*sum(Lift(ii,kk)*surfaceRHS2(kk,jj), kk);
+
+			fds.RHS3 += std::sqrt(nu)*(dg.ry()*sum(Dr(ii,kk)*qy(kk,jj), kk) + dg.sy()*sum(Ds(ii,kk)*qy(kk,jj),kk));
+			fds.RHS3 -= std::sqrt(nu)*sum(Lift(ii,kk)*surfaceRHS3(kk,jj), kk);
+
+
 		} // computeRHS
 
 		void readDepthData(const std::string& depthFile, real_matrix_type& H) {
@@ -537,8 +640,8 @@ namespace blitzdg {
 				for (index_type n=0; n < Np; ++n) {
 					real_type val = depthData(count);
 
-					if (val < 5.0)
-						val = 5.0;
+					if (val < 150.0)
+						val = 150.0;
 
 					H(n,k) = val;
 					++count;
