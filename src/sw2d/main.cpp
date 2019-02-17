@@ -2,7 +2,6 @@
 // See COPYING and LICENSE files at project root for more details.
 
 #include "Nodes1DProvisioner.hpp"
-#include "CsvOutputter.hpp"
 #include "Types.hpp"
 #include "BlitzHelpers.hpp"
 #include "Warning.hpp"
@@ -13,14 +12,17 @@
 #include "Constants.hpp"
 #include "CSVFileReader.hpp"
 #include "BCtypes.hpp"
+#include "OutputterBase.hpp"
 #ifndef __MINGW32__
 	#include "VtkOutputter.hpp"
 #endif
+#include "CsvOutputter.hpp"
 #include <blitz/array.h>
 #include <math.h>
 #include <string>
 #include <stdexcept>
 #include <unordered_set>
+#include <map>
 
 using blitz::firstIndex;
 using blitz::secondIndex;
@@ -35,6 +37,7 @@ using std::endl;
 using std::sqrt;
 using std::max;
 using std::unordered_set;
+using std::map;
 using std::cos;
 using std::hypot;
 
@@ -62,6 +65,7 @@ int main(int argc, char **argv) {
 	MeshManager meshManager;
 	meshManager.readVertices("input/vh_verts_z.dat");
 	meshManager.readElements("input/vh_els_0.oct");
+
 	// Dependency-inject mesh manager to nodes provisioner.
 	TriangleNodesProvisioner triangleNodesProvisioner(n.N, meshManager);
 
@@ -70,13 +74,12 @@ int main(int argc, char **argv) {
 
 	DGContext2D dg = triangleNodesProvisioner.get_DGContext();
 
-
 #ifndef __MINGW32__
-	VtkOutputter vtkOutputter(triangleNodesProvisioner);
+	VtkOutputter outputter(triangleNodesProvisioner);
+#else
+	CsvOutputter outputter;
 #endif
 	
-	CsvOutputter outputter;
-
 	index_type Np = dg.numLocalPoints();
 	index_type K = dg.numElements();
 
@@ -110,12 +113,6 @@ int main(int argc, char **argv) {
 	const string depthFile = "input/H0_try2.oct";
 	sw2d::readDepthData(depthFile, fields_n.H);
 
-
-#ifndef __MINGW32__
-	string vtkFileName = "H.vtu";
-	vtkOutputter.writeFieldToFile(vtkFileName, fields_n.H, "H");
-#endif
-
 	// Set initial values for fields
 	fields_n.RHS1 = 0*jj;
 	fields_n.RHS2 = 0*jj;
@@ -126,12 +123,6 @@ int main(int argc, char **argv) {
 	fields_n.resRK3= 0*jj;
 
 	index_type count = 0;
-
-	const char delim = ' ';
-	outputter.writeFieldToFile("x.dat", dg.x(), delim);
-	outputter.writeFieldToFile("y.dat", dg.y(), delim);
-
-	outputter.writeFieldToFile("H.dat", fields_n.H, delim);
 
 	const index_vector_type& EToV = meshManager.get_Elements();
 
@@ -159,6 +150,15 @@ int main(int argc, char **argv) {
 	fields_n.hu = fields_n.h*fields_n.u;
 	fields_n.hv = fields_n.h*fields_n.v;
 
+	// hashmap for outputting
+	map<string, real_matrix_type> timeDepFields;
+	timeDepFields.clear();
+	timeDepFields.insert({"eta", fields_n.eta});
+	timeDepFields.insert({"u", fields_n.u});
+	timeDepFields.insert({"v", fields_n.v});
+
+	outputter.writeFieldsToFiles(timeDepFields, 0);
+
 	// deal with open boundary conditions.
 	for (index_type k=0; k < K; ++k) {
 			index_type v1 = EToV(3*k);
@@ -180,7 +180,15 @@ int main(int argc, char **argv) {
 	spongeCoeff = 0.0*jj;
 	sw2d::buildSpongeCoeff(dg, 10000.0, 1000.0, spongeCoeff);
 
-	outputter.writeFieldToFile("sponge.dat", spongeCoeff, delim);
+	map<string, real_matrix_type> staticFields;
+	staticFields.insert({"x", dg.x()});
+	staticFields.insert({"y", dg.y()});
+	staticFields.insert({"H", fields_n.H});
+	staticFields.insert({"Hx", fields_n.Hx});
+	staticFields.insert({"Hy", fields_n.Hy});
+	staticFields.insert({"Sponge", spongeCoeff});
+
+	outputter.writeFieldsToFiles(staticFields, 0);
 
 	real_type dt;
 	while (t < p.finalTime) {
@@ -190,10 +198,15 @@ int main(int argc, char **argv) {
 		if ((count % n.outputInterval) == 0) {
 			cout << "dt=" << dt << endl;
 			cout << "t=" << t << ", h_min=" << blitz::min(fields_n.h) << ", h_max=" << normMax(fields_n.h) << ", hu_max=" << normMax(fields_n.hu) << ", hv_max=" << normMax(fields_n.hv) << endl;
-#ifndef __MINGW32__
-			string fileName = vtkOutputter.generateFileName("eta", count);
-			vtkOutputter.writeFieldToFile(fileName, fields_n.eta, "eta");
-#endif
+
+			fields_n.u = fields_n.hu/fields_n.h;
+			fields_n.v = fields_n.hv/fields_n.h;
+
+			timeDepFields["eta"] = fields_n.eta;
+			timeDepFields["u"] = fields_n.u;
+			timeDepFields["v"] = fields_n.v;
+
+			outputter.writeFieldsToFiles(timeDepFields, count);
 		}	
 
 		// 2nd order SSP Runge-Kutta
