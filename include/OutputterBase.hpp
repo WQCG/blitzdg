@@ -10,5 +10,6 @@ namespace blitzdg {
     class OutputterBase {
     public:
         virtual void writeFieldsToFiles(std::map<std::string, real_matrix_type>& fields, index_type tstep) = 0;
+        virtual ~OutputterBase();
     };
 }
