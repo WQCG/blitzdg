@@ -130,6 +130,8 @@ namespace blitzdg {
                 ++count;
             }
         }
+        real_matrix_type& VinvRef = *Vinv;
+        Inverter.computeInverse(V, VinvRef);
     }
 
     void TriangleNodesProvisioner::computeGradVandermondeMatrix(index_type N,  const real_vector_type & r, const real_vector_type & s, real_matrix_type & V2Dr, real_matrix_type & V2Ds) const {
@@ -217,8 +219,11 @@ namespace blitzdg {
                 ++count;
             }
         }
-        F = sum(Fdiag(ii,kk)*Vinvref(kk,jj), kk);
-        F = sum(Vref(ii,kk)*F(kk,jj), kk);
+        
+        real_matrix_type tmp(NumLocalPoints, NumLocalPoints);
+        tmp = sum(Fdiag(ii,kk)*Vinvref(kk,jj), kk);
+
+        F = sum(Vref(ii,kk)*tmp(kk,jj), kk);
     }
 
     void TriangleNodesProvisioner::computeEquilateralNodes(real_vector_type & x, real_vector_type & y) const {
