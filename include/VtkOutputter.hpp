@@ -7,6 +7,8 @@
  */
 #pragma once
 
+#ifndef __MINGW32__
+
 #include <vtk-7.1/vtkXMLUnstructuredGridWriter.h>
 #include <vtk-7.1/vtkSmartPointer.h>
 #include <memory>
@@ -34,3 +36,4 @@ public:
 
   };
 }
+#endif
