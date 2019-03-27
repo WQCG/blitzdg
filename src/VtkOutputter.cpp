@@ -197,9 +197,6 @@ namespace blitzdg {
 		resultField = blitz::sum(IM(ii,kk)*field(kk,jj),kk);
 		
 
-
-
-
 	}
 
 }

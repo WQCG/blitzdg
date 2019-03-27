@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
 	real_type t = 0.0;
 
 	// Numerical parameters (N = Order of polynomials)
-	const index_type N = 1;
+	const index_type N = 4;
 	const real_type CFL = 0.4;
 
 	// Build dependencies.
@@ -60,9 +60,9 @@ int main(int argc, char **argv) {
 	triangleNodesProvisioner.buildMaps();
 	triangleNodesProvisioner.buildBCHash();
 	// Pre-processing step - build polynomial dealiasing filter.
-	triangleNodesProvisioner.buildFilter(0.85*N, N);
+	triangleNodesProvisioner.buildFilter(0.65*N, N);
 
-	VtkOutputter outputter(triangleNodesProvisioner);
+	CsvOutputter outputter;
 
 	const real_matrix_type& x = triangleNodesProvisioner.get_xGrid();
 	const real_matrix_type& y = triangleNodesProvisioner.get_yGrid();
@@ -125,7 +125,10 @@ int main(int argc, char **argv) {
 		if ((count % 10) == 0) {
 			cout << "t=" << t << ", eta_max=" << max(eta) << ", dt=" << dt << "\n";
 			string fileName = outputter.generateFileName("eta", count);
-			outputter.writeFieldToFile(fileName, eta, "eta");
+
+			std::map<std::string, real_matrix_type> fields;
+			fields.insert({"eta", eta});
+			outputter.writeFieldsToFiles(fields, count);
 		}
 
 		real_matrix_type h1(Np,K), hu1(Np,K), hv1(Np,K);
@@ -139,6 +142,10 @@ int main(int argc, char **argv) {
 		spd = blitz::sqrt(u*u + v*v);
 		RHS2 -= CD*hu*spd;
 		RHS3 -= CD*hv*spd;
+
+		RHS1 = sum(Filt(ii,kk)*RHS1(kk,jj), kk);
+		RHS2 = sum(Filt(ii,kk)*RHS2(kk,jj), kk);
+		RHS3 = sum(Filt(ii,kk)*RHS3(kk,jj), kk);
 
 		h1  = h + dt*RHS1;
 		hu1 = hu + dt*RHS2;
@@ -156,6 +163,7 @@ int main(int argc, char **argv) {
 		h  = 0.5*(h  + h1  + dt*RHS1);
 		hu = 0.5*(hu + hu1 + dt*RHS2);
 		hv = 0.5*(hv + hv1 + dt*RHS3);
+
 		t += dt;
 		count++;
 
@@ -164,6 +172,12 @@ int main(int argc, char **argv) {
 		spd = blitz::sqrt(u*u + v*v) + blitz::sqrt(g*h);
 
 		eta = h - H;
+
+		eta = sum(Filt(ii,kk)*eta(kk,jj), kk);
+		hu = sum(Filt(ii,kk)*hu(kk,jj), kk);
+		hv = sum(Filt(ii,kk)*hv(kk,jj), kk);
+
+		h = H + eta;
 
 		real_type eta_max = normMax(eta);
 		if ( std::abs(eta_max) > 1e8  || std::isnan(eta_max) )
