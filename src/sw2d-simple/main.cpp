@@ -11,6 +11,7 @@
 #include "LSERK4.hpp"
 #include "LinAlgHelpers.hpp"
 #include "TriangleNodesProvisioner.hpp"
+#include "VtkOutputter.hpp"
 #include <blitz/array.h>
 #include <math.h>
 #include <string>
@@ -35,17 +36,18 @@ int main(int argc, char **argv) {
 
 	// Physical parameters
 	const real_type g = 9.81;
+	const real_type CD = 2.5e-3;
 
-	const real_type finalTime = 2.0;
+	const real_type finalTime = 1000.0;
 	real_type t = 0.0;
 
 	// Numerical parameters (N = Order of polynomials)
-	const index_type N = 4;
-	const real_type CFL = 0.85;
+	const index_type N = 1;
+	const real_type CFL = 0.4;
 
 	// Build dependencies.
 	MeshManager meshManager;
-	meshManager.readMesh("input/coarse_box.msh");
+	meshManager.readMesh("input/figure8_mesh.msh");
 	const index_type K = meshManager.get_NumElements();
 
 	// Dependency-inject mesh manager to nodes provisioner.
@@ -56,12 +58,17 @@ int main(int argc, char **argv) {
 	triangleNodesProvisioner.buildLift();
 	triangleNodesProvisioner.buildPhysicalGrid();
 	triangleNodesProvisioner.buildMaps();
+	triangleNodesProvisioner.buildBCHash();
+	// Pre-processing step - build polynomial dealiasing filter.
+	triangleNodesProvisioner.buildFilter(0.85*N, N);
 
-	CsvOutputter outputter;
+	VtkOutputter outputter(triangleNodesProvisioner);
 
 	const real_matrix_type& x = triangleNodesProvisioner.get_xGrid();
 	const real_matrix_type& y = triangleNodesProvisioner.get_yGrid();
 	index_type Np = triangleNodesProvisioner.get_NumLocalPoints();
+
+	const real_matrix_type& Filt = triangleNodesProvisioner.get_Filter();
 
 	real_matrix_type H(Np,K);
 	real_matrix_type eta(Np, K);
@@ -70,15 +77,19 @@ int main(int argc, char **argv) {
 	real_matrix_type v(Np, K);
 	real_matrix_type hu(Np, K);
 	real_matrix_type hv(Np, K);
+	real_matrix_type spd(Np, K);
 	real_matrix_type RHS1(Np, K), RHS2(Np, K), RHS3(Np, K);
 	real_matrix_type resRK1(Np, K), resRK2(Np, K), resRK3(Np, K);
 
 	firstIndex ii;
 	secondIndex jj;
+	thirdIndex kk;
 
 	// Intialize fields.
 	H = 10.0 + 0*jj;
-	eta = 1.e-5*exp(-3.0*(x*x + y*y));
+	//eta = 1e-3*(x/1500);
+	eta = exp(-(x/200)*(x/200) - (y/200)*(y/200));
+
 	u = 0*jj;
 	v = 0*jj;
 	h = H + eta;
@@ -87,10 +98,18 @@ int main(int argc, char **argv) {
 
 	real_matrix_type Fscale = triangleNodesProvisioner.get_Fscale();
 
-	real_type Fsc_max = max(abs(Fscale));
-	const real_type dt = CFL/max((N+1)*(N+1)*0.5*Fsc_max*sqrt(g*h));
+	spd = blitz::sqrt(u*u + v*v) + blitz::sqrt(g*h);
+	const index_vector_type& vmapM = triangleNodesProvisioner.get_vmapM();
 
-	cout << "dt=" << dt << endl;
+	real_vector_type spdM(triangleNodesProvisioner.NumFaces*triangleNodesProvisioner.get_NumFacePoints()*K);
+	real_vector_type spdVec(Np*K), fsVec(triangleNodesProvisioner.NumFaces*triangleNodesProvisioner.get_NumFacePoints()*K);
+
+	fullToVector(spd, spdVec, false);
+	fullToVector(Fscale, fsVec, false);
+	applyIndexMap(spdVec, vmapM, spdM);
+
+	real_type Fsc_max = blitz::max(abs(fsVec)*spdM);
+	real_type dt = CFL/((N+1)*(N+1)*0.5*Fsc_max);
 
 	RHS1 = 0*jj;
 	RHS2 = 0*jj;
@@ -102,45 +121,63 @@ int main(int argc, char **argv) {
 
 	index_type count = 0;
 
-	const char delim = ' ';
-	outputter.writeFieldToFile("x.dat", x, delim);
-	outputter.writeFieldToFile("y.dat", y, delim);
-
 	while (t < finalTime) {
 		if ((count % 10) == 0) {
-			eta = h-H;
-			u = hu/h;
-			v = hv/h;
-			cout << "t=" << t << ", eta_max=" << max(eta) << endl;
+			cout << "t=" << t << ", eta_max=" << max(eta) << ", dt=" << dt << "\n";
 			string fileName = outputter.generateFileName("eta", count);
-			outputter.writeFieldToFile(fileName, eta, delim);
-		}	
-
-		for (index_type i=0; i < LSERK4::numStages;  i++ ) {
-
-			// Calculate Right-hand side.
-			sw2d::computeRHS(h, hu, hv, g, triangleNodesProvisioner, RHS1, RHS2, RHS3);
-
-			// Compute Runge-Kutta Residual.
-			resRK1 = LSERK4::rk4a[i]*resRK1 + dt*RHS1;
-			resRK2 = LSERK4::rk4a[i]*resRK2 + dt*RHS2;
-			resRK3 = LSERK4::rk4a[i]*resRK3 + dt*RHS3;
-
-			// Update solution.
-			h  += LSERK4::rk4b[i]*resRK1;
-			hu += LSERK4::rk4b[i]*resRK2;
-			hv += LSERK4::rk4b[i]*resRK3;
+			outputter.writeFieldToFile(fileName, eta, "eta");
 		}
+
+		real_matrix_type h1(Np,K), hu1(Np,K), hv1(Np,K);
+
+		// SSP RK2
+		sw2d::computeRHS(h, hu, hv, g, triangleNodesProvisioner, RHS1, RHS2, RHS3);
+		u = hu / h;
+		v = hv / h;
+		
+		// add bottom drag.
+		spd = blitz::sqrt(u*u + v*v);
+		RHS2 -= CD*hu*spd;
+		RHS3 -= CD*hv*spd;
+
+		h1  = h + dt*RHS1;
+		hu1 = hu + dt*RHS2;
+		hv1 = hv + dt*RHS3;
+
+		sw2d::computeRHS(h1, hu1, hv1, g, triangleNodesProvisioner, RHS1, RHS2, RHS3);
+		u = hu / h;
+		v = hv / h;
+
+		// add bottom drag.
+		spd = blitz::sqrt(u*u + v*v);
+		RHS2 -= CD*hu*spd;
+		RHS3 -= CD*hv*spd;
+
+		h  = 0.5*(h  + h1  + dt*RHS1);
+		hu = 0.5*(hu + hu1 + dt*RHS2);
+		hv = 0.5*(hv + hv1 + dt*RHS3);
+		t += dt;
+		count++;
+
+		u = hu / h;
+		v = hv / h;
+		spd = blitz::sqrt(u*u + v*v) + blitz::sqrt(g*h);
+
+		eta = h - H;
 
 		real_type eta_max = normMax(eta);
 		if ( std::abs(eta_max) > 1e8  || std::isnan(eta_max) )
 			throw std::runtime_error("A numerical instability has occurred!");
 
-		t += dt;
-		count++;
+		fullToVector(spd, spdVec, false);
+		applyIndexMap(spdVec, vmapM, spdM);
+
+		real_type Fsc_max = max(abs(fsVec)*spdM);
+		dt = CFL/((N+1)*(N+1)*0.5*Fsc_max);
+
 	}
 	real_matrix_type etafinal(Np, K);
-	etafinal = h - H;
+	etafinal = eta;
 
 	return 0;
 } // end main
@@ -218,7 +255,7 @@ namespace blitzdg {
 
 			applyIndexMap(hvVec, vmapM, hvM);
 			applyIndexMap(hvVec, vmapP, hvP);
-
+			
 			// BC's - no flow through walls.
 			for (index_type i=0; i < static_cast<index_type>(mapW.size()); ++i) {
 				index_type w = mapW[i];
@@ -268,6 +305,15 @@ namespace blitzdg {
 			// Compute 'trace max' over '-' and '+'.
 			for (index_type i=0; i < numFaceNodes; ++i)
 				spdMax(i) = max(spdM(i), spdP(i));
+
+			// Compute max over each face to get maximum linearized eigenvalue.
+			real_matrix_type lambda(Nfp, numFaces*K);
+			vectorToFull(spdMax, lambda, false);
+		
+			real_matrix_type lambdaMaxMat(Nfp, numFaces*K);
+			lambdaMaxMat = (1 + 0*ii)*(blitz::max(lambda(kk, jj), kk));
+
+			fullToVector(lambdaMaxMat, spdMax, byRowsOpt);
 
 			real_vector_type dFlux1(numFaceNodes), dFlux2(numFaceNodes), dFlux3(numFaceNodes);
 
