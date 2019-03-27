@@ -67,11 +67,16 @@ namespace blitzdg {
 			real_matrix_type xnew, ynew, fieldnew;
 			splitTriangles(x, y, field, xnew, ynew, fieldnew);
 
+			Np = 3;
+			K = fieldnew.cols();
+
+			x.resize(Np, K);
+			y.resize(Np, K);
+			field.resize(Np, K);
+
 			x = xnew;
 			y = ynew;
 			field = fieldnew;
-			Np = 3;
-			K = field.cols();
 		}
 
 		vtkSmartPointer<vtkCellArray> cellArray = vtkSmartPointer<vtkCellArray>::New();
@@ -143,9 +148,9 @@ namespace blitzdg {
 		counter = -1; // -1 == 'No Value'
 
 		for (index_type n=0; n < N+1; ++n) {
-			for (index_type m=0; m < N+2-n; ++m) {
-				rout(count) = -1 + 2*m/N;
-				sout(count) = -1 + 2*n/N;
+			for (index_type m=0; m < N+2-(n+1); ++m) {
+				rout(count) = -1. + 2.*static_cast<double>(m)/static_cast<double>(N);
+				sout(count) = -1. + 2.*static_cast<double>(n)/static_cast<double>(N);
 
 				counter(n,m) = count;
 				++count;
@@ -161,13 +166,18 @@ namespace blitzdg {
 
 		index_type numLocalElements =0;
 		for (index_type n=0; n < N+1; ++n) {
-			for (index_type m=0; m < N+1-n; ++m) {
+			for (index_type m=0; m < N+1-(n+1); ++m) {
 				index_type v1 = counter(n,m), v2 = counter(n,m+1),
 					v3 = counter(n+1, m), v4 = counter(n+1,m+1);
+
+				index_vector_type tri123(3);
+				tri123 = v1,v2,v3;
 				
-				localE2V.push_back({v1,v2,v3});
+				localE2V.push_back(tri123);
 				if (v4 >= 0) {
-					localE2V.push_back({v2,v4,v3});
+					index_vector_type tri243(3);
+					tri243 = v2,v4,v3;
+					localE2V.push_back(tri243);
 					++numLocalElements;
 				}
 			
