@@ -2,6 +2,7 @@
 
 #include "Types.hpp"
 #include "VtkOutputter.hpp"
+#include "BlitzHelpers.hpp"
 #include <vtk-7.1/vtkXMLUnstructuredGridWriter.h>
 #include <vtk-7.1/vtkIndent.h>
 #include <vtk-7.1/vtkUnstructuredGrid.h>
@@ -64,7 +65,7 @@ namespace blitzdg {
 		// If higher order than linear, need to break up the trangles.
 		if (Np > 3) {
 			index_type dof = Np*K;
-			vector<real_type[3]> xnew, ynew, fieldnew;
+			vector<real_vector_type> xnew, ynew, fieldnew;
 			splitTriangles(x, y, field, xnew, ynew, fieldnew);
 		}
 
@@ -123,7 +124,7 @@ namespace blitzdg {
         }
 	}
 
-	void VtkOutputter::splitTriangles(const real_matrix_type& x, const real_matrix_type& y, const real_matrix_type& field, std::vector<real_type[3]>& xnew, std::vector<real_type[3]>& ynew, std::vector<real_type[3]>& fieldnew) const {
+	void VtkOutputter::splitTriangles(const real_matrix_type& x, const real_matrix_type& y, const real_matrix_type& field, std::vector<real_vector_type>& xnew, std::vector<real_vector_type>& ynew, std::vector<real_vector_type>& fieldnew) const {
 		index_type Np = field.rows();
 		index_type K = field.cols();
 
@@ -151,7 +152,7 @@ namespace blitzdg {
 
 		NodesProvisioner.computeInterpMatrix(rout, sout, IM);
 
-		vector<index_type[3]> localE2V;
+		vector<index_vector_type> localE2V;
 
 		index_type numLocalElements =0;
 		for (index_type n=0; n < N+1; ++n) {
@@ -169,20 +170,32 @@ namespace blitzdg {
 			}
 		}
 
-		vector<index_type[3]> E2Vnew;
+		vector<index_vector_type> E2Vnew;
 
 		for (index_type k=0; k<K; ++k) {
 			index_type shift = k*Np;
 
-			for (index_type l=0; l<numLocalElements; ++l){ 
-				E2Vnew.push_back({localE2V[l][0] + shift, localE2V[l][1] + shift, localE2V[l][2] + shift});
+			for (index_type l=0; l<numLocalElements; ++l) {
+				index_vector_type row(3);
+				row(0) = localE2V[l](0) + shift;
+				row(1) = localE2V[l](1) + shift;
+				row(2) = localE2V[l](2) + shift;
+				E2Vnew.push_back(row);
 			}
 		}
 
 		index_type totalNewElements = numLocalElements*K;
-		xnew.reserve(totalNewElements);
-		ynew.reserve(totalNewElements);
-		fieldnew.reserve(totalNewElements);
+		index_type totalNewNodes = 3*totalNewElements;
+
+		blitz::firstIndex ii;
+		blitz::secondIndex jj;
+		blitz::thirdIndex kk;
+
+		real_matrix_type resultx(Np,K), resulty(Np,K), resultField(Np,K);
+		resultx = blitz::sum(IM(ii,kk)*x(kk,jj),kk);
+		resulty = blitz::sum(IM(ii,kk)*y(kk,jj),kk);
+		resultField = blitz::sum(IM(ii,kk)*field(kk,jj),kk);
+		
 
 
 

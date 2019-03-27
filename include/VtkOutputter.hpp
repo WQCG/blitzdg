@@ -33,7 +33,7 @@ public:
 	void writeFieldsToFiles(std::map<std::string, real_matrix_type>& fields, index_type tstep);
 
 private:
-	void splitTriangles(const real_matrix_type& x, const real_matrix_type& y, const real_matrix_type& field, std::vector<real_type[3]>& xnew, std::vector<real_type[3]>& ynew, std::vector<real_type[3]>& fieldnew) const;
+	void splitTriangles(const real_matrix_type& x, const real_matrix_type& y, const real_matrix_type& field, std::vector<real_vector_type>& xnew, std::vector<real_vector_type>& ynew, std::vector<real_vector_type>& fieldnew) const;
 
   };
 }
