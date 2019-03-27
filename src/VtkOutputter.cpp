@@ -54,9 +54,9 @@ namespace blitzdg {
      * @param[in] field Two-dimensional blitz array to be written to the file. Usually a 'field' of the PDE (system) being solved.
      * @param[in] delimeter Character that will be used to separate columns. Rows are always separated by line-endings.
      */
-    void VtkOutputter::writeFieldToFile(const string & fileName, const real_matrix_type & field, const string & fieldName) const {
+    void VtkOutputter::writeFieldToFile(const string & fileName, real_matrix_type field, const string & fieldName) const {
 
-		const real_matrix_type& x = NodesProvisioner.get_xGrid(), y = NodesProvisioner.get_yGrid();
+		real_matrix_type x = NodesProvisioner.get_xGrid(), y = NodesProvisioner.get_yGrid();
 
 		index_type K = field.cols();
 		index_type Np = field.rows();
@@ -64,9 +64,14 @@ namespace blitzdg {
 
 		// If higher order than linear, need to break up the trangles.
 		if (Np > 3) {
-			index_type dof = Np*K;
-			vector<real_vector_type> xnew, ynew, fieldnew;
+			real_matrix_type xnew, ynew, fieldnew;
 			splitTriangles(x, y, field, xnew, ynew, fieldnew);
+
+			x = xnew;
+			y = ynew;
+			field = fieldnew;
+			Np = 3;
+			K = field.cols();
 		}
 
 		vtkSmartPointer<vtkCellArray> cellArray = vtkSmartPointer<vtkCellArray>::New();
@@ -117,14 +122,14 @@ namespace blitzdg {
 
 	void VtkOutputter::writeFieldsToFiles(std::map<std::string, real_matrix_type>& fields, index_type tstep) {
 		for (auto kv : fields) {
-            const string& fieldName = kv.first;
+      const string& fieldName = kv.first;
 			const real_matrix_type& field = kv.second;
 			string fileName = generateFileName(fieldName, tstep);
 			writeFieldToFile(fileName, field, fieldName);
-        }
+    }
 	}
 
-	void VtkOutputter::splitTriangles(const real_matrix_type& x, const real_matrix_type& y, const real_matrix_type& field, std::vector<real_vector_type>& xnew, std::vector<real_vector_type>& ynew, std::vector<real_vector_type>& fieldnew) const {
+	void VtkOutputter::splitTriangles(const real_matrix_type& x, const real_matrix_type& y, const real_matrix_type& field, real_matrix_type& xnew, real_matrix_type& ynew, real_matrix_type& fieldnew) const {
 		index_type Np = field.rows();
 		index_type K = field.cols();
 
@@ -185,7 +190,6 @@ namespace blitzdg {
 		}
 
 		index_type totalNewElements = numLocalElements*K;
-		index_type totalNewNodes = 3*totalNewElements;
 
 		blitz::firstIndex ii;
 		blitz::secondIndex jj;
@@ -197,9 +201,40 @@ namespace blitzdg {
 		resultField = blitz::sum(IM(ii,kk)*field(kk,jj),kk);
 		
 
+		real_vector_type xVec(Np*K), yVec(Np*K), fieldVec(Np*K);
+		fullToVector(resultx, xVec, false);
+		fullToVector(resulty, yVec, false);
+		fullToVector(resultField, fieldVec, false);
+
+		// Unpack 1D arrays storing EToV and Vertex coordinates
+		index_vector_type va(totalNewElements), vb(totalNewElements), vc(totalNewElements);
+		for (index_type i=0; i < totalNewElements; ++i) {
+				va(i) = E2Vnew[i](0);
+				vb(i) = E2Vnew[i](1);
+				vc(i) = E2Vnew[i](2);
+		}
+
+		// resize arrays for the new linear elements.
+		xnew.resize(3, totalNewElements);
+		ynew.resize(3, totalNewElements);
+		fieldnew.resize(3, totalNewElements);
 
 
+		for (index_type i=0; i < totalNewElements; ++i) {
+			 index_type vai = va(i), vbi = vb(i), vci = vc(i);
 
+				xnew(0,i) = xVec(vai);
+				xnew(1,i) = xVec(vbi);
+				xnew(2,i) = xVec(vci);
+
+				ynew(0,i) = yVec(vai);
+				ynew(1,i) = yVec(vbi);
+				ynew(2,i) = yVec(vci);
+				
+				fieldnew(0,i) = fieldVec(vai);
+				fieldnew(1,i) = fieldVec(vbi);
+				fieldnew(2,i) = fieldVec(vci);
+		}
 	}
 
 }
