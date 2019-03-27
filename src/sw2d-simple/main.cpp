@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
 	// Pre-processing step - build polynomial dealiasing filter.
 	triangleNodesProvisioner.buildFilter(0.85*N, N);
 
-	VtkOutputter outputter(triangleNodesProvisioner);
+	CsvOutputter outputter;
 
 	const real_matrix_type& x = triangleNodesProvisioner.get_xGrid();
 	const real_matrix_type& y = triangleNodesProvisioner.get_yGrid();
@@ -125,7 +125,7 @@ int main(int argc, char **argv) {
 		if ((count % 10) == 0) {
 			cout << "t=" << t << ", eta_max=" << max(eta) << ", dt=" << dt << "\n";
 			string fileName = outputter.generateFileName("eta", count);
-			outputter.writeFieldToFile(fileName, eta, "eta");
+			outputter.writeFieldToFile(fileName, eta, ' ');
 		}
 
 		real_matrix_type h1(Np,K), hu1(Np,K), hv1(Np,K);
