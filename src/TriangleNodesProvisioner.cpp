@@ -790,6 +790,16 @@ namespace blitzdg {
         Liftref = sum(MassInv(ii,kk)*E(kk,jj),kk);
     }
 
+    void TriangleNodesProvisioner::computeInterpMatrix(const real_vector_type& rout, const real_vector_type& sout, real_matrix_type& IM) const {
+        index_type length = rout.size();
+
+        real_matrix_type Vout(length, NumLocalPoints);
+        computeVandermondeMatrix(NOrder, rout, sout, Vout);
+
+        real_matrix_type& invV = *Vinv;
+        IM = Vout*invV;
+    }
+
     const real_matrix_type & TriangleNodesProvisioner::get_Lift() const {
         return *Lift;
     }

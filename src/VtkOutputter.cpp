@@ -61,6 +61,13 @@ namespace blitzdg {
 		index_type Np = field.rows();
 		index_type nodeId = 0;
 
+		// If higher order than linear, need to break up the trangles.
+		if (Np > 3) {
+			index_type dof = Np*K;
+			vector<real_type[3]> xnew, ynew, fieldnew;
+			splitTriangles(x, y, field, xnew, ynew, fieldnew);
+		}
+
 		vtkSmartPointer<vtkCellArray> cellArray = vtkSmartPointer<vtkCellArray>::New();
 		vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
 
@@ -115,5 +122,72 @@ namespace blitzdg {
 			writeFieldToFile(fileName, field, fieldName);
         }
 	}
+
+	void VtkOutputter::splitTriangles(const real_matrix_type& x, const real_matrix_type& y, const real_matrix_type& field, std::vector<real_type[3]>& xnew, std::vector<real_type[3]>& ynew, std::vector<real_type[3]>& fieldnew) const {
+		index_type Np = field.rows();
+		index_type K = field.cols();
+
+		real_vector_type rout(Np), sout(Np);
+
+		const index_type N = NodesProvisioner.get_NumFacePoints() - 1;
+
+		index_type count = 0;
+
+		index_matrix_type counter(N+1,N+1);
+		counter = -1; // -1 == 'No Value'
+
+		for (index_type n=0; n < N+1; ++n) {
+			for (index_type m=0; m < N+2-n; ++m) {
+				rout(count) = -1 + 2*m/N;
+				sout(count) = -1 + 2*n/N;
+
+				counter(n,m) = count;
+				++count;
+			}
+		}
+
+		real_matrix_type IM(Np,Np);
+		IM = 0.;
+
+		NodesProvisioner.computeInterpMatrix(rout, sout, IM);
+
+		vector<index_type[3]> localE2V;
+
+		index_type numLocalElements =0;
+		for (index_type n=0; n < N+1; ++n) {
+			for (index_type m=0; m < N+1-n; ++m) {
+				index_type v1 = counter(n,m), v2 = counter(n,m+1),
+					v3 = counter(n+1, m), v4 = counter(n+1,m+1);
+				
+				localE2V.push_back({v1,v2,v3});
+				if (v4 >= 0) {
+					localE2V.push_back({v2,v4,v3});
+					++numLocalElements;
+				}
+			
+				++numLocalElements;
+			}
+		}
+
+		vector<index_type[3]> E2Vnew;
+
+		for (index_type k=0; k<K; ++k) {
+			index_type shift = k*Np;
+
+			for (index_type l=0; l<numLocalElements; ++l){ 
+				E2Vnew.push_back({localE2V[l][0] + shift, localE2V[l][1] + shift, localE2V[l][2] + shift});
+			}
+		}
+
+		index_type totalNewElements = numLocalElements*K;
+		xnew.reserve(totalNewElements);
+		ynew.reserve(totalNewElements);
+		fieldnew.reserve(totalNewElements);
+
+
+
+
+	}
+
 }
 #endif
