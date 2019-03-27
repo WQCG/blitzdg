@@ -62,7 +62,11 @@ int main(int argc, char **argv) {
 	// Pre-processing step - build polynomial dealiasing filter.
 	triangleNodesProvisioner.buildFilter(0.65*N, N);
 
+#ifndef __MINGW32__
 	VtkOutputter outputter(triangleNodesProvisioner);
+#else
+	CsvOutputter outputter;
+#endif
 
 	const real_matrix_type& x = triangleNodesProvisioner.get_xGrid();
 	const real_matrix_type& y = triangleNodesProvisioner.get_yGrid();
