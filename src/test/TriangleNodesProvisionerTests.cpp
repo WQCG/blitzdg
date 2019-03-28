@@ -265,7 +265,7 @@ namespace blitzdg {
 
 				const index_type Np = (NOrder+1)*(NOrder+2)/2;
 
-				real_matrix_type V(Np,Np), V2Dr(Np,Np), V2Ds(Np,Np), Dr(Np,Np), Ds(Np,Np), 
+				real_matrix_type V(Np,Np), V2Dr(Np,Np), V2Ds(Np,Np), Dr(Np,Np), Ds(Np,Np), Drw(Np,Np), Dsw(Np,Np),
 					expectedDr(Np,Np), expectedDs(Np,Np), res(Np,Np);
 
 				V2Dr = 0*jj; V2Ds = 0*jj; V = 0*jj; Dr = 0*jj; Ds = 0*jj;
@@ -277,7 +277,7 @@ namespace blitzdg {
 
 				triangleNodes.computeVandermondeMatrix(NOrder, r, s, V);
 				triangleNodes.computeGradVandermondeMatrix(NOrder, r, s, V2Dr, V2Ds);
-				triangleNodes.computeDifferentiationMatrices(V2Dr, V2Ds, V, Dr, Ds);
+				triangleNodes.computeDifferentiationMatrices(V2Dr, V2Ds, V, Dr, Ds, Drw, Dsw);
 
 				expectedDr =-3.00000,4.04508,-1.54508,0.50000,-0.00000,-0.00000,-0.00000,-0.00000,-0.00000,0.00000,
 							-0.80902,0.00000,1.11803,-0.30902,-0.00000,-0.00000,0.00000,-0.00000,0.00000,0.00000,
