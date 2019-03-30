@@ -175,8 +175,6 @@ int main(int argc, char **argv) {
 	real_type dt;
 	while (t < p.finalTime) {
 		fields_n.eta = fields_n.h-fields_n.H;
-		fields_n.eta = sum(Filt(ii,kk)*fields_n.eta(kk,jj), kk);
-		fields_n.h = fields_n.eta + fields_n.H;
 
 		dt = computeTimeStep(fields_n, p, n, dg);
 
