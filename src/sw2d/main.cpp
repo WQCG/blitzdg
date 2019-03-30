@@ -50,21 +50,21 @@ int main(int argc, char **argv) {
 	p.CD = 2.5e-3;
 	p.f = 1.0070e-4;
 	p.initTime = 0.0;
-	p.finalTime = 1000.0;
+	p.finalTime = 24.0*3600.0;
 
 	sw2d::numParams n;
-	n.N = 4;
-	n.CFL = 0.15;
+	n.N = 1;
+	n.CFL = 0.25;
 	n.outputInterval = 20;
-	n.filterPercent = 0.65;
+	n.filterPercent = 0.90;
 	n.filterOrder = 4;
 
 	real_type t = p.initTime;
 
 	// Build dependencies.
 	MeshManager meshManager;
-	meshManager.readMesh("input/box.msh");
-
+	meshManager.readVertices("input/vh_verts_z.dat");
+    meshManager.readElements("input/vh_els_0.oct");
 	// Dependency-inject mesh manager to nodes provisioner.
 	TriangleNodesProvisioner triangleNodesProvisioner(n.N, meshManager);
 
@@ -103,11 +103,14 @@ int main(int argc, char **argv) {
 	// copy for next time-step.
 	sw2d::fields fields_np1 = fields_n;
 
+	unordered_set<index_type> obcNodes = {0,1,2,3,5,6,8,11,12,15,19,20,25,28,31,37,39,44,51,52,60,65,69,78,81,88,98,99,110,117,122,137,157,178,199,220,242,264,287,310,334,358,383,409,435,461,488,516,544,573,602,631,660,690,721,753,784,816,849,933,1018,1106,1193,1281,1369,1455,1538,1619,1699,1781,1813,1846,1879,1912,1946,1980,2014,2049,2084,2120,2156,2192,2228,2265,2302,2340,2374,2412,2448,2488,2526,2565,2603,2642,2682,2723,2765,2804,2845,2886,2929,2972,3014,3054,3097,3144,3190,3236,3284,3329,3376,3492,3607,3724,3835,3953,4074,4192,4321,4461,4625,4691,4759,4829,4900,4971,5039,5107,5175,5253,5319,5383,5440,5494,5562,5620,5681,5746,5904,6064,6221,6374,6541,6704,6872,7028,7186,7374,7580,7788,8009,8233,8482,8783,9138,9587,9762,9920,10068,10202,10338,10461,10582,10699,10817,10918,11015,11118,11217,11310,11564,11829,12073,12326,12584,12866,13191,13559,14017,14554,15146,15717,16037,16309,16533,16750,16878,17009,17147,17280,17554,17870,18093,18276,18471,18712,18940,19142,19294,19424,19540,19652,19740,19836,19929,20013,20111,20216,20341,20465,20605,20733,20852,20970,21066,21157,21246,21345,21469,21591,21726,21847,21952,22043,22127,22195,22257,22308,22351,22391,22429,22467,22500,22529,22557,22586,22617};
+
 	firstIndex ii;
 	secondIndex jj;
 	thirdIndex kk;
 
-	fields_n.H = 0*jj + 10.0;
+    const string depthFile = "input/H0_try2.oct";
+    sw2d::readDepthData(depthFile, fields_n.H);
 
 	// Set initial values for fields
 	fields_n.RHS1 = 0*jj;
@@ -139,7 +142,7 @@ int main(int argc, char **argv) {
 
 	const real_matrix_type& x = triangleNodesProvisioner.get_xGrid();
 
-	fields_n.eta = 1e-4*x;
+	fields_n.eta = 0.*jj;
 	fields_n.h = fields_n.H + fields_n.eta;
 	fields_n.u = 0*jj;
 	fields_n.v = 0*jj;
@@ -155,12 +158,28 @@ int main(int argc, char **argv) {
 
 	outputter.writeFieldsToFiles(timeDepFields, 0);
 
+	const index_vector_type& EToV = meshManager.get_Elements();
+
+	// deal with open boundary conditions.
+	for (index_type k=0; k < K; ++k) {
+        index_type v1 = EToV(3*k);
+        index_type v2 = EToV(3*k+1);
+        index_type v3 = EToV(3*k+2);
+
+		if (obcNodes.count(v1) > 0 && obcNodes.count(v2) > 0)
+				bcType(3*k) = BCTag::Out;
+		if (obcNodes.count(v2) > 0 && obcNodes.count(v3) > 0)
+				bcType(3*k+1) = BCTag::Out;
+		if (obcNodes.count(v3) > 0 && obcNodes.count(v1) > 0)
+				bcType(3*k+2) = BCTag::Out;
+    }
+
 	triangleNodesProvisioner.buildBCHash(bcType);
 
 	// sponge layer -- build that wall!
 	real_matrix_type spongeCoeff(Np, K);
 	spongeCoeff = 0.0*jj;
-	//sw2d::buildSpongeCoeff(dg, 10000.0, 1000.0, spongeCoeff);
+	sw2d::buildSpongeCoeff(dg, 10000.0, 1000.0, spongeCoeff);
 
 	map<string, real_matrix_type> staticFields;
 	staticFields.insert({"x", dg.x()});
@@ -194,9 +213,9 @@ int main(int argc, char **argv) {
 
 		// 2nd order SSP Runge-Kutta
 		sw2d::computeRHS(fields_n, n, p, dg, t);
-		fields_n.RHS1 = sum(Filt(ii,kk)*fields_n.RHS1(kk,jj), kk);
-		fields_n.RHS2 = sum(Filt(ii,kk)*fields_n.RHS2(kk,jj), kk);
-		fields_n.RHS3 = sum(Filt(ii,kk)*fields_n.RHS3(kk,jj), kk);
+		//fields_n.RHS1 = sum(Filt(ii,kk)*fields_n.RHS1(kk,jj), kk);
+		//fields_n.RHS2 = sum(Filt(ii,kk)*fields_n.RHS2(kk,jj), kk);
+		//fields_n.RHS3 = sum(Filt(ii,kk)*fields_n.RHS3(kk,jj), kk);
 
 		// Update solution.
 		fields_np1.h  = fields_n.h  + dt*fields_n.RHS1;
@@ -204,20 +223,20 @@ int main(int argc, char **argv) {
 		fields_np1.hv = fields_n.hv + dt*fields_n.RHS3;
 
 		// sponge layer relaxation -- to control insane velocities near the open boundary.		
-		//fields_np1.hu /= (1.0 + spongeCoeff*fields_np1.hu*fields_np1.hu);
-		//fields_np1.hv /= (1.0 + spongeCoeff*fields_np1.hv*fields_np1.hv);
+		fields_np1.hu /= (1.0 + spongeCoeff*fields_np1.hu*fields_np1.hu);
+		fields_np1.hv /= (1.0 + spongeCoeff*fields_np1.hv*fields_np1.hv);
 
 		sw2d::computeRHS(fields_np1, n, p, dg, t);
-		//fields_n.RHS1 = sum(Filt(ii,kk)*fields_n.RHS1(kk,jj), kk);
-		fields_np1.RHS2 = sum(Filt(ii,kk)*fields_np1.RHS2(kk,jj), kk);
-		fields_np1.RHS3 = sum(Filt(ii,kk)*fields_np1.RHS3(kk,jj), kk);
+		//fields_np1.RHS1 = sum(Filt(ii,kk)*fields_np1.RHS1(kk,jj), kk);
+		//fields_np1.RHS2 = sum(Filt(ii,kk)*fields_np1.RHS2(kk,jj), kk);
+		//fields_np1.RHS3 = sum(Filt(ii,kk)*fields_np1.RHS3(kk,jj), kk);
 
 		fields_n.h  = 0.5*(fields_n.h  + fields_np1.h  + dt*fields_np1.RHS1);
 		fields_n.hu = 0.5*(fields_n.hu + fields_np1.hu + dt*fields_np1.RHS2);
 		fields_n.hv = 0.5*(fields_n.hv + fields_np1.hv + dt*fields_np1.RHS3);
 
-		//fields_n.hu /= (1.0 + spongeCoeff*fields_n.hu*fields_n.hu);
-		//fields_n.hv /= (1.0 + spongeCoeff*fields_n.hv*fields_n.hv);
+		fields_n.hu /= (1.0 + spongeCoeff*fields_n.hu*fields_n.hu);
+		fields_n.hv /= (1.0 + spongeCoeff*fields_n.hv*fields_n.hv);
 
 		real_type eta_max = normMax(fields_n.eta);
 		if ( std::abs(eta_max) > 1e8  || std::isnan(sum(fields_n.eta)))
@@ -262,6 +281,9 @@ namespace blitzdg {
 
 		void computeRHS(fields fds, const numParams& num, const physParams& phys, const DGContext2D& dg, real_type t) {
 
+			real_type T_tide = 3600*12.42; // or something?
+			real_type om_tide = 2.0*pi/T_tide;
+			real_type amp_tide = 3.0; // 3.
 			real_type g = phys.g;
 
 			// Blitz indices
@@ -272,6 +294,7 @@ namespace blitzdg {
 			// boundary indices.
 			const index_hashmap& bcHash = dg.bcmap();
 			const std::vector<index_type>& mapW = bcHash.at(BCTag::Wall);
+			const std::vector<index_type>& mapO = bcHash.at(BCTag::Out);
 
 			index_type numFaces = dg.numFaces(), Nfp = dg.numFacePoints(), Np=dg.numLocalPoints(), K = dg.numElements();
 
@@ -322,6 +345,14 @@ namespace blitzdg {
 				hP(w) = hM(w);
 				huP(w) = huM(w) - 2*nxVec(w)*(huM(w)*nxVec(w) + hvM(w)*nyVec(w));
 				hvP(w) = hvM(w) - 2*nyVec(w)*(huM(w)*nxVec(w) + hvM(w)*nyVec(w));
+			}
+
+            // OBC's - free surface moves up and down according to the tidal forcing.
+			for (index_type i=0; i < static_cast<index_type>(mapO.size()); ++i) {
+				index_type o = mapO[i];
+                huP(o) = huM(o);
+				hvP(o) = hvM(o);
+				hP(o) = HM(o) + amp_tide*std::cos(om_tide*t)*0.5*(std::tanh(0.15/3600*(t-T_tide))+1);
 			}
 
 			// well-balancing scheme (star variables).
@@ -382,6 +413,7 @@ namespace blitzdg {
 			for (index_type i=0; i < numFaceNodes; ++i)
 				spdMax(i) = max(spdM(i), spdP(i));
 
+			// use global lax-friedrichs speed for now.
 			spdMax = blitz::max(spdMax) + 0*ii;
 
 			real_vector_type dFlux1(numFaceNodes), dFlux2(numFaceNodes), dFlux3(numFaceNodes);
@@ -476,8 +508,8 @@ namespace blitzdg {
 				for (index_type n=0; n < Np; ++n) {
 					real_type val = depthData(count);
 
-					if (val < 300.0)
-						val = 300.0;
+					if (val < 150.0)
+						val = 150.0;
 
 					H(n,k) = val;
 					++count;
