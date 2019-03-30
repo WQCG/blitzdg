@@ -361,6 +361,11 @@ namespace blitzdg {
       void buildFilter(real_type Nc, index_type s);
 
       /**
+       * Build an interpolation operator to a new set of nodes on the reference triangle.
+       */
+      void computeInterpMatrix(const real_vector_type& rout, const real_vector_type& sout, real_matrix_type& IM) const;
+
+      /**
        * Returns the number of nodes local to a 2D triangular element.
        */
       index_type get_NumLocalPoints() const;

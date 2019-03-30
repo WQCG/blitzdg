@@ -42,8 +42,8 @@ int main(int argc, char **argv) {
 	real_type t = 0.0;
 
 	// Numerical parameters (N = Order of polynomials)
-	const index_type N = 1;
-	const real_type CFL = 0.4;
+	const index_type N = 4;
+	const real_type CFL = 0.85;
 
 	// Build dependencies.
 	MeshManager meshManager;
@@ -60,9 +60,13 @@ int main(int argc, char **argv) {
 	triangleNodesProvisioner.buildMaps();
 	triangleNodesProvisioner.buildBCHash();
 	// Pre-processing step - build polynomial dealiasing filter.
-	triangleNodesProvisioner.buildFilter(0.85*N, N);
+	triangleNodesProvisioner.buildFilter(0.65*N, N);
 
+#ifndef __MINGW32__
+	VtkOutputter outputter(triangleNodesProvisioner);
+#else
 	CsvOutputter outputter;
+#endif
 
 	const real_matrix_type& x = triangleNodesProvisioner.get_xGrid();
 	const real_matrix_type& y = triangleNodesProvisioner.get_yGrid();
@@ -87,7 +91,7 @@ int main(int argc, char **argv) {
 
 	// Intialize fields.
 	H = 10.0 + 0*jj;
-	//eta = 1e-3*(x/1500);
+	//eta = -1.*(x/1500);
 	eta = exp(-(x/200)*(x/200) - (y/200)*(y/200));
 
 	u = 0*jj;
@@ -125,10 +129,13 @@ int main(int argc, char **argv) {
 		if ((count % 10) == 0) {
 			cout << "t=" << t << ", eta_max=" << max(eta) << ", dt=" << dt << "\n";
 			string fileName = outputter.generateFileName("eta", count);
-			outputter.writeFieldToFile(fileName, eta, ' ');
+
+			std::map<std::string, real_matrix_type> fields;
+			fields.insert({"eta", eta});
+			outputter.writeFieldsToFiles(fields, count);
 		}
 
-		real_matrix_type h1(Np,K), hu1(Np,K), hv1(Np,K);
+		real_matrix_type h1(Np,K), hu1(Np,K), hv1(Np,K), eta1(Np,K);
 
 		// SSP RK2
 		sw2d::computeRHS(h, hu, hv, g, triangleNodesProvisioner, RHS1, RHS2, RHS3);
@@ -139,10 +146,24 @@ int main(int argc, char **argv) {
 		spd = blitz::sqrt(u*u + v*v);
 		RHS2 -= CD*hu*spd;
 		RHS3 -= CD*hv*spd;
-
+		
 		h1  = h + dt*RHS1;
 		hu1 = hu + dt*RHS2;
 		hv1 = hv + dt*RHS3;
+
+		eta1 = h1 - H;
+		eta1 = sum(Filt(ii,kk)*eta1(kk,jj), kk);
+		h1 = H + eta1;
+
+		u = hu1 / h1;
+		v = hv1 / h1;
+
+		u = sum(Filt(ii,kk)*u(kk,jj), kk);
+		v = sum(Filt(ii,kk)*v(kk,jj), kk);
+
+		hu1 = h1*u;
+		hv1 = h1*v;
+
 
 		sw2d::computeRHS(h1, hu1, hv1, g, triangleNodesProvisioner, RHS1, RHS2, RHS3);
 		u = hu / h;
@@ -153,17 +174,30 @@ int main(int argc, char **argv) {
 		RHS2 -= CD*hu*spd;
 		RHS3 -= CD*hv*spd;
 
+		RHS2 = sum(Filt(ii,kk)*RHS2(kk,jj), kk);
+		RHS3 = sum(Filt(ii,kk)*RHS3(kk,jj), kk);
+
 		h  = 0.5*(h  + h1  + dt*RHS1);
 		hu = 0.5*(hu + hu1 + dt*RHS2);
 		hv = 0.5*(hv + hv1 + dt*RHS3);
+
 		t += dt;
 		count++;
 
+		eta = h - H;
+		eta = sum(Filt(ii,kk)*eta(kk,jj), kk);
+		h = H + eta;
+
 		u = hu / h;
 		v = hv / h;
-		spd = blitz::sqrt(u*u + v*v) + blitz::sqrt(g*h);
 
-		eta = h - H;
+		u = sum(Filt(ii,kk)*u(kk,jj), kk);
+		v = sum(Filt(ii,kk)*v(kk,jj), kk);
+
+		hu = h*u;
+		hv = h*v;
+
+		spd = blitz::sqrt(u*u + v*v) + blitz::sqrt(g*h);
 
 		real_type eta_max = normMax(eta);
 		if ( std::abs(eta_max) > 1e8  || std::isnan(eta_max) )
