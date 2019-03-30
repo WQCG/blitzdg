@@ -38,6 +38,8 @@ namespace blitzdg {
       real_mat_smart_ptr V;
       real_mat_smart_ptr Dr;
       real_mat_smart_ptr Ds;
+      real_mat_smart_ptr Drw;
+      real_mat_smart_ptr Dsw;
       real_mat_smart_ptr Lift;
       real_mat_smart_ptr J;
       real_mat_smart_ptr rx;
@@ -172,7 +174,7 @@ namespace blitzdg {
       * @param[out] Dr Differentiation matrix with respect to r coordinate.
       * @param[out] Ds Differentiation matrix with respect to s coordinate.
       */
-      void computeDifferentiationMatrices(const real_matrix_type & V2Dr, const real_matrix_type & V2Ds, const real_matrix_type & V, real_matrix_type & Dr, real_matrix_type & Ds) const;
+      void computeDifferentiationMatrices(const real_matrix_type & V2Dr, const real_matrix_type & V2Ds, const real_matrix_type & V, real_matrix_type & Dr, real_matrix_type & Ds, real_matrix_type& Drw, real_matrix_type& Dsw) const;
 
      /**
       * Returns a reference to a matrix whose jth column contains the
@@ -209,6 +211,18 @@ namespace blitzdg {
        * to the s component on the the standard element.
        */
       const real_matrix_type & get_Ds() const;
+
+      /**
+       * Returns a reference to the weak differentiation matrix with respect
+       * to the r component on the the standard element.
+       */
+      const real_matrix_type & get_Drw() const;
+
+      /**
+       * Returns a reference to the weak differentiation matrix with respect
+       * to the s component on the the standard element.
+       */
+      const real_matrix_type & get_Dsw() const;
 
       /**
        * Returns a reference to the 2D generalized Vandermonde matrix

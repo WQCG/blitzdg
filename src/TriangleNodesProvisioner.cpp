@@ -44,14 +44,16 @@ namespace blitzdg {
         V{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) }, 
         Dr{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
         Ds{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
+        Drw{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
+        Dsw{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
         Lift{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder+1)*NumFaces) },
         J{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements(), ColumnMajorOrder()) },
-        rx{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements()) },
-        sx{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements()) },
-        ry{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements()) },
-        sy{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements()) },
-        nx{ new real_matrix_type((_NOrder+1)*NumFaces, _MeshManager.get_NumElements()) },
-        ny{ new real_matrix_type((_NOrder+1)*NumFaces, _MeshManager.get_NumElements()) },
+        rx{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements(), ColumnMajorOrder()) },
+        sx{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements(), ColumnMajorOrder()) },
+        ry{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements(), ColumnMajorOrder()) },
+        sy{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements(), ColumnMajorOrder()) },
+        nx{ new real_matrix_type((_NOrder+1)*NumFaces, _MeshManager.get_NumElements(), ColumnMajorOrder()) },
+        ny{ new real_matrix_type((_NOrder+1)*NumFaces, _MeshManager.get_NumElements(), ColumnMajorOrder()) },
         Vinv{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
         Filter{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
         Fmask{ new index_matrix_type( _NOrder+1, NumFaces, ColumnMajorOrder()) },
@@ -156,9 +158,10 @@ namespace blitzdg {
         }
     }
 
-    void TriangleNodesProvisioner::computeDifferentiationMatrices(const real_matrix_type & V2Dr, const real_matrix_type & V2Ds, const real_matrix_type & V, real_matrix_type & Dr, real_matrix_type & Ds) const {
+    void TriangleNodesProvisioner::computeDifferentiationMatrices(const real_matrix_type & V2Dr, const real_matrix_type & V2Ds, const real_matrix_type & V, real_matrix_type & Dr, real_matrix_type & Ds, real_matrix_type& Drw, real_matrix_type& Dsw) const {
         firstIndex ii;
         secondIndex jj;
+        thirdIndex kk;
  
         const index_type numRowsV = V.rows();
         const index_type numColsV = V.cols();
@@ -191,6 +194,24 @@ namespace blitzdg {
         // Take transpose.
         Dr = Drtrans(jj, ii); 
         Ds = Dstrans(jj, ii);
+
+        // Now construct the weak derivatives.
+        real_matrix_type VVt(numRowsV,numRowsV), VVrt(numRowsV, numRowsV), VVst(numRowsV, numRowsV); 
+        real_matrix_type VVttrans(numRowsV,numRowsV), VVrttrans(numRowsV, numRowsV), VVsttrans(numRowsV, numRowsV); 
+        real_matrix_type Drwtrans(numRowsV,numRowsV), Dswtrans(numRowsV,numRowsV);
+        VVt = blitz::sum(V(ii,kk)*Vtrans(kk,jj), kk);
+        VVrt = blitz::sum(V(ii,kk)*V2Drtrans(kk,jj), kk);
+        VVst = blitz::sum(V(ii,kk)*V2Dstrans(kk,jj), kk);
+
+        VVttrans = VVt(jj,ii);
+        VVrttrans = VVrt(jj,ii);
+        VVsttrans = VVst(jj,ii);
+
+        LinSolver.solve( VVttrans, VVrttrans,  Drwtrans );
+        LinSolver.solve( VVttrans, VVsttrans,  Dswtrans );
+
+        Drw = Drwtrans(jj,ii);
+        Dsw = Dswtrans(jj,ii);
     }
 
     void TriangleNodesProvisioner::buildFilter(real_type Nc, index_type s) {
@@ -463,9 +484,12 @@ namespace blitzdg {
         real_matrix_type& D_r = *Dr;
         real_matrix_type& D_s = *Ds;
 
+        real_matrix_type& D_rw = *Drw;
+        real_matrix_type& D_sw = *Dsw;
+
         computeVandermondeMatrix(NOrder, r, s, V2D);
         computeGradVandermondeMatrix(NOrder, r, s, V2Dr, V2Ds);
-        computeDifferentiationMatrices(V2Dr, V2Ds, V2D, D_r, D_s);
+        computeDifferentiationMatrices(V2Dr, V2Ds, V2D, D_r, D_s, D_rw, D_sw);
 
         real_matrix_type& x = *xGrid;
         real_matrix_type& y = *yGrid;
@@ -814,6 +838,14 @@ namespace blitzdg {
 
     const real_matrix_type & TriangleNodesProvisioner::get_Ds() const {
         return *Ds;
+    }
+
+    const real_matrix_type & TriangleNodesProvisioner::get_Drw() const {
+        return *Drw;
+    }
+
+    const real_matrix_type & TriangleNodesProvisioner::get_Dsw() const {
+        return *Dsw;
     }
 
     const real_matrix_type & TriangleNodesProvisioner::get_rx() const {
