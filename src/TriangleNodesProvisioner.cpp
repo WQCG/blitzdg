@@ -221,6 +221,7 @@ namespace blitzdg {
 
         real_type alpha = -std::log(1.e-15);
 
+
         real_matrix_type& F = *Filter;
         real_matrix_type& Vref = *V;
         real_matrix_type& Vinvref = *Vinv;
@@ -232,8 +233,9 @@ namespace blitzdg {
         index_type count = 0;
         for (index_type i=0; i <= NOrder; ++i) {
             for (index_type j=0; j <= NOrder-i; ++j) {
-                if ( i+j >= Nc) {
-                    Fdiag(count, count) = std::exp(-alpha*std::pow((i+j - Nc)/(NOrder-Nc),s));
+                if ( (i+j) >= Nc) {
+                    real_type k = (static_cast<real_type>(i+j) - Nc) / (static_cast<real_type>(NOrder) - Nc);
+                    Fdiag(count, count) = std::exp(-alpha*std::pow(k,s));
                 } else {
                     Fdiag(count, count) = 1.0;
                 }
