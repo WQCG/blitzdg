@@ -84,7 +84,6 @@ int main(int argc, char **argv) {
 	// Intialize fields.
 	H = 10.0 + 0*jj;
 	eta = -1.*(x/1500.0);
-	//eta = exp(-(x/200)*(x/200) - (y/200)*(y/200));
 
 	u = 0*jj;
 	v = 0*jj;
@@ -130,9 +129,9 @@ int main(int argc, char **argv) {
 
 		// SSP RK2
 		sw2d::computeRHS(h, hu, hv, g, triangleNodesProvisioner, RHS1, RHS2, RHS3);
-		//RHS1 = sum(Filt(ii,kk)*RHS1(kk,jj), kk);
-		//RHS2 = sum(Filt(ii,kk)*RHS2(kk,jj), kk);
-		//RHS3 = sum(Filt(ii,kk)*RHS3(kk,jj), kk);
+		RHS1 = sum(Filt(ii,kk)*RHS1(kk,jj), kk);
+		RHS2 = sum(Filt(ii,kk)*RHS2(kk,jj), kk);
+		RHS3 = sum(Filt(ii,kk)*RHS3(kk,jj), kk);
 
 		real_matrix_type h1(Np,K), hu1(Np,K), hv1(Np,K), u1(Np,K), v1(Np,K);
 
@@ -141,16 +140,15 @@ int main(int argc, char **argv) {
 		hv1 = hv + 0.5*dt*RHS3;
 
 		sw2d::computeRHS(h1, hu1, hv1, g, triangleNodesProvisioner, RHS1, RHS2, RHS3);
-		//RHS1 = sum(Filt(ii,kk)*RHS1(kk,jj), kk);
-		//RHS2 = sum(Filt(ii,kk)*RHS2(kk,jj), kk);
-		//RHS3 = sum(Filt(ii,kk)*RHS3(kk,jj), kk);
+		RHS1 = sum(Filt(ii,kk)*RHS1(kk,jj), kk);
+		RHS2 = sum(Filt(ii,kk)*RHS2(kk,jj), kk);
+		RHS3 = sum(Filt(ii,kk)*RHS3(kk,jj), kk);
 
 		h  += dt*RHS1;
 		hu += dt*RHS2;
 		hv += dt*RHS3;
 
 		eta = h-H;
-
 
 		real_type eta_max = normMax(eta);
 		if ( std::abs(eta_max) > 1e8  || std::isnan(eta_max) )
@@ -165,8 +163,6 @@ int main(int argc, char **argv) {
 
 		real_type Fsc_max = max(abs(fsVec)*spdM);
 		dt = CFL/((N+1)*(N+1)*0.5*Fsc_max);
-
-		
 
 		t += dt;
 		++count;
