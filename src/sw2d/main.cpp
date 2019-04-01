@@ -50,13 +50,13 @@ int main(int argc, char **argv) {
 	p.CD = 2.5e-3;
 	p.f = 1.0070e-4;
 	p.initTime = 0.0;
-	p.finalTime = 24.0*3600;
+	p.finalTime = 24.0*3600.0;
 
 	sw2d::numParams n;
 	n.N = 1;
-	n.CFL = 0.55;
+	n.CFL = 0.25;
 	n.outputInterval = 20;
-	n.filterPercent = 0.95;
+	n.filterPercent = 0.90;
 	n.filterOrder = 4;
 
 	real_type t = p.initTime;
@@ -64,13 +64,12 @@ int main(int argc, char **argv) {
 	// Build dependencies.
 	MeshManager meshManager;
 	meshManager.readVertices("input/vh_verts_z.dat");
-	meshManager.readElements("input/vh_els_0.oct");
-
+    meshManager.readElements("input/vh_els_0.oct");
 	// Dependency-inject mesh manager to nodes provisioner.
 	TriangleNodesProvisioner triangleNodesProvisioner(n.N, meshManager);
 
 	// Pre-processing step - build polynomial dealiasing filter.
-	triangleNodesProvisioner.buildFilter(n.filterPercent*n.N, n.filterOrder);
+	triangleNodesProvisioner.buildFilter(n.filterPercent*static_cast<real_type>(n.N), n.filterOrder);
 
 	DGContext2D dg = triangleNodesProvisioner.get_DGContext();
 
@@ -110,8 +109,8 @@ int main(int argc, char **argv) {
 	secondIndex jj;
 	thirdIndex kk;
 
-	const string depthFile = "input/H0_try2.oct";
-	sw2d::readDepthData(depthFile, fields_n.H);
+    const string depthFile = "input/H0_try2.oct";
+    sw2d::readDepthData(depthFile, fields_n.H);
 
 	// Set initial values for fields
 	fields_n.RHS1 = 0*jj;
@@ -123,8 +122,6 @@ int main(int argc, char **argv) {
 	fields_n.resRK3= 0*jj;
 
 	index_type count = 0;
-
-	const index_vector_type& EToV = meshManager.get_Elements();
 
 	// Make copy of bcMap, for hacking it.
     index_vector_type bcType = meshManager.get_BCType();
@@ -143,8 +140,10 @@ int main(int argc, char **argv) {
 	fields_np1.Hx = fields_n.Hx;
 	fields_np1.Hy = fields_n.Hy;
 
-	fields_n.eta = 0*jj;
-	fields_n.h = fields_n.H;
+	const real_matrix_type& x = triangleNodesProvisioner.get_xGrid();
+
+	fields_n.eta = 0.*jj;
+	fields_n.h = fields_n.H + fields_n.eta;
 	fields_n.u = 0*jj;
 	fields_n.v = 0*jj;
 	fields_n.hu = fields_n.h*fields_n.u;
@@ -159,19 +158,21 @@ int main(int argc, char **argv) {
 
 	outputter.writeFieldsToFiles(timeDepFields, 0);
 
+	const index_vector_type& EToV = meshManager.get_Elements();
+
 	// deal with open boundary conditions.
 	for (index_type k=0; k < K; ++k) {
-			index_type v1 = EToV(3*k);
-			index_type v2 = EToV(3*k+1);
-			index_type v3 = EToV(3*k+2);
+        index_type v1 = EToV(3*k);
+        index_type v2 = EToV(3*k+1);
+        index_type v3 = EToV(3*k+2);
 
-			if (obcNodes.count(v1) > 0 && obcNodes.count(v2) > 0)
+		if (obcNodes.count(v1) > 0 && obcNodes.count(v2) > 0)
 				bcType(3*k) = BCTag::Out;
-			if (obcNodes.count(v2) > 0 && obcNodes.count(v3) > 0)
+		if (obcNodes.count(v2) > 0 && obcNodes.count(v3) > 0)
 				bcType(3*k+1) = BCTag::Out;
-			if (obcNodes.count(v3) > 0 && obcNodes.count(v1) > 0)
+		if (obcNodes.count(v3) > 0 && obcNodes.count(v1) > 0)
 				bcType(3*k+2) = BCTag::Out;
-	}
+    }
 
 	triangleNodesProvisioner.buildBCHash(bcType);
 
@@ -193,6 +194,7 @@ int main(int argc, char **argv) {
 	real_type dt;
 	while (t < p.finalTime) {
 		fields_n.eta = fields_n.h-fields_n.H;
+
 		dt = computeTimeStep(fields_n, p, n, dg);
 
 		if ((count % n.outputInterval) == 0) {
@@ -211,6 +213,10 @@ int main(int argc, char **argv) {
 
 		// 2nd order SSP Runge-Kutta
 		sw2d::computeRHS(fields_n, n, p, dg, t);
+		//fields_n.RHS1 = sum(Filt(ii,kk)*fields_n.RHS1(kk,jj), kk);
+		//fields_n.RHS2 = sum(Filt(ii,kk)*fields_n.RHS2(kk,jj), kk);
+		//fields_n.RHS3 = sum(Filt(ii,kk)*fields_n.RHS3(kk,jj), kk);
+
 		// Update solution.
 		fields_np1.h  = fields_n.h  + dt*fields_n.RHS1;
 		fields_np1.hu = fields_n.hu + dt*fields_n.RHS2;
@@ -221,6 +227,9 @@ int main(int argc, char **argv) {
 		fields_np1.hv /= (1.0 + spongeCoeff*fields_np1.hv*fields_np1.hv);
 
 		sw2d::computeRHS(fields_np1, n, p, dg, t);
+		//fields_np1.RHS1 = sum(Filt(ii,kk)*fields_np1.RHS1(kk,jj), kk);
+		//fields_np1.RHS2 = sum(Filt(ii,kk)*fields_np1.RHS2(kk,jj), kk);
+		//fields_np1.RHS3 = sum(Filt(ii,kk)*fields_np1.RHS3(kk,jj), kk);
 
 		fields_n.h  = 0.5*(fields_n.h  + fields_np1.h  + dt*fields_np1.RHS1);
 		fields_n.hu = 0.5*(fields_n.hu + fields_np1.hu + dt*fields_np1.RHS2);
@@ -245,7 +254,7 @@ int main(int argc, char **argv) {
 namespace blitzdg {
 	namespace sw2d {
 		double computeTimeStep(fields& fds, const physParams& phys, const numParams& num, const DGContext2D& dg) {
-			index_type numFaceNodes = dg.numFaces()*dg.numFaces()*dg.numElements();
+			index_type numFaceNodes = dg.numFaces()*dg.numFacePoints()*dg.numElements();
 			index_type numTotalNodes = dg.numLocalPoints()*dg.numElements();
 			real_vector_type uVec(numTotalNodes), vVec(numTotalNodes), hVec(numTotalNodes);
 			real_vector_type uM(numFaceNodes), vM(numFaceNodes), hM(numFaceNodes), fsVec(numFaceNodes);
@@ -253,10 +262,12 @@ namespace blitzdg {
 			fds.u = fds.hu/fds.h; 
 			fds.v = fds.hv/fds.h;
 
+			const real_matrix_type& fscale = dg.fscale();
+
 			fullToVector(fds.u, uVec, false);
 			fullToVector(fds.v, vVec, false);
 			fullToVector(fds.h, hVec, false);
-			fullToVector(dg.fscale() , fsVec, false);
+			fullToVector(fscale, fsVec, false);
 			applyIndexMap(uVec, dg.vmapM(), uM);
 			applyIndexMap(vVec, dg.vmapM(), vM);
 			applyIndexMap(hVec, dg.vmapM(), hM);
@@ -331,16 +342,15 @@ namespace blitzdg {
 			// BC's - no flow through walls.
 			for (index_type i=0; i < static_cast<index_type>(mapW.size()); ++i) {
 				index_type w = mapW[i];
+				hP(w) = hM(w);
 				huP(w) = huM(w) - 2*nxVec(w)*(huM(w)*nxVec(w) + hvM(w)*nyVec(w));
 				hvP(w) = hvM(w) - 2*nyVec(w)*(huM(w)*nxVec(w) + hvM(w)*nyVec(w));
 			}
 
-			// OBC's - free surface moves up and down according to the tidal forcing.
+            // OBC's - free surface moves up and down according to the tidal forcing.
 			for (index_type i=0; i < static_cast<index_type>(mapO.size()); ++i) {
 				index_type o = mapO[i];
-				//huP(o) = huM(o) - 2*nxVec(o)*(huM(o)*nxVec(o) + hvM(o)*nyVec(o));
-				//hvP(o) = hvM(o) - 2*nyVec(o)*(huM(o)*nxVec(o) + hvM(o)*nyVec(o));
-				huP(o) = huM(o);
+                huP(o) = huM(o);
 				hvP(o) = hvM(o);
 				hP(o) = HM(o) + amp_tide*std::cos(om_tide*t)*0.5*(std::tanh(0.15/3600*(t-T_tide))+1);
 			}
@@ -377,7 +387,7 @@ namespace blitzdg {
 			real_vector_type F2P(numFaceNodes), G2P(numFaceNodes), G3P(numFaceNodes);
 
 			F2P = (huP*huP)/hP + 0.5*g*hP*hP; G2P = (huP*hvP)/hP;
-			real_vector_type& F3P = G2P;  G3P = (hvP*hvP)/hP + 0.5*g*hM*hM;
+			real_vector_type& F3P = G2P;  G3P = (hvP*hvP)/hP + 0.5*g*hP*hP;
 
 			// Full fields
 			real_matrix_type& F1 = fds.hu, G1 = fds.hv;
@@ -403,12 +413,15 @@ namespace blitzdg {
 			for (index_type i=0; i < numFaceNodes; ++i)
 				spdMax(i) = max(spdM(i), spdP(i));
 
+			// use global lax-friedrichs speed for now.
+			spdMax = blitz::max(spdMax) + 0*ii;
+
 			real_vector_type dFlux1(numFaceNodes), dFlux2(numFaceNodes), dFlux3(numFaceNodes);
 
 			// strong form: Compute flux jump vector. (fluxM - numericalFlux ) dot n
 			dFlux1 = 0.5*((F1M - F1P)*nxVec + (G1M-G1P)*nyVec - spdMax*dh);
 			dFlux2 = 0.5*((F2M - F2P)*nxVec + (G2M-G2P)*nyVec - spdMax*dhu - (0.5*g*hM*hM - 0.5*g*hMstar*hMstar)*nxVec);
-			dFlux3 = 0.5*((F3M - F3P)*nxVec + (G2M-G2P)*nyVec - spdMax*dhv - (0.5*g*hM*hM - 0.5*g*hMstar*hMstar)*nyVec);
+			dFlux3 = 0.5*((F3M - F3P)*nxVec + (G3M-G3P)*nyVec - spdMax*dhv - (0.5*g*hM*hM - 0.5*g*hMstar*hMstar)*nyVec);
 
 			real_matrix_type dFlux1Mat(Nfp*numFaces, K), dFlux2Mat(Nfp*numFaces, K), dFlux3Mat(Nfp*numFaces, K);
 
@@ -495,8 +508,8 @@ namespace blitzdg {
 				for (index_type n=0; n < Np; ++n) {
 					real_type val = depthData(count);
 
-					if (val < 300.0)
-						val = 300.0;
+					if (val < 150.0)
+						val = 150.0;
 
 					H(n,k) = val;
 					++count;

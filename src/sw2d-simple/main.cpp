@@ -36,14 +36,12 @@ int main(int argc, char **argv) {
 
 	// Physical parameters
 	const real_type g = 9.81;
-	const real_type CD = 2.5e-3;
-
 	const real_type finalTime = 1000.0;
 	real_type t = 0.0;
 
 	// Numerical parameters (N = Order of polynomials)
 	const index_type N = 4;
-	const real_type CFL = 0.85;
+	const real_type CFL = 0.65;
 
 	// Build dependencies.
 	MeshManager meshManager;
@@ -53,14 +51,8 @@ int main(int argc, char **argv) {
 	// Dependency-inject mesh manager to nodes provisioner.
 	TriangleNodesProvisioner triangleNodesProvisioner(N, meshManager);
 
-	// Pre-processing steps.
-	triangleNodesProvisioner.buildNodes();
-	triangleNodesProvisioner.buildLift();
-	triangleNodesProvisioner.buildPhysicalGrid();
-	triangleNodesProvisioner.buildMaps();
-	triangleNodesProvisioner.buildBCHash();
 	// Pre-processing step - build polynomial dealiasing filter.
-	triangleNodesProvisioner.buildFilter(0.65*N, N);
+	triangleNodesProvisioner.buildFilter(0.9*N, N);
 
 #ifndef __MINGW32__
 	VtkOutputter outputter(triangleNodesProvisioner);
@@ -91,8 +83,7 @@ int main(int argc, char **argv) {
 
 	// Intialize fields.
 	H = 10.0 + 0*jj;
-	//eta = -1.*(x/1500);
-	eta = exp(-(x/200)*(x/200) - (y/200)*(y/200));
+	eta = -1.*(x/1500.0);
 
 	u = 0*jj;
 	v = 0*jj;
@@ -127,6 +118,7 @@ int main(int argc, char **argv) {
 
 	while (t < finalTime) {
 		if ((count % 10) == 0) {
+			eta = h-H;
 			cout << "t=" << t << ", eta_max=" << max(eta) << ", dt=" << dt << "\n";
 			string fileName = outputter.generateFileName("eta", count);
 
@@ -135,79 +127,45 @@ int main(int argc, char **argv) {
 			outputter.writeFieldsToFiles(fields, count);
 		}
 
-		real_matrix_type h1(Np,K), hu1(Np,K), hv1(Np,K), eta1(Np,K);
-
 		// SSP RK2
 		sw2d::computeRHS(h, hu, hv, g, triangleNodesProvisioner, RHS1, RHS2, RHS3);
-		u = hu / h;
-		v = hv / h;
-		
-		// add bottom drag.
-		spd = blitz::sqrt(u*u + v*v);
-		RHS2 -= CD*hu*spd;
-		RHS3 -= CD*hv*spd;
-		
-		h1  = h + dt*RHS1;
-		hu1 = hu + dt*RHS2;
-		hv1 = hv + dt*RHS3;
-
-		eta1 = h1 - H;
-		eta1 = sum(Filt(ii,kk)*eta1(kk,jj), kk);
-		h1 = H + eta1;
-
-		u = hu1 / h1;
-		v = hv1 / h1;
-
-		u = sum(Filt(ii,kk)*u(kk,jj), kk);
-		v = sum(Filt(ii,kk)*v(kk,jj), kk);
-
-		hu1 = h1*u;
-		hv1 = h1*v;
-
-
-		sw2d::computeRHS(h1, hu1, hv1, g, triangleNodesProvisioner, RHS1, RHS2, RHS3);
-		u = hu / h;
-		v = hv / h;
-
-		// add bottom drag.
-		spd = blitz::sqrt(u*u + v*v);
-		RHS2 -= CD*hu*spd;
-		RHS3 -= CD*hv*spd;
-
+		RHS1 = sum(Filt(ii,kk)*RHS1(kk,jj), kk);
 		RHS2 = sum(Filt(ii,kk)*RHS2(kk,jj), kk);
 		RHS3 = sum(Filt(ii,kk)*RHS3(kk,jj), kk);
 
-		h  = 0.5*(h  + h1  + dt*RHS1);
-		hu = 0.5*(hu + hu1 + dt*RHS2);
-		hv = 0.5*(hv + hv1 + dt*RHS3);
+		real_matrix_type h1(Np,K), hu1(Np,K), hv1(Np,K), u1(Np,K), v1(Np,K);
 
-		t += dt;
-		count++;
+		h1 =  h + 0.5*dt*RHS1;
+		hu1 = hu + 0.5*dt*RHS2;
+		hv1 = hv + 0.5*dt*RHS3;
 
-		eta = h - H;
-		eta = sum(Filt(ii,kk)*eta(kk,jj), kk);
-		h = H + eta;
+		sw2d::computeRHS(h1, hu1, hv1, g, triangleNodesProvisioner, RHS1, RHS2, RHS3);
+		RHS1 = sum(Filt(ii,kk)*RHS1(kk,jj), kk);
+		RHS2 = sum(Filt(ii,kk)*RHS2(kk,jj), kk);
+		RHS3 = sum(Filt(ii,kk)*RHS3(kk,jj), kk);
 
-		u = hu / h;
-		v = hv / h;
+		h  += dt*RHS1;
+		hu += dt*RHS2;
+		hv += dt*RHS3;
 
-		u = sum(Filt(ii,kk)*u(kk,jj), kk);
-		v = sum(Filt(ii,kk)*v(kk,jj), kk);
-
-		hu = h*u;
-		hv = h*v;
-
-		spd = blitz::sqrt(u*u + v*v) + blitz::sqrt(g*h);
+		eta = h-H;
 
 		real_type eta_max = normMax(eta);
 		if ( std::abs(eta_max) > 1e8  || std::isnan(eta_max) )
 			throw std::runtime_error("A numerical instability has occurred!");
 
+		u = hu / h;
+		v = hv / h;
+
+		spd = blitz::sqrt(u*u + v*v) + blitz::sqrt(g*h);
 		fullToVector(spd, spdVec, false);
 		applyIndexMap(spdVec, vmapM, spdM);
 
 		real_type Fsc_max = max(abs(fsVec)*spdM);
 		dt = CFL/((N+1)*(N+1)*0.5*Fsc_max);
+
+		t += dt;
+		++count;
 
 	}
 	real_matrix_type etafinal(Np, K);
@@ -314,7 +272,7 @@ namespace blitzdg {
 			real_vector_type F2P(numFaceNodes), G2P(numFaceNodes), G3P(numFaceNodes);
 
 			F2P = (huP*huP)/hP + 0.5*g*hP*hP; G2P = (huP*hvP)/hP;
-			real_vector_type& F3P = G2P;  G3P = (hvP*hvP)/hP + 0.5*g*hM*hM;
+			real_vector_type& F3P = G2P;  G3P = (hvP*hvP)/hP + 0.5*g*hP*hP;
 
 			// Full fields
 			real_matrix_type& F1 = hu, G1 = hv;
@@ -354,7 +312,7 @@ namespace blitzdg {
 			// strong form: Compute flux jump vector. (fluxM - numericalFlux ) dot n
 			dFlux1 = 0.5*((F1M - F1P)*nxVec + (G1M-G1P)*nyVec - spdMax*dh);
 			dFlux2 = 0.5*((F2M - F2P)*nxVec + (G2M-G2P)*nyVec - spdMax*dhu);
-			dFlux3 = 0.5*((F3M - F3P)*nxVec + (G2M-G2P)*nyVec - spdMax*dhv);
+			dFlux3 = 0.5*((F3M - F3P)*nxVec + (G3M-G3P)*nyVec - spdMax*dhv);
 
 			real_matrix_type dFlux1Mat(Nfp*numFaces, K), dFlux2Mat(Nfp*numFaces, K), dFlux3Mat(Nfp*numFaces, K);
 

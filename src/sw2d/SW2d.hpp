@@ -25,7 +25,7 @@ namespace blitzdg {
 			index_type N ; // N = Order of polynomials
 			real_type CFL;
 			index_type outputInterval;
-			index_type filterPercent = 0.95;
+			real_type filterPercent = 0.95;
 			index_type filterOrder = 4;
 		};
 
