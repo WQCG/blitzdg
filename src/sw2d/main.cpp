@@ -387,7 +387,7 @@ namespace blitzdg {
 			real_vector_type F2P(numFaceNodes), G2P(numFaceNodes), G3P(numFaceNodes);
 
 			F2P = (huP*huP)/hP + 0.5*g*hP*hP; G2P = (huP*hvP)/hP;
-			real_vector_type& F3P = G2P;  G3P = (hvP*hvP)/hP + 0.5*g*hM*hM;
+			real_vector_type& F3P = G2P;  G3P = (hvP*hvP)/hP + 0.5*g*hP*hP;
 
 			// Full fields
 			real_matrix_type& F1 = fds.hu, G1 = fds.hv;
@@ -421,7 +421,7 @@ namespace blitzdg {
 			// strong form: Compute flux jump vector. (fluxM - numericalFlux ) dot n
 			dFlux1 = 0.5*((F1M - F1P)*nxVec + (G1M-G1P)*nyVec - spdMax*dh);
 			dFlux2 = 0.5*((F2M - F2P)*nxVec + (G2M-G2P)*nyVec - spdMax*dhu - (0.5*g*hM*hM - 0.5*g*hMstar*hMstar)*nxVec);
-			dFlux3 = 0.5*((F3M - F3P)*nxVec + (G2M-G2P)*nyVec - spdMax*dhv - (0.5*g*hM*hM - 0.5*g*hMstar*hMstar)*nyVec);
+			dFlux3 = 0.5*((F3M - F3P)*nxVec + (G3M-G3P)*nyVec - spdMax*dhv - (0.5*g*hM*hM - 0.5*g*hMstar*hMstar)*nyVec);
 
 			real_matrix_type dFlux1Mat(Nfp*numFaces, K), dFlux2Mat(Nfp*numFaces, K), dFlux3Mat(Nfp*numFaces, K);
 
