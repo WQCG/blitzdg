@@ -219,8 +219,7 @@ namespace blitzdg {
         secondIndex jj;
         thirdIndex kk;
 
-        real_type alpha = -std::log(1.e-15);
-
+        real_type alpha = -std::log(std::numeric_limits<real_type>().epsilon());
 
         real_matrix_type& F = *Filter;
         real_matrix_type& Vref = *V;
@@ -722,8 +721,12 @@ namespace blitzdg {
         ones = 0*ii + 1;
         boundaryNodesMat = ones(ii)*bcType(jj);
 
+        index_vector_type boundaryNodes(NumFacePoints*NumFaces*NumElements);
+        fullToVector(boundaryNodesMat, boundaryNodes, false);
+
+
         index_type count=0;
-        for (auto itr = boundaryNodesMat.begin(); itr != boundaryNodesMat.end(); ++itr) {
+        for (auto itr = boundaryNodes.begin(); itr != boundaryNodes.end(); ++itr) {
             index_type bct = *itr;
 
             if (bct != 0) {
