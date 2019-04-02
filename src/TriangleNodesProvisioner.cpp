@@ -932,6 +932,8 @@ namespace blitzdg {
             xGrid.get(),
             yGrid.get(),
             Fscale.get(),
+            V.get(),
+            Vinv.get(),
             J.get(),
             rx.get(),
             ry.get(),
