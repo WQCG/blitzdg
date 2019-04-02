@@ -228,8 +228,10 @@ namespace blitzdg {
             }
         }
 
-        buildBCTable(lines);
         buildConnectivity();
+
+        // calling this with 'lines' seems to be broken.
+        buildBCTable(BCTag::Wall);
     }
 
     void MeshManager::buildBCTable(index_type tagNumber) {
@@ -241,12 +243,11 @@ namespace blitzdg {
         //k2 == k you could use k2 == k / NumFaces, where k now ranges over 0,...,NumFaces*NumElements-1
         for (index_type f=0; f < NumFaces*NumElements; ++f) {
             index_type k2 = E2E(f);
-
+        
             // self-referencing elements are boundary elements.
             if (k2 == (f / NumFaces))
                 BCTable(f) = tagNumber;
         }
-        
     }
 
     void MeshManager::buildBCTable(std::vector<std::vector<index_type>>& edges) {

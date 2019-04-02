@@ -724,7 +724,6 @@ namespace blitzdg {
         index_vector_type boundaryNodes(NumFacePoints*NumFaces*NumElements);
         fullToVector(boundaryNodesMat, boundaryNodes, false);
 
-
         index_type count=0;
         for (auto itr = boundaryNodes.begin(); itr != boundaryNodes.end(); ++itr) {
             index_type bct = *itr;
