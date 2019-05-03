@@ -12,11 +12,12 @@ namespace blitzdg {
         index_type K_;
         index_type NumFaces_;
         real_matrix_type* Filt_;
-        real_matrix_type* x_;
-        real_matrix_type* y_;
+        real_vector_type* r_;
+        real_vector_type* s_;
         real_matrix_type* xGrid_;
         real_matrix_type* yGrid_;
         real_matrix_type* Fscale_;
+        index_matrix_type* Fmask_;
         real_matrix_type* V_;
         real_matrix_type* Vinv_;
         real_matrix_type* J_;
@@ -41,9 +42,12 @@ namespace blitzdg {
             index_type numElems,
             index_type numFaces,
             real_matrix_type* filter,
+            real_vector_type* rgrid,
+            real_vector_type* sgrid,
             real_matrix_type* xgrid,
             real_matrix_type* ygrid,
             real_matrix_type* fscale,
+            index_matrix_type* fmask,
             real_matrix_type* vandermonde2d,
             real_matrix_type* vandermonde2dinv,
             real_matrix_type* jacobian,
@@ -61,8 +65,8 @@ namespace blitzdg {
             index_hashmap* bcmap)
             : Np_{ numLocalPoints }, Nfp_{ numFacePoints },
             K_{ numElems }, NumFaces_{ numFaces },
-            Filt_{ filter }, xGrid_{ xgrid }, yGrid_{ ygrid },
-            Fscale_{ fscale }, V_ { vandermonde2d }, Vinv_ {vandermonde2dinv}, J_{ jacobian }, rx_{ rx },
+            Filt_{ filter }, r_{ rgrid }, s_{ sgrid },  xGrid_{ xgrid }, yGrid_{ ygrid },
+            Fscale_{ fscale }, Fmask_ { fmask }, V_ { vandermonde2d }, Vinv_ {vandermonde2dinv}, J_{ jacobian }, rx_{ rx },
             ry_{ ry }, sx_{ sx }, sy_{ sy }, nx_{ nx }, ny_{ ny },
             Dr_{ Dr }, Ds_{ Ds }, Lift_{ lift }, vmapM_{ vmapM },
             vmapP_{ vmapP }, bcHash_{ bcmap }
@@ -87,6 +91,14 @@ namespace blitzdg {
         const real_matrix_type& filter() const {
             return *Filt_;
         }
+
+        const real_vector_type& r() const {
+            return *r_;
+        }
+
+        const real_vector_type& s() const {
+            return *s_;
+        }
         
         const real_matrix_type& x() const {
             return *xGrid_;
@@ -98,6 +110,10 @@ namespace blitzdg {
         
         const real_matrix_type& fscale() const {
             return *Fscale_;
+        }
+
+        const index_matrix_type& fmask() const {
+            return *Fmask_;
         }
 
         const real_matrix_type& V() const {

@@ -62,7 +62,7 @@ namespace blitzdg {
 
 				// impose boundary condition -- Dirichlet BC's (reflective)
 				//const index_hashmap& bcMap = dg.bcmap();
-				std::vector<index_type> mapD = dg.bcmap().at(BCTag::Wall);
+				std::vector<index_type> mapD = dg.bcmap().at(BCTag::Wall); // forcing dirichlet for now.
 				for (index_type i=0; i < static_cast<int>(mapD.size()); ++i) {
 					index_type d = mapD[i];
 					uP(d) = -uM(d);
@@ -109,7 +109,11 @@ namespace blitzdg {
 
 				// Neuman BC's imply auxiliary vector "(qx,qy) = 0" on the boundary
 				//std::vector<index_type> mapN = dg.bcmap().at(BCTag::Neuman);
-				std::vector<index_type> mapN = dg.bcmap().at(BCTag::Wall);
+				std::vector<index_type> mapN;
+				if (dg.bcmap().count( BCTag::Neuman )) {
+					mapN = dg.bcmap().at(BCTag::Neuman);
+				}
+
 				for (index_type i=0; i < static_cast<int>(mapN.size()); ++i) {
 					index_type n = mapN[i];
 					uxP(n) = -uxM(n); // + 2*(... stuff with normals?)

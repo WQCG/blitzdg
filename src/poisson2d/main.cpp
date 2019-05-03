@@ -40,11 +40,11 @@ int main(int argc, char **argv) {
 	printDisclaimer();
 
 	// Numerical parameters (N = Order of polynomials)
-	const index_type N = 1;
+	const index_type N = 2;
 
 	// Build dependencies.
 	MeshManager meshManager;
-	meshManager.readMesh("input/simple_circle.msh");
+	meshManager.readMesh("input/box.msh");
 
 	// Dependency-inject mesh manager to nodes provisioner.
 	TriangleNodesProvisioner triangleNodesProvisioner(N, meshManager);
@@ -61,12 +61,8 @@ int main(int argc, char **argv) {
 	real_matrix_type uexact(Np, K), r(Np, K), rhs(Np, K), soln(Np,K);
 	const real_matrix_type& x = dg.x(), y = dg.y();
 
-	r = blitz::sqrt(x*x + y*y);
-	const real_type r0 = blitz::max(r);
-
-	uexact = sin(pi*(r*r)/(r0*r0));
-
-	rhs = 4*pi/r0/r0*(cos(pi*(r*r)/(r0*r0)) - pi*r*r/(r0*r0)*sin(pi*(r*r)/(r0*r0)) );
+	uexact = sin(pi*x)*sin(pi*y);
+	rhs = -pi*pi*uexact;
 
 	const index_type numGlobalNodes = Np*K;
 
@@ -94,7 +90,8 @@ int main(int argc, char **argv) {
 	GMRESSolver gmres;
 	GMRESParams params;
 	params.maxits = 1500;
-	params.relTol = 8.e-3;
+	params.relTol = 1.e-4;
+	params.kspaceSz = 300;
 
 	GMRESOut result = gmres.solve(PoissonOperator(dg), Precon(), MMRHSVec, outVec, params);
 
