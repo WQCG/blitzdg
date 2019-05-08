@@ -2,10 +2,19 @@ cmake_minimum_required(VERSION 3.5)
 
 set (CMAKE_CONFIGURATION_TYPE x64)
 set (CMAKE_BUILD_TYPE DEBUG) # or Debug
-set (CMAKE_CXX_FLAGS "-g -Wall -std=c++11")
+set (CMAKE_CXX_FLAGS "-Wall -std=c++11 -fPIC")
 set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2")
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage -DBZ_DEBUG")
+# set (CMAKE_MODULE_LINKER_FLAGS  "${CMAKE_MODULE_LINKER_FLAGS} -Wl,-soname,pyblitzdg.so")
 include_directories ("include" "/usr/include/python3.6m/")
+set (CMAKE_CXX_LINK_FLAGS "-L/home/dsteinmo/Downloads/blitz-1.0.1/lib/.libs -WL,-soname,pyblitzdg.so")
+
+
+add_library(blitz SHARED IMPORTED) # or STATIC instead of SHARED
+set_target_properties(blitz PROPERTIES
+  IMPORTED_LOCATION "/home/dsteinmo/Downloads/blitz-1.0.1/lib/.libs/libblitz.so"
+  INTERFACE_INCLUDE_DIRECTORIES "/home/dsteinmo/Downloads/blitz-1.0.1"
+)
 
 link_libraries(
     blitz
@@ -18,11 +27,13 @@ link_libraries(
     vtkCommonCore-7.1
     vtkCommonExecutionModel-7.1
     vtkCommonDataModel-7.1
+    boost_python3
 )
 
 project(blitzdg)
 file (GLOB sources src/*.cpp)
-add_library(blitzdg ${sources})
+add_library(blitzdg SHARED ${sources})
+# target_compile_options(blitzdg PUBLIC "-fPIC")
 set_target_properties(blitzdg
     PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
@@ -86,8 +97,10 @@ set_target_properties(sw2d-simple
     )
 
 project(pyblitzdg)
+
 file (GLOB sources src/pyblitzdg/*.cpp)
 add_library(pyblitzdg SHARED ${sources})
+# target_compile_options(pyblitzdg PUBLIC "-fPIC")
 set_target_properties(pyblitzdg
     PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
@@ -98,6 +111,5 @@ set_target_properties(pyblitzdg PROPERTIES PREFIX "")
 
 target_link_libraries(pyblitzdg
     python3.6m
-    boost_python3
     blitzdg
     )
