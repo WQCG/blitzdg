@@ -21,6 +21,7 @@ link_libraries(
     vtkCommonCore-7.1
     vtkCommonExecutionModel-7.1
     vtkCommonDataModel-7.1
+    python3.6m
     boost_python3
 )
 
@@ -104,6 +105,5 @@ set_target_properties(pyblitzdg
 set_target_properties(pyblitzdg PROPERTIES PREFIX "")
 
 target_link_libraries(pyblitzdg
-    python3.6m
     blitzdg
     )
