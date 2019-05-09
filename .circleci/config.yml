@@ -16,8 +16,6 @@ jobs:
       - run:
           name: Generate makefiles
           command: |
-            apt-get -y update
-            apt-get -y install cmake
             DEBUG=1 CXX=clang++ INC="-I /opt/blitzpp/blitz-1.0.1" cmake .
       - run:
           name: Build (clang)
