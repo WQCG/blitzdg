@@ -30,7 +30,7 @@ jobs:
             DEBUG=1 CXX='g++ -Og' INC="-I /opt/blitzpp/blitz-1.0.1" make -j4
       - run:
           name: Test
-          command: bin/tests
+          command: mv bin/tests bin/test && LD_LIBRARY_PATH=/usr/local/lib bin/test
       - run:
           name: Code Coverage
           command: coveralls --exclude include/igloo --gcov-options '\-lp'
