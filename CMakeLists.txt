@@ -39,6 +39,18 @@ set_target_properties(blitzdg
 
 # link all projets below to blitzdg.
 link_libraries(
+    blitz
+    metis
+    umfpack
+    cxsparse
+    lapack
+    blas
+    vtkIOXML-7.1
+    vtkCommonCore-7.1
+    vtkCommonExecutionModel-7.1
+    vtkCommonDataModel-7.1
+    python3.6m
+    boost_python3
     blitzdg
 )
 
@@ -103,7 +115,3 @@ set_target_properties(pyblitzdg
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
     )
 set_target_properties(pyblitzdg PROPERTIES PREFIX "")
-
-target_link_libraries(pyblitzdg
-    blitzdg
-    )
