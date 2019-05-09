@@ -20,6 +20,7 @@ if [ "$machine" == "Linux" ] ; then
     apt-get -y install libmetis-dev libmetis-doc
     apt-get -y install libvtk7.1 libtvtk7-dev
     apt-get -y install libboost-dbg libboost-dev libboost-doc
+    apt-get -y install libboost-python1.65-dev
 
 	# pull in doxygen (latest) for travis - should flag this on only for travis and not for all devs.
     # get doxygen deps
