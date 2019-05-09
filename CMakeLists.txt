@@ -95,10 +95,10 @@ set_target_properties(sw2d
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
     )
 
-project(test)
+project(tests)
 file (GLOB sources src/test/*.cpp)
-add_executable(test ${sources})
-set_target_properties(test
+add_executable(tests ${sources})
+set_target_properties(tests
     PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
