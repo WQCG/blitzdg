@@ -7,7 +7,7 @@ set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2")
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage -DBZ_DEBUG")
 # set (CMAKE_MODULE_LINKER_FLAGS  "${CMAKE_MODULE_LINKER_FLAGS} -Wl,-soname,pyblitzdg.so")
 include_directories ("include" "/usr/include/python3.6m/")
-set (CMAKE_CXX_LINK_FLAGS "-WL,-soname,pyblitzdg.so")
+set (CMAKE_CXX_LINK_FLAGS "-Wl,-soname=pyblitzdg.so")
 
 
 link_libraries(
