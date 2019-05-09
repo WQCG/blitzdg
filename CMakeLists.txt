@@ -10,8 +10,6 @@ include_directories ("include" "/usr/include/python3.6m/")
 set (CMAKE_CXX_LINK_FLAGS "-WL,-soname,pyblitzdg.so")
 
 
-add_library(blitz SHARED IMPORTED) # or STATIC instead of SHARED
-
 link_libraries(
     blitz
     metis
