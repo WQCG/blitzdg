@@ -51,6 +51,7 @@ link_libraries(
     vtkCommonDataModel-7.1
     python3.6m
     boost_python3
+    boost_numpy
     blitzdg
 )
 
