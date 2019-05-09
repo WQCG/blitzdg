@@ -7,14 +7,10 @@ set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2")
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage -DBZ_DEBUG")
 # set (CMAKE_MODULE_LINKER_FLAGS  "${CMAKE_MODULE_LINKER_FLAGS} -Wl,-soname,pyblitzdg.so")
 include_directories ("include" "/usr/include/python3.6m/")
-set (CMAKE_CXX_LINK_FLAGS "-L/home/dsteinmo/Downloads/blitz-1.0.1/lib/.libs -WL,-soname,pyblitzdg.so")
+set (CMAKE_CXX_LINK_FLAGS "-WL,-soname,pyblitzdg.so")
 
 
 add_library(blitz SHARED IMPORTED) # or STATIC instead of SHARED
-set_target_properties(blitz PROPERTIES
-  IMPORTED_LOCATION "/home/dsteinmo/Downloads/blitz-1.0.1/lib/.libs/libblitz.so"
-  INTERFACE_INCLUDE_DIRECTORIES "/home/dsteinmo/Downloads/blitz-1.0.1"
-)
 
 link_libraries(
     blitz
