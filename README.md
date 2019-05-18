@@ -18,12 +18,12 @@ Build and development support has broadened from linux only to Mac OSX and Windo
 
 1. `git clone https://github.com/dsteinmo/blitzdg.git`
 2. `cd blitzdg && ./pull-deps.sh`
-3. `make && ./bin/advec1d` (This binary is a 1D advection equation solver.).
+3. `cmake . && make && ./bin/advec1d` (This binary is a 1D advection equation solver.).
 4. Run unit tests with `make test`.
 
 ### Running with Docker
 
-You can also run the build and tests inside a docker (linux) container. The container is based on an ubuntu 16.04 image.
+You can also run the build and tests inside a docker (linux) container. The container is based on an ubuntu 18.04 image.
 
 1. `git clone https://github.com/dsteinmo/blitzdg.git && cd blitzdg`
 2. `docker build -t blitzdg .`
@@ -33,20 +33,21 @@ You can also run the build and tests inside a docker (linux) container. The cont
 
 So far:
 
+* `cmake`
 * `blitz++`
 * `SuiteSparse (umfpack, cxsparse)`
 * `LAPACK`
 * `metis`
 * `boost`
 * `igloo` for BDD-style testing.
+* `vtk` for visualization in Paraview.
+* `boost-python` for experimental python pindings.
 
 Dependency installation is outlined in `pull-deps.sh` (tested on Ubuntu and Mac OSX).
 
-### Windows Dependencies
+### Windows
 
-The Windows build requires [MinGW/MinGW64](http://www.mingw.org/wiki/Getting_Started "MinGW Installation Instructions"). We are currently building windows binaries via cross-compile, targeting the `mingw64-x86_64-7.3.0-posix-seh-rt_v5-rev0` distribution of MinGW. There is currently not a Visual Studio/MSVC build.
-
-Run `.\pull-deps.ps1` in Powershell (4+ or Powershell Core (`pwsh`)).
+The Windows build is currently deprecated due to lack of MinGW support of libvtk.
 
 ## Contributing
 
