@@ -10,6 +10,7 @@
 #include <cmath>
 #include <limits>
 #include <memory>
+#include <boost/python/numpy.hpp>
 
 using blitz::firstIndex;
 using blitz::Range;
@@ -18,6 +19,11 @@ using blitz::sum;
 using blitz::thirdIndex;
 using std::numeric_limits;
 using std::unique_ptr;
+using boost::python::numpy::ndarray;
+using boost::python::numpy::zeros;
+using boost::python::numpy::dtype;
+
+
 
 namespace blitzdg {
     const index_type Nodes1DProvisioner::NumFacePoints = 1;
@@ -306,6 +312,13 @@ namespace blitzdg {
 
     const real_matrix_type & Nodes1DProvisioner::get_xGrid() const {
         return *xGrid;
+    }
+
+    ndarray Nodes1DProvisioner::get_xGrid_numpy() const {
+        Py_intptr_t shape[1] = { NumElements*NumLocalPoints };
+        ndarray result = zeros(1, shape, dtype::get_builtin<double>());
+        std::copy((*xGrid).begin(), (*xGrid).end(), reinterpret_cast<double*>(result.get_data()));
+        return result;
     }
 
     const real_vector_type & Nodes1DProvisioner::get_rGrid() const {
