@@ -14,7 +14,7 @@ Support blitzdg: <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&ho
 
 ## Getting Started
 
-Build and development support has broadened from linux only to Mac OSX and Windows systems. Tested with GNU make (written to be cross-platform) and `g++` on linux/MinGW64, `c++` on Mac OSX Sierra.
+Build and development support has broadened from linux only to Mac OSX and Windows systems. Tested with GNU make (written to be cross-platform) and `g++` on linux/MinGW64, `c++` on Mac OSX Sierra. Our build system depends on the cross-platform `cmake` tooling for Makefile generation.
 
 1. `git clone https://github.com/dsteinmo/blitzdg.git`
 2. `cd blitzdg && ./pull-deps.sh`
