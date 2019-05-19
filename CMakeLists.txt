@@ -9,7 +9,6 @@ set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-cove
 include_directories ("include" "include/igloo" "/usr/include/python3.6m/")
 set (CMAKE_CXX_LINK_FLAGS "-Wl,-soname=pyblitzdg.so")
 
-
 link_libraries(
     blitz
     metis
@@ -23,7 +22,7 @@ link_libraries(
     vtkCommonDataModel-7.1
     python3.6m
     boost_python3
-    boost_numpy36
+    boost_numpy3
 )
 
 project(blitzdg)
@@ -36,6 +35,19 @@ set_target_properties(blitzdg
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
     )
+
+project(pyblitzdg)
+
+file (GLOB sources src/pyblitzdg/*.cpp)
+add_library(pyblitzdg SHARED ${sources})
+# target_compile_options(pyblitzdg PUBLIC "-fPIC")
+set_target_properties(pyblitzdg
+    PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    )
+set_target_properties(pyblitzdg PROPERTIES PREFIX "")
 
 
 # link all projets below to blitzdg.
@@ -52,8 +64,9 @@ link_libraries(
     vtkCommonDataModel-7.1
     python3.6m
     boost_python3
-    boost_numpy36
+    boost_numpy3
     blitzdg
+    pyblitzdg
 )
 
 project(advec1d)
@@ -114,16 +127,3 @@ set_target_properties(sw2d-simple
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
     )
-
-project(pyblitzdg)
-
-file (GLOB sources src/pyblitzdg/*.cpp)
-add_library(pyblitzdg SHARED ${sources})
-# target_compile_options(pyblitzdg PUBLIC "-fPIC")
-set_target_properties(pyblitzdg
-    PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-    )
-set_target_properties(pyblitzdg PROPERTIES PREFIX "")
