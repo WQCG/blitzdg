@@ -41,7 +41,7 @@ So far:
 * `boost`
 * `igloo` for BDD-style testing.
 * `vtk` for visualization in Paraview.
-* `boost-python` for experimental python pindings.
+* `boost-python` for experimental python bindings.
 
 Dependency installation is outlined in `pull-deps.sh` (tested on Ubuntu and Mac OSX).
 
