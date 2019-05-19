@@ -316,8 +316,15 @@ namespace blitzdg {
 
     ndarray Nodes1DProvisioner::get_xGrid_numpy() const {
         Py_intptr_t shape[1] = { NumElements*NumLocalPoints };
-        ndarray result = zeros(1, shape, dtype::get_builtin<double>());
-        std::copy((*xGrid).begin(), (*xGrid).end(), reinterpret_cast<double*>(result.get_data()));
+        ndarray result = zeros(1, shape, dtype::get_builtin<real_type>());
+        std::copy((*xGrid).begin(), (*xGrid).end(), reinterpret_cast<real_type*>(result.get_data()));
+        return result;
+    }
+
+    ndarray Nodes1DProvisioner::get_Dr_numpy() const {
+        Py_intptr_t shape[2] = { NumLocalPoints, NumLocalPoints };
+        ndarray result = zeros(2, shape, dtype::get_builtin<real_type>());
+        std::copy((*Dr).begin(), (*Dr).end(), reinterpret_cast<real_type*>(result.get_data()));
         return result;
     }
 

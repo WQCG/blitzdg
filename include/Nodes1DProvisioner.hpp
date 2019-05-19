@@ -288,5 +288,7 @@ namespace blitzdg {
 
 
       boost::python::numpy::ndarray get_xGrid_numpy() const;
+
+      boost::python::numpy::ndarray get_Dr_numpy() const;
   };
 } // namespace blitzdg

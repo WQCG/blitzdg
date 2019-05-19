@@ -26,7 +26,8 @@ BOOST_PYTHON_MODULE(pyblitzdg)
         .def("buildNodes", &Nodes1DProvisioner::buildNodes)
         .def("computeJacobian", &Nodes1DProvisioner::computeJacobian)
         .add_property("numLocalPoints", &Nodes1DProvisioner::get_NumLocalPoints)
-        .add_property("xGrid", &Nodes1DProvisioner::get_xGrid_numpy);
+        .add_property("xGrid", &Nodes1DProvisioner::get_xGrid_numpy)
+        .add_property("Dr", &Nodes1DProvisioner::get_Dr_numpy);
         
     //    .def
 
