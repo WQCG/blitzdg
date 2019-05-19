@@ -28,10 +28,15 @@ BOOST_PYTHON_MODULE(pyblitzdg)
         .def("computeJacobian", &Nodes1DProvisioner::computeJacobian)
         .add_property("numLocalPoints", &Nodes1DProvisioner::get_NumLocalPoints)
         .add_property("xGrid", &Nodes1DProvisioner::get_xGrid_numpy)
-        .add_property("Dr", &Nodes1DProvisioner::get_Dr_numpy);
-        
-    //    .def
-
+        .add_property("Dr", &Nodes1DProvisioner::get_Dr_numpy)
+        .add_property("rx", &Nodes1DProvisioner::get_rx_numpy)
+        .add_property("Fscale", &Nodes1DProvisioner::get_Fscale_numpy)
+        .add_property("Lift", &Nodes1DProvisioner::get_Lift_numpy)
+        .add_property("vmapM", &Nodes1DProvisioner::get_vmapM_numpy)
+        .add_property("vmapP", &Nodes1DProvisioner::get_vmapP_numpy)
+        .add_property("mapI", &Nodes1DProvisioner::get_mapI)
+        .add_property("mapO", &Nodes1DProvisioner::get_mapO)
+        .add_property("nx", &Nodes1DProvisioner::get_nx_numpy);
 }
 
 
