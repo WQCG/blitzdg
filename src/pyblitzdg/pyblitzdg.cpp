@@ -19,6 +19,7 @@ BOOST_PYTHON_MODULE(pyblitzdg)
     using namespace boost::python;
     using namespace blitzdg;
 
+    boost::python::numpy::initialize();
 
     class_<real_matrix_type>("real_matrix_type", init<index_type>());
 
