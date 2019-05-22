@@ -18,8 +18,8 @@ def advec1dComputeRHS(u,c, nodes1d):
     Lift = nodes1d.Lift
     Fscale = nodes1d.Fscale
 
-    uC = np.squeeze(np.reshape(u, (u.shape[0]*u.shape[1],1), order='F'), axis=1)
-    nxC = np.squeeze(np.reshape(nx, (nx.shape[0]*nx.shape[1],1), order='F'), axis=1)
+    uC = u.flatten('F')
+    nxC = nx.flatten('F')
     RHS = 0*vmapM
     uM = uC[vmapM]
     uP = uC[vmapP]
@@ -33,7 +33,7 @@ def advec1dComputeRHS(u,c, nodes1d):
     du = (uM - uP)*0.5*(c*nxC - (1-alpha)*np.abs(c*nxC)); 
 
     RHS =-c*rx*np.dot(Dr, u)
-    RHS += np.dot(Lift, Fscale*np.reshape(du, nx.shape, order='F'))
+    RHS += np.dot(Lift, Fscale*np.reshape(du, nx.shape, 'F'))
 
     return RHS
 
@@ -63,9 +63,6 @@ uplot = np.squeeze(np.reshape(u, ((N+1)*K, 1)))
 xplot = np.squeeze(np.reshape(x, ((N+1)*K, 1)))
 uplot = np.squeeze(np.reshape(u, ((N+1)*K, 1)))
 
-RHS = 0*u
-resRK = 0*u
-
 min_dx = x[1,0] - x[0,0]
 
 dt = CFL*min_dx/abs(c)
@@ -87,8 +84,8 @@ while t < finalTime:
 
     t += dt
 
-    xplot = np.squeeze(x[0,:])
-    uplot = np.squeeze(u[0,:])
+    xplot = x.flatten('F')
+    uplot = u.flatten('F')
 
     plt.clf()
     plt.plot(x, u, '.-b')
