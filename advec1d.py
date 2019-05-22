@@ -5,6 +5,7 @@ See COPYING and LICENSE files at project root for more details.
 
 import numpy as np
 from lib import pyblitzdg
+from lib.pyblitzdg import LSERK4
 import matplotlib.pyplot as plt
 
 def advec1dComputeRHS(u,c, nodes1d):
@@ -43,13 +44,13 @@ xmin =-1.0
 xmax = 4.0
 c = 0.1
 
-finalTime = 20.0
+finalTime = 40.0
 t = 0.0
 
 # Numerical parameters:
 N = 1
 K = 60
-CFL = 0.25
+CFL = 0.45
 
 nodes1d = pyblitzdg.Nodes1DProvisioner(N, K, xmin, xmax)
 nodes1d.buildNodes()
@@ -67,18 +68,26 @@ min_dx = x[1,0] - x[0,0]
 
 dt = CFL*min_dx/abs(c)
 
+rk4a = LSERK4.rk4a
+rk4b = LSERK4.rk4b
 plt.figure()
 plt.ion()
 plt.show()
+resRK = np.zeros(u.shape)
 while t < finalTime:
 
-    # Calculate Right-hand side.
-    RHS = advec1dComputeRHS(u,c, nodes1d)
+    # Loop over Runge-Kutta stages.
+    for stg in range(0,LSERK4.numStages):
+        # Calculate Right-hand side.
+        RHS = advec1dComputeRHS(u,c, nodes1d)
 
-    # Update solution.
-    u += dt*RHS
+        # Compute Runge-Kutta Residual.
+        resRK = rk4a[stg]*resRK + dt*RHS
 
-    u_max = np.max(np.max(np.abs(u)))
+        # Update solution
+        u += LSERK4.rk4b[stg]*resRK
+
+    u_max = np.max(np.abs(u))
     if u_max > 1e8  or np.isnan(u_max):
         raise("A numerical instability has occurred!")
 
