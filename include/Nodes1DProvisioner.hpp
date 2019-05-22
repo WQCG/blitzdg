@@ -287,6 +287,17 @@ namespace blitzdg {
       index_type get_NumElements() const;
 
 
+      /**
+       * Python bindings.
+       */
       boost::python::numpy::ndarray get_xGrid_numpy() const;
+      boost::python::numpy::ndarray get_Dr_numpy() const;
+      boost::python::numpy::ndarray get_Fscale_numpy() const;
+      boost::python::numpy::ndarray get_Lift_numpy() const;
+      boost::python::numpy::ndarray get_rx_numpy() const;
+      boost::python::numpy::ndarray get_vmapM_numpy() const;
+      boost::python::numpy::ndarray get_vmapP_numpy() const;
+      boost::python::numpy::ndarray get_nx_numpy() const;
+
   };
 } // namespace blitzdg

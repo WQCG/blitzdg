@@ -1,3 +1,6 @@
+// Copyright (C) 2017-2019  Waterloo Quantitative Consulting Group, Inc.
+// See COPYING and LICENSE files at project root for more details.
+
 #ifndef __MINGW32__
 
 #include "Types.hpp"

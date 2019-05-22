@@ -65,7 +65,6 @@ set_target_properties(pyblitzdg
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
     )
 set_target_properties(pyblitzdg PROPERTIES PREFIX "")
-target_link_libraries(blitzdg)
 
 # link all projets below to blitzdg.
 link_libraries(

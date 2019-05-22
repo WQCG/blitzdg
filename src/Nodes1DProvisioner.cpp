@@ -315,9 +315,58 @@ namespace blitzdg {
     }
 
     ndarray Nodes1DProvisioner::get_xGrid_numpy() const {
-        Py_intptr_t shape[1] = { NumElements*NumLocalPoints };
-        ndarray result = zeros(1, shape, dtype::get_builtin<double>());
-        std::copy((*xGrid).begin(), (*xGrid).end(), reinterpret_cast<double*>(result.get_data()));
+        Py_intptr_t shape[2] = { NumLocalPoints, NumElements };
+        ndarray result = zeros(2, shape, dtype::get_builtin<real_type>());
+        std::copy(xGrid->begin(), xGrid->end(), reinterpret_cast<real_type*>(result.get_data()));
+        return result;
+    }
+
+    ndarray Nodes1DProvisioner::get_Dr_numpy() const {
+        Py_intptr_t shape[2] = { NumLocalPoints, NumLocalPoints };
+        ndarray result = zeros(2, shape, dtype::get_builtin<real_type>());
+        std::copy(Dr->begin(), Dr->end(), reinterpret_cast<real_type*>(result.get_data()));
+        return result;
+    }
+
+    ndarray Nodes1DProvisioner::get_Fscale_numpy() const {
+        Py_intptr_t shape[2] = { NumFacePoints*NumFaces, NumElements };
+        ndarray result = zeros(2, shape, dtype::get_builtin<real_type>());
+        std::copy(Fscale->begin(), Fscale->end(), reinterpret_cast<real_type*>(result.get_data()));
+        return result;
+    }
+
+    ndarray Nodes1DProvisioner::get_rx_numpy() const {
+        Py_intptr_t shape[2] = { NumLocalPoints, NumElements };
+        ndarray result = zeros(2, shape, dtype::get_builtin<real_type>());
+        std::copy(rx->begin(), rx->end(), reinterpret_cast<real_type*>(result.get_data()));
+        return result;
+    }
+
+    ndarray Nodes1DProvisioner::get_Lift_numpy() const {
+        Py_intptr_t shape[2] = { NumLocalPoints, NumFacePoints*NumFaces };
+        ndarray result = zeros(2, shape, dtype::get_builtin<real_type>());
+        std::copy(Lift->begin(), Lift->end(), reinterpret_cast<real_type*>(result.get_data()));
+        return result;
+    }
+
+    ndarray Nodes1DProvisioner::get_vmapM_numpy() const {
+        Py_intptr_t shape[1] = { NumElements*NumFacePoints*NumFaces };
+        ndarray result = zeros(1, shape, dtype::get_builtin<index_type>());
+        std::copy(vmapM->begin(), vmapM->end(), reinterpret_cast<index_type*>(result.get_data()));
+        return result;
+    }
+
+    ndarray Nodes1DProvisioner::get_vmapP_numpy() const {
+        Py_intptr_t shape[1] = { NumElements*NumFacePoints*NumFaces };
+        ndarray result = zeros(1, shape, dtype::get_builtin<index_type>());
+        std::copy(vmapP->begin(), vmapP->end(), reinterpret_cast<index_type*>(result.get_data()));
+        return result;
+    }
+
+    ndarray Nodes1DProvisioner::get_nx_numpy() const {
+        Py_intptr_t shape[2] = { NumFacePoints*NumFaces, NumElements };
+        ndarray result = zeros(2, shape, dtype::get_builtin<real_type>());
+        std::copy(nx->begin(), nx->end(), reinterpret_cast<real_type*>(result.get_data()));
         return result;
     }
 
