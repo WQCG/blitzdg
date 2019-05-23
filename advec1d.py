@@ -21,7 +21,6 @@ def advec1dComputeRHS(u,c, nodes1d):
 
     uC = u.flatten('F')
     nxC = nx.flatten('F')
-    RHS = 0*vmapM
     uM = uC[vmapM]
     uP = uC[vmapP]
 
@@ -77,7 +76,7 @@ resRK = np.zeros(u.shape)
 while t < finalTime:
 
     # Loop over Runge-Kutta stages.
-    for stg in range(0,LSERK4.numStages):
+    for stg in range(LSERK4.numStages):
         # Calculate Right-hand side.
         RHS = advec1dComputeRHS(u,c, nodes1d)
 
