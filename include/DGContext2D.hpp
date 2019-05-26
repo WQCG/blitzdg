@@ -165,7 +165,5 @@ namespace blitzdg {
         boost::python::numpy::ndarray vmapM_numpy() const;
         boost::python::numpy::ndarray vmapP_numpy() const;
         boost::python::dict bcmap_numpy() const;
-
-
     };
 }

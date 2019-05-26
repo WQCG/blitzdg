@@ -79,7 +79,23 @@ BOOST_PYTHON_MODULE(pyblitzdg)
         .add_property("numFacePoints", &DGContext2D::numFacePoints)
         .add_property("numElements", &DGContext2D::numElements)
         .add_property("numFaces", &DGContext2D::numFaces)
-        .add_property("filter", &DGContext2D::filter_numpy);
+        .add_property("filter", &DGContext2D::filter_numpy)
+        .add_property("x", &DGContext2D::x_numpy)
+        .add_property("y", &DGContext2D::y_numpy)
+        .add_property("Fscale", &DGContext2D::fscale_numpy)
+        .add_property("J", &DGContext2D::jacobian_numpy)
+        .add_property("rx", &DGContext2D::rx_numpy)
+        .add_property("ry", &DGContext2D::ry_numpy)
+        .add_property("sx", &DGContext2D::sx_numpy)
+        .add_property("sy", &DGContext2D::sy_numpy)
+        .add_property("nx", &DGContext2D::nx_numpy)
+        .add_property("ny", &DGContext2D::ny_numpy)
+        .add_property("Dr", &DGContext2D::Dr_numpy)
+        .add_property("Ds", &DGContext2D::Ds_numpy)
+        .add_property("Lift", &DGContext2D::lift_numpy)
+        .add_property("vmapM", &DGContext2D::vmapM_numpy)
+        .add_property("vmapP", &DGContext2D::vmapP_numpy)
+        .add_property("BCmap", &DGContext2D::bcmap_numpy);
 }
 
 
