@@ -10,6 +10,8 @@
 #include "Nodes1DProvisioner.hpp"
 #include "Types.hpp"
 #include "LSERK4.hpp"
+#include "MeshManager.hpp"
+#include "TriangleNodesProvisioner.hpp"
 
 using namespace boost::python;
 using namespace boost::python::numpy;
@@ -64,7 +66,20 @@ BOOST_PYTHON_MODULE(pyblitzdg)
         .add_static_property("rk4a", &lserk4wrapper::rk4a)
         .add_static_property("rk4b", &lserk4wrapper::rk4b);
 
+    class_<MeshManager, boost::noncopyable>("MeshManager", init<>())
+        .def("readMesh", &MeshManager::readMesh)
+        .add_property("numElements", &MeshManager::get_NumElements);
 
+    class_<TriangleNodesProvisioner, boost::noncopyable>("TriangleNodesProvisioner", init<index_type, MeshManager&>())
+        .def("buildFilter", &TriangleNodesProvisioner::buildFilter)
+        .def("dgContext", &TriangleNodesProvisioner::get_DGContext);
+
+    class_<DGContext2D>("DGContext2D", init<>())
+        .add_property("numLocalPoints", &DGContext2D::numLocalPoints)
+        .add_property("numFacePoints", &DGContext2D::numFacePoints)
+        .add_property("numElements", &DGContext2D::numElements)
+        .add_property("numFaces", &DGContext2D::numFaces)
+        .add_property("filter", &DGContext2D::filter_numpy);
 }
 
 

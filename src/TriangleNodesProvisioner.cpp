@@ -946,6 +946,5 @@ namespace blitzdg {
             vmapP.get(),
             BCmap.get()
         };
-
     }
 }
