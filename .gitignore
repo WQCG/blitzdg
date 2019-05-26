@@ -4,6 +4,7 @@
 bin/
 lib/
 build/
+dist/
 *.pdf
 .vscode/
 .coveralls.yml
@@ -16,3 +17,5 @@ doxygen/
 /include/boost/
 /include/metis.h
 /include/suitesparse/
+CMakeCache.txt
+CMakeFiles/
