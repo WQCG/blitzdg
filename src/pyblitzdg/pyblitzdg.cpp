@@ -8,6 +8,7 @@
 
 #include <boost/python.hpp>
 #include "Nodes1DProvisioner.hpp"
+#include "VtkOutputter.hpp"
 #include "Types.hpp"
 #include "LSERK4.hpp"
 #include "MeshManager.hpp"
@@ -96,6 +97,10 @@ BOOST_PYTHON_MODULE(pyblitzdg)
         .add_property("vmapM", &DGContext2D::vmapM_numpy)
         .add_property("vmapP", &DGContext2D::vmapP_numpy)
         .add_property("BCmap", &DGContext2D::bcmap_numpy);
+    
+    class_<VtkOutputter>("VtkOutputter", init<TriangleNodesProvisioner&>())
+        .def("writeFieldToFile", &VtkOutputter::writeFieldToFile_numpy)
+        .def("writeFieldsToFiles", &VtkOutputter::writeFieldsToFiles_numpy);
 }
 
 
