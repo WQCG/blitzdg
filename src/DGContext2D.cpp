@@ -121,8 +121,8 @@ namespace blitzdg {
 
     ndarray DGContext2D::vmapM_numpy() const {
         Py_intptr_t shape[1] = {  NumFaces_*Nfp_*K_ };
-        ndarray result = zeros(1, shape, dtype::get_builtin<real_type>());
-        std::copy(vmapM_->begin(), vmapM_->end(), reinterpret_cast<real_type*>(result.get_data()));
+        ndarray result = zeros(1, shape, dtype::get_builtin<index_type>());
+        std::copy(vmapM_->begin(), vmapM_->end(), reinterpret_cast<index_type*>(result.get_data()));
         return result;
     }
 

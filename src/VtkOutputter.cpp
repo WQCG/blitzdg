@@ -256,8 +256,8 @@ namespace blitzdg {
 
 	void VtkOutputter::writeFieldToFile_numpy(boost::python::str fileName, const boost::python::numpy::ndarray& field, boost::python::str fieldName) const
  	{
-		 // numpy field must be column major (Fortran-style) also.
-        real_matrix_type blitzField(field.shape(0), field.shape(1), ColumnMajorOrder());
+		real_matrix_type blitzField(field.shape(0), field.shape(1));
+		blitzField = 0.0;
 		char * raw = field.get_data();
         std::copy(&raw[0], &raw[field.shape(0)*field.shape(1)*sizeof(real_type)] , reinterpret_cast<char*>(blitzField.data()));
 
@@ -282,7 +282,7 @@ namespace blitzdg {
 			string fileName = generateFileName(fieldNameCpp, tstep);
 			const ndarray& field = fieldArrays.at(count);
 			
-			writeFieldToFile_numpy(str(fileName), field, str(field));
+			writeFieldToFile_numpy(str(fileName), field, str(fieldNameCpp));
 			++count;
 		}
 	}
