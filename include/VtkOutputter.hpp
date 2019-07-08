@@ -15,6 +15,8 @@
 #include "Types.hpp"
 #include "TriangleNodesProvisioner.hpp"
 #include "OutputterBase.hpp"
+#include <boost/python/numpy.hpp>
+#include <boost/python.hpp>
 
 namespace blitzdg {
   /**
@@ -33,6 +35,11 @@ public:
 
 	void writeFieldToFile(const std::string & fileName, real_matrix_type field, const std::string & fieldName) const;
 	void writeFieldsToFiles(std::map<std::string, real_matrix_type>& fields, index_type tstep);
+
+	void writeFieldToFile_numpy(boost::python::str fileName, const boost::python::numpy::ndarray& field, boost::python::str fieldName) const;
+	void writeFieldsToFiles_numpy(const boost::python::dict& fields, index_type tstep);
+
+
 
 private:
 	void splitTriangles(const real_matrix_type& x, const real_matrix_type& y, const real_matrix_type& field, real_matrix_type& xnew, real_matrix_type& ynew, real_matrix_type& fieldnew) const;

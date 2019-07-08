@@ -12,6 +12,7 @@
 #include "LinAlgHelpers.hpp"
 #include "TriangleNodesProvisioner.hpp"
 #include "VtkOutputter.hpp"
+#include "DGContext2D.hpp"
 #include <blitz/array.h>
 #include <math.h>
 #include <string>
@@ -40,12 +41,12 @@ int main(int argc, char **argv) {
 	real_type t = 0.0;
 
 	// Numerical parameters (N = Order of polynomials)
-	const index_type N = 4;
+	const index_type N = 1;
 	const real_type CFL = 0.65;
 
 	// Build dependencies.
 	MeshManager meshManager;
-	meshManager.readMesh("input/figure8_mesh.msh");
+	meshManager.readMesh("input/box.msh");
 	const index_type K = meshManager.get_NumElements();
 
 	// Dependency-inject mesh manager to nodes provisioner.
@@ -83,7 +84,8 @@ int main(int argc, char **argv) {
 
 	// Intialize fields.
 	H = 10.0 + 0*jj;
-	eta = -1.*(x/1500.0);
+	//eta = -1.*(x/1500.0);
+	eta = exp(-10*(x*x) -10*(y*y));
 
 	u = 0*jj;
 	v = 0*jj;
@@ -197,6 +199,8 @@ namespace blitzdg {
 			// Get volume to surface maps.
 			const index_vector_type& vmapM = triangleNodesProvisioner.get_vmapM();
 			const index_vector_type& vmapP = triangleNodesProvisioner.get_vmapP();
+
+			const DGContext2D& ctx = triangleNodesProvisioner.get_DGContext();
 
 			// boundary indices.
 			const index_hashmap bcHash = triangleNodesProvisioner.get_bcMap();
