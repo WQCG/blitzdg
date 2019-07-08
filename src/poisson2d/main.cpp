@@ -64,9 +64,9 @@ int main(int argc, char **argv) {
 	r = blitz::sqrt(x*x + y*y);
 	const real_type r0 = blitz::max(r);
 
-	uexact = sin(pi*(r*r)/(r0*r0));
+	uexact = r-r0;
 
-	rhs = 4*pi/r0/r0*(cos(pi*(r*r)/(r0*r0)) - pi*r*r/(r0*r0)*sin(pi*(r*r)/(r0*r0)) );
+	rhs = 0.0;
 
 	const index_type numGlobalNodes = Np*K;
 
@@ -85,22 +85,30 @@ int main(int argc, char **argv) {
 
 	real_matrix_type MMRHS(Np, K);
 
-	MMRHS = dg.jacobian()*(blitz::sum(MassMatrix(ii,kk)*rhs(kk,jj),kk));
+	// MMRHS = dg.jacobian()*(blitz::sum(MassMatrix(ii,kk)*rhs(kk,jj),kk));
+	MMRHS = rhs;
 	fullToVector(MMRHS, MMRHSVec, byRowsOpt);
 
 	// Need to initialize to zero to tell gmres we aren't making an initial guess.
-	outVec = 0*ii;
+	//outVec = 0*ii;
+	fullToVector(uexact, outVec, false);
 
 	GMRESSolver gmres;
 	GMRESParams params;
-	params.maxits = 1500;
-	params.relTol = 8.e-3;
+	params.maxits = 10;
+	params.relTol = 1.e-3;
+	params.kspaceSz=2250;
 
 	GMRESOut result = gmres.solve(PoissonOperator(dg), Precon(), MMRHSVec, outVec, params);
 
 	vectorToFull(outVec, soln, false);
 
+	cout << "K: " << K << "\n";
+	cout << "r0: " << r0 << "\n";
+
 	cout << "result is " << result << "\n";
+
+	cout << "normMax u is: " << blitzdg::normMax(soln) << "\n";
 
 	std::map<std::string, real_matrix_type> fields;
 	fields.insert({"uexact", uexact});
