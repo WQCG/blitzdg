@@ -5,7 +5,6 @@ See COPYING and LICENSE files at project root for more details.
 
 import numpy as np
 from lib import pyblitzdg as dg
-from lib.pyblitzdg import LSERK4
 import matplotlib.pyplot as plt
 from pprint import pprint
 
@@ -175,8 +174,6 @@ c = np.sqrt(g*h)
 dt =0.000724295
 #dt = CFL*dx/np.max(abs(c))
 
-rk4a = LSERK4.rk4a
-rk4b = LSERK4.rk4b
 step = 0
 while t < finalTime:
 

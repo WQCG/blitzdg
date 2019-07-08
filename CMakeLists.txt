@@ -7,7 +7,6 @@ set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2")
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage -DBZ_DEBUG")
 # set (CMAKE_MODULE_LINKER_FLAGS  "${CMAKE_MODULE_LINKER_FLAGS} -Wl,-soname,pyblitzdg.so")
 include_directories ("include" "include/igloo" "/usr/include/python3.6m/")
-set (CMAKE_CXX_LINK_FLAGS "-Wl,-soname=pyblitzdg.so")
 
 link_libraries(
     blitz
@@ -34,6 +33,7 @@ set_target_properties(blitzdg
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    LINK_FLAGS "-Wl,-soname=libblitzdg.so -Wl,-rpath=/usr/local/lib/python3.6/dist-packages/pyblitzdg/"
     )
 
     link_libraries(
@@ -57,12 +57,12 @@ project(pyblitzdg)
 
 file (GLOB sources src/pyblitzdg/*.cpp)
 add_library(pyblitzdg SHARED ${sources})
-# target_compile_options(pyblitzdg PUBLIC "-fPIC")
 set_target_properties(pyblitzdg
     PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    LINK_FLAGS "-Wl,-soname=pyblitzdg.so -Wl,-rpath=/usr/local/lib/python3.6/dist-packages/pyblitzdg/"
     )
 set_target_properties(pyblitzdg PROPERTIES PREFIX "")
 
