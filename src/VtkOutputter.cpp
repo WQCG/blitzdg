@@ -133,7 +133,7 @@ namespace blitzdg {
     }
 
 	void VtkOutputter::writeFieldsToFiles(std::map<std::string, real_matrix_type>& fields, index_type tstep) {
-		for (auto kv : fields) {
+		for (const auto& kv : fields) {
 			const string& fieldName = kv.first;
 			const real_matrix_type& field = kv.second;
 			string fileName = generateFileName(fieldName, tstep);
@@ -276,8 +276,8 @@ namespace blitzdg {
 			stl_input_iterator<ndarray>()); 
 
 		index_type count = 0;
-		for (auto f = fieldNames.begin(); f != fieldNames.end(); ++f) {
-			const char * fieldNameC = *f;
+		for (const auto& f : fieldNames) {
+			const char * fieldNameC = f;
 			string fieldNameCpp = fieldNameC;
 			string fileName = generateFileName(fieldNameCpp, tstep);
 			const ndarray& field = fieldArrays.at(count);

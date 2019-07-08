@@ -136,13 +136,13 @@ namespace blitzdg {
     dict DGContext2D::bcmap_numpy() const {
         boost::python::dict bcDict;
 
-        for (auto t = bcHash_->begin(); t != bcHash_->end(); ++t) {
-            auto key = t->first;
-            auto vec = t->second;
+        for (const auto& t : *bcHash_) {
+            auto key = t.first;
+            const auto& vec = t.second;
 
             boost::python::list bcList;
-            for (auto n = vec.begin(); n != vec.end(); ++n) {
-                bcList.append( *n );
+            for (auto n : vec) {
+                bcList.append( n );
             }
             bcDict[key] = bcList;
         }
