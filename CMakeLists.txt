@@ -8,6 +8,11 @@ set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-cove
 # set (CMAKE_MODULE_LINKER_FLAGS  "${CMAKE_MODULE_LINKER_FLAGS} -Wl,-soname,pyblitzdg.so")
 include_directories ("include" "include/igloo" "/usr/include/python3.6m/")
 
+set (pyblitzdg_VERSION_MAJOR 0)
+set (pyblitzdg_VERSION_MINOR 1)
+set (pyblitzdg_VERSION_PATCH 2)
+SET(DISABLE_SOLVER_BUILDS on)
+
 link_libraries(
     blitz
     metis
@@ -85,61 +90,118 @@ link_libraries(
     pyblitzdg
 )
 
-project(advec1d)
-file (GLOB sources src/advec1d/*.cpp)
-add_executable(advec1d ${sources})
-set_target_properties(advec1d
-    PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-    )
+if(NOT DISABLE_SOLVER_BUILDS)
+    project(advec1d)
+    file (GLOB sources src/advec1d/*.cpp)
+    add_executable(advec1d ${sources})
+    set_target_properties(advec1d
+        PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+        )
 
-file (GLOB sources src/burgers1d/*.cpp)
-add_executable(burgers1d ${sources})
-set_target_properties(burgers1d
-    PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-    )
+    file (GLOB sources src/burgers1d/*.cpp)
+    add_executable(burgers1d ${sources})
+    set_target_properties(burgers1d
+        PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+        )
 
-project(poisson1d)
-file (GLOB sources src/poisson1d/*.cpp)
-add_executable(poisson1d ${sources})
-set_target_properties(poisson1d
-    PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-    )
+    project(poisson1d)
+    file (GLOB sources src/poisson1d/*.cpp)
+    add_executable(poisson1d ${sources})
+    set_target_properties(poisson1d
+        PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+        )
 
-project(sw2d)
-file (GLOB sources src/sw2d/*.cpp)
-add_executable(sw2d ${sources})
-set_target_properties(sw2d
-    PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-    )
+    project(sw2d)
+    file (GLOB sources src/sw2d/*.cpp)
+    add_executable(sw2d ${sources})
+    set_target_properties(sw2d
+        PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+        )
 
-project(tests)
-file (GLOB sources src/test/*.cpp)
-add_executable(tests ${sources})
-set_target_properties(tests
-    PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-    )
+    project(tests)
+    file (GLOB sources src/test/*.cpp)
+    add_executable(tests ${sources})
+    set_target_properties(tests
+        PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+        )
 
-project(sw2d-simple)
-file (GLOB sources src/sw2d-simple/*.cpp)
-add_executable(sw2d-simple ${sources})
-set_target_properties(sw2d-simple
-    PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-    )
+    project(sw2d-simple)
+    file (GLOB sources src/sw2d-simple/*.cpp)
+    add_executable(sw2d-simple ${sources})
+    set_target_properties(sw2d-simple
+        PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+        )
+endif()
+
+#set(CPACK_MONOLITHIC_INSTALL 1)
+SET(CPACK_PACKAGE_DESCRIPTION "Discontinuous Galerkin library and solvers")
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Discontinuous Galerkin library and solvers.")
+SET(CPACK_PACKAGE_VENDOR "dsteinmo@wqcg.ca")
+SET(CPACK_PACKAGE_CONTACT "dsteinmo@wqcg.ca")
+SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+
+set (CPACK_PACKAGE_VERSION "0.1.2")
+# set(CMAKE_BUILD_WITH_INSTALL_RPATH false)
+
+INSTALL(TARGETS pyblitzdg blitzdg
+    DESTINATION "/usr/lib/x86_64-linux-gnu/"
+)
+#INSTALL(TARGETS sw2d-simple
+#    DESTINATION "/usr/local/bin"
+#)
+INSTALL(FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/pyblitzdg/libblitz.so.0"
+    "${CMAKE_CURRENT_SOURCE_DIR}/pyblitzdg/libblitzdg.so"
+    DESTINATION "/usr/lib/x86_64-linux-gnu/"
+)
+INSTALL(FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/pyblitzdg/pyblitzdg.so"
+    "${CMAKE_CURRENT_SOURCE_DIR}/pyblitzdg/libblitz.so.0"
+    "${CMAKE_CURRENT_SOURCE_DIR}/pyblitzdg/libblitzdg.so"
+    "${CMAKE_CURRENT_SOURCE_DIR}/pyblitzdg/__init__.py"
+    "${CMAKE_CURRENT_SOURCE_DIR}/pyblitzdg/__pycache__/__init__.cpython-36.pyc"
+    DESTINATION "/usr/local/lib/python3.6/dist-packages/pyblitzdg/"
+)
+
+INSTALL(FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/advec1d.py"
+    "${CMAKE_CURRENT_SOURCE_DIR}/sw2d.py"
+    DESTINATION "/usr/local/bin/"
+)
+
+SET(CPACK_GENERATOR DEB)
+SET(CPACK_PACKAGE_NAME "pyblitzdg")
+SET(CPACK_SOURCE_STRIP_FILES "")
+SET(CPACK_DEBIAN_PACKAGE_BUILDS_DEPENDS "build-essential,cmake,libvtk7.1,libvtk7-dev,libsuitesparse-dev,libmetis-dev,libboost-dev,libboost-python1.65.1-dev,libboost-numpy1.65.1-dev")
+SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libvtk7.1,python3-pip,python3-numpy,libsuitesparse-dev,libmetis-dev,libboost-dev,libboost-python1.65.1,libboost-numpy1.65.1")
+SET(CPACK_DEBIAN_FILE_NAME "DEB-DEFAULT")
+SET(CPACK_PACKAGE_CONTACT "Derek Steinmoeller <dsteinmo@wqcg.ca>")
+SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Derek Steinmoeller <dsteinmo@wqcg.ca>")
+SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
+
+
+INCLUDE(CPack)
+IF(DEBIAN_FOUND)
+  message("-- debian found!")
+  ADD_DEBIAN_TARGETS(pyblitzdg)
+ENDIF(DEBIAN_FOUND)
+INCLUDE(InstallRequiredSystemLibraries)
