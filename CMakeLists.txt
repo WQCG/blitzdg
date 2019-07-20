@@ -5,13 +5,12 @@ set (CMAKE_BUILD_TYPE Release) # or Debug
 set (CMAKE_CXX_FLAGS "-Wall -std=c++11 -fPIC")
 set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2")
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage -DBZ_DEBUG")
-# set (CMAKE_MODULE_LINKER_FLAGS  "${CMAKE_MODULE_LINKER_FLAGS} -Wl,-soname,pyblitzdg.so")
 include_directories ("include" "include/igloo" "/usr/include/python3.6m/")
 
 set (pyblitzdg_VERSION_MAJOR 0)
 set (pyblitzdg_VERSION_MINOR 1)
 set (pyblitzdg_VERSION_PATCH 2)
-SET(DISABLE_SOLVER_BUILDS on)
+set (DISABLE_SOLVER_BUILDS on)
 
 link_libraries(
     blitz
@@ -32,7 +31,6 @@ link_libraries(
 project(blitzdg)
 file (GLOB sources src/*.cpp)
 add_library(blitzdg SHARED ${sources})
-# target_compile_options(blitzdg PUBLIC "-fPIC")
 set_target_properties(blitzdg
     PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
@@ -149,9 +147,13 @@ if(NOT DISABLE_SOLVER_BUILDS)
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
         )
+
+    INSTALL(TARGETS sw2d-simple
+        DESTINATION "/usr/local/bin"
+    )
+    
 endif()
 
-#set(CPACK_MONOLITHIC_INSTALL 1)
 SET(CPACK_PACKAGE_DESCRIPTION "Discontinuous Galerkin library and solvers")
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Discontinuous Galerkin library and solvers.")
 SET(CPACK_PACKAGE_VENDOR "dsteinmo@wqcg.ca")
@@ -160,26 +162,14 @@ SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
 SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 
 set (CPACK_PACKAGE_VERSION "0.1.2")
-# set(CMAKE_BUILD_WITH_INSTALL_RPATH false)
 
 INSTALL(TARGETS pyblitzdg blitzdg
     DESTINATION "/usr/lib/x86_64-linux-gnu/"
 )
-#INSTALL(TARGETS sw2d-simple
-#    DESTINATION "/usr/local/bin"
-#)
 INSTALL(FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/pyblitzdg/libblitz.so.0"
     "${CMAKE_CURRENT_SOURCE_DIR}/pyblitzdg/libblitzdg.so"
     DESTINATION "/usr/lib/x86_64-linux-gnu/"
-)
-INSTALL(FILES
-    "${CMAKE_CURRENT_SOURCE_DIR}/pyblitzdg/pyblitzdg.so"
-    "${CMAKE_CURRENT_SOURCE_DIR}/pyblitzdg/libblitz.so.0"
-    "${CMAKE_CURRENT_SOURCE_DIR}/pyblitzdg/libblitzdg.so"
-    "${CMAKE_CURRENT_SOURCE_DIR}/pyblitzdg/__init__.py"
-    "${CMAKE_CURRENT_SOURCE_DIR}/pyblitzdg/__pycache__/__init__.cpython-36.pyc"
-    DESTINATION "/usr/local/lib/python3.6/dist-packages/pyblitzdg/"
 )
 
 INSTALL(FILES
@@ -197,7 +187,8 @@ SET(CPACK_DEBIAN_FILE_NAME "DEB-DEFAULT")
 SET(CPACK_PACKAGE_CONTACT "Derek Steinmoeller <dsteinmo@wqcg.ca>")
 SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Derek Steinmoeller <dsteinmo@wqcg.ca>")
 SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
-
+set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA
+    "${CMAKE_CURRENT_SOURCE_DIR}/deb/postinst")
 
 INCLUDE(CPack)
 IF(DEBIAN_FOUND)
