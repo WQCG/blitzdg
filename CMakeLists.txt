@@ -128,16 +128,6 @@ if(NOT DISABLE_SOLVER_BUILDS)
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
         )
 
-    project(tests)
-    file (GLOB sources src/test/*.cpp)
-    add_executable(tests ${sources})
-    set_target_properties(tests
-        PROPERTIES
-        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-        )
-
     project(sw2d-simple)
     file (GLOB sources src/sw2d-simple/*.cpp)
     add_executable(sw2d-simple ${sources})
@@ -151,8 +141,17 @@ if(NOT DISABLE_SOLVER_BUILDS)
     INSTALL(TARGETS sw2d-simple
         DESTINATION "/usr/local/bin"
     )
-    
 endif()
+
+project(tests)
+file (GLOB sources src/test/*.cpp)
+add_executable(tests ${sources})
+set_target_properties(tests
+    PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    )
 
 SET(CPACK_PACKAGE_DESCRIPTION "Discontinuous Galerkin library and solvers")
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Discontinuous Galerkin library and solvers.")
