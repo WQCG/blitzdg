@@ -36,7 +36,6 @@ set_target_properties(blitzdg
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-    LINK_FLAGS "-Wl,-soname=libblitzdg.so -Wl,-rpath=/usr/local/lib/python3.6/dist-packages/pyblitzdg/"
     )
 
     link_libraries(
@@ -65,7 +64,6 @@ set_target_properties(pyblitzdg
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-    LINK_FLAGS "-Wl,-soname=pyblitzdg.so -Wl,-rpath=/usr/local/lib/python3.6/dist-packages/pyblitzdg/"
     )
 set_target_properties(pyblitzdg PROPERTIES PREFIX "")
 
@@ -155,6 +153,7 @@ set_target_properties(tests
 
 SET(CPACK_PACKAGE_DESCRIPTION "Discontinuous Galerkin library and solvers")
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Discontinuous Galerkin library and solvers.")
+SET(CPACK_RPM_PACKAGE_SUMMARY "Discontinuous Galerkin library and solvers.")
 SET(CPACK_PACKAGE_VENDOR "dsteinmo@wqcg.ca")
 SET(CPACK_PACKAGE_CONTACT "dsteinmo@wqcg.ca")
 SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
@@ -195,3 +194,7 @@ IF(DEBIAN_FOUND)
   ADD_DEBIAN_TARGETS(pyblitzdg)
 ENDIF(DEBIAN_FOUND)
 INCLUDE(InstallRequiredSystemLibraries)
+
+SET(CPACK_GENERATOR RPM)
+set(CPACK_RPM_PACKAGE_VERSION "0.1.2")
+SET(CPACK_RPM_PACKAGE_DEPENDS "python3,python3-pip,libgfortran.x86_64,suitesparse-devel.x86_64,metis-devel.x86_64,boost-devel.x86_64,vtk-devel.x86_64 vtk.x86_64,boost-python3-devel.x86_64,boost-numpy3.x86_64")
