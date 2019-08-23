@@ -147,5 +147,23 @@ namespace blitzdg {
         const index_hashmap& bcmap() const {
             return *bcHash_;
         }
+
+        boost::python::numpy::ndarray filter_numpy() const;
+        boost::python::numpy::ndarray x_numpy() const;
+        boost::python::numpy::ndarray y_numpy() const;
+        boost::python::numpy::ndarray fscale_numpy() const;
+        boost::python::numpy::ndarray jacobian_numpy() const;
+        boost::python::numpy::ndarray rx_numpy() const;
+        boost::python::numpy::ndarray ry_numpy() const;
+        boost::python::numpy::ndarray sx_numpy() const;
+        boost::python::numpy::ndarray sy_numpy() const;
+        boost::python::numpy::ndarray nx_numpy() const;
+        boost::python::numpy::ndarray ny_numpy() const;
+        boost::python::numpy::ndarray Dr_numpy() const;
+        boost::python::numpy::ndarray Ds_numpy() const;
+        boost::python::numpy::ndarray lift_numpy() const;
+        boost::python::numpy::ndarray vmapM_numpy() const;
+        boost::python::numpy::ndarray vmapP_numpy() const;
+        boost::python::dict bcmap_numpy() const;
     };
 }

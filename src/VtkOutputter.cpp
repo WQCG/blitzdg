@@ -24,6 +24,7 @@
 #include <fstream>
 #include <string>
 #include <iomanip>
+#include <boost/python.hpp>
 
 using std::stringstream;
 using std::ostream;
@@ -31,6 +32,9 @@ using std::ios;
 using std::filebuf;
 using std::string;
 using std::vector;
+using boost::python::str;
+using boost::python::numpy::ndarray;
+using boost::python::stl_input_iterator;
 
 namespace blitzdg {
 	VtkOutputter::VtkOutputter(TriangleNodesProvisioner & _NodesProvisioner)
@@ -129,12 +133,12 @@ namespace blitzdg {
     }
 
 	void VtkOutputter::writeFieldsToFiles(std::map<std::string, real_matrix_type>& fields, index_type tstep) {
-		for (auto kv : fields) {
-      const string& fieldName = kv.first;
+		for (const auto& kv : fields) {
+			const string& fieldName = kv.first;
 			const real_matrix_type& field = kv.second;
 			string fileName = generateFileName(fieldName, tstep);
 			writeFieldToFile(fileName, field, fieldName);
-    }
+		}
 	}
 
 	void VtkOutputter::splitTriangles(const real_matrix_type& x, const real_matrix_type& y, const real_matrix_type& field, real_matrix_type& xnew, real_matrix_type& ynew, real_matrix_type& fieldnew) const {
@@ -250,5 +254,37 @@ namespace blitzdg {
 		}
 	}
 
+	void VtkOutputter::writeFieldToFile_numpy(boost::python::str fileName, const boost::python::numpy::ndarray& field, boost::python::str fieldName) const
+ 	{
+		real_matrix_type blitzField(field.shape(0), field.shape(1));
+		blitzField = 0.0;
+		char * raw = field.get_data();
+        std::copy(&raw[0], &raw[field.shape(0)*field.shape(1)*sizeof(real_type)] , reinterpret_cast<char*>(blitzField.data()));
+
+		string fileNameCpp = string(boost::python::extract<const char*>(fileName));
+		string fieldNameCpp = string(boost::python::extract<const char*>(fieldName));
+
+		writeFieldToFile(fileNameCpp, blitzField, fieldNameCpp);
+	}
+
+	void VtkOutputter::writeFieldsToFiles_numpy(const boost::python::dict& fields, index_type tstep) {
+
+		auto fieldNames = std::vector<const char*>(boost::python::stl_input_iterator<const char *>(fields.keys()),
+			stl_input_iterator<const char *>() );
+
+		auto fieldArrays = std::vector<ndarray>(boost::python::stl_input_iterator<ndarray>(fields.values()),
+			stl_input_iterator<ndarray>()); 
+
+		index_type count = 0;
+		for (const auto& f : fieldNames) {
+			const char * fieldNameC = f;
+			string fieldNameCpp = fieldNameC;
+			string fileName = generateFileName(fieldNameCpp, tstep);
+			const ndarray& field = fieldArrays.at(count);
+			
+			writeFieldToFile_numpy(str(fileName), field, str(fieldNameCpp));
+			++count;
+		}
+	}
 }
 #endif

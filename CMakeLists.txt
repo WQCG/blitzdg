@@ -84,9 +84,10 @@ add_library(blitzdg SHARED ${sources})
 # target_compile_options(blitzdg PUBLIC "-fPIC")
 set_target_properties(blitzdg
     PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    LINK_FLAGS "-Wl,-soname=libblitzdg.so -Wl,-rpath=/usr/local/lib/python3.6/dist-packages/pyblitzdg/"
     )
 
 project(pyblitzdg)
