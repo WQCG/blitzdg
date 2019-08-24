@@ -23,7 +23,7 @@ add_compile_definitions(VTKCOMMONCORE_STATIC_DEFINE
   )
 
 set(CMAKE_FIND_LIBRARY_PREFIXES "" "lib")
-set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib" ".a"  ".so" ".dll")
+set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib" ".a"  ".so")
 message("--looking in lib")
 find_library(BLITZ NAMES "blitz" "libblitz" PATHS "lib")
 find_library(METIS NAMES "metis" "libmetis" PATHS "lib")
@@ -37,9 +37,9 @@ find_library(SUITESPARSECONFIG NAMES "suitesparseconfig" "libsuitesparseconfig" 
 find_library(LAPACK NAMES "liblapack" "lapack" PATHS "lib")
 find_library(BLAS NAMES "libblas" "blas" PATHS "lib")
 
-find_library(PYTHON37 NAMES "python37" "libpython37" PATHS "lib")
-find_library(BOOSTPYTHON NAMES "boost_python37-vc140-mt-x64-1_67" PATHS "lib")
-find_library(BOOSTNUMPY NAMES "boost_numpy37-vc140-mt-x64-1_67" PATHS "lib")
+find_library(PYTHON37 NAMES "python37" "libpython37" PATHS "lib") 
+find_library(BOOSTPYTHON NAMES "boost_python3-vc140-mt-1_60" PATHS "lib")
+find_library(BOOSTNUMPY NAMES "boost_numpy3-vc140-mt-1_60" PATHS "lib")
 
 message("-- found ${BOOSTNUMPY}")
 message("-- found ${BOOSTPYTHON}")
@@ -87,7 +87,6 @@ set_target_properties(blitzdg
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-    LINK_FLAGS "-Wl,-soname=libblitzdg.so -Wl,-rpath=/usr/local/lib/python3.6/dist-packages/pyblitzdg/"
     )
 
 project(pyblitzdg)
@@ -101,3 +100,4 @@ file (GLOB sources src/pyblitzdg/*.cpp)
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
         )
+    target_link_libraries(pyblitzdg blitzdg)
