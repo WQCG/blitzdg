@@ -2,14 +2,11 @@ cmake_minimum_required(VERSION 3.5)
 
 set (CMAKE_CONFIGURATION_TYPES "Win64")
 set (CMAKE_BUILD_TYPE Release) # or Debug
-# set (CMAKE_CXX_FLAGS "-Wall -std=c++11 -fPIC")
+set (CMAKE_CXX_FLAGS "-std=c++11 -fPIC")
 set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2")
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage -DBZ_DEBUG")
-# set (CMAKE_MODULE_LINKER_FLAGS  "${CMAKE_MODULE_LINKER_FLAGS} -Wl,-soname,pyblitzdg.so")
-include_directories ("include" "include/igloo" "/usr/include/python3.7m/" "C:/Users/dsteinmo/AppData/Local/Programs/Python/Python37/include/" "C:/local/boost_1_66_0" "C:/Users/dsteinmo/Downloads/boost_1_63_0" "C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/VC/Tools/MSVC/14.20.27508/include/" "C:/ProgramData/Anaconda3/pkgs/python-3.7.3-h8c8aaf0_0/include")
-set (CMAKE_CXX_LINK_FLAGS "-Wl,-soname=pyblitzdg.so")
-set (CMAKE_CXX_STANDARD "14")
-set (CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS on)
+# set (CMAKE_MODULE_LINKER_FLAGS  "${CMAKE_MODULE_LINKER_FLAGS}")
+include_directories ("include" "include/igloo" "/usr/include/python3.7m/" "/usr/local/include/" "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/include/python3.7m/")
 
 
 # include path: "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\Tools\MSVC\14.20.27508\include\vcruntime.h"
@@ -45,37 +42,19 @@ message("-- found ${BOOSTNUMPY}")
 message("-- found ${BOOSTPYTHON}")
 message("-- found ${PYTHON37}")
 link_libraries(
-    ${BLITZ}
-    ${METIS}
-    ${UMFPACK}
-    ${CXSPARSE}
-    ${LAPACK}
-    ${BLAS}
-    ${CHOLMOD}
-    ${AMD}
-    ${COLAMD}
-    ${SUITESPARSECONFIG}
-    ${BOOSTPYTHON}
-    ${BOOSTNUMPY}
-    #${GFORTRAN}
-    #${QUADMATH}
-    ${PYTHON37}
-    #boost_python3
-    #boost_numpy3
-    lib/vtkIOXML-7.1
-    lib/vtkCommonCore-7.1
-    lib/vtkCommonExecutionModel-7.1
-    lib/vtkCommonDataModel-7.1
-    lib/vtkCommonMisc-7.1
-    lib/vtkCommonSystem-7.1
-    lib/vtkCommonTransforms-7.1
-    lib/vtkexpat-7.1
-    lib/vtkIOCore-7.1
-    lib/vtkIOGeometry-7.1
-    lib/vtkIOXML-7.1
-    lib/vtkIOXMLParser-7.1
-    lib/vtksys-7.1
-    lib/vtkzlib-7.1
+    blitz
+    metis
+    umfpack
+    cxsparse
+    lapack
+    blas
+    vtkIOXML-7.1
+    vtkCommonCore-7.1
+    vtkCommonExecutionModel-7.1
+    vtkCommonDataModel-7.1
+    python3.7m
+    boost_python3
+    boost_numpy3
 )
 
 project(blitzdg)
@@ -87,17 +66,113 @@ set_target_properties(blitzdg
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    LINK_FLAGS "-Wl,-rpath,/usr/local/lib -L /usr/local/lib -L/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/"
+    )
+
+    link_libraries(
+        blitz
+        metis
+        umfpack
+        cxsparse
+        lapack
+        blas
+        vtkIOXML-7.1
+        vtkCommonCore-7.1
+        vtkCommonExecutionModel-7.1
+        vtkCommonDataModel-7.1
+        python3.7m
+        boost_python3
+        boost_numpy3
+        blitzdg
     )
 
 project(pyblitzdg)
 
 file (GLOB sources src/pyblitzdg/*.cpp)
-    add_library(pyblitzdg SHARED ${sources})
-    # target_compile_options(pyblitzdg PUBLIC "-fPIC")
-    set_target_properties(pyblitzdg
-        PROPERTIES
-        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-        )
-    target_link_libraries(pyblitzdg blitzdg)
+add_library(pyblitzdg SHARED ${sources})
+set_target_properties(pyblitzdg
+    PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    LINK_FLAGS "-Wl,-rpath,/usr/local/lib -L /usr/local/lib -L/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/"
+    )
+set_target_properties(pyblitzdg PROPERTIES PREFIX "")
+
+# link all projets below to blitzdg.
+link_libraries(
+    blitz
+    metis
+    umfpack
+    cxsparse
+    lapack
+    blas
+    vtkIOXML-7.1
+    vtkCommonCore-7.1
+    vtkCommonExecutionModel-7.1
+    vtkCommonDataModel-7.1
+    python3.7m
+    boost_python3
+    boost_numpy3
+    blitzdg
+    pyblitzdg
+)
+
+project(advec1d)
+file (GLOB sources src/advec1d/*.cpp)
+add_executable(advec1d ${sources})
+set_target_properties(advec1d
+    PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    )
+
+file (GLOB sources src/burgers1d/*.cpp)
+add_executable(burgers1d ${sources})
+set_target_properties(burgers1d
+    PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    )
+
+project(poisson1d)
+file (GLOB sources src/poisson1d/*.cpp)
+add_executable(poisson1d ${sources})
+set_target_properties(poisson1d
+    PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    )
+
+project(sw2d)
+file (GLOB sources src/sw2d/*.cpp)
+add_executable(sw2d ${sources})
+set_target_properties(sw2d
+    PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    )
+
+project(tests)
+file (GLOB sources src/test/*.cpp)
+add_executable(tests ${sources})
+set_target_properties(tests
+    PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    )
+
+project(sw2d-simple)
+file (GLOB sources src/sw2d-simple/*.cpp)
+add_executable(sw2d-simple ${sources})
+set_target_properties(sw2d-simple
+    PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    )
