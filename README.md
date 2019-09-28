@@ -14,20 +14,12 @@ Support blitzdg: <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&ho
 
 ## Building From Source
 
-Build and development support has broadened from linux only to Mac OSX and Windows systems. Tested with GNU make (written to be cross-platform) and `g++` on linux/MinGW64, `clang++` on Mac OSX Sierra, and MSVC on Windows. Our build system depends on the cross-platform `cmake` tooling for Makefile generation.
+Build and development support has broadened from linux only to Mac OSX and Windows systems. Tested with GNU make (written to be cross-platform) and `g++` on linux/MinGW64, `clang++` on Mac OSX High Sierra, and MSVC on Windows. Our build system depends on the cross-platform `cmake` tooling for Makefile generation.
 
 1. `git clone https://github.com/dsteinmo/blitzdg.git`
 2. `cd blitzdg && ./pull-deps.sh`
 3. `cmake . && make advec1d && ./bin/advec1d` (This binary is a 1D advection equation solver.).
 4. Run unit tests with `make test`.
-
-### Running with Docker
-
-You can also run the build and tests inside a docker (linux) container. The container is based on an ubuntu 18.04 image.
-
-1. `git clone https://github.com/dsteinmo/blitzdg.git && cd blitzdg`
-2. `docker build -t blitzdg .`
-3. `docker run -t blitzdg`
 
 ## Dependencies
 
@@ -36,10 +28,10 @@ You can also run the build and tests inside a docker (linux) container. The cont
 * `SuiteSparse (umfpack, cxsparse)`
 * `LAPACK`
 * `metis`
-* `boost`
 * `igloo` for BDD-style testing.
 * `vtk` for visualization in Paraview.
-* `boost-python` for python bindings.
+* `boost-python3` for python bindings.
+* `boost-numpy3` for numpy C++ interoperability.
 
 Dependency installation is outlined in `pull-deps.sh` (tested on Ubuntu and Mac OSX).
 
