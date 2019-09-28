@@ -14,6 +14,7 @@
 #include "VandermondeBuilders.hpp"
 #include "Types.hpp"
 #include <memory>
+#include <boost/python/numpy.hpp>
 
 namespace blitzdg {
   /**
@@ -284,5 +285,19 @@ namespace blitzdg {
        * Returns the number of elements in the 1D grid.
        */
       index_type get_NumElements() const;
+
+
+      /**
+       * Python bindings.
+       */
+      boost::python::numpy::ndarray get_xGrid_numpy() const;
+      boost::python::numpy::ndarray get_Dr_numpy() const;
+      boost::python::numpy::ndarray get_Fscale_numpy() const;
+      boost::python::numpy::ndarray get_Lift_numpy() const;
+      boost::python::numpy::ndarray get_rx_numpy() const;
+      boost::python::numpy::ndarray get_vmapM_numpy() const;
+      boost::python::numpy::ndarray get_vmapP_numpy() const;
+      boost::python::numpy::ndarray get_nx_numpy() const;
+
   };
 } // namespace blitzdg

@@ -37,8 +37,8 @@ namespace blitzdg {
         : NumElements{ _MeshManager.get_NumElements() }, NOrder{ _NOrder },
         NumLocalPoints{ (_NOrder + 2)*(_NOrder+1)/2 },
         NumFacePoints{ _NOrder + 1},
-        xGrid{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements(), ColumnMajorOrder()) },
-        yGrid{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements(), ColumnMajorOrder()) },
+        xGrid{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements()) },
+        yGrid{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements()) },
         rGrid{ new real_vector_type((_NOrder + 2)*(_NOrder+1)/2) },
         sGrid{ new real_vector_type((_NOrder + 2)*(_NOrder+1)/2) },
         V{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) }, 
@@ -47,17 +47,17 @@ namespace blitzdg {
         Drw{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
         Dsw{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
         Lift{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder+1)*NumFaces) },
-        J{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements(), ColumnMajorOrder()) },
-        rx{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements(), ColumnMajorOrder()) },
-        sx{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements(), ColumnMajorOrder()) },
-        ry{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements(), ColumnMajorOrder()) },
-        sy{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements(), ColumnMajorOrder()) },
-        nx{ new real_matrix_type((_NOrder+1)*NumFaces, _MeshManager.get_NumElements(), ColumnMajorOrder()) },
-        ny{ new real_matrix_type((_NOrder+1)*NumFaces, _MeshManager.get_NumElements(), ColumnMajorOrder()) },
+        J{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements()) },
+        rx{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements()) },
+        sx{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements()) },
+        ry{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements()) },
+        sy{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, _MeshManager.get_NumElements()) },
+        nx{ new real_matrix_type((_NOrder+1)*NumFaces, _MeshManager.get_NumElements()) },
+        ny{ new real_matrix_type((_NOrder+1)*NumFaces, _MeshManager.get_NumElements()) },
         Vinv{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
         Filter{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
-        Fmask{ new index_matrix_type( _NOrder+1, NumFaces, ColumnMajorOrder()) },
-        Fscale{ new real_matrix_type((_NOrder+1)*NumFaces, _MeshManager.get_NumElements(), ColumnMajorOrder()) },
+        Fmask{ new index_matrix_type( _NOrder+1, NumFaces) },
+        Fscale{ new real_matrix_type((_NOrder+1)*NumFaces, _MeshManager.get_NumElements()) },
         vmapM{ new index_vector_type((_NOrder+1)*NumFaces*_MeshManager.get_NumElements()) },
         vmapP{ new index_vector_type((_NOrder+1)*NumFaces*_MeshManager.get_NumElements()) },
         mapP{ new index_vector_type((_NOrder+1)*NumFaces*_MeshManager.get_NumElements()) },
@@ -679,6 +679,7 @@ namespace blitzdg {
             }
         }
 
+
         // identify all boundary nodes
         index_vector_type tmpMapB(NumElements*NumFaces*NumFacePoints);
         index_type numBoundaryNodes = 0;
@@ -951,6 +952,5 @@ namespace blitzdg {
             vmapP.get(),
             BCmap.get()
         };
-
     }
 }
