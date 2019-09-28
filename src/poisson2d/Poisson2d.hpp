@@ -51,8 +51,13 @@ namespace blitzdg {
 				blitzdg::fullToVector(u, uVec, byRowsOpt);
 
 				const real_matrix_type& Dr = dg.Dr(), Ds = dg.Ds();
-				ux = dg.rx()*blitz::sum(Dr(ii,kk)*u(kk,jj), kk) + dg.sx()*blitz::sum(Ds(ii,kk)*u(kk,jj), kk);
-				uy = dg.ry()*blitz::sum(Dr(ii,kk)*u(kk,jj), kk) + dg.sy()*blitz::sum(Ds(ii,kk)*u(kk,jj), kk);
+				real_matrix_type dudr(Np,K), duds(Np,K);
+
+				dudr = blitz::sum(Dr(ii,kk)*u(kk,jj), kk);
+				duds = blitz::sum(Ds(ii,kk)*u(kk,jj), kk);
+
+				ux = dg.rx()*dudr + dg.sx()*duds;
+				uy = dg.ry()*dudr + dg.sy()*duds;
 
 				blitzdg::fullToVector(ux, uxVec, byRowsOpt);
 				blitzdg::fullToVector(uy, uyVec, byRowsOpt);
@@ -107,6 +112,9 @@ namespace blitzdg {
 				blitzdg::applyIndexMap(uxVec, dg.vmapM(), uxM);
 				blitzdg::applyIndexMap(uxVec, dg.vmapP(), uxP);
 
+				blitzdg::applyIndexMap(uyVec, dg.vmapM(), uyM);
+				blitzdg::applyIndexMap(uyVec, dg.vmapP(), uyP);
+
 				// Neuman BC's imply auxiliary vector "(qx,qy) = 0" on the boundary
 				//std::vector<index_type> mapN = dg.bcmap().at(BCTag::Neuman);
 				std::vector<index_type> mapN;
@@ -116,8 +124,8 @@ namespace blitzdg {
 
 				for (index_type i=0; i < static_cast<int>(mapN.size()); ++i) {
 					index_type n = mapN[i];
-					uxP(n) = -uxM(n); // + 2*(... stuff with normals?)
-					uyP(n) = -uyM(n); // + 2*(... stuff with normals?)
+					uxP(n) = uxM(n) - 2*nxVec(n)*(uxM(n)*nxVec(n) + uyM(n)*nyVec(n));
+					uyP(n) = uyM(n) - 2*nyVec(n)*(uxM(n)*nxVec(n) + uyM(n)*nyVec(n));
 				}
 
 				// the weirdness that is interior penalty....
@@ -145,12 +153,13 @@ namespace blitzdg {
 				MassMatrix = blitz::sum(Vinv(kk,ii)*Vinv(kk,jj), kk); // local one.
 
 				// Commpute Laplacian.
-				tmp  = dg.rx()*blitz::sum(Dr(ii,kk)*qx(kk,jj), kk) + dg.sx()*blitz::sum(Ds(ii,kk)*qx(kk,jj),kk);
+				tmp  = dg.rx()*blitz::sum(Dr(ii,kk)*qx(kk,jj), kk) + dg.sx()*blitz::sum(Ds(ii,kk)*qx(kk,jj), kk);
 				tmp += dg.ry()*blitz::sum(Dr(ii,kk)*qy(kk,jj), kk) + dg.sy()*blitz::sum(Ds(ii,kk)*qy(kk,jj), kk);
 				tmp -= sum(Lift(ii,kk)*surfaceRHS(kk,jj), kk);
 
 				// Multiply by mass matrix for a symmetric problem.
-				result = dg.jacobian()*(sum(MassMatrix(ii,kk)*tmp(kk,jj),kk));
+				//result = dg.jacobian()*(sum(MassMatrix(ii,kk)*tmp(kk,jj),kk));
+				result = tmp;
 
 				blitzdg::fullToVector(result, out, byRowsOpt);
 
