@@ -1,0 +1,4 @@
+<map id="blitzdg::CSVFileReader::skipLines" name="blitzdg::CSVFileReader::skipLines">
+<area shape="rect" id="node1" title="Skips the file stream ahead by n lines or until the end&#45;of&#45;file is reached." alt="" coords="5,5,164,47"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1CSVFileReader.html#afa28c6d7a4a6356cf95d1372c009ba5b" title="Reads the next line of the file if possible." alt="" coords="212,5,371,47"/>
+</map>

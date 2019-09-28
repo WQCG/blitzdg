@@ -1,0 +1,6 @@
+<map id="blitzdg::JacobiBuilders::computeJacobiQuadWeights" name="blitzdg::JacobiBuilders::computeJacobiQuadWeights">
+<area shape="rect" id="node1" title="Computes the nodes and weights of the Nth order Gauss&#45;Jacobi&#45;Lobotto quadrature rule with parameters ..." alt="" coords="5,59,203,101"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1EigenSolver.html#a67242ffc3a849bd20a497ae100b78495" title="Computes the eigenvalues and eigenvectors of the symmetric matrix ." alt="" coords="251,59,389,101"/>
+<area shape="rect" id="node3" href="$BlitzHelpers_8hpp.html#a2b714b6a07df67f99846579b713a1581" title="Reshapes an array to a dense matrix." alt="" coords="437,29,605,56"/>
+<area shape="rect" id="node4" href="$BlitzHelpers_8hpp.html#aaa66bfe8cd7c9adad27aa42f765c980b" title="Vectorizes a dense matrix by writing it to an array." alt="" coords="437,104,605,131"/>
+</map>

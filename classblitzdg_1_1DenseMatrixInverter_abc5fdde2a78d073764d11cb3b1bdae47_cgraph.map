@@ -1,0 +1,5 @@
+<map id="blitzdg::DenseMatrixInverter::computeInverse" name="blitzdg::DenseMatrixInverter::computeInverse">
+<area shape="rect" id="node1" title="Inverts the dense matrix ." alt="" coords="5,59,192,101"/>
+<area shape="rect" id="node2" href="$BlitzHelpers_8hpp.html#a2b714b6a07df67f99846579b713a1581" title="Reshapes an array to a dense matrix." alt="" coords="240,29,408,56"/>
+<area shape="rect" id="node3" href="$BlitzHelpers_8hpp.html#aaa66bfe8cd7c9adad27aa42f765c980b" title="Vectorizes a dense matrix by writing it to an array." alt="" coords="240,104,408,131"/>
+</map>

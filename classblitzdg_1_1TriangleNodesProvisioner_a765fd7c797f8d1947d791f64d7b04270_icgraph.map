@@ -1,0 +1,5 @@
+<map id="blitzdg::TriangleNodesProvisioner::computeWarpFactor" name="blitzdg::TriangleNodesProvisioner::computeWarpFactor">
+<area shape="rect" id="node1" title="Computes geometric warp function for interior nodes." alt="" coords="536,5,753,47"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1TriangleNodesProvisioner.html#acc359d3edf261edc8c5396d747f5b06c" title="Compute (x,y) nodes in equilateral triangle for polynomial of order N." alt="" coords="271,5,488,47"/>
+<area shape="rect" id="node3" href="$classblitzdg_1_1TriangleNodesProvisioner.html#a07a0a9e0808ee63eb8259212aff90518" title="Builds nodes and local operators." alt="" coords="5,5,223,47"/>
+</map>

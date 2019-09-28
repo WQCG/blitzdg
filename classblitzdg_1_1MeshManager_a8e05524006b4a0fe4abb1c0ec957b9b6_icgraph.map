@@ -1,0 +1,5 @@
+<map id="blitzdg::MeshManager::get_Vertices" name="blitzdg::MeshManager::get_Vertices">
+<area shape="rect" id="node1" title="Returns a reference to the array of vertex coordinates." alt="" coords="271,39,421,80"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1TriangleNodesProvisioner.html#ae3c85b338a622a5064dbc084f1d71c07" title="Build volume&#45;to&#45;surface maps for &#39;&#45;&#39; and &#39;+&#39; traces, as well as for BC faces." alt="" coords="5,5,223,47"/>
+<area shape="rect" id="node3" href="$classblitzdg_1_1TriangleNodesProvisioner.html#aef7f798f38c69f237c124b92ce3af33b" title="Build x and y coordinates and geometric factors." alt="" coords="5,71,223,112"/>
+</map>

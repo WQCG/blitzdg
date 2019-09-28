@@ -1,0 +1,19 @@
+<map id="blitzdg::TriangleNodesProvisioner::buildPhysicalGrid" name="blitzdg::TriangleNodesProvisioner::buildPhysicalGrid">
+<area shape="rect" id="node1" title="Build x and y coordinates and geometric factors." alt="" coords="5,279,223,321"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1TriangleNodesProvisioner.html#a3690f4dbca6665f66effb69f94aab6bc" title="Compute the two 2D differentiation matrices given the Gradient of the Vandermonde matrix and the Vand..." alt="" coords="274,58,491,99"/>
+<area shape="rect" id="node6" href="$classblitzdg_1_1TriangleNodesProvisioner.html#ab72907f460709c6dd73846c302fb6d7b" title="Computes the Gradient of the 2D Vandermonde matrix." alt="" coords="271,214,495,255"/>
+<area shape="rect" id="node11" href="$classblitzdg_1_1TriangleNodesProvisioner.html#a6dd0ba9ce10a2b151d34a9f793e355b3" title="Computes the 2D Vandermonde matrix which maps modal coefficients to nodal values." alt="" coords="274,149,491,190"/>
+<area shape="rect" id="node14" href="$classblitzdg_1_1MeshManager.html#a913a20fecd751355bb976fe46e110e31" title="Returns a reference to the array of element indices." alt="" coords="307,279,458,321"/>
+<area shape="rect" id="node15" href="$classblitzdg_1_1MeshManager.html#aa8e1e4abed28bbf536852c85567478da" title="Returns the number of elements." alt="" coords="307,345,458,386"/>
+<area shape="rect" id="node16" href="$classblitzdg_1_1MeshManager.html#ae946e0b137cb80449226de8a98e729d3" title="Returns the number of vertices." alt="" coords="307,410,458,451"/>
+<area shape="rect" id="node17" href="$classblitzdg_1_1MeshManager.html#a8e05524006b4a0fe4abb1c0ec957b9b6" title="Returns a reference to the array of vertex coordinates." alt="" coords="307,475,458,517"/>
+<area shape="rect" id="node3" href="$classblitzdg_1_1DirectSolver.html#a728856cfee7ed7c7c5761d39acbc7606" title="Solves the linear system ." alt="" coords="581,29,721,70"/>
+<area shape="rect" id="node4" href="$BlitzHelpers_8hpp.html#a2b714b6a07df67f99846579b713a1581" title="Reshapes an array to a dense matrix." alt="" coords="833,29,1001,56"/>
+<area shape="rect" id="node5" href="$BlitzHelpers_8hpp.html#aaa66bfe8cd7c9adad27aa42f765c980b" title="Vectorizes a dense matrix by writing it to an array." alt="" coords="833,104,1001,131"/>
+<area shape="rect" id="node7" href="$classblitzdg_1_1TriangleNodesProvisioner.html#a198dfd20f8c2c8b047c2b5ec8d243887" title="Evaluates the gradient of the 2D orthonormal polynomial of index (id,jd) on the simplex at (a,..." alt="" coords="543,277,760,318"/>
+<area shape="rect" id="node10" href="$classblitzdg_1_1TriangleNodesProvisioner.html#ac387403eeb135dd15dd11a4be3518b52" title="Maps from (r,s) to (a,b) coordinates in the triangle." alt="" coords="543,211,760,253"/>
+<area shape="rect" id="node8" href="$classblitzdg_1_1JacobiBuilders.html#a7e4e8d22f83e71108552a213439bb186" title="Computes the first derivative of the Nth order Jacobi polynomial with parameters &#160;and &#160;at each point ..." alt="" coords="840,277,993,318"/>
+<area shape="rect" id="node9" href="$classblitzdg_1_1JacobiBuilders.html#a629c1bda92b2b4414c5ef22ccd6d25ce" title="Computes the value of the Nth order Jacobi polynomial with parameters &#160;and &#160;at each point in the inpu..." alt="" coords="1073,218,1256,259"/>
+<area shape="rect" id="node12" href="$classblitzdg_1_1DenseMatrixInverter.html#abc5fdde2a78d073764d11cb3b1bdae47" title="Inverts the dense matrix ." alt="" coords="558,94,745,135"/>
+<area shape="rect" id="node13" href="$classblitzdg_1_1TriangleNodesProvisioner.html#ab1a4793c4f4bc3f4d184c8dc0bbf1af4" title="Evaluates the 2D orthonormal polynomial on the simplex at (a,b) of order (i,j)." alt="" coords="808,158,1025,199"/>
+</map>

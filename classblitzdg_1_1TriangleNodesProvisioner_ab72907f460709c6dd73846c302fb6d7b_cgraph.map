@@ -1,0 +1,7 @@
+<map id="blitzdg::TriangleNodesProvisioner::computeGradVandermondeMatrix" name="blitzdg::TriangleNodesProvisioner::computeGradVandermondeMatrix">
+<area shape="rect" id="node1" title="Computes the Gradient of the 2D Vandermonde matrix." alt="" coords="5,68,229,109"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1TriangleNodesProvisioner.html#a198dfd20f8c2c8b047c2b5ec8d243887" title="Evaluates the gradient of the 2D orthonormal polynomial of index (id,jd) on the simplex at (a,..." alt="" coords="277,35,495,76"/>
+<area shape="rect" id="node5" href="$classblitzdg_1_1TriangleNodesProvisioner.html#ac387403eeb135dd15dd11a4be3518b52" title="Maps from (r,s) to (a,b) coordinates in the triangle." alt="" coords="277,100,495,141"/>
+<area shape="rect" id="node3" href="$classblitzdg_1_1JacobiBuilders.html#a7e4e8d22f83e71108552a213439bb186" title="Computes the first derivative of the Nth order Jacobi polynomial with parameters &#160;and &#160;at each point ..." alt="" coords="543,5,696,47"/>
+<area shape="rect" id="node4" href="$classblitzdg_1_1JacobiBuilders.html#a629c1bda92b2b4414c5ef22ccd6d25ce" title="Computes the value of the Nth order Jacobi polynomial with parameters &#160;and &#160;at each point in the inpu..." alt="" coords="744,35,927,76"/>
+</map>

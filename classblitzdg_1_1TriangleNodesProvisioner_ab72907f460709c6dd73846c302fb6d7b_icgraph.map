@@ -1,0 +1,4 @@
+<map id="blitzdg::TriangleNodesProvisioner::computeGradVandermondeMatrix" name="blitzdg::TriangleNodesProvisioner::computeGradVandermondeMatrix">
+<area shape="rect" id="node1" title="Computes the Gradient of the 2D Vandermonde matrix." alt="" coords="271,5,495,47"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1TriangleNodesProvisioner.html#aef7f798f38c69f237c124b92ce3af33b" title="Build x and y coordinates and geometric factors." alt="" coords="5,5,223,47"/>
+</map>

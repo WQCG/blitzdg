@@ -1,0 +1,4 @@
+<map id="blitzdg::JacobiBuilders::computeGradJacobi" name="blitzdg::JacobiBuilders::computeGradJacobi">
+<area shape="rect" id="node1" title="Computes the first derivative of the Nth order Jacobi polynomial with parameters &#160;and &#160;at each point ..." alt="" coords="5,5,159,47"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1JacobiBuilders.html#a629c1bda92b2b4414c5ef22ccd6d25ce" title="Computes the value of the Nth order Jacobi polynomial with parameters &#160;and &#160;at each point in the inpu..." alt="" coords="207,5,389,47"/>
+</map>

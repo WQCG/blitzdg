@@ -1,0 +1,4 @@
+<map id="blitzdg::CSVFileReader::parseRowIterator" name="blitzdg::CSVFileReader::parseRowIterator">
+<area shape="rect" id="node1" title="Parses the next line of the file and writes the tokens to the output iterator if possible." alt="" coords="5,5,164,47"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1CSVFileReader.html#a8ea6c4ae955e400b5bb55851cd775f5f" title="Parses a line into string tokens based on the delimiter sequence." alt="" coords="212,5,371,47"/>
+</map>

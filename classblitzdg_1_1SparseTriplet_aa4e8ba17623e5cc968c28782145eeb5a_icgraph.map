@@ -1,0 +1,4 @@
+<map id="blitzdg::SparseTriplet::rows" name="blitzdg::SparseTriplet::rows">
+<area shape="rect" id="node1" title="Returns the number of rows." alt="" coords="199,5,344,47"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1SparseTriplet.html#afefcde1cfd08244e3b496e2ad8702186" title="Constructor that creates a rows by cols sparse triplet matrix with space allocated for nzmax nonzero ..." alt="" coords="5,5,151,47"/>
+</map>

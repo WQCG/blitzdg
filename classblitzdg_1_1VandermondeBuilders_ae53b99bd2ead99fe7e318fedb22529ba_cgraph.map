@@ -1,0 +1,5 @@
+<map id="blitzdg::VandermondeBuilders::computeGradVandermonde" name="blitzdg::VandermondeBuilders::computeGradVandermonde">
+<area shape="rect" id="node1" title="Computes the elementwise derivative of the Vandermonde matrix." alt="" coords="5,5,200,47"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1JacobiBuilders.html#a7e4e8d22f83e71108552a213439bb186" title="Computes the first derivative of the Nth order Jacobi polynomial with parameters &#160;and &#160;at each point ..." alt="" coords="248,5,401,47"/>
+<area shape="rect" id="node3" href="$classblitzdg_1_1JacobiBuilders.html#a629c1bda92b2b4414c5ef22ccd6d25ce" title="Computes the value of the Nth order Jacobi polynomial with parameters &#160;and &#160;at each point in the inpu..." alt="" coords="449,5,632,47"/>
+</map>

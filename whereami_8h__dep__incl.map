@@ -1,0 +1,4 @@
+<map id="include/whereami.h" name="include/whereami.h">
+<area shape="rect" id="node1" title="Off&#45;the&#45;shelf C library for determing the location of a C binary at runtime. See https://github...." alt="" coords="23,5,158,32"/>
+<area shape="rect" id="node2" href="$PathResolver_8hpp.html" title="Defines the PathResolver class that allows for the resolution of paths relative to the project root p..." alt="" coords="5,80,176,107"/>
+</map>

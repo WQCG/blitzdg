@@ -1,0 +1,6 @@
+<map id="blitzdg::CSCMat::nnz" name="blitzdg::CSCMat::nnz">
+<area shape="rect" id="node1" title="Returns the number of nonzero elements." alt="" coords="411,31,559,57"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1CSCMat.html#a7378aa6add8f8a6e0540b31148c0af33" title="Constructor that creates a rows x cols CSC matrix with nnz nonzero elements." alt="" coords="184,5,363,32"/>
+<area shape="rect" id="node3" href="$CSCMatrix_8hpp.html#af412eb6a8ef06ec7d2e74abecc595962" title="Writes the CSC matrix to the output stream in coordinate format (i, j, elem)." alt="" coords="208,56,339,83"/>
+<area shape="rect" id="node4" href="$GMRESSolver_8hpp.html#afcef465b1811e1a58461f319ff1c353c" title="Write a ConvFlag to an output stream." alt="" coords="5,56,136,83"/>
+</map>

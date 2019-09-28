@@ -1,0 +1,4 @@
+<map id="blitzdg::SparseTriplet::row" name="blitzdg::SparseTriplet::row">
+<area shape="rect" id="node1" title="Provides read&#45;write access to the kth row index." alt="" coords="199,13,373,39"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1SparseTriplet.html#ac3a3c3fabb2591364b9332110eccf259" title="Inserts an element into the sparse triplet matrix." alt="" coords="5,5,151,47"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="blitzdg::TriangleNodesProvisioner::evaluateSimplexPolynomial" name="blitzdg::TriangleNodesProvisioner::evaluateSimplexPolynomial">
+<area shape="rect" id="node1" title="Evaluates the 2D orthonormal polynomial on the simplex at (a,b) of order (i,j)." alt="" coords="536,5,753,47"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1TriangleNodesProvisioner.html#a6dd0ba9ce10a2b151d34a9f793e355b3" title="Computes the 2D Vandermonde matrix which maps modal coefficients to nodal values." alt="" coords="271,5,488,47"/>
+<area shape="rect" id="node3" href="$classblitzdg_1_1TriangleNodesProvisioner.html#aef7f798f38c69f237c124b92ce3af33b" title="Build x and y coordinates and geometric factors." alt="" coords="5,5,223,47"/>
+</map>

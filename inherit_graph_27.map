@@ -1,0 +1,5 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classblitzdg_1_1OutputterBase.html" title=" " alt="" coords="5,31,157,57"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1CsvOutputter.html" title=" " alt="" coords="205,5,352,32"/>
+<area shape="rect" id="node3" href="$classblitzdg_1_1VtkOutputter.html" title="Outputter class for vtk files." alt="" coords="207,56,350,83"/>
+</map>

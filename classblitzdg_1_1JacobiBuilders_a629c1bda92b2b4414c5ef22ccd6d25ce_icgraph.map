@@ -1,0 +1,15 @@
+<map id="blitzdg::JacobiBuilders::computeJacobiPolynomial" name="blitzdg::JacobiBuilders::computeJacobiPolynomial">
+<area shape="rect" id="node1" title="Computes the value of the Nth order Jacobi polynomial with parameters &#160;and &#160;at each point in the inpu..." alt="" coords="1073,131,1256,172"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1JacobiBuilders.html#a7e4e8d22f83e71108552a213439bb186" title="Computes the first derivative of the Nth order Jacobi polynomial with parameters &#160;and &#160;at each point ..." alt="" coords="840,72,993,113"/>
+<area shape="rect" id="node4" href="$classblitzdg_1_1TriangleNodesProvisioner.html#a198dfd20f8c2c8b047c2b5ec8d243887" title="Evaluates the gradient of the 2D orthonormal polynomial of index (id,jd) on the simplex at (a,..." alt="" coords="543,127,760,168"/>
+<area shape="rect" id="node7" href="$classblitzdg_1_1VandermondeBuilders.html#af1b51b21a630ecefbe8f001cbbcf00d1" title="Computes the Vandermonde matrix which maps modal coefficients to nodal values." alt="" coords="819,192,1015,233"/>
+<area shape="rect" id="node9" href="$classblitzdg_1_1TriangleNodesProvisioner.html#a765fd7c797f8d1947d791f64d7b04270" title="Computes geometric warp function for interior nodes." alt="" coords="543,257,760,299"/>
+<area shape="rect" id="node12" href="$classblitzdg_1_1TriangleNodesProvisioner.html#ab1a4793c4f4bc3f4d184c8dc0bbf1af4" title="Evaluates the 2D orthonormal polynomial on the simplex at (a,b) of order (i,j)." alt="" coords="808,5,1025,47"/>
+<area shape="rect" id="node3" href="$classblitzdg_1_1VandermondeBuilders.html#ae53b99bd2ead99fe7e318fedb22529ba" title="Computes the elementwise derivative of the Vandermonde matrix." alt="" coords="554,61,749,103"/>
+<area shape="rect" id="node5" href="$classblitzdg_1_1TriangleNodesProvisioner.html#ab72907f460709c6dd73846c302fb6d7b" title="Computes the Gradient of the 2D Vandermonde matrix." alt="" coords="271,112,495,153"/>
+<area shape="rect" id="node6" href="$classblitzdg_1_1TriangleNodesProvisioner.html#aef7f798f38c69f237c124b92ce3af33b" title="Build x and y coordinates and geometric factors." alt="" coords="5,65,223,107"/>
+<area shape="rect" id="node8" href="$classblitzdg_1_1Nodes1DProvisioner.html#abe2340db4af5d25b8b0c5ada270fce5c" title="Builds the nodes and all geometric factors for each element." alt="" coords="557,192,745,233"/>
+<area shape="rect" id="node10" href="$classblitzdg_1_1TriangleNodesProvisioner.html#acc359d3edf261edc8c5396d747f5b06c" title="Compute (x,y) nodes in equilateral triangle for polynomial of order N." alt="" coords="274,257,491,299"/>
+<area shape="rect" id="node11" href="$classblitzdg_1_1TriangleNodesProvisioner.html#a07a0a9e0808ee63eb8259212aff90518" title="Builds nodes and local operators." alt="" coords="5,257,223,299"/>
+<area shape="rect" id="node13" href="$classblitzdg_1_1TriangleNodesProvisioner.html#a6dd0ba9ce10a2b151d34a9f793e355b3" title="Computes the 2D Vandermonde matrix which maps modal coefficients to nodal values." alt="" coords="274,17,491,59"/>
+</map>

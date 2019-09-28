@@ -1,0 +1,6 @@
+<map id="blitzdg::TriangleNodesProvisioner::computeDifferentiationMatrices" name="blitzdg::TriangleNodesProvisioner::computeDifferentiationMatrices">
+<area shape="rect" id="node1" title="Compute the two 2D differentiation matrices given the Gradient of the Vandermonde matrix and the Vand..." alt="" coords="5,59,223,101"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1DirectSolver.html#a728856cfee7ed7c7c5761d39acbc7606" title="Solves the linear system ." alt="" coords="271,59,411,101"/>
+<area shape="rect" id="node3" href="$BlitzHelpers_8hpp.html#a2b714b6a07df67f99846579b713a1581" title="Reshapes an array to a dense matrix." alt="" coords="459,29,627,56"/>
+<area shape="rect" id="node4" href="$BlitzHelpers_8hpp.html#aaa66bfe8cd7c9adad27aa42f765c980b" title="Vectorizes a dense matrix by writing it to an array." alt="" coords="459,104,627,131"/>
+</map>

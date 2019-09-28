@@ -1,0 +1,4 @@
+<map id="blitzdg::SparseTriplet::expand" name="blitzdg::SparseTriplet::expand">
+<area shape="rect" id="node1" title="Increases the allocated storage to nzmax." alt="" coords="5,5,151,47"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1SparseTriplet.html#a07ab0f13c0c5dbe5b0bfb65a3ebca8c8" title="Returns the maximum number of nonzero elements currently allocated." alt="" coords="199,5,344,47"/>
+</map>

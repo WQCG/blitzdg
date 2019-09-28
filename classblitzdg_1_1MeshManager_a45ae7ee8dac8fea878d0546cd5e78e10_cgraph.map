@@ -1,0 +1,9 @@
+<map id="blitzdg::MeshManager::buildConnectivity" name="blitzdg::MeshManager::buildConnectivity">
+<area shape="rect" id="node1" title="Build EToE and EToF connectivity tables." alt="" coords="5,123,156,165"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1CSCMat.html#ac3cfc9336711481db047c7183d3d9ad2" title="Provides read&#45;write access to the kth column pointer index." alt="" coords="207,5,375,32"/>
+<area shape="rect" id="node3" href="$classblitzdg_1_1CSCMat.html#a172a6117183b30613657fd15add8c652" title="Provides read&#45;write access to the kth nonzero element." alt="" coords="209,56,372,83"/>
+<area shape="rect" id="node4" href="$CSCMatrix_8hpp.html#a1866fcdc4e272d252d1460ebdd67284e" title="Returns the matrix&#45;matrix product of two CSC matrices: lhs * rhs." alt="" coords="234,131,347,157"/>
+<area shape="rect" id="node6" href="$classblitzdg_1_1CSCMat.html#a10225fa24f960187226b9a3a3628303e" title="Provides read&#45;write access to the kth row index." alt="" coords="204,181,377,208"/>
+<area shape="rect" id="node7" href="$CSCMatrix_8hpp.html#a5867556d69e744f932c8774703236fe2" title="Returns the transpose of a CSC matrix." alt="" coords="228,256,353,283"/>
+<area shape="rect" id="node5" href="$classblitzdg_1_1CSCMat.html#a2197e4253539671e4971f82a974de37d" title="Provides access to the underlying raw pointer that points to the managed cs_di object." alt="" coords="425,193,592,220"/>
+</map>

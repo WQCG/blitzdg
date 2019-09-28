@@ -1,0 +1,5 @@
+<map id="blitzdg::MeshManager::get_NumElements" name="blitzdg::MeshManager::get_NumElements">
+<area shape="rect" id="node1" title="Returns the number of elements." alt="" coords="271,39,421,80"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1TriangleNodesProvisioner.html#aef7f798f38c69f237c124b92ce3af33b" title="Build x and y coordinates and geometric factors." alt="" coords="5,5,223,47"/>
+<area shape="rect" id="node3" href="$classblitzdg_1_1TriangleNodesProvisioner.html#a86236f3df3222e896e346d0aa40be78f" title="Constructor." alt="" coords="5,71,223,112"/>
+</map>

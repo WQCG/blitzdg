@@ -1,0 +1,4 @@
+<map id="blitzdg::TriangleNodesProvisioner::computeVandermondeMatrix" name="blitzdg::TriangleNodesProvisioner::computeVandermondeMatrix">
+<area shape="rect" id="node1" title="Computes the 2D Vandermonde matrix which maps modal coefficients to nodal values." alt="" coords="271,5,488,47"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1TriangleNodesProvisioner.html#aef7f798f38c69f237c124b92ce3af33b" title="Build x and y coordinates and geometric factors." alt="" coords="5,5,223,47"/>
+</map>

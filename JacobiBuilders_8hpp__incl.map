@@ -1,0 +1,8 @@
+<map id="include/JacobiBuilders.hpp" name="include/JacobiBuilders.hpp">
+<area shape="rect" id="node1" title="Defines the JacobiBuilders class that constructs Jacobi polynomials, their derivatives,..." alt="" coords="87,5,265,32"/>
+<area shape="rect" id="node2" href="$EigenSolver_8hpp.html" title="Defines the EigenSolver class that implements LAPACK solution routine DSYEVD. For symmetric matrices ..." alt="" coords="69,80,187,107"/>
+<area shape="rect" id="node3" href="$Types_8hpp.html" title="Defines the basic types used throughout this project." alt="" coords="135,155,217,181"/>
+<area shape="rect" id="node4" title=" " alt="" coords="5,229,96,256"/>
+<area shape="rect" id="node5" title=" " alt="" coords="121,229,231,256"/>
+<area shape="rect" id="node6" title=" " alt="" coords="256,229,315,256"/>
+</map>

@@ -1,0 +1,40 @@
+\form#0:$a_{ij}$
+\form#1:$|a_{ij}| > \mathrm{dropTol}$
+\form#2:$A$
+\form#3:$n\times n$
+\form#4:$AX = B$
+\form#5:$n\times k$
+\form#6:$n$
+\form#7:$AM^{-1}u = b$
+\form#8:$u = Mx$
+\form#9:$M$
+\form#10:$\|r_k\| \leq \max(\mathrm{relTol}\cdot\|b\|, \mathrm{absTol})$
+\form#11:$\|r_k\| \geq \mathrm{divTol}\cdot\|r_0\|$
+\form#12:$|x_{k+1}(i) - x_k(i)| \leq \mathrm{stgTol}\cdot|x_{k+1}(i)|~~\forall i$
+\form#13:$\mathrm{maxits}\cdot\mathrm{kspaceSz}$
+\form#14:$\|\cdot\|$
+\form#15:$r_k$
+\form#16:$k$
+\form#17:$x_k$
+\form#18:$Uy = x$
+\form#19:$U$
+\form#20:$Ax$
+\form#21:$\|r\|/\|b\|$
+\form#22:$Ax = b$
+\form#23:$M^{-1}x$
+\form#24:$\alpha$
+\form#25:$\beta$
+\form#26:$\alpha,\beta > -1$
+\form#27:$\alpha,\beta \neq -1/2$
+\form#28:$(a,b)$
+\form#29:$c,\,s$
+\form#30:$G(c,s)$
+\form#31:\begin{eqnarray*} ca + sb &=& r\\ cb - sa &=& 0 \end{eqnarray*}
+\form#32:$x$
+\form#33:$y$
+\form#34:$a = r$
+\form#35:$b = 0$
+\form#36:$(x,y)$
+\form#37:\begin{eqnarray*} x &=& cx + sy\\ y &=& cy - sx \end{eqnarray*}
+\form#38:$|x - y| < \tau$
+\form#39:$\tau$

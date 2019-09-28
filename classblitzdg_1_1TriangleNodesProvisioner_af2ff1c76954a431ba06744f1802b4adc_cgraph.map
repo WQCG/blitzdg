@@ -1,0 +1,5 @@
+<map id="blitzdg::TriangleNodesProvisioner::buildBCHash" name="blitzdg::TriangleNodesProvisioner::buildBCHash">
+<area shape="rect" id="node1" title="Build hashmap mapping BCTypes to node indices that are on that boundary using the input BCType table." alt="" coords="5,22,223,63"/>
+<area shape="rect" id="node2" href="$BlitzHelpers_8hpp.html#a11524766470643376a34bedb9b22678b" title="Convert a blitz matrix to a vector." alt="" coords="271,29,409,56"/>
+<area shape="rect" id="node3" href="$BlitzHelpers_8hpp.html#aaa66bfe8cd7c9adad27aa42f765c980b" title="Vectorizes a dense matrix by writing it to an array." alt="" coords="457,29,625,56"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="blitzdg::JacobiBuilders::computeGradJacobi" name="blitzdg::JacobiBuilders::computeGradJacobi">
+<area shape="rect" id="node1" title="Computes the first derivative of the Nth order Jacobi polynomial with parameters &#160;and &#160;at each point ..." alt="" coords="808,39,961,80"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1VandermondeBuilders.html#ae53b99bd2ead99fe7e318fedb22529ba" title="Computes the elementwise derivative of the Vandermonde matrix." alt="" coords="554,5,749,47"/>
+<area shape="rect" id="node3" href="$classblitzdg_1_1TriangleNodesProvisioner.html#a198dfd20f8c2c8b047c2b5ec8d243887" title="Evaluates the gradient of the 2D orthonormal polynomial of index (id,jd) on the simplex at (a,..." alt="" coords="543,71,760,112"/>
+<area shape="rect" id="node4" href="$classblitzdg_1_1TriangleNodesProvisioner.html#ab72907f460709c6dd73846c302fb6d7b" title="Computes the Gradient of the 2D Vandermonde matrix." alt="" coords="271,71,495,112"/>
+<area shape="rect" id="node5" href="$classblitzdg_1_1TriangleNodesProvisioner.html#aef7f798f38c69f237c124b92ce3af33b" title="Build x and y coordinates and geometric factors." alt="" coords="5,71,223,112"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="blitzdg::MeshManager::get_NumVerts" name="blitzdg::MeshManager::get_NumVerts">
+<area shape="rect" id="node1" title="Returns the number of vertices." alt="" coords="271,5,421,47"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1TriangleNodesProvisioner.html#aef7f798f38c69f237c124b92ce3af33b" title="Build x and y coordinates and geometric factors." alt="" coords="5,5,223,47"/>
+</map>

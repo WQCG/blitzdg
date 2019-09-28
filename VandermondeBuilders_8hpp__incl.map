@@ -1,0 +1,12 @@
+<map id="include/VandermondeBuilders.hpp" name="include/VandermondeBuilders.hpp">
+<area shape="rect" id="node1" title="Defines a class for computating the generalized Vandermonde, its gradient, and its inverse for 1D ort..." alt="" coords="157,5,375,32"/>
+<area shape="rect" id="node2" href="$DirectSolver_8hpp.html" title="Defines the DirectSolver class that implements LAPACK direct solution routine DSGESV...." alt="" coords="5,155,124,181"/>
+<area shape="rect" id="node3" href="$Types_8hpp.html" title="Defines the basic types used throughout this project." alt="" coords="171,229,254,256"/>
+<area shape="rect" id="node7" href="$JacobiBuilders_8hpp.html" title="Defines the JacobiBuilders class that constructs Jacobi polynomials, their derivatives,..." alt="" coords="200,80,332,107"/>
+<area shape="rect" id="node9" href="$DenseMatrixInverter_8hpp.html" title="Defines the DenseMatrixInverter class that computes the explicit inverse of a dense matrix via the LA..." alt="" coords="391,155,557,181"/>
+<area shape="rect" id="node10" title=" " alt="" coords="407,80,477,107"/>
+<area shape="rect" id="node4" title=" " alt="" coords="42,304,133,331"/>
+<area shape="rect" id="node5" title=" " alt="" coords="157,304,268,331"/>
+<area shape="rect" id="node6" title=" " alt="" coords="293,304,351,331"/>
+<area shape="rect" id="node8" href="$EigenSolver_8hpp.html" title="Defines the EigenSolver class that implements LAPACK solution routine DSYEVD. For symmetric matrices ..." alt="" coords="250,155,367,181"/>
+</map>

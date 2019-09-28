@@ -1,0 +1,3 @@
+<map id="blitzdg::details::matTimesVec" name="blitzdg::details::matTimesVec">
+<area shape="rect" id="node1" title="Calls the BLAS function dgemv to compute the matrix&#45;vector product ." alt="" coords="5,29,200,56"/>
+</map>

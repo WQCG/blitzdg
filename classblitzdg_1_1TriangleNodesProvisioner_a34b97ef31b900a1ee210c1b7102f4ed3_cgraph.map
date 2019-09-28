@@ -1,0 +1,4 @@
+<map id="blitzdg::TriangleNodesProvisioner::buildBCHash" name="blitzdg::TriangleNodesProvisioner::buildBCHash">
+<area shape="rect" id="node1" title="Build hashmap mapping BCTypes to node indices that are on that boundary." alt="" coords="5,5,223,47"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1MeshManager.html#a222946ff2233e841111f0461161230ac" title="Returns table of boundary condition tags corresponding to element faces." alt="" coords="271,5,421,47"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="blitzdg::DirectSolver::solve" name="blitzdg::DirectSolver::solve">
+<area shape="rect" id="node1" title="Solves the linear system ." alt="" coords="5,59,145,101"/>
+<area shape="rect" id="node2" href="$BlitzHelpers_8hpp.html#a2b714b6a07df67f99846579b713a1581" title="Reshapes an array to a dense matrix." alt="" coords="193,29,361,56"/>
+<area shape="rect" id="node3" href="$BlitzHelpers_8hpp.html#aaa66bfe8cd7c9adad27aa42f765c980b" title="Vectorizes a dense matrix by writing it to an array." alt="" coords="193,104,361,131"/>
+</map>

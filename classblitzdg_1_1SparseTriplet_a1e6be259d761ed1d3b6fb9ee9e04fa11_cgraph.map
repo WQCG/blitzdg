@@ -1,0 +1,4 @@
+<map id="blitzdg::SparseTriplet::SparseTriplet" name="blitzdg::SparseTriplet::SparseTriplet">
+<area shape="rect" id="node1" title="Constructor that creates a sparse triplet matrix from a dense matrix." alt="" coords="5,22,151,63"/>
+<area shape="rect" id="node2" href="$BlitzHelpers_8hpp.html#aacde821739fcd71fdfe15db3c55d1aed" title="Returns the number of nonzero elements in the dense matrix." alt="" coords="199,29,355,56"/>
+</map>

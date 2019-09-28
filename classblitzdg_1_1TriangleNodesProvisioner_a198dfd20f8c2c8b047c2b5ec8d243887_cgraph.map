@@ -1,0 +1,5 @@
+<map id="blitzdg::TriangleNodesProvisioner::evaluateGradSimplex" name="blitzdg::TriangleNodesProvisioner::evaluateGradSimplex">
+<area shape="rect" id="node1" title="Evaluates the gradient of the 2D orthonormal polynomial of index (id,jd) on the simplex at (a,..." alt="" coords="5,35,223,76"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1JacobiBuilders.html#a7e4e8d22f83e71108552a213439bb186" title="Computes the first derivative of the Nth order Jacobi polynomial with parameters &#160;and &#160;at each point ..." alt="" coords="271,5,424,47"/>
+<area shape="rect" id="node3" href="$classblitzdg_1_1JacobiBuilders.html#a629c1bda92b2b4414c5ef22ccd6d25ce" title="Computes the value of the Nth order Jacobi polynomial with parameters &#160;and &#160;at each point in the inpu..." alt="" coords="472,35,655,76"/>
+</map>

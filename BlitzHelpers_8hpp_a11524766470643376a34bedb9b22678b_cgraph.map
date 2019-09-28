@@ -1,0 +1,4 @@
+<map id="blitzdg::fullToVector" name="blitzdg::fullToVector">
+<area shape="rect" id="node1" title="Convert a blitz matrix to a vector." alt="" coords="5,29,144,56"/>
+<area shape="rect" id="node2" href="$BlitzHelpers_8hpp.html#aaa66bfe8cd7c9adad27aa42f765c980b" title="Vectorizes a dense matrix by writing it to an array." alt="" coords="192,29,360,56"/>
+</map>

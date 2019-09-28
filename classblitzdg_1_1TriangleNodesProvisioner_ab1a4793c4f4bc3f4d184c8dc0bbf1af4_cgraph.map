@@ -1,0 +1,4 @@
+<map id="blitzdg::TriangleNodesProvisioner::evaluateSimplexPolynomial" name="blitzdg::TriangleNodesProvisioner::evaluateSimplexPolynomial">
+<area shape="rect" id="node1" title="Evaluates the 2D orthonormal polynomial on the simplex at (a,b) of order (i,j)." alt="" coords="5,5,223,47"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1JacobiBuilders.html#a629c1bda92b2b4414c5ef22ccd6d25ce" title="Computes the value of the Nth order Jacobi polynomial with parameters &#160;and &#160;at each point in the inpu..." alt="" coords="271,5,453,47"/>
+</map>

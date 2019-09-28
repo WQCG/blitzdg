@@ -1,0 +1,4 @@
+<map id="blitzdg::countNonzeros" name="blitzdg::countNonzeros">
+<area shape="rect" id="node1" title="Returns the number of nonzero elements in the dense matrix." alt="" coords="199,29,355,56"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1SparseTriplet.html#a1e6be259d761ed1d3b6fb9ee9e04fa11" title="Constructor that creates a sparse triplet matrix from a dense matrix." alt="" coords="5,22,151,63"/>
+</map>

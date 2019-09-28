@@ -1,0 +1,8 @@
+<map id="blitzdg::TriangleNodesProvisioner::buildMaps" name="blitzdg::TriangleNodesProvisioner::buildMaps">
+<area shape="rect" id="node1" title="Build volume&#45;to&#45;surface maps for &#39;&#45;&#39; and &#39;+&#39; traces, as well as for BC faces." alt="" coords="5,136,223,177"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1MeshManager.html#a913a20fecd751355bb976fe46e110e31" title="Returns a reference to the array of element indices." alt="" coords="279,5,430,47"/>
+<area shape="rect" id="node3" href="$classblitzdg_1_1MeshManager.html#acece09c4eee14812e9183456d57335e3" title="Returns element&#45;to&#45;element connectivity table." alt="" coords="279,71,430,112"/>
+<area shape="rect" id="node4" href="$classblitzdg_1_1MeshManager.html#a3441dc858cb938b971107b63bf4e23d9" title="Return element&#45;to&#45;face connectivity table." alt="" coords="279,136,430,177"/>
+<area shape="rect" id="node5" href="$classblitzdg_1_1MeshManager.html#a8e05524006b4a0fe4abb1c0ec957b9b6" title="Returns a reference to the array of vertex coordinates." alt="" coords="279,201,430,243"/>
+<area shape="rect" id="node6" href="$BlitzHelpers_8hpp.html#aaa66bfe8cd7c9adad27aa42f765c980b" title="Vectorizes a dense matrix by writing it to an array." alt="" coords="271,291,439,318"/>
+</map>

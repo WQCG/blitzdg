@@ -1,0 +1,9 @@
+<map id="blitzdg::TriangleNodesProvisioner::computeVandermondeMatrix" name="blitzdg::TriangleNodesProvisioner::computeVandermondeMatrix">
+<area shape="rect" id="node1" title="Computes the 2D Vandermonde matrix which maps modal coefficients to nodal values." alt="" coords="5,158,223,199"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1DenseMatrixInverter.html#abc5fdde2a78d073764d11cb3b1bdae47" title="Inverts the dense matrix ." alt="" coords="286,93,473,134"/>
+<area shape="rect" id="node5" href="$classblitzdg_1_1TriangleNodesProvisioner.html#ab1a4793c4f4bc3f4d184c8dc0bbf1af4" title="Evaluates the 2D orthonormal polynomial on the simplex at (a,b) of order (i,j)." alt="" coords="271,158,488,199"/>
+<area shape="rect" id="node7" href="$classblitzdg_1_1TriangleNodesProvisioner.html#ac387403eeb135dd15dd11a4be3518b52" title="Maps from (r,s) to (a,b) coordinates in the triangle." alt="" coords="271,223,488,265"/>
+<area shape="rect" id="node3" href="$BlitzHelpers_8hpp.html#a2b714b6a07df67f99846579b713a1581" title="Reshapes an array to a dense matrix." alt="" coords="543,29,711,56"/>
+<area shape="rect" id="node4" href="$BlitzHelpers_8hpp.html#aaa66bfe8cd7c9adad27aa42f765c980b" title="Vectorizes a dense matrix by writing it to an array." alt="" coords="543,104,711,131"/>
+<area shape="rect" id="node6" href="$classblitzdg_1_1JacobiBuilders.html#a629c1bda92b2b4414c5ef22ccd6d25ce" title="Computes the value of the Nth order Jacobi polynomial with parameters &#160;and &#160;at each point in the inpu..." alt="" coords="536,158,719,199"/>
+</map>

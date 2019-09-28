@@ -1,0 +1,10 @@
+<map id="blitzdg::DenseMatrixInverter::computeInverse" name="blitzdg::DenseMatrixInverter::computeInverse">
+<area shape="rect" id="node1" title="Inverts the dense matrix ." alt="" coords="1067,104,1253,145"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1VandermondeBuilders.html#af1b51b21a630ecefbe8f001cbbcf00d1" title="Computes the Vandermonde matrix which maps modal coefficients to nodal values." alt="" coords="812,71,1008,112"/>
+<area shape="rect" id="node7" href="$classblitzdg_1_1TriangleNodesProvisioner.html#a6dd0ba9ce10a2b151d34a9f793e355b3" title="Computes the 2D Vandermonde matrix which maps modal coefficients to nodal values." alt="" coords="801,136,1019,177"/>
+<area shape="rect" id="node3" href="$classblitzdg_1_1Nodes1DProvisioner.html#abe2340db4af5d25b8b0c5ada270fce5c" title="Builds the nodes and all geometric factors for each element." alt="" coords="551,5,739,47"/>
+<area shape="rect" id="node4" href="$classblitzdg_1_1TriangleNodesProvisioner.html#a765fd7c797f8d1947d791f64d7b04270" title="Computes geometric warp function for interior nodes." alt="" coords="536,71,753,112"/>
+<area shape="rect" id="node5" href="$classblitzdg_1_1TriangleNodesProvisioner.html#acc359d3edf261edc8c5396d747f5b06c" title="Compute (x,y) nodes in equilateral triangle for polynomial of order N." alt="" coords="271,71,488,112"/>
+<area shape="rect" id="node6" href="$classblitzdg_1_1TriangleNodesProvisioner.html#a07a0a9e0808ee63eb8259212aff90518" title="Builds nodes and local operators." alt="" coords="5,71,223,112"/>
+<area shape="rect" id="node8" href="$classblitzdg_1_1TriangleNodesProvisioner.html#aef7f798f38c69f237c124b92ce3af33b" title="Build x and y coordinates and geometric factors." alt="" coords="536,136,753,177"/>
+</map>

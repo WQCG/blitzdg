@@ -1,0 +1,13 @@
+<map id="blitzdg::TriangleNodesProvisioner::computeEquilateralNodes" name="blitzdg::TriangleNodesProvisioner::computeEquilateralNodes">
+<area shape="rect" id="node1" title="Compute (x,y) nodes in equilateral triangle for polynomial of order N." alt="" coords="5,100,223,141"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1TriangleNodesProvisioner.html#a765fd7c797f8d1947d791f64d7b04270" title="Computes geometric warp function for interior nodes." alt="" coords="271,100,488,141"/>
+<area shape="rect" id="node3" href="$classblitzdg_1_1JacobiBuilders.html#a8b85322f52325c7efe38e2c27cb25292" title="Computes the nodes of the Nth order Gauss&#45;Jacobi&#45;Lobotto quadrature rule with parameters &#160;and ." alt="" coords="536,11,735,52"/>
+<area shape="rect" id="node8" href="$classblitzdg_1_1JacobiBuilders.html#a629c1bda92b2b4414c5ef22ccd6d25ce" title="Computes the value of the Nth order Jacobi polynomial with parameters &#160;and &#160;at each point in the inpu..." alt="" coords="790,188,973,229"/>
+<area shape="rect" id="node9" href="$classblitzdg_1_1VandermondeBuilders.html#af1b51b21a630ecefbe8f001cbbcf00d1" title="Computes the Vandermonde matrix which maps modal coefficients to nodal values." alt="" coords="537,129,733,171"/>
+<area shape="rect" id="node11" href="$classblitzdg_1_1DirectSolver.html#a728856cfee7ed7c7c5761d39acbc7606" title="Solves the linear system ." alt="" coords="1051,71,1191,112"/>
+<area shape="rect" id="node4" href="$classblitzdg_1_1JacobiBuilders.html#a6c06c7134e69c90790fe33e18dbd98a2" title="Computes the nodes and weights of the Nth order Gauss&#45;Jacobi&#45;Lobotto quadrature rule with parameters ..." alt="" coords="783,9,980,51"/>
+<area shape="rect" id="node5" href="$classblitzdg_1_1EigenSolver.html#a67242ffc3a849bd20a497ae100b78495" title="Computes the eigenvalues and eigenvectors of the symmetric matrix ." alt="" coords="1052,5,1191,47"/>
+<area shape="rect" id="node6" href="$BlitzHelpers_8hpp.html#a2b714b6a07df67f99846579b713a1581" title="Reshapes an array to a dense matrix." alt="" coords="1263,115,1431,142"/>
+<area shape="rect" id="node7" href="$BlitzHelpers_8hpp.html#aaa66bfe8cd7c9adad27aa42f765c980b" title="Vectorizes a dense matrix by writing it to an array." alt="" coords="1263,41,1431,67"/>
+<area shape="rect" id="node10" href="$classblitzdg_1_1DenseMatrixInverter.html#abc5fdde2a78d073764d11cb3b1bdae47" title="Inverts the dense matrix ." alt="" coords="1028,136,1215,177"/>
+</map>

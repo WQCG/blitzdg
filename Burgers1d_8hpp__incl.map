@@ -1,0 +1,16 @@
+<map id="src/burgers1d/Burgers1d.hpp" name="src/burgers1d/Burgers1d.hpp">
+<area shape="rect" id="node1" title="Short header file for 1D Burger&#39;s solver&#39;s main.cpp file." alt="" coords="292,5,481,32"/>
+<area shape="rect" id="node2" href="$Nodes1DProvisioner_8hpp.html" title="Defines a class for computations related to the construction of one&#45;dimensional nodes,..." alt="" coords="303,80,470,107"/>
+<area shape="rect" id="node4" href="$Types_8hpp.html" title="Defines the basic types used throughout this project." alt="" coords="348,379,431,405"/>
+<area shape="rect" id="node14" title=" " alt="" coords="494,80,549,107"/>
+<area shape="rect" id="node3" href="$DirectSolver_8hpp.html" title="Defines the DirectSolver class that implements LAPACK direct solution routine DSGESV...." alt="" coords="319,229,438,256"/>
+<area shape="rect" id="node8" href="$JacobiBuilders_8hpp.html" title="Defines the JacobiBuilders class that constructs Jacobi polynomials, their derivatives,..." alt="" coords="462,229,594,256"/>
+<area shape="rect" id="node10" href="$VandermondeBuilders_8hpp.html" title="Defines a class for computating the generalized Vandermonde, its gradient, and its inverse for 1D ort..." alt="" coords="105,155,279,181"/>
+<area shape="rect" id="node12" title=" " alt="" coords="43,229,112,256"/>
+<area shape="rect" id="node13" title=" " alt="" coords="304,155,469,181"/>
+<area shape="rect" id="node5" title=" " alt="" coords="219,453,309,480"/>
+<area shape="rect" id="node6" title=" " alt="" coords="334,453,445,480"/>
+<area shape="rect" id="node7" title=" " alt="" coords="469,453,528,480"/>
+<area shape="rect" id="node9" href="$EigenSolver_8hpp.html" title="Defines the EigenSolver class that implements LAPACK solution routine DSYEVD. For symmetric matrices ..." alt="" coords="427,304,544,331"/>
+<area shape="rect" id="node11" href="$DenseMatrixInverter_8hpp.html" title="Defines the DenseMatrixInverter class that computes the explicit inverse of a dense matrix via the LA..." alt="" coords="187,304,352,331"/>
+</map>

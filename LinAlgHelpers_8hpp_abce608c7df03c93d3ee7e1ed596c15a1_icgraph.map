@@ -1,0 +1,4 @@
+<map id="blitzdg::norm2" name="blitzdg::norm2">
+<area shape="rect" id="node1" title="Returns the two&#45;norm of a vector x." alt="" coords="208,29,312,56"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1GMRESSolver.html#a70f9e36b71cd6618b93f0bb0ab8ced2a" title="Calls GMRES to solves the linear system ." alt="" coords="5,22,160,63"/>
+</map>

@@ -1,0 +1,3 @@
+<map id="blitzdg::reshapeMatTo1D" name="blitzdg::reshapeMatTo1D">
+<area shape="rect" id="node1" title="Vectorizes a dense matrix by writing it to an array." alt="" coords="5,29,173,56"/>
+</map>

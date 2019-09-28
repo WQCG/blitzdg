@@ -1,0 +1,4 @@
+<map id="blitzdg::transpose" name="blitzdg::transpose">
+<area shape="rect" id="node1" title="Returns the transpose of a CSC matrix." alt="" coords="5,29,131,56"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1CSCMat.html#a2197e4253539671e4971f82a974de37d" title="Provides access to the underlying raw pointer that points to the managed cs_di object." alt="" coords="179,29,345,56"/>
+</map>

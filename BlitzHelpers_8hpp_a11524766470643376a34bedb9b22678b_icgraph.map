@@ -1,0 +1,4 @@
+<map id="blitzdg::fullToVector" name="blitzdg::fullToVector">
+<area shape="rect" id="node1" title="Convert a blitz matrix to a vector." alt="" coords="271,29,409,56"/>
+<area shape="rect" id="node2" href="$classblitzdg_1_1TriangleNodesProvisioner.html#af2ff1c76954a431ba06744f1802b4adc" title="Build hashmap mapping BCTypes to node indices that are on that boundary using the input BCType table." alt="" coords="5,22,223,63"/>
+</map>
