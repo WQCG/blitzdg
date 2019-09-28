@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.5)
 set (CMAKE_CONFIGURATION_TYPE x64)
 set (CMAKE_BUILD_TYPE Release) # or Debug
 set (CMAKE_CXX_FLAGS "-Wall -std=c++11 -fPIC")
-set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2")
+set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2 -L/usr/lib/vtk")
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage -DBZ_DEBUG")
 include_directories ("include" "include/igloo" "/usr/include/python3.6m/")
 
