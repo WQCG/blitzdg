@@ -1,6 +1,6 @@
 # blitzdg
 
-blitzdg is an open-source project aiming to implement parallel discontinuous Galerkin (dg) solvers for common partial differential equations systems using blitz++ for array and tensor manipulations and MPI for distributed parallelism.
+blitzdg is an open-source library offering discontinuous Galerkin (dg) solvers for common partial differential equations systems using blitz++ for array and tensor manipulations in a C++ environment or NumPy as a Python 3 library.
 
 <img alt="shallow water wave example" src="https://raw.githubusercontent.com/WQCG/blitzdg/master/example/sw_coarsebox.gif" />
 
@@ -12,13 +12,13 @@ Support blitzdg: <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&ho
 <img alt="" border="0" src="https://www.paypal.com/en_CA/i/scr/pixel.gif" width="1" height="1" />
 
 
-## Getting Started
+## Building From Source
 
-Build and development support has broadened from linux only to Mac OSX and Windows systems. Tested with GNU make (written to be cross-platform) and `g++` on linux/MinGW64, `c++` on Mac OSX Sierra. Our build system depends on the cross-platform `cmake` tooling for Makefile generation.
+Build and development support has broadened from linux only to Mac OSX and Windows systems. Tested with GNU make (written to be cross-platform) and `g++` on linux/MinGW64, `clang++` on Mac OSX Sierra, and MSVC on Windows. Our build system depends on the cross-platform `cmake` tooling for Makefile generation.
 
 1. `git clone https://github.com/dsteinmo/blitzdg.git`
 2. `cd blitzdg && ./pull-deps.sh`
-3. `cmake . && make && ./bin/advec1d` (This binary is a 1D advection equation solver.).
+3. `cmake . && make advec1d && ./bin/advec1d` (This binary is a 1D advection equation solver.).
 4. Run unit tests with `make test`.
 
 ### Running with Docker
@@ -31,8 +31,6 @@ You can also run the build and tests inside a docker (linux) container. The cont
 
 ## Dependencies
 
-So far:
-
 * `cmake`
 * `blitz++`
 * `SuiteSparse (umfpack, cxsparse)`
@@ -41,13 +39,13 @@ So far:
 * `boost`
 * `igloo` for BDD-style testing.
 * `vtk` for visualization in Paraview.
-* `boost-python` for experimental python bindings.
+* `boost-python` for python bindings.
 
 Dependency installation is outlined in `pull-deps.sh` (tested on Ubuntu and Mac OSX).
 
 ### Windows
 
-The Windows build is currently deprecated due to lack of MinGW support of libvtk.
+Our windows distribution was recently switched from MinGW to MSVC in order to achieve better support for graphics APIs, so support is lacking at the moment. Instructions will be made available here soon.
 
 ## Contributing
 
