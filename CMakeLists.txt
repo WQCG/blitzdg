@@ -9,7 +9,7 @@ set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-cove
 include_directories ("include" "include/igloo" "/usr/include/python3.7m/" "/usr/local/include/" "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/include/python3.7m/")
 
 set(CMAKE_FIND_LIBRARY_PREFIXES "" "lib")
-set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib" ".so" ".a" ".dylib")
+set(CMAKE_FIND_LIBRARY_SUFFIXES ".so" ".dylib" ".a" ".lib")
 find_library(BLITZ NAMES "blitz" "libblitz" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 find_library(METIS NAMES "metis" "libmetis" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 find_library(UMFPACK NAMES "umfpack" "libumfpack" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
@@ -22,7 +22,7 @@ find_library(SUITESPARSECONFIG NAMES "suitesparseconfig" "libsuitesparseconfig" 
 find_library(LAPACK NAMES "liblapack" "lapack" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 find_library(BLAS NAMES "libblas" "blas" "libblas" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 
-find_library(PYTHON3 NAMES "python3" "libpython3" "python3.7" "libpython3.7" "libpython37" "python3.6" "libpython3.6" "libpython36" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu" "/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu" "lib" "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/")
+find_library(PYTHON3 NAMES "python3" "libpython3" "python3.6" "libpython3.6" "libpython36" "python3.7" "libpython3.7" "libpython37" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu" "/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu" "lib" "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/")
 find_library(BOOSTPYTHON NAMES "boost_python3-vc140-mt-1_60" "libboost_python3" "boost_python3" "libboost_python3,7" "boost_python3.7" "boost_python3.6" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu" "/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu" "lib")
 find_library(BOOSTNUMPY NAMES "boost_numpy3-vc140-mt-1_60" "libboost_numpy3" "boost_numpy3" "libboost_numpy37" "boost_numpy37" "boost_numpy36" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 
@@ -121,23 +121,6 @@ set_target_properties(blitzdg
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
     LINK_FLAGS "-Wl,-rpath,/usr/local/lib -L /usr/local/lib -L/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/"
-    )
-
-    link_libraries(
-        blitz
-        metis
-        umfpack
-        cxsparse
-        lapack
-        blas
-        vtkIOXML-7.1
-        vtkCommonCore-7.1
-        vtkCommonExecutionModel-7.1
-        vtkCommonDataModel-7.1
-        python3.7m
-        boost_python3
-        boost_numpy3
-        blitzdg
     )
 
 # Link to vtk using static mode (otherwise won't work on windows)
