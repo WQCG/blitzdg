@@ -9,7 +9,7 @@ set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-cove
 include_directories ("include" "include/igloo" "/usr/include/python3.7m/" "/usr/local/include/" "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/include/python3.7m/")
 
 set(CMAKE_FIND_LIBRARY_PREFIXES "" "lib")
-set(CMAKE_FIND_LIBRARY_SUFFIXES ".so" ".dylib" ".a" ".lib")
+set(CMAKE_FIND_LIBRARY_SUFFIXES ".so" ".dylib" ".lib" ".a")
 find_library(BLITZ NAMES "blitz" "libblitz" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 find_library(METIS NAMES "metis" "libmetis" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 find_library(UMFPACK NAMES "umfpack" "libumfpack" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
@@ -73,7 +73,7 @@ message("-- found ${VTKIOXMLPARSER7}")
 message("-- found ${VTKSYS7}")
 
 set (CMAKE_CXX_FLAGS "-Wall -std=c++11 -fPIC")
-set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2 -L/usr/lib/vtk")
+set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2")
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage -DBZ_DEBUG")
 include_directories ("include" "include/igloo" "/usr/include/python3.6m/")
 
@@ -133,6 +133,37 @@ target_compile_definitions(blitzdg PUBLIC "VTKCOMMONCORE_STATIC_DEFINE"
   )
 
 project(pyblitzdg)
+
+link_libraries(
+    ${BLITZ}
+    ${METIS}
+    ${UMFPACK}
+    ${CXSPARSE}
+    ${LAPACK}
+    ${BLAS}
+    ${CHOLMOD}
+    ${AMD}
+    ${COLAMD}
+    ${SUITESPARSECONFIG}
+    ${BOOSTPYTHON}
+    ${BOOSTNUMPY}
+    ${PYTHON3}
+    ${VTKIOXML7}
+    ${VTKCOMMONCORE7}
+    ${VTKCOMMONEXECUTIONMODEL7}
+    ${VTKCOMMONDATAMODEL7}
+    ${VTKCOMMONMISC7}
+    ${VTKCOMMONSYSTEM7}
+    ${VTKCOMMONTRANSFORMS7}
+    ${VTKIOCORE7}
+    ${VTKIOGEOMETRY7}
+    ${VTKIOXML7}
+    ${VTKIOXMLPARSER7}
+    ${VTKSYS7}
+    ${VTKZLIB7}
+    ${VTKEXPAT7}
+    blitzdg
+)
 
 file (GLOB sources src/pyblitzdg/*.cpp)
 add_library(pyblitzdg SHARED ${sources})
