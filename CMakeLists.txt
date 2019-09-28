@@ -2,17 +2,14 @@ cmake_minimum_required(VERSION 3.5)
 
 set (CMAKE_CONFIGURATION_TYPES "Win64")
 set (CMAKE_BUILD_TYPE Release) # or Debug
-# set (CMAKE_CXX_FLAGS "-Wall -std=c++11 -fPIC")
+set (CMAKE_CXX_FLAGS "-std=c++11 -fPIC")
 set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2")
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage -DBZ_DEBUG")
-# set (CMAKE_MODULE_LINKER_FLAGS  "${CMAKE_MODULE_LINKER_FLAGS} -Wl,-soname,pyblitzdg.so")
-include_directories ("include" "include/igloo" "/usr/include/python3.7m/" "C:/Users/dsteinmo/AppData/Local/Programs/Python/Python37/include/" "C:/local/boost_1_66_0" "C:/Users/dsteinmo/Downloads/boost_1_63_0" "C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/VC/Tools/MSVC/14.20.27508/include/" "C:/ProgramData/Anaconda3/pkgs/python-3.7.3-h8c8aaf0_0/include")
-set (CMAKE_CXX_LINK_FLAGS "-Wl,-soname=pyblitzdg.so")
-set (CMAKE_CXX_STANDARD "14")
-set (CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS on)
+# set (CMAKE_MODULE_LINKER_FLAGS  "${CMAKE_MODULE_LINKER_FLAGS}")
+include_directories ("include" "include/igloo" "/usr/include/python3.7m/" "/usr/local/include/" "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/include/python3.7m/")
 
 set(CMAKE_FIND_LIBRARY_PREFIXES "" "lib")
-set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib" ".so" ".a")
+set(CMAKE_FIND_LIBRARY_SUFFIXES ".so" ".dylib" ".a" ".lib")
 find_library(BLITZ NAMES "blitz" "libblitz" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 find_library(METIS NAMES "metis" "libmetis" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 find_library(UMFPACK NAMES "umfpack" "libumfpack" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
@@ -25,7 +22,7 @@ find_library(SUITESPARSECONFIG NAMES "suitesparseconfig" "libsuitesparseconfig" 
 find_library(LAPACK NAMES "liblapack" "lapack" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 find_library(BLAS NAMES "libblas" "blas" "libblas" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 
-find_library(PYTHON3 NAMES "python3" "libpython3" "python3.7" "libpython3.7" "libpython37" "python3.6" "libpython3.6" "libpython36" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu" "/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu" "lib")
+find_library(PYTHON3 NAMES "python3" "libpython3" "python3.6" "libpython3.6" "libpython36" "python3.7" "libpython3.7" "libpython37" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu" "/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu" "lib" "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/")
 find_library(BOOSTPYTHON NAMES "boost_python3-vc140-mt-1_60" "libboost_python3" "boost_python3" "libboost_python3,7" "boost_python3.7" "boost_python3.6" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu" "/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu" "lib")
 find_library(BOOSTNUMPY NAMES "boost_numpy3-vc140-mt-1_60" "libboost_numpy3" "boost_numpy3" "libboost_numpy37" "boost_numpy37" "boost_numpy36" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 
@@ -123,6 +120,7 @@ set_target_properties(blitzdg
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    LINK_FLAGS "-Wl,-rpath,/usr/local/lib -L /usr/local/lib -L/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/"
     )
 
 # Link to vtk using static mode (otherwise won't work on windows)
@@ -143,6 +141,7 @@ set_target_properties(pyblitzdg
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    LINK_FLAGS "-Wl,-rpath,/usr/local/lib -L /usr/local/lib -L/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/"
     )
 set_target_properties(pyblitzdg PROPERTIES PREFIX "")
 
@@ -156,21 +155,35 @@ target_compile_definitions(pyblitzdg PUBLIC "VTKCOMMONCORE_STATIC_DEFINE"
   )
 
 
-# link all projets below to blitzdg.
+# link all projets below to pyblitzdg.
 link_libraries(
-    blitz
-    metis
-    umfpack
-    cxsparse
-    lapack
-    blas
-    vtkIOXML-7.1
-    vtkCommonCore-7.1
-    vtkCommonExecutionModel-7.1
-    vtkCommonDataModel-7.1
-    python3.6m
-    boost_python3
-    boost_numpy3
+    ${BLITZ}
+    ${METIS}
+    ${UMFPACK}
+    ${CXSPARSE}
+    ${LAPACK}
+    ${BLAS}
+    ${CHOLMOD}
+    ${AMD}
+    ${COLAMD}
+    ${SUITESPARSECONFIG}
+    ${BOOSTPYTHON}
+    ${BOOSTNUMPY}
+    ${PYTHON3}
+    ${VTKIOXML7}
+    ${VTKCOMMONCORE7}
+    ${VTKCOMMONEXECUTIONMODEL7}
+    ${VTKCOMMONDATAMODEL7}
+    ${VTKCOMMONMISC7}
+    ${VTKCOMMONSYSTEM7}
+    ${VTKCOMMONTRANSFORMS7}
+    ${VTKIOCORE7}
+    ${VTKIOGEOMETRY7}
+    ${VTKIOXML7}
+    ${VTKIOXMLPARSER7}
+    ${VTKSYS7}
+    ${VTKZLIB7}
+    ${VTKEXPAT7}
     blitzdg
     pyblitzdg
 )
@@ -248,7 +261,7 @@ SET(CPACK_PACKAGE_CONTACT "dsteinmo@wqcg.ca")
 SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
 SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 
-set (CPACK_PACKAGE_VERSION "0.1.2")
+set (CPACK_PACKAGE_VERSION "0.1.5")
 
 INSTALL(TARGETS pyblitzdg blitzdg
     DESTINATION "/usr/lib/x86_64-linux-gnu/"
@@ -285,5 +298,5 @@ ENDIF(DEBIAN_FOUND)
 INCLUDE(InstallRequiredSystemLibraries)
 
 SET(CPACK_GENERATOR RPM)
-set(CPACK_RPM_PACKAGE_VERSION "0.1.2")
+set(CPACK_RPM_PACKAGE_VERSION "0.1.5")
 SET(CPACK_RPM_PACKAGE_DEPENDS "python3,python3-pip,libgfortran.x86_64,suitesparse-devel.x86_64,metis-devel.x86_64,boost-devel.x86_64,vtk-devel.x86_64 vtk.x86_64,boost-python3-devel.x86_64,boost-numpy3.x86_64")

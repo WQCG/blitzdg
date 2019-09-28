@@ -1,0 +1,15 @@
+#!/bin/bash
+set -e -x
+
+# build extension and wheel.
+python3 setup.py bdist_wheel
+
+# delocate deps of theextension module
+python3 /usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages/delocate/cmd/delocate_path.py build/lib.macosx-10.14-x86_64-3.7/pyblitzdg.cpython-37m-darwin.so
+
+# re-bundle the wheel
+rm dist/pyblitzdg-0.1.5-cp37-cp37m-macosx_10_14_x86_64.whl
+python3 setup.py bdist_wheel
+
+# Delocate the wheel itself. 
+python3 /usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages/delocate/cmd/delocate_wheel.py dist/pyblitzdg-0.1.5-cp37-cp37m-macosx_10_14_x86_64.whl  -d -L _libs -v -w wheelhouse/.
