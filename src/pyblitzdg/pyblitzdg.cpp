@@ -18,7 +18,11 @@ using namespace boost::python;
 using namespace boost::python::numpy;
 
 namespace blitzdg {
-    class lserk4wrapper{
+#ifdef _WIN32
+    class __declspec(dllexport) lserk4wrapper {
+#else
+    class lserk4wrapper {
+#endif
         public:
 
         static boost::python::list rk4a() {

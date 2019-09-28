@@ -26,7 +26,6 @@ namespace blitzdg {
         index_type lda = sz;
         index_type iwkopt;
 
-        real_type ww[sz];
         real_type wkopt;
         index_type lwork = -1;
         index_type liwork = -1;
@@ -36,11 +35,12 @@ namespace blitzdg {
         char UPLO[] = "UP";
 
         unique_ptr<real_type[]> Apod(new real_type[sz*lda]());
+        unique_ptr<real_type[]> ww(new real_type[sz]());
 
         reshapeMatTo1D(A, Apod.get());
 
         /* Determining optimal workspace parameters */
-        dsyevd_( &JOBZ, UPLO, &sz, Apod.get(), &lda, ww, &wkopt, &lwork, &iwkopt, &liwork, &info );
+        dsyevd_( &JOBZ, UPLO, &sz, Apod.get(), &lda, ww.get(), &wkopt, &lwork, &iwkopt, &liwork, &info );
         stringstream strm;
         if (info < 0) {
             strm << "Error calling DSYEVD to determine workspace parameters. Error was in Argument " << info*(-1) << "." << endl;
@@ -56,7 +56,7 @@ namespace blitzdg {
         unique_ptr<index_type[]> iwork(new index_type[liwork]());
 
         /* Solve eigenproblem */
-        dsyevd_( &JOBZ, UPLO, &sz, Apod.get(), &lda, ww, work.get(), &lwork, iwork.get(), &liwork, &info );
+        dsyevd_( &JOBZ, UPLO, &sz, Apod.get(), &lda, ww.get(), work.get(), &lwork, iwork.get(), &liwork, &info );
         if (info < 0) {
             strm << "Error calling DSYEVD. Error was in Argument " << info*(-1) << "." << endl;
             throw runtime_error(strm.str());
