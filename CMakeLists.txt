@@ -25,7 +25,7 @@ find_library(SUITESPARSECONFIG NAMES "suitesparseconfig" "libsuitesparseconfig" 
 find_library(LAPACK NAMES "liblapack" "lapack" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 find_library(BLAS NAMES "libblas" "blas" "libblas" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 
-find_library(PYTHON3 NAMES "python3" "libpython3" "python3.7" "libpython3.7" "python3.6" "libpython3.6" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu" "/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu" "lib")
+find_library(PYTHON3 NAMES "python3" "libpython3" "python3.7" "libpython3.7" "libpython37" "python3.6" "libpython3.6" "libpython36" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu" "/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu" "lib")
 find_library(BOOSTPYTHON NAMES "boost_python3-vc140-mt-1_60" "libboost_python3" "boost_python3" "libboost_python3,7" "boost_python3.7" "boost_python3.6" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu" "/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu" "lib")
 find_library(BOOSTNUMPY NAMES "boost_numpy3-vc140-mt-1_60" "libboost_numpy3" "boost_numpy3" "libboost_numpy37" "boost_numpy37" "boost_numpy36" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 
