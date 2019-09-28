@@ -5,6 +5,13 @@ from distutils.core import Extension
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+pyblitzdg = Extension('pyblitzdg',
+                        sources=['src/pyblitzdg/pyblitzdg.cpp'],
+                        include_dirs=['/usr/local/include', 'include'],
+                        library_dirs=['/usr/local/lib/boost', '/usr/local/lib', 'lib'],
+                        runtime_library_dirs=['/usr/local/lib/boost'],
+                        libraries=['boost_python3', 'blitzdg', 'blitz'])
+
 setuptools.setup(
      name='pyblitzdg',  
      version='0.1.5',
