@@ -11,39 +11,70 @@ set (CMAKE_CXX_LINK_FLAGS "-Wl,-soname=pyblitzdg.so")
 set (CMAKE_CXX_STANDARD "14")
 set (CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS on)
 
-
-# include path: "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\Tools\MSVC\14.20.27508\include\vcruntime.h"
-# Link to vtk using static mode (otherwise won't work on windows)
-add_compile_definitions(VTKCOMMONCORE_STATIC_DEFINE 
-  VTKCOMMONEXECUTIONMODEL_STATIC_DEFINE 
-  VTKIOGEOMETRY_STATIC_DEFINE 
-  VTKCOMMONDATAMODEL_STATIC_DEFINE 
-  VTKIOXML_STATIC_DEFINE
-  VTKRENDERINGCORE_STATIC_DEFINE
-  )
-
 set(CMAKE_FIND_LIBRARY_PREFIXES "" "lib")
-set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib" ".a"  ".so")
-message("--looking in lib")
-find_library(BLITZ NAMES "blitz" "libblitz" PATHS "lib")
-find_library(METIS NAMES "metis" "libmetis" PATHS "lib")
-find_library(UMFPACK NAMES "umfpack" "libumfpack" PATHS "lib")
-find_library(CXSPARSE NAMES "cxsparse" "libcxsparse" PATHS "lib")
-find_library(AMD NAMES "amd" "libamd" PATHS "lib")
-find_library(CHOLMOD names "cholmod" "libcholmod" PATHS "lib")
-find_library(COLAMD names "colamd" "libcolamd" PATHS "lib")
-find_library(SUITESPARSECONFIG NAMES "suitesparseconfig" "libsuitesparseconfig" PATHS "lib")
+set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib" ".so" ".a")
+find_library(BLITZ NAMES "blitz" "libblitz" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+find_library(METIS NAMES "metis" "libmetis" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+find_library(UMFPACK NAMES "umfpack" "libumfpack" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+find_library(CXSPARSE NAMES "cxsparse" "libcxsparse" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+find_library(AMD NAMES "amd" "libamd" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+find_library(CHOLMOD names "cholmod" "libcholmod" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+find_library(COLAMD names "colamd" "libcolamd" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+find_library(SUITESPARSECONFIG NAMES "suitesparseconfig" "libsuitesparseconfig" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 
-find_library(LAPACK NAMES "liblapack" "lapack" PATHS "lib")
-find_library(BLAS NAMES "libblas" "blas" PATHS "lib")
+find_library(LAPACK NAMES "liblapack" "lapack" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+find_library(BLAS NAMES "libblas" "blas" "libblas" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 
-find_library(PYTHON37 NAMES "python37" "libpython37" PATHS "lib") 
-find_library(BOOSTPYTHON NAMES "boost_python3-vc140-mt-1_60" PATHS "lib")
-find_library(BOOSTNUMPY NAMES "boost_numpy3-vc140-mt-1_60" PATHS "lib")
+find_library(PYTHON3 NAMES "python3" "libpython3" "python3.7" "libpython3.7" "python3.6" "libpython3.6" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu" "/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu" "lib")
+find_library(BOOSTPYTHON NAMES "boost_python3-vc140-mt-1_60" "libboost_python3" "boost_python3" "libboost_python3,7" "boost_python3.7" "boost_python3.6" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu" "/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu" "lib")
+find_library(BOOSTNUMPY NAMES "boost_numpy3-vc140-mt-1_60" "libboost_numpy3" "boost_numpy3" "libboost_numpy37" "boost_numpy37" "boost_numpy36" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 
+find_library(VTKIOXML7 NAMES "vtkIOXML-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+find_library(VTKCOMMONCORE7 NAMES "vtkCommonCore-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+find_library(VTKCOMMONEXECUTIONMODEL7 NAMES "vtkCommonExecutionModel-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+find_library(VTKCOMMONDATAMODEL7 NAMES "vtkCommonDataModel-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+find_library(VTKCOMMONMISC7 NAMES "vtkCommonMisc-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+find_library(VTKCOMMONSYSTEM7 NAMES "vtkCommonSystem-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+find_library(VTKCOMMONTRANSFORMS7 NAMES "vtkCommonTransforms-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+find_library(VTKIOCORE7 NAMES "vtkIOCore-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+find_library(VTKIOGEOMETRY7 NAMES "vtkIOGeometry-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+find_library(VTKIOXML7 NAMES "vtkIOXML-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+find_library(VTKIOXMLPARSER7 NAMES "vtkIOXMLParser-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+find_library(VTKSYS7 NAMES "vtksys-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+
+if (WIN32)
+    find_library(VTKZLIB7 NAMES "vtkzlib-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+    find_library(VTKEXPAT7 NAMES "vtkexpat-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+    message("-- found ${VTKZLIB7}")
+    message("-- found ${VTKEXPAT7}")
+endif()
+
+message("-- found ${BLITZ}")
+message("-- found ${METIS}")
+message("-- found ${UMFPACK}")
+message("-- found ${CXSPARSE}")
+message("-- found ${AMD}")
+message("-- found ${CHOLMOD}")
+message("-- found ${COLAMD}")
+message("-- found ${SUITESPARSECONFIG}")
+message("-- found ${LAPACK}")
+message("-- found ${BLAS}")
+message("-- found ${PYTHON3}")
 message("-- found ${BOOSTNUMPY}")
 message("-- found ${BOOSTPYTHON}")
-message("-- found ${PYTHON37}")
+message("-- found ${VTKIOXML7}")
+message("-- found ${VTKCOMMONCORE7}")
+message("-- found ${VTKCOMMONEXECUTIONMODEL7}")
+message("-- found ${VTKCOMMONDATAMODEL7}")
+message("-- found ${VTKCOMMONMISC7}")
+message("-- found ${VTKCOMMONSYSTEM7}")
+message("-- found ${VTKCOMMONTRANSFORMS7}")
+message("-- found ${VTKIOCORE7}")
+message("-- found ${VTKIOGEOMETRY7}")
+message("-- found ${VTKIOXML7}")
+message("-- found ${VTKIOXMLPARSER7}")
+message("-- found ${VTKSYS7}")
+
 set (CMAKE_CXX_FLAGS "-Wall -std=c++11 -fPIC")
 set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2 -L/usr/lib/vtk")
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage -DBZ_DEBUG")
@@ -51,7 +82,7 @@ include_directories ("include" "include/igloo" "/usr/include/python3.6m/")
 
 set (pyblitzdg_VERSION_MAJOR 0)
 set (pyblitzdg_VERSION_MINOR 1)
-set (pyblitzdg_VERSION_PATCH 2)
+set (pyblitzdg_VERSION_PATCH 5)
 set (DISABLE_SOLVER_BUILDS on)
 
 link_libraries(
@@ -67,25 +98,21 @@ link_libraries(
     ${SUITESPARSECONFIG}
     ${BOOSTPYTHON}
     ${BOOSTNUMPY}
-    #${GFORTRAN}
-    #${QUADMATH}
-    ${PYTHON37}
-    #boost_python3
-    #boost_numpy3
-    lib/vtkIOXML-7.1
-    lib/vtkCommonCore-7.1
-    lib/vtkCommonExecutionModel-7.1
-    lib/vtkCommonDataModel-7.1
-    lib/vtkCommonMisc-7.1
-    lib/vtkCommonSystem-7.1
-    lib/vtkCommonTransforms-7.1
-    lib/vtkexpat-7.1
-    lib/vtkIOCore-7.1
-    lib/vtkIOGeometry-7.1
-    lib/vtkIOXML-7.1
-    lib/vtkIOXMLParser-7.1
-    lib/vtksys-7.1
-    lib/vtkzlib-7.1
+    ${PYTHON3}
+    ${VTKIOXML7}
+    ${VTKCOMMONCORE7}
+    ${VTKCOMMONEXECUTIONMODEL7}
+    ${VTKCOMMONDATAMODEL7}
+    ${VTKCOMMONMISC7}
+    ${VTKCOMMONSYSTEM7}
+    ${VTKCOMMONTRANSFORMS7}
+    ${VTKIOCORE7}
+    ${VTKIOGEOMETRY7}
+    ${VTKIOXML7}
+    ${VTKIOXMLPARSER7}
+    ${VTKSYS7}
+    ${VTKZLIB7}
+    ${VTKEXPAT7}
 )
 
 project(blitzdg)
@@ -98,6 +125,15 @@ set_target_properties(blitzdg
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
     )
 
+# Link to vtk using static mode (otherwise won't work on windows)
+target_compile_definitions(blitzdg PUBLIC "VTKCOMMONCORE_STATIC_DEFINE"
+  "VTKCOMMONEXECUTIONMODEL_STATIC_DEFINE"
+  "VTKIOGEOMETRY_STATIC_DEFINE"
+  "VTKCOMMONDATAMODEL_STATIC_DEFINE"
+  "VTKIOXML_STATIC_DEFINE"
+  "VTKRENDERINGCORE_STATIC_DEFINE"
+  )
+
 project(pyblitzdg)
 
 file (GLOB sources src/pyblitzdg/*.cpp)
@@ -109,6 +145,16 @@ set_target_properties(pyblitzdg
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
     )
 set_target_properties(pyblitzdg PROPERTIES PREFIX "")
+
+# Link to vtk using static mode (otherwise won't work on windows)
+target_compile_definitions(pyblitzdg PUBLIC "VTKCOMMONCORE_STATIC_DEFINE"
+  "VTKCOMMONEXECUTIONMODEL_STATIC_DEFINE" 
+  "VTKIOGEOMETRY_STATIC_DEFINE"
+  "VTKCOMMONDATAMODEL_STATIC_DEFINE"
+  "VTKIOXML_STATIC_DEFINE"
+  "VTKRENDERINGCORE_STATIC_DEFINE"
+  )
+
 
 # link all projets below to blitzdg.
 link_libraries(
