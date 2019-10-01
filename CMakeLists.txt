@@ -219,6 +219,16 @@ link_libraries(
     pyblitzdg
 )
 
+project(poisson2d)
+file (GLOB sources src/poisson2d/*.cpp)
+add_executable(poisson2d ${sources})
+set_target_properties(poisson2d
+    PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    )
+
 if(NOT DISABLE_SOLVER_BUILDS)
     project(advec1d)
     file (GLOB sources src/advec1d/*.cpp)

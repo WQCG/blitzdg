@@ -100,7 +100,6 @@ int main(int argc, char **argv) {
 	vectorToFull(outVec, soln, false);
 
 	cout << "K: " << K << "\n";
-	cout << "r0: " << r0 << "\n";
 
 	cout << "result is " << result << "\n";
 
