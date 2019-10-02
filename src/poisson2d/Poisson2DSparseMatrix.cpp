@@ -3,6 +3,7 @@
 #include "Nodes1DProvisioner.hpp"
 #include "MeshManager.hpp"
 #include "VandermondeBuilders.hpp"
+#include "BCtypes.hpp"
 
 using blitz::Range;
 
@@ -16,13 +17,13 @@ namespace blitzdg{
         const real_matrix_type& ry = dg.ry();
         const real_matrix_type& sx = dg.sx();
         const real_matrix_type& sy = dg.sy();
-        const real_matrix_type& J  = dg.jacobian();
         const real_matrix_type& Fscale = dg.fscale();
 
         const real_matrix_type& Vinv = dg.Vinv();
 
         const index_vector_type& EToE = mshManager.get_EToE();
         const index_vector_type& EToF = mshManager.get_EToF();
+        const index_vector_type& BCType = mshManager.get_BCType();
 
         blitz::firstIndex ii;
         blitz::secondIndex jj;
@@ -51,7 +52,7 @@ namespace blitzdg{
         VandermondeBuilders vandermonde;
 
         const real_vector_type& r = dg.r(), s = dg.s();
-        const real_vector_type& nx = dg.nx(), ny  = dg.ny();
+        const real_matrix_type& nx = dg.nx(), ny  = dg.ny();
 
         real_vector_type edge(Nfp, 1);
         for (index_type i=0; i < Nfp; ++i)
@@ -119,15 +120,15 @@ namespace blitzdg{
                 for (index_type j=0; j < Nfp; ++j) {
                     vidM(j) = vmapM(fidM(j));
                     vidP(j) = vmapP(fidM(j));
-                    Fm1(j) = vidM % Np;
-                    Fm2(j) = vidP % Np;
+                    Fm1(j) = vidM(j) % Np;
+                    Fm2(j) = vidP(j) % Np;
                 }
 
                 index_type id = f1*Nfp + k1*Nfp*Nfaces;
                 real_type lnx = nx(id), lny = ny(id),
                     lsJ = std::sqrt(nx(id)*nx(id)+ny(id)*ny(id));
 
-                real_type hinv = std::max(Fscale(f1*Nfp, k1), Fscale(f2*Nfp, k2))
+                real_type hinv = std::max(Fscale(f1*Nfp, k1), Fscale(f2*Nfp, k2));
                 real_matrix_type Dx2(Np, Np), Dy2(Np, Np);
 
                 Dx2 = rx(1, k2)*Dr + sx(1, k2)*Ds;
@@ -142,37 +143,40 @@ namespace blitzdg{
 
                 real_type gtau = 100*2*(N+1)*(N+1)*hinv; // set penalty scaling
 
-                switch(BCType(k1,f1)) {
-                case bcType::Dirichlet:
+                switch(BCType(Nfaces*k1 +f1)) {
+                case BCTag::Dirichlet:
                     OP11 += ( gtau*mmE - blitz::sum(mmE(ii,kk)*Dn1(kk,jj), kk) - blitz::sum(Dn1(kk,ii)*mmE(kk,jj), kk) ); // ok
                     break;
-                case bcType::Neuman:
-                case bcType::Wall:
+                case BCTag::Neuman:
+                case BCTag::Wall:
                 default:
+                    // interior face variational terms
+                    OP11 += + 0.5*( gtau*mmE - blitz::sum(mmE(ii,kk)*Dn1(kk,jj), kk) - blitz::sum(Dn1(kk,ii)*mmE(kk,jj), kk) );
 
+
+                    real_matrix_type OP12(Np, Np);
+
+                    for (index_type i=0; i < Np; ++i) {
+                        for (index_type j=0; j < Np; ++j) {
+                            OP12(i, Fm2(j)) =             - 0.5*( gtau*mmE(i, Fm1(j)) );  
+                            OP12(Fm1(j), i) += - 0.5*(      mmE(Fm1(j),Fm1(j))*Dn2(Fm2(j), i));  
+                            OP12(i, Fm2(j)) += - 0.5*(-Dn1(i, j)*mmE(i, Fm1(j)));                        }
+                    }
+                    for (index_type j=0; j < Np*Np; ++j) {
+                        OP(entries(3*j),   3*j)   = rows1(j);
+                        OP(entries(3*j+1), 3*j+1) = cols2(j);
+                        OP(entries(3*j+2), 3*j+2) = OP12(j); 
+                    }
+                    entries += Np*Np;
                 }
-
-                // interior face variational terms
-                OP11 += + 0.5*( gtau*mmE - blitz::sum(mmE(ii,kk)*Dn1(kk,jj), kk) - blitz::sum(Dn1(kk,ii)*mmE(kk,jj), kk) );
-
-
-                real_matrix_type OP12(Np, Np);
-
-                for (index_type j=0; j < Np; ++j) {
-                    OP12(Range::all(), Fm2(j)) =             - 0.5*( gtau*mmE(Range::all(),Fm1(j)) );  
-                    OP12(Fm1(j), Range::all()) += - 0.5*(      mmE(Fm1(j),Fm1(j))*Dn2(Fm2(j), Range::all()));  
-                    OP12(Range::all(), Fm2(j)) += - 0.5*(-blitz::sum(Dn1(kk, jj)*mmE(Range::all(), Fm1(j)) (kk), kk) ); /// fix this!!
-                }
-                OP(entries(:), :) = [rows1(:), cols2(:), OP12(:)]; */
-
-                entries += Np*Np;
-  
             }
 
-
-
-
-
+            for (index_type j=0; j < Np*Np; ++j) {
+                OP(entries(3*j),   3*j)   = rows1(j);
+                OP(entries(3*j+1), 3*j+1) = cols1(j);
+                OP(entries(3*j+2), 3*j+2) = OP11(j);
+            }
+            entries += Np*Np;
 
         }
 
