@@ -1,11 +1,17 @@
+
 #include "Poisson2DSparseMatrix.hpp"
+#include "SparseTriplet.hpp"
 #include "CSCMatrix.hpp"
 #include "Nodes1DProvisioner.hpp"
 #include "MeshManager.hpp"
 #include "VandermondeBuilders.hpp"
 #include "BCtypes.hpp"
+#include "Types.hpp"
 
 using blitz::Range;
+using boost::python::numpy::ndarray;
+using boost::python::numpy::zeros;
+using boost::python::numpy::dtype;
 
 namespace blitzdg{
     Poisson2DSparseMatrix::Poisson2DSparseMatrix(DGContext2D& dg, MeshManager& mshManager) {
@@ -18,6 +24,7 @@ namespace blitzdg{
         const real_matrix_type& sx = dg.sx();
         const real_matrix_type& sy = dg.sy();
         const real_matrix_type& Fscale = dg.fscale();
+        const real_matrix_type& J      = dg.jacobian();
 
         const real_matrix_type& Vinv = dg.Vinv();
 
@@ -74,7 +81,8 @@ namespace blitzdg{
         massEdge(Range::all(), Range::all(), 2) = blitz::sum(V1Dinv(kk,ii)*V1Dinv(kk,jj), kk);
 
         // allocate storage for sparse matrix entries. 
-        real_matrix_type MM(K*Np,Np, 3), OP(K*Np*Np*(1+Nfaces), 3);
+        SparseTriplet MM(Np*K, Np*K, Np*Np*K),
+            OP(Np*K, Np*K, (1+Nfaces)*Np*Np*K);
 
         index_vector_type entries(Np*Np, 1), entriesMM(Np*Np, 1);
 
@@ -98,10 +106,11 @@ namespace blitzdg{
             real_matrix_type OP11(Np, Np), tmp(Np, Np);
 
             // OP11 = J(1,k1)*(Dx'*MassMatrix*Dx + Dy'*MassMatrix*Dy);
-            tmp  = blitz::sum(Dx(kk, ii)*MassMatrix(kk, jj), kk);
-            OP11 = blitz::sum(tmp(ii, kk)*Dx(kk, jj), kk);
-            tmp  = blitz::sum(Dy(kk, ii)*MassMatrix(kk, jj), kk);
-            OP11+= blitz::sum(tmp(ii, kk)*Dy(kk, jj), kk);
+            tmp   = blitz::sum(Dx(kk, ii)*MassMatrix(kk, jj), kk);
+            OP11  = blitz::sum(tmp(ii, kk)*Dx(kk, jj), kk);
+            tmp   = blitz::sum(Dy(kk, ii)*MassMatrix(kk, jj), kk);
+            OP11 += blitz::sum(tmp(ii, kk)*Dy(kk, jj), kk);
+            OP11 *= J(1, k);
 
             const index_type k1 = k;
             for (index_type f1=0; f1 < Nfaces; ++f1) {
@@ -162,37 +171,71 @@ namespace blitzdg{
                             OP12(Fm1(j), i) += - 0.5*(      mmE(Fm1(j),Fm1(j))*Dn2(Fm2(j), i));  
                             OP12(i, Fm2(j)) += - 0.5*(-Dn1(i, j)*mmE(i, Fm1(j)));                        }
                     }
-                    for (index_type j=0; j < Np*Np; ++j) {
-                        OP(entries(3*j),   3*j)   = rows1(j);
-                        OP(entries(3*j+1), 3*j+1) = cols2(j);
-                        OP(entries(3*j+2), 3*j+2) = OP12(j); 
+                    for (index_type j=0; j < Np*Np; ++j) { 
+                        OP.insert(rows1(j), cols2(j), OP12(j));
                     }
                     entries += Np*Np;
                 }
             }
 
             for (index_type j=0; j < Np*Np; ++j) {
-                OP(entries(3*j),   3*j)   = rows1(j);
-                OP(entries(3*j+1), 3*j+1) = cols1(j);
-                OP(entries(3*j+2), 3*j+2) = OP11(j);
+                tmp = J(1, k)*MassMatrix;
+                OP.insert(rows1(j), cols1(j), OP11(j));
+                MM.insert(rows1(j), cols1(j), tmp(j));
             }
             entries += Np*Np;
-
+            entriesMM += Np*Np;
         }
 
 
+        OP_ = std::make_unique<CSCMat>(OP);
+        MM_ = std::make_unique<CSCMat>(MM);
 
+    }
 
+    const ndarray Poisson2DSparseMatrix::getOP_numpy() const {
+        Py_intptr_t shape[2] = { OP_->nnz(), 3 };
+        ndarray result = zeros(2, shape, dtype::get_builtin<real_type>());
 
+        real_type *raw = reinterpret_cast<real_type*>(result.get_data());
+        index_type colStart = 0;
+        
+        index_type count = 0;
+        for (index_type j=0; j < OP_->nnz(); ++j) {
+            index_type& colEnd = OP_->colPtrs(j);
 
-    } 
+            for (index_type c = colStart; c < colEnd; ++c ) {
+                raw[3*count]   = OP_->rowInds(j);
+                raw[3*count+1] = c;
+                raw[3*count+2] = OP_->elems(j);
+                ++count;
+            }
+            // update left-hand bracket for next iteration.
+            colStart = colEnd;
+        }
+        return result; 
+    }
+
+    const ndarray Poisson2DSparseMatrix::getMM_numpy() const {
+        Py_intptr_t shape[2] = { MM_->nnz(), 3 };
+        ndarray result = zeros(2, shape, dtype::get_builtin<real_type>());
+
+        real_type *raw = reinterpret_cast<real_type*>(result.get_data());
+        index_type colStart = 0;
+        
+        index_type count = 0;
+        for (index_type j=0; j < MM_->nnz(); ++j) {
+            index_type& colEnd = MM_->colPtrs(j);
+
+            for (index_type c = colStart; c < colEnd; ++c ) {
+                raw[3*count]   = MM_->rowInds(j);
+                raw[3*count+1] = c;
+                raw[3*count+2] = MM_->elems(j);
+                ++count;
+            }
+            // update left-hand bracket for next iteration.
+            colStart = colEnd;
+        }
+        return result; 
+    }
 }
-
-/*
-massEdge = zeros(Np,Np,Nfaces);
-Fm = Fmask(:,1); faceR = r(Fm); 
-V1D = Vandermonde1D(N, faceR);  massEdge(Fm,Fm,1) = inv(V1D*V1D');
-Fm = Fmask(:,2); faceR = r(Fm); 
-V1D = Vandermonde1D(N, faceR);  massEdge(Fm,Fm,2) = inv(V1D*V1D');
-Fm = Fmask(:,3); faceS = s(Fm); 
-V1D = Vandermonde1D(N, faceS);  massEdge(Fm,Fm,3) = inv(V1D*V1D'); */
