@@ -239,7 +239,7 @@ namespace blitzdg{
     }
 
     const ndarray Poisson2DSparseMatrix::getMM_numpy() const {
-        Py_intptr_t shape[2] = { MM_->nnz(), 3 }; // 4* shouldn't be needed...
+        Py_intptr_t shape[2] = { MM_->nnz(), 3 };
         ndarray result = zeros(2, shape, dtype::get_builtin<real_type>());
 
         real_type *raw = reinterpret_cast<real_type*>(result.get_data());
