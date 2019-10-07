@@ -52,6 +52,7 @@ namespace blitzdg{
         const index_matrix_type& Fmask = dg.fmask();
 
         real_tensor3_type massEdge(Np, Np, Nfaces);
+        massEdge = 0.0;
 
         Nodes1DProvisioner nodes1d(Nfp-1, 1, -1., 1.);
 
@@ -82,7 +83,6 @@ namespace blitzdg{
         for (index_type i=0; i < Nfp; ++i) {
             edge2(i) = r(Fmask(i, 1));
         }
-
 
         vandermonde.computeVandermondeMatrix(edge2, V1D2, V1Dinv2);
         myTemp = blitz::sum(V1Dinv2(kk,ii)*V1Dinv2(kk,jj), kk);
@@ -146,20 +146,20 @@ namespace blitzdg{
                 // check this, modified for zero-based indices.
                 cols2 = rows2(jj, ii);
 
-                index_vector_type fidM(Nfp), vidM(Nfp), vidP(Nfp),
+                index_vector_type vidM(Nfp), vidP(Nfp),
                     Fm1(Nfp), Fm2(Nfp);
 
-                fidM = ii*Nfp*Nfaces*k;
                 for (index_type j=0; j < Nfp; ++j) {
-                    vidM(j) = vmapM(fidM(j));
-                    vidP(j) = vmapP(fidM(j));
+                    index_type fidM = Nfp*Nfaces*k + f1*Nfp + j;
+                    vidM(j) = vmapM(fidM);
+                    vidP(j) = vmapP(fidM);
                     Fm1(j) = vidM(j) % Np;
                     Fm2(j) = vidP(j) % Np;
                 }
 
                 //index_type id = f1*Nfp + k1*Nfp*Nfaces;
                 real_type lnx = nx(f1*Nfp, k1), lny = ny(f1*Nfp, k1),
-                    lsJ = std::hypot(lnx*lnx, lny*lny);
+                      lsJ = Fscale(f1*Nfp, k1)*J(Fm1(1), k1);
 
                 real_type hinv = std::max(Fscale(f1*Nfp, k1), Fscale(f2*Nfp, k2));
                 real_matrix_type Dx2(Np, Np), Dy2(Np, Np);
@@ -174,7 +174,7 @@ namespace blitzdg{
                 real_matrix_type mmE(Np, Np);
                 mmE = lsJ * massEdge(Range::all(), Range::all(), f1);
 
-                real_type gtau = 100*2*(N+1)*(N+1)*hinv; // set penalty scaling
+                real_type gtau = 100*100*2*(N+1)*(N+1)*hinv; // set penalty scaling
 
                 switch(BCType(Nfaces*k1 +f1)) {
                 case BCTag::Dirichlet:
@@ -187,17 +187,44 @@ namespace blitzdg{
                     OP11 += 0.5*( gtau*mmE(ii,jj) - blitz::sum(mmE(ii,kk)*Dn1(kk,jj), kk) - blitz::sum(Dn1(kk,ii)*mmE(kk,jj), kk) );
 
                     real_matrix_type OP12(Np, Np);
+                    OP12 = 0.0;
 
                     for (index_type i=0; i < Np; ++i) {
                         for (index_type j=0; j < Nfp; ++j) {
-                            OP12(i, Fm2(j)) =             - 0.5*( gtau*mmE(i, Fm1(j)) );  
-                            OP12(Fm1(j), i) += - 0.5*(      mmE(Fm1(j),Fm1(j))*Dn2(Fm2(j), i));  
-                            OP12(i, Fm2(j)) += - 0.5*(-Dn1(i, j)*mmE(i, Fm1(j)));
+                            OP12(i, Fm2(j)) +=             - 0.5*( gtau*mmE(i, Fm1(j)) );  
                         }
                     }
+
+                    // sliced temporaries
+                    real_matrix_type mmE_Fm1Fm1(Nfp, Nfp), Dn2_Fm2(Nfp, Np),
+                        mmE_Fm1(Np, Nfp), prod1(Nfp, Np), prod2(Np, Nfp);
+
+                    mmE_Fm1Fm1 = 0.0; Dn2_Fm2 = 0.0;
+                    mmE_Fm1 = 0.0;
+                    for (index_type i=0; i < Nfp; ++i) {
+                        for(index_type j=0; j < Nfp; ++j) {
+                            mmE_Fm1Fm1(i, j) = mmE(Fm1(i), Fm1(j));
+                        }
+                        for(index_type j=0; j < Np; ++j) {
+                            Dn2_Fm2(i, j) = Dn2(Fm2(i), j);
+                            mmE_Fm1(j, i) = mmE(j, Fm1(i));
+                        }
+                    }
+
+                    // products needed in the face-to-neighbour assembly.
+                    prod1 = blitz::sum(mmE_Fm1Fm1(ii, kk)*Dn2_Fm2(kk, jj), kk);
+                    prod2 = blitz::sum(-Dn1(kk, ii)*mmE_Fm1(kk, jj), kk);
+
+                    for (index_type i=0; i < Np; ++i) {
+                        for (index_type j=0; j < Nfp; ++j) {
+                            OP12(Fm1(j), i) += -0.5*prod1(j, i);
+                            OP12(i, Fm2(j)) += -0.5*prod2(i, j);
+                        }
+                    }
+
                     for (index_type i=0; i < Np; ++i) {
                         for (index_type j=0; j < Np; ++j) { 
-                            OP.insert(rows1(i,j), cols2(i,j), OP12(i,j));
+                            OP.insert(rows1(i, j), cols2(i, j), OP12(i, j));
                         }
                     }
                     entries += Np*Np;
@@ -207,8 +234,8 @@ namespace blitzdg{
             tmp = J(0, k)*MassMatrix;                    
             for (index_type i=0; i < Np; ++i ) {
                 for (index_type j=0; j < Np; ++j) {
-                    OP.insert(rows1(i,j), cols1(i,j), OP11(i,j));
-                    MM.insert(rows1(i,j), cols1(i,j), tmp(i,j));
+                    OP.insert(rows1(i, j), cols1(i, j), OP11(i,j));
+                    MM.insert(rows1(i, j), cols1(i, j), tmp(i,j));
                 }
             }
             entries += Np*Np;
@@ -250,7 +277,6 @@ namespace blitzdg{
                 raw[3*count]   = MM_->rowInds(k);
                 raw[3*count+1] = j;
                 raw[3*count+2] = MM_->elems(k);
-
                 ++count;
             }
         }

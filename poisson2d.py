@@ -7,7 +7,6 @@ See COPYING and LICENSE files at project root for more details.
 import numpy as np
 from pyblitzdg import pyblitzdg as dg
 import matplotlib.pyplot as plt
-from pprint import pprint
 from scipy.sparse import csc_matrix
 from scipy.sparse.linalg import splu as lu
 
@@ -22,7 +21,6 @@ ctx = nodes.dgContext()
 x = ctx.x
 y = ctx.y
 
-
 poisson2d = dg.Poisson2DSparseMatrix(ctx, meshManager)
 
 MM = poisson2d.getMM()
@@ -30,44 +28,53 @@ OP = poisson2d.getOP()
 
 # create scipy sparse mats
 dof = ctx.numLocalPoints*ctx.numElements
-MMsp = csc_matrix((MM[:, 2], (MM[:, 0], MM[:, 1])), shape=(dof, dof))
-OPsp = csc_matrix((OP[:, 2], (OP[:, 0], OP[:, 1])), shape=(dof, dof))
+MMsp = csc_matrix((MM[:, 2], (MM[:, 0], MM[:, 1])), shape=(dof, dof), dtype=np.dtype('Float64'))
 
+rows = OP[:, 0]
+cols = OP[:, 1]
+vals = OP[:, 2]
+
+# bordering trick - ensures Pure Neuman problem is solvable.
+for j in range(0, dof):
+    rows = np.append(rows, [dof])
+    cols = np.append(cols, [j])
+    vals = np.append(vals, [1.0])
+
+    cols = np.append(cols, [dof])
+    rows = np.append(rows, [j])
+    vals = np.append(vals, [1.0])
+
+cols = np.append(cols, [dof])
+rows = np.append(rows, [dof])
+vals = np.append(vals, [0.0])
+
+# Pass sparse triplet into csc_matrix constructor.
+OPsp = csc_matrix((vals, (rows, cols)), shape=(dof + 1, dof + 1))
 
 # factorize
-linSolver = lu(OPsp)
+linSolver = lu(-OPsp)
+
+# Define right-hand side; compute load vector (mass matrix times forcing).
+rhs1 = np.cos(np.pi*x, dtype=np.dtype('Float64') , order='C') * np.cos(np.pi*y, dtype=np.dtype('Float64') , order='C')
+rhs = rhs1.flatten('F')
+rhs = MMsp.dot(rhs)
+rhs = np.append(rhs, [0.0])
 
 # solve x = A \ b
-
-rhs = np.cos(x)*np.cos(y)
-rhs = rhs.flatten('F')
-
 soln = linSolver.solve(rhs)
+soln = np.reshape(soln[:-1], (ctx.numLocalPoints, ctx.numElements), order='F')
 
-print(soln)
+# Output solution statistics.
+print(f"max: {np.max(soln)}")
+print(f"min: {np.min(soln)}")
+print(f"mean: {np.sum(soln)/dof}")
 
-plt.figure()
-plt.spy(OPsp)
-plt.show()
+soln /= np.max(soln)
 
+fields = dict()
+# Need to ensure fields send to the outputter are Row-Major ('C'-ordering),
+# since blitzdg internally assumes they are.
+fields["u"] = np.array(soln, dtype=np.dtype('Float64'), order='C')
+fields["f"] = np.array(rhs1, dtype=np.dtype('Float64'), order='C') 
 outputter = dg.VtkOutputter(nodes)
-
-
-x = ctx.x
-y = ctx.y
-
-
-Np = ctx.numLocalPoints
-K = ctx.numElements
-
-Filt = ctx.filter
-
-eta = np.exp(-10*(x*x) -10*(y*y), dtype=np.dtype('Float64') , order='C')
-#eta = -1*(x/1500.0)
-u   = np.zeros([Np, K], dtype=np.dtype('Float64'), order='C')
-v   = np.zeros([Np, K], dtype=np.dtype('Float64'), order='C')
-H   = 10*np.ones([Np, K], dtype=np.dtype('Float64'), order='C')
-
-h = H + eta
-hu = h*u
-hv = h*v
+outputter.writeFieldsToFiles(fields, 0)
