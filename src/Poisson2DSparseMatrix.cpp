@@ -176,6 +176,7 @@ namespace blitzdg{
                     break;
                 case BCTag::Neuman:
                 case BCTag::Wall:
+                    break;
                 default:
                     // interior face variational terms
                     OP11 += 0.5*( gtau*mmE(ii,jj) - blitz::sum(mmE(ii,kk)*Dn1(kk,jj), kk) - blitz::sum(Dn1(kk,ii)*mmE(kk,jj), kk) );
