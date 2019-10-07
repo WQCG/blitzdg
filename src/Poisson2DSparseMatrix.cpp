@@ -113,11 +113,7 @@ namespace blitzdg{
         entries = ii;
         entriesMM = ii;
 
-        //CSCMat sparseMat(Np*K, Np*K, K*Np*Np*(1+Nfaces));
-
         for (index_type k=0; k < K; ++k) {
-            //rows1 = ((k1-1)*Np+1:k1*Np)'*ones(1,Np); cols1 = rows1';
-
             index_matrix_type rows1(Np, Np), cols1(Np, Np);
             rows1 = ((ii+Np*k) * (0*jj + 1));
             cols1 = rows1(jj, ii);
@@ -129,7 +125,7 @@ namespace blitzdg{
 
             real_matrix_type OP11(Np, Np), tmp(Np, Np);
 
-            // OP11 = J(1,k1)*(Dx'*MassMatrix*Dx + Dy'*MassMatrix*Dy);
+            // 'Volume' contribution.
             tmp   = blitz::sum(Dx(kk, ii)*MassMatrix(kk, jj), kk);
             OP11  = blitz::sum(tmp(ii, kk)*Dx(kk, jj), kk);
             tmp   = blitz::sum(Dy(kk, ii)*MassMatrix(kk, jj), kk);
@@ -143,7 +139,6 @@ namespace blitzdg{
 
                 index_matrix_type rows2(Np, Np), cols2(Np, Np);
                 rows2 = ((ii+ Np*k2) ) * (0*jj + 1);
-                // check this, modified for zero-based indices.
                 cols2 = rows2(jj, ii);
 
                 index_vector_type vidM(Nfp), vidP(Nfp),
@@ -157,7 +152,6 @@ namespace blitzdg{
                     Fm2(j) = vidP(j) % Np;
                 }
 
-                //index_type id = f1*Nfp + k1*Nfp*Nfaces;
                 real_type lnx = nx(f1*Nfp, k1), lny = ny(f1*Nfp, k1),
                       lsJ = Fscale(f1*Nfp, k1)*J(Fm1(1), k1);
 
@@ -195,7 +189,7 @@ namespace blitzdg{
                         }
                     }
 
-                    // sliced temporaries
+                    // sliced temporaries.
                     real_matrix_type mmE_Fm1Fm1(Nfp, Nfp), Dn2_Fm2(Nfp, Np),
                         mmE_Fm1(Np, Nfp), prod1(Nfp, Np), prod2(Np, Nfp);
 
@@ -211,7 +205,7 @@ namespace blitzdg{
                         }
                     }
 
-                    // products needed in the face-to-neighbour assembly.
+                    // products needed in the face-to-neighbour variational terms assembly.
                     prod1 = blitz::sum(mmE_Fm1Fm1(ii, kk)*Dn2_Fm2(kk, jj), kk);
                     prod2 = blitz::sum(-Dn1(kk, ii)*mmE_Fm1(kk, jj), kk);
 
