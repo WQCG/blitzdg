@@ -3,10 +3,12 @@
 
 #pragma once
 #include "Types.hpp"
+#include <boost/python/numpy.hpp>
 
 namespace blitzdg {
     class DGContext2D {
     private:
+        index_type N_;
         index_type Np_;
         index_type Nfp_;
         index_type K_;
@@ -37,6 +39,7 @@ namespace blitzdg {
         DGContext2D() = default;
         
         DGContext2D(
+            index_type order,
             index_type numLocalPoints,
             index_type numFacePoints,
             index_type numElems,
@@ -63,7 +66,7 @@ namespace blitzdg {
             index_vector_type* vmapM,
             index_vector_type* vmapP,
             index_hashmap* bcmap)
-            : Np_{ numLocalPoints }, Nfp_{ numFacePoints },
+            : N_{ order }, Np_{ numLocalPoints }, Nfp_{ numFacePoints },
             K_{ numElems }, NumFaces_{ numFaces },
             Filt_{ filter }, r_{ rgrid }, s_{ sgrid },  xGrid_{ xgrid }, yGrid_{ ygrid },
             Fscale_{ fscale }, Fmask_ { fmask }, V_ { vandermonde2d }, Vinv_ {vandermonde2dinv}, J_{ jacobian }, rx_{ rx },
@@ -71,6 +74,10 @@ namespace blitzdg {
             Dr_{ Dr }, Ds_{ Ds }, Lift_{ lift }, vmapM_{ vmapM },
             vmapP_{ vmapP }, bcHash_{ bcmap }
         {}
+
+        index_type order() const {
+            return N_;
+        }
         
         index_type numLocalPoints() const {
             return Np_;

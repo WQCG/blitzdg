@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 
 set (CMAKE_CONFIGURATION_TYPES "Win64")
 set (CMAKE_BUILD_TYPE Release) # or Debug
-set (CMAKE_CXX_FLAGS "-std=c++11 -fPIC")
+set (CMAKE_CXX_FLAGS "-std=c++14 -fPIC")
 set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2")
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage -DBZ_DEBUG")
 # set (CMAKE_MODULE_LINKER_FLAGS  "${CMAKE_MODULE_LINKER_FLAGS}")
@@ -72,7 +72,7 @@ message("-- found ${VTKIOXML7}")
 message("-- found ${VTKIOXMLPARSER7}")
 message("-- found ${VTKSYS7}")
 
-set (CMAKE_CXX_FLAGS "-Wall -std=c++11 -fPIC")
+set (CMAKE_CXX_FLAGS "-Wall -std=c++14 -fPIC")
 set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2")
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage -DBZ_DEBUG")
 include_directories ("include" "include/igloo" "/usr/include/python3.6m/")
@@ -218,6 +218,16 @@ link_libraries(
     blitzdg
     pyblitzdg
 )
+
+project(poisson2d)
+file (GLOB sources src/poisson2d/*.cpp)
+add_executable(poisson2d ${sources})
+set_target_properties(poisson2d
+    PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    )
 
 if(NOT DISABLE_SOLVER_BUILDS)
     project(advec1d)

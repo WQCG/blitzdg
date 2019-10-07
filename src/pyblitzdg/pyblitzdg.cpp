@@ -13,6 +13,7 @@
 #include "LSERK4.hpp"
 #include "MeshManager.hpp"
 #include "TriangleNodesProvisioner.hpp"
+#include "Poisson2DSparseMatrix.hpp"
 
 using namespace boost::python;
 using namespace boost::python::numpy;
@@ -105,6 +106,10 @@ BOOST_PYTHON_MODULE(pyblitzdg)
     class_<VtkOutputter>("VtkOutputter", init<TriangleNodesProvisioner&>())
         .def("writeFieldToFile", &VtkOutputter::writeFieldToFile_numpy)
         .def("writeFieldsToFiles", &VtkOutputter::writeFieldsToFiles_numpy);
+
+    class_<Poisson2DSparseMatrix, boost::noncopyable>("Poisson2DSparseMatrix", init<DGContext2D&, MeshManager&>())
+        .def("getOP", &Poisson2DSparseMatrix::getOP_numpy)
+        .def("getMM", &Poisson2DSparseMatrix::getMM_numpy);
 }
 
 
