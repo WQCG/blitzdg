@@ -55,7 +55,7 @@ OPsp = csc_matrix((vals, (rows, cols)), shape=(dof + 1, dof + 1))
 linSolver = lu(-OPsp)
 
 # Define right-hand side; compute load vector (mass matrix times forcing).
-rhs1 = np.cos(np.pi*x, dtype=np.dtype('Float64') , order='C') * np.cos(np.pi*y, dtype=np.dtype('Float64') , order='C')
+rhs1 = np.sin(0.5*np.pi*x, dtype=np.dtype('Float64') , order='C') * np.sin(0.5*np.pi*y, dtype=np.dtype('Float64') , order='C')
 rhs = rhs1.flatten('F')
 rhs = MMsp.dot(rhs)
 rhs = np.append(rhs, [0.0])
@@ -68,8 +68,6 @@ soln = np.reshape(soln[:-1], (ctx.numLocalPoints, ctx.numElements), order='F')
 print(f"max: {np.max(soln)}")
 print(f"min: {np.min(soln)}")
 print(f"mean: {np.sum(soln)/dof}")
-
-soln /= np.max(soln)
 
 fields = dict()
 # Need to ensure fields send to the outputter are Row-Major ('C'-ordering),
