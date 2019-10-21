@@ -12,6 +12,7 @@
 #include "CSVFileReader.hpp"
 #include <memory>
 #include <string>
+#include <boost/python/numpy.hpp>
 
 namespace blitzdg {
   /**
@@ -204,6 +205,13 @@ namespace blitzdg {
        * for distributed computing with MPI.
        */
       const index_vector_type& get_VertexPartitionMap() const;
+
+      boost::python::numpy::ndarray get_VertexPartitionMap_numpy() const;
+      boost::python::numpy::ndarray get_ElementPartitionMap_numpy() const;
+      boost::python::numpy::ndarray get_Elements_numpy() const;
+      boost::python::numpy::ndarray get_Vertices_numpy() const;
+
+      void buildMesh(boost::python::numpy::ndarray EToV, boost::python::numpy::ndarray Vert);
 
       /**
        * Write the vertices to the console.

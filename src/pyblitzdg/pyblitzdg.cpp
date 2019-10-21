@@ -74,7 +74,13 @@ BOOST_PYTHON_MODULE(pyblitzdg)
 
     class_<MeshManager, boost::noncopyable>("MeshManager", init<>())
         .def("readMesh", &MeshManager::readMesh)
-        .add_property("numElements", &MeshManager::get_NumElements);
+        .def("partitionMesh", &MeshManager::partitionMesh)
+        .def("buildMesh", &MeshManager::buildMesh)
+        .add_property("vertexPartitionMap", &MeshManager::get_VertexPartitionMap_numpy)
+        .add_property("elementPartitionMap", &MeshManager::get_ElementPartitionMap_numpy)
+        .add_property("numElements", &MeshManager::get_NumElements)
+        .add_property("vertices", &MeshManager::get_Vertices_numpy)
+        .add_property("elements", &MeshManager::get_Elements_numpy);
 
     class_<TriangleNodesProvisioner, boost::noncopyable>("TriangleNodesProvisioner", init<index_type, MeshManager&>())
         .def("buildFilter", &TriangleNodesProvisioner::buildFilter)

@@ -7,6 +7,8 @@
 #include "CSCMatrix.hpp"
 #include "BCtypes.hpp"
 #include <boost/algorithm/string.hpp>
+#include <boost/python/numpy.hpp>
+#include <boost/python/stl_iterator.hpp>
 #include <metis.h>
 #include <cmath>
 #include <fstream>
@@ -18,7 +20,10 @@
 using boost::algorithm::is_any_of;
 using boost::algorithm::split;
 using boost::algorithm::trim;
+using boost::python::stl_input_iterator;
 using boost::token_compress_on;
+using boost::python::numpy::ndarray;
+using boost::python::numpy::dtype;
 using std::cout;
 using std::endl;
 using std::getline;
@@ -53,7 +58,6 @@ namespace blitzdg {
         ElementPartitionMap{ nullptr }, VertexPartitionMap{ nullptr }
     {}
 
-
     std::vector<index_type> MeshManager::parseElem(const std::vector<string>& input) {
 
         std::vector<index_type> elems;
@@ -63,6 +67,56 @@ namespace blitzdg {
             elems.push_back(std::stoi(s));
 
         return elems;
+    }
+
+    void MeshManager::buildMesh(ndarray EToVnp, ndarray Vertnp) {
+        Dim = Vertnp.shape(1);
+        NumVerts = Vertnp.shape(0);
+
+        NumFaces = EToVnp.shape(1);
+        NumElements = EToVnp.shape(0);
+
+        EToV = std::make_unique<index_vector_type>(NumElements*NumFaces);
+        Vert = std::make_unique<real_vector_type>(Dim*NumVerts);
+        BCType = std::make_unique<index_vector_type>(NumElements*NumFaces);
+        EToE = std::make_unique<index_vector_type>(NumElements*NumFaces);
+        EToF = std::make_unique<index_vector_type>(NumElements*NumFaces);
+
+        auto vertRawData = std::vector<real_type>(reinterpret_cast<real_type*>(Vertnp.get_data()), reinterpret_cast<real_type*>(Vertnp.get_data() + 8*Dim*NumVerts));
+        auto eToVRawData = std::vector<real_type>(reinterpret_cast<real_type*>(EToVnp.get_data()), reinterpret_cast<real_type*>(EToVnp.get_data() + 8*NumElements*NumFaces));
+
+        std::copy(vertRawData.begin(), vertRawData.end(), reinterpret_cast<real_type*>(Vert->data()));
+        std::copy(eToVRawData.begin(), eToVRawData.end(), reinterpret_cast<index_type*>(EToV->data()));
+
+        // deal with tricky conversion.
+        index_vector_type& E2V = *EToV;
+        real_vector_type& Vref = *Vert;
+        for (index_type i=0; i < NumElements*NumFaces; ++i) {
+            E2V(i) = static_cast<index_type>(eToVRawData[i]);
+        }
+
+        std::cout << "E2V:" << E2V << "\n";
+
+    
+        for (index_type k=0; k < NumElements; ++k) {
+            std::cout << k << ", " << E2V(NumFaces*k) << "\n";
+            // Enforce counter-clockwise ordering of vertices in EToV table.
+            real_type ax = Vref(E2V(NumFaces*k)*NumFaces),   ay = Vref(E2V(NumFaces*k)*NumFaces+1);
+            real_type bx = Vref(E2V(NumFaces*k+1)*NumFaces), by = Vref(E2V(NumFaces*k+1)*NumFaces+1);
+            real_type cx = Vref(E2V(NumFaces*k+2)*NumFaces), cy = Vref(E2V(NumFaces*k+2)*NumFaces+1);
+
+            real_type det = (ax-cx)*(by-cy) - (bx-cx)*(ay-cy);
+
+            if (det < 0) {
+                using std::swap;
+                swap(E2V(NumFaces*k+1), E2V(NumFaces*k+2));
+            }
+        }
+
+        buildConnectivity();
+        
+        // this is still a hack, but okay.
+        buildBCTable(BCTag::Wall);
     }
 
     void MeshManager::readMesh(const string& gmshInputFile) {
@@ -106,7 +160,7 @@ namespace blitzdg {
         csvReader.setNumCols(4);
 
         // Allocate storage for Vertices.
-        index_type Dim = 3;
+        Dim = 3;
         Vert = real_vec_smart_ptr(new real_vector_type(NumVerts*Dim));
 
         real_vector_type& Vref = *Vert;
@@ -336,7 +390,8 @@ namespace blitzdg {
             }
         }
         VToF.colPtrs(totalFaces) = nnz;
-        CSCMat FToF = multiply(transpose(VToF), VToF);
+        CSCMat FToV = transpose(VToF);
+        CSCMat FToF = multiply(FToV, VToF);
 
         // Count the number of face-to-face connections.
         index_type connectionsCount = 0;
@@ -453,14 +508,6 @@ namespace blitzdg {
             cout << "Unknown METIS error: " << result << endl;
 
         cout << "total communication volume of partition: " << objval << endl;
-
-        cout << "Element partitioning vector: " << endl;
-        for (index_type i = 0; i < NumElements; ++i)
-            cout << (*ElementPartitionMap)(i) << endl;
-
-        cout << "Vertex partitioning vector: " << endl;
-        for (index_type i = 0; i < NumVerts; ++i)
-            cout << (*VertexPartitionMap)(i) << endl;
     }
 
     void MeshManager::readVertices(const string& vertFile) {
@@ -532,4 +579,33 @@ namespace blitzdg {
     const index_vector_type& MeshManager::get_VertexPartitionMap() const {
         return *VertexPartitionMap;
     }
+
+    ndarray MeshManager::get_VertexPartitionMap_numpy() const {
+        Py_intptr_t shape[1] = { NumVerts };
+        ndarray result = zeros(1, shape, dtype::get_builtin<index_type>());
+        std::copy(VertexPartitionMap->begin(), VertexPartitionMap->end(), reinterpret_cast<index_type*>(result.get_data()));
+        return result;
+    }
+
+    ndarray MeshManager::get_ElementPartitionMap_numpy() const {
+        Py_intptr_t shape[1] = { NumElements };
+        ndarray result = zeros(1, shape, dtype::get_builtin<index_type>());
+        std::copy(ElementPartitionMap->begin(), ElementPartitionMap->end(), reinterpret_cast<index_type*>(result.get_data()));
+        return result;
+    }
+
+    ndarray MeshManager::get_Elements_numpy() const {
+        Py_intptr_t shape[2] = { NumElements, NumFaces };
+        ndarray result = zeros(2, shape, dtype::get_builtin<index_type>());
+        std::copy(EToV->begin(), EToV->end(), reinterpret_cast<index_type*>(result.get_data()));
+        return result;
+    }
+
+    ndarray MeshManager::get_Vertices_numpy() const {
+        Py_intptr_t shape[2] = { NumVerts, Dim };
+        ndarray result = zeros(2, shape, dtype::get_builtin<real_type>());
+        std::copy(Vert->begin(), Vert->end(), reinterpret_cast<real_type*>(result.get_data()));
+        return result;
+    }
+
 } // namespace blitzdg
