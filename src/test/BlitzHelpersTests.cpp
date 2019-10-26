@@ -209,6 +209,31 @@ namespace blitzdg {
 				real_type diff = normInf(out);
                 Assert::That(diff, Equals(0.0));
 			}
+			It(Should_Compute_Kronecker_Product) {
+				real_matrix_type A(3,3), B(3,3), C(9,9), Cexpected(9,9);
+				A = 1.,0,0,
+					0,1.,0,
+					0,0,1.;
+				B = 3.,3.,3.,
+					3.,3.,3.,
+					3.,3.,3.;
+				
+				C = kron(A,B);
+
+				Cexpected = 3.,3.,3.,0.,0.,0.,0.,0.,0.,
+					3.,3.,3.,0.,0.,0.,0.,0.,0.,
+					3.,3.,3.,0.,0.,0.,0.,0.,0.,
+					0.,0.,0.,3.,3.,3.,0.,0.,0.,
+					0.,0.,0.,3.,3.,3.,0.,0.,0.,
+					0.,0.,0.,3.,3.,3.,0.,0.,0.,
+					0.,0.,0.,0.,0.,0.,3.,3.,3.,
+					0.,0.,0.,0.,0.,0.,3.,3.,3.,
+					0.,0.,0.,0.,0.,0.,3.,3.,3.;
+
+				C -= Cexpected;
+				real_type diff = normMax(C);
+                Assert::That(diff, Equals(0.0));
+			}
         };
     } // namespace DenseMatrixHelpersTests
 } // namespace blitzdg
