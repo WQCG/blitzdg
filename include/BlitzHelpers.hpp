@@ -167,4 +167,27 @@ namespace blitzdg {
 	void fullToVector(const matrix_type<T>& mat, vector_type<T>& vec, bool byRows = true) {
 		reshapeMatTo1D(mat, vec.begin(), byRows);
 	}
+
+    /**
+     *  Computes Kronecker product of matrices A and B.
+     *  @param[in] A The left matrix.
+     *  @param[in] B The right matrix.
+     *  @returns C = kron(A,B)
+     */
+    template <typename T>
+    matrix_type<T> kron(const matrix_type<T>& A, const matrix_type<T>&B) {
+        using range = blitz::Range;
+        const index_type Br = B.rows(), Bc = B.cols();
+        const index_type Ar = A.rows(), Ac = A.cols();
+        matrix_type<T> C(Ar*Br, Ac*Bc);
+
+        for (index_type i = 0; i < Ar; ++i) {
+            for (index_type j = 0; j < Ac; ++j) {
+                C(range(j * Br, (j + 1) * Br - 1), 
+                range(i * Bc, (i + 1) * Bc - 1)) = A(i,j) * B;
+            }
+        }
+
+        return C;
+    }
 } // namespace blitzdg
