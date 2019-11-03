@@ -176,19 +176,18 @@ namespace blitzdg {
      */
     template <typename T>
     matrix_type<T> kron(const matrix_type<T>& A, const matrix_type<T>&B) {
-        matrix_type<T> C(A.rows()*B.rows(), A.cols()*B.cols());
+        using range = blitz::Range;
+        const index_type Br = B.rows(), Bc = B.cols();
+        const index_type Ar = A.rows(), Ac = A.cols();
+        matrix_type<T> C(Ar*Br, Ac*Bc);
 
-        index_type rowstart = 0, colstart =0;
-        for (index_type i=0; i < A.rows(); ++i) {
-            for (index_type j=0; j < A.cols(); ++j) {
-                C(blitz::Range(rowstart, rowstart + B.rows() - 1), blitz::Range(colstart, colstart + B.cols() - 1)) 
-                    = A(i,j) * B;
-
-                rowstart += B.rows();
+        for (index_type i = 0; i < Ar; ++i) {
+            for (index_type j = 0; j < Ac; ++j) {
+                C(range(j * Br, (j + 1) * Br - 1), 
+                range(i * Bc, (i + 1) * Bc - 1)) = A(i,j) * B;
             }
-            colstart += B.cols();
-            rowstart = 0;
         }
+
         return C;
     }
 } // namespace blitzdg
