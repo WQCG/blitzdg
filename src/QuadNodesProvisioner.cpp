@@ -652,7 +652,7 @@ namespace blitzdg {
             }
         }
 
-        // Face 4.
+        // Face 4
         for (index_type i=0; i < NumFacePoints; ++i)
             faceS(i) = s(Fm(i, 3));
 

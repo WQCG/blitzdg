@@ -103,8 +103,6 @@ namespace blitzdg {
 
 				quadNodes.computeGradVandermondeMatrix(NOrder, r, s, V2Dr, V2Ds);
 
-				std::cout << "V2Ds: " << V2Ds << "\n";
-
 				real_matrix_type V2DrExpected(numLocalPoints, numLocalPoints),
 					V2DsExpected(numLocalPoints, numLocalPoints);
 
@@ -166,6 +164,14 @@ namespace blitzdg {
 				FmExpected -= Fm;
 
 				Assert::That(normMax(FmExpected), Equals(0.0));
+			}
+
+			It(Should_Build_Lift) {
+				cout << "Should_Build_Lift" << endl;
+                QuadNodesProvisioner & quadNodes = *quadNodesProvisioner;
+				const real_matrix_type& lift = quadNodes.get_Lift();
+				std::cout << "Lift: " << lift << "\n";
+
 			}
 
 		};
