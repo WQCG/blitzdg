@@ -149,6 +149,26 @@ namespace blitzdg {
 				Assert::That(normMax(V2DsExpected), IsLessThan(1.e-4));
             }
 
+			It(Should_Build_Face_Masks) {
+				cout << "Should_Build_Face_Masks" << endl;
+                QuadNodesProvisioner & quadNodes = *quadNodesProvisioner;
+
+				quadNodes.buildNodes();
+				const index_matrix_type& Fm = quadNodes.get_Fmask();
+
+				const index_type numFacePoints = (NOrder + 1);
+				index_matrix_type FmExpected(numFacePoints, 4);
+
+				FmExpected = 0,12,3,0
+					,4,13,7,1
+					,8,14,11,2
+					,12,15,15,3;
+
+				FmExpected -= Fm;
+
+				Assert::That(normMax(FmExpected), Equals(0.0));
+			}
+
 		};
    } // namespace QuadNodesProvisionerTests
 } // namespace blitzdg

@@ -236,7 +236,7 @@ namespace blitzdg {
             }
         }
 
-        testField = r+1;
+        testField = r-1;
         count = 0;
         fmask2 = 0*ii;
         for (index_type i=0; i < NumLocalPoints; i++) {
@@ -256,9 +256,9 @@ namespace blitzdg {
             }
         }
 
-        testField = r-1;
+        testField = r+1;
         count = 0;
-        fmask3 = 0*ii;
+        fmask4 = 0*ii;
         for (index_type i=0; i < NumLocalPoints; i++) {
             if (abs(testField(i)) < NodeTol) {
                 fmask4(count) = i;
