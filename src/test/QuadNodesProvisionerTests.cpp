@@ -153,7 +153,6 @@ namespace blitzdg {
 				cout << "Should_Build_Face_Masks" << endl;
                 QuadNodesProvisioner & quadNodes = *quadNodesProvisioner;
 
-				quadNodes.buildNodes();
 				const index_matrix_type& Fm = quadNodes.get_Fmask();
 
 				const index_type numFacePoints = (NOrder + 1);

@@ -68,7 +68,7 @@ namespace blitzdg {
     {
         // Nodal construction required for physical simulations.
         buildNodes();
-        //buildLift();
+        buildLift();
         //buildPhysicalGrid();
         //buildMaps();
     }
@@ -221,7 +221,6 @@ namespace blitzdg {
                 s((NOrder+1)*j+i) = s1d(i);
             }
         }
-
 
         real_vector_type fmask1(NumFacePoints), fmask2(NumFacePoints), fmask3(NumFacePoints),
             fmask4(NumFacePoints), testField(NumLocalPoints);
@@ -606,8 +605,8 @@ namespace blitzdg {
         real_matrix_type V1D(NumFacePoints, NumFacePoints), V1Dinv(NumFacePoints,NumFacePoints);
         real_matrix_type massEdgeInv(NumFacePoints, NumFacePoints);
 
-        real_matrix_type massEdge1(NumFacePoints, NumFacePoints), massEdge2(NumFacePoints,NumFacePoints),
-                         massEdge3(NumFacePoints, NumFacePoints);
+        real_matrix_type massEdge1(NumFacePoints, NumFacePoints), massEdge2(NumFacePoints, NumFacePoints),
+                         massEdge3(NumFacePoints, NumFacePoints), massEdge4(NumFacePoints, NumFacePoints);
 
         // Face 1
         for (index_type i=0; i < NumFacePoints; ++i)
@@ -627,9 +626,9 @@ namespace blitzdg {
 
         // Face 2
         for (index_type i=0; i < NumFacePoints; ++i)
-            faceR(i) = r(Fm(i, 1));
+            faceS(i) = s(Fm(i, 1));
 
-        Vandermonde.computeVandermondeMatrix(faceR, V1D, V1Dinv);
+        Vandermonde.computeVandermondeMatrix(faceS, V1D, V1Dinv);
         massEdgeInv = sum(V1D(ii,kk)*V1D(jj,kk), kk);
 
         Inverter.computeInverse(massEdgeInv, massEdge2);
@@ -639,17 +638,31 @@ namespace blitzdg {
             }
         }
 
-        // Face 3.
+        // Face 3
         for (index_type i=0; i < NumFacePoints; ++i)
-            faceS(i) = s(Fm(i, 2));
+            faceR(i) = r(Fm(i, 2));
 
-        Vandermonde.computeVandermondeMatrix(faceS, V1D, V1Dinv);
+        Vandermonde.computeVandermondeMatrix(faceR, V1D, V1Dinv);
         massEdgeInv = sum(V1D(ii,kk)*V1D(jj,kk), kk);
 
         Inverter.computeInverse(massEdgeInv, massEdge3);
         for (index_type i=0; i < NumFacePoints; ++i) {
             for (index_type j=2*NumFacePoints; j < 3*NumFacePoints; ++j) {
                 E(Fm(i,2),j) = massEdge3(i,j - 2*NumFacePoints);
+            }
+        }
+
+        // Face 4.
+        for (index_type i=0; i < NumFacePoints; ++i)
+            faceS(i) = s(Fm(i, 3));
+
+        Vandermonde.computeVandermondeMatrix(faceS, V1D, V1Dinv);
+        massEdgeInv = sum(V1D(ii,kk)*V1D(jj,kk), kk);
+
+        Inverter.computeInverse(massEdgeInv, massEdge3);
+        for (index_type i=0; i < NumFacePoints; ++i) {
+            for (index_type j=3*NumFacePoints; j < 4*NumFacePoints; ++j) {
+                E(Fm(i,3),j) = massEdge3(i,j - 3*NumFacePoints);
             }
         }
 
