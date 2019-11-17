@@ -73,14 +73,6 @@ namespace blitzdg {
         buildMaps();
     }
 
-    bool TriangleNodesProvisioner::distanceLessThanEps(real_type x1, real_type y1, real_type x2, real_type y2, real_type eps) {
-        if (hypot(x2-x1, y2-y1) < eps) 
-            return true;
-
-        return false;
-    }
-
-
 	void TriangleNodesProvisioner::evaluateSimplexPolynomial(const real_vector_type & a, const real_vector_type & b, index_type i, index_type j, real_vector_type & p) const {
 		real_vector_type h1(a.length(0));
 		real_vector_type h2(b.length(0));
