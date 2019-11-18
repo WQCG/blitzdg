@@ -69,7 +69,7 @@ namespace blitzdg {
         // Nodal construction required for physical simulations.
         buildNodes();
         buildLift();
-        //buildPhysicalGrid();
+        buildPhysicalGrid();
         //buildMaps();
     }
 
@@ -287,7 +287,7 @@ namespace blitzdg {
         NumElements = Mesh2D.get_NumElements();
 
         real_vector_type VX(NumVertices), VY(NumVertices), VZ(NumVertices);
-        index_vector_type va(NumElements), vb(NumElements), vc(NumElements);
+        index_vector_type va(NumElements), vb(NumElements), vc(NumElements), vd(NumElements);
         index_type count=0;
 
         // Unpack 1D arrays storing EToV and Vertex coordinates
@@ -295,7 +295,8 @@ namespace blitzdg {
             va(i) = EToV(count);
             vb(i) = EToV(count+1);
             vc(i) = EToV(count+2);
-            count += 3;
+            vd(i) = EToV(count+3);
+            count += NumFaces;
         }
 
         count=0;
@@ -306,16 +307,18 @@ namespace blitzdg {
             count += 3;
         }
 
-        real_vector_type VXa(NumElements), VXb(NumElements), VXc(NumElements);
-        real_vector_type VYa(NumElements), VYb(NumElements), VYc(NumElements);
+        real_vector_type VXa(NumElements), VXb(NumElements), VXc(NumElements), VXd(NumElements);
+        real_vector_type VYa(NumElements), VYb(NumElements), VYc(NumElements), VYd(NumElements);
         for (index_type i=0; i < NumElements; ++i) {
             VXa(i) = VX(va(i));
             VXb(i) = VX(vb(i));
             VXc(i) = VX(vc(i));
+            VXd(i) = VX(vd(i));
 
             VYa(i) = VY(va(i));
             VYb(i) = VY(vb(i));
             VYc(i) = VY(vc(i));
+            VYd(i) = VY(vd(i));
         }
 
         const real_vector_type& r = *rGrid;
@@ -349,8 +352,14 @@ namespace blitzdg {
 
         real_matrix_type xr(Np,K), yr(Np,K), xs(Np,K), ys(Np,K);
 
-        x = 0.5*(-(r(ii)+s(ii) + 0.*jj)*VXa(jj) + (1+r(ii) + 0.*jj)*VXb(jj) + (1+s(ii) + 0.*jj)*VXc(jj));
-        y = 0.5*(-(r(ii)+s(ii) + 0.*jj)*VYa(jj) + (1+r(ii) + 0.*jj)*VYb(jj) + (1+s(ii) + 0.*jj)*VYc(jj));
+        //x = 0.5*(-(r(ii)+s(ii) + 0.*jj)*VXa(jj) + (1+r(ii) + 0.*jj)*VXb(jj) + (1+s(ii) + 0.*jj)*VXc(jj));
+        //y = 0.5*(-(r(ii)+s(ii) + 0.*jj)*VYa(jj) + (1+r(ii) + 0.*jj)*VYb(jj) + (1+s(ii) + 0.*jj)*VYc(jj));
+
+        x = 0.25*((1-r(ii))*(1-s(ii)) + 0.*jj)*VXa(jj) + 0.25*((1+r(ii))*(1-s(ii)) +0.*jj)*VXb(jj)
+            + 0.25*((1+r(ii))*(1+s(ii)) + 0.*jj)*VXc(jj) + 0.25*((1-r(ii))*(1+s(ii) + 0.*jj))*VXd(jj);
+
+        y = 0.25*((1-r(ii))*(1-s(ii)) + 0.*jj)*VYa(jj) + 0.25*((1+r(ii))*(1-s(ii)) +0.*jj)*VYb(jj)
+            + 0.25*((1+r(ii))*(1+s(ii)) + 0.*jj)*VYc(jj) + 0.25*((1-r(ii))*(1+s(ii) + 0.*jj))*VYd(jj);
 
         xr = sum(D_r(ii,kk)*x(kk,jj), kk);
         yr = sum(D_r(ii,kk)*y(kk,jj), kk);
@@ -394,25 +403,31 @@ namespace blitzdg {
 
         real_matrix_type norm(numLocalFaceNodes, NumElements, ColumnMajorOrder());
 
-        index_vector_type fid1(NumFacePoints), fid2(NumFacePoints), fid3(NumFacePoints);
+        index_vector_type fid1(NumFacePoints), fid2(NumFacePoints),
+            fid3(NumFacePoints), fid4(NumFacePoints);
 
         fid1 = ii;
         fid2 = ii + NumFacePoints;
         fid3 = ii + 2*NumFacePoints;
+        fid4 = ii + 3*NumFacePoints;
 
         for(index_type k=0; k < NumElements; ++k) {
             for (index_type i=0; i < NumFacePoints; i++) {
                 // face 1
-                n_x(fid1(i), k) =  fyr(fid1(i), k);
+                n_x(fid1(i), k) = -fyr(fid1(i), k);
                 n_y(fid1(i), k) = -fxr(fid1(i), k);
 
                 // face 2
-                n_x(fid2(i), k) =  fys(fid2(i), k)-fyr(fid2(i), k);
-                n_y(fid2(i), k) = -fxs(fid2(i), k)+fxr(fid2(i), k);
+                n_x(fid2(i), k) =  fys(fid2(i), k);
+                n_y(fid2(i), k) = -fxs(fid2(i), k);
 
                 // face 3
-                n_x(fid3(i), k) = -fys(fid3(i), k);
-                n_y(fid3(i), k) =  fxs(fid3(i), k);
+                n_x(fid3(i), k) = -fyr(fid3(i), k);
+                n_y(fid3(i), k) =  fxr(fid3(i), k);
+
+                // face 4
+                n_x(fid4(i), k) = -fys(fid4(i), k);
+                n_y(fid4(i), k) = -fxs(fid4(i), k);
             }
         }
 
