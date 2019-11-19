@@ -54,13 +54,11 @@ namespace blitzdg {
 				PathResolver resolver;
 				meshManager = shared_ptr<MeshManager>(new MeshManager());
 
+				string root = resolver.get_RootPath();
+				string inputPath = resolver.joinPaths(root, "input");
+				string meshPath = resolver.joinPaths(inputPath, "coarse_box_quads.msh");
 
-				//string root = resolver.get_RootPath();
-				//string inputPath = resolver.joinPaths(root, "input");
-				//string meshPath = resolver.joinPaths(inputPath, "coarse_box.msh");
-
-
-				//meshManager->readMesh(meshPath);
+				meshManager->readMesh(meshPath);
 				quadNodesProvisioner = unique_ptr<QuadNodesProvisioner>(new QuadNodesProvisioner(NOrder, *meshManager)); 
 			}
 

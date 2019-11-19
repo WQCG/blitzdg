@@ -70,7 +70,7 @@ namespace blitzdg {
         buildNodes();
         buildLift();
         buildPhysicalGrid();
-        //buildMaps();
+        buildMaps();
     }
 
     void QuadNodesProvisioner::computeVandermondeMatrix(index_type N, const real_vector_type & r, const real_vector_type & s, real_matrix_type & V) const {

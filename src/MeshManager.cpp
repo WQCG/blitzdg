@@ -242,43 +242,70 @@ namespace blitzdg {
             }
         }
 
+        // this is yucky.
+        NumFaces = 3;
         if (!quads.empty())
-            throw runtime_error("Quadrangle elements currently not supported by blitzdg!");
+            NumFaces = 4;
 
         lines.shrink_to_fit();
         tris.shrink_to_fit();
+        quads.shrink_to_fit();
 
         // Allocate storage EToV and BC Table.
         // Note: we are doing this here as opposed to in the initializer list,
         // since prior to this point we did not know how many elements there are.
-        index_type K = static_cast<index_type>(tris.size());
-        EToV = index_vec_smart_ptr(new index_vector_type(K*3));
-        BCType = index_vec_smart_ptr(new index_vector_type(K*3));
-        EToE = index_vec_smart_ptr(new index_vector_type(K*3));
-        EToF = index_vec_smart_ptr(new index_vector_type(K*3));
+        index_type K = static_cast<index_type>(tris.size() + quads.size());
+        EToV = index_vec_smart_ptr(new index_vector_type(K*NumFaces));
+        BCType = index_vec_smart_ptr(new index_vector_type(K*NumFaces));
+        EToE = index_vec_smart_ptr(new index_vector_type(K*NumFaces));
+        EToF = index_vec_smart_ptr(new index_vector_type(K*NumFaces));
 
         index_vector_type& E2V = *EToV;
 
         NumElements = K;
-        NumFaces = 3; // hard-code for now.
-        for (index_type k=0; k < K; ++k) {
+        index_type numFacesTri = 3; // hard-code for now.
+        for (index_type k=0; k < static_cast<index_type>(tris.size()); ++k) {
             // Subtract one to go from 1-based (Gmsh) to 0-based (us).
-            E2V(NumFaces*k)   = tris[k][5] - 1;
-            E2V(NumFaces*k+1) = tris[k][6] - 1;
-            E2V(NumFaces*k+2) = tris[k][7] - 1;
+            E2V(numFacesTri*k)   = tris[k][5] - 1;
+            E2V(numFacesTri*k+1) = tris[k][6] - 1;
+            E2V(numFacesTri*k+2) = tris[k][7] - 1;
         }
 
-        for (index_type k=0; k < K; ++k) {
+        for (index_type k=0; k < static_cast<index_type>(tris.size()); ++k) {
             // Enforce counter-clockwise ordering of vertices in EToV table.
-            real_type ax = Vref(E2V(NumFaces*k)*NumFaces),   ay = Vref(E2V(NumFaces*k)*NumFaces+1);
-            real_type bx = Vref(E2V(NumFaces*k+1)*NumFaces), by = Vref(E2V(NumFaces*k+1)*NumFaces+1);
-            real_type cx = Vref(E2V(NumFaces*k+2)*NumFaces), cy = Vref(E2V(NumFaces*k+2)*NumFaces+1);
+            real_type ax = Vref(E2V(numFacesTri*k)*3),   ay = Vref(E2V(numFacesTri*k)*3+1);
+            real_type bx = Vref(E2V(numFacesTri*k+1)*3), by = Vref(E2V(numFacesTri*k+1)*3+1);
+            real_type cx = Vref(E2V(numFacesTri*k+2)*3), cy = Vref(E2V(numFacesTri*k+2)*3+1);
 
             real_type det = (ax-cx)*(by-cy) - (bx-cx)*(ay-cy);
 
             if (det < 0) {
                 using std::swap;
-                swap(E2V(NumFaces*k+1), E2V(NumFaces*k+2));
+                swap(E2V(numFacesTri*k+1), E2V(numFacesTri*k+2));
+            }
+        }
+
+        index_type numFacesQuad = 4; // hard-code for now.
+        for (index_type k=static_cast<index_type>(tris.size()); k < static_cast<index_type>(tris.size()+quads.size()); ++k) {
+            // Subtract one to go from 1-based (Gmsh) to 0-based (us).
+            E2V(numFacesQuad*k)   = quads[k][5] - 1;
+            E2V(numFacesQuad*k+1) = quads[k][6] - 1;
+            E2V(numFacesQuad*k+2) = quads[k][7] - 1;
+            E2V(numFacesQuad*k+3) = quads[k][8] - 1;
+        }
+
+        for (index_type k=static_cast<index_type>(tris.size()); k < static_cast<index_type>(tris.size()+quads.size()); ++k) {
+            // Enforce counter-clockwise ordering of vertices in EToV table.
+            real_type ax = Vref(E2V(numFacesQuad*k)*3),   ay = Vref(E2V(numFacesQuad*k)*3+1);
+            real_type bx = Vref(E2V(numFacesQuad*k+1)*3), by = Vref(E2V(numFacesQuad*k+1)*3+1);
+            real_type cx = Vref(E2V(numFacesQuad*k+2)*3), cy = Vref(E2V(numFacesQuad*k+2)*3+1);
+
+            real_type det = (ax-cx)*(by-cy) - (bx-cx)*(ay-cy);
+
+            if (det < 0) {
+                using std::swap;
+                // [0,1,2,3] --> [0, 3, 2, 1]
+                swap(E2V(numFacesQuad*k+1), E2V(numFacesQuad*k+3));
             }
         }
 
@@ -359,7 +386,15 @@ namespace blitzdg {
     void MeshManager::buildConnectivity() {
         index_type totalFaces = NumFaces * NumElements;
         index_type numVertices = NumVerts;
-        index_type localVertNum[3][2] = {{0, 1}, {1, 2}, {2, 0}};
+        index_type localVertNum[4][2] = {{0, 1}, {1, 2}, {2, 0}, {0, 0}};
+
+        if (NumFaces == 4) {
+            localVertNum[0][0] = 0; localVertNum[0][1] = 1;
+            localVertNum[1][0] = 1; localVertNum[1][1] = 2;
+            localVertNum[2][0] = 2; localVertNum[2][1] = 3;
+            localVertNum[3][0] = 3; localVertNum[3][1] = 0;
+        }
+
 
         // Build global face-to-vertex array. Note: we actually
         // build its transpose for easy column access.
@@ -367,6 +402,8 @@ namespace blitzdg {
         const index_vector_type& E2V = *EToV;
         index_type globalFaceNum = 0;
         index_type nnz=0;
+
+        // need to think about if this is general enough for quads (works for tris.)
         for (index_type k = 0; k < NumElements; ++k) {
             for (index_type f = 0; f < NumFaces; ++f) {
                 VToF.colPtrs(globalFaceNum) = nnz; 
