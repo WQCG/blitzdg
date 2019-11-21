@@ -101,9 +101,6 @@ namespace blitzdg {
      * Helper method for checking that two points (x1,y1) and (x2,y2) are less than a distance eps apart.
      */
     inline bool distanceLessThanEps(real_type x1, real_type y1, real_type x2, real_type y2, real_type eps) {
-        if (std::hypot(x2-x1, y2-y1) < eps) 
-            return true;
-
-        return false;
+        return std::hypot(x2 - x1, y2 - y1) < eps;
     }
 } // namespace blitzdg
