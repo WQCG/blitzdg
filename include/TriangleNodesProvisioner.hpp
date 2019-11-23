@@ -394,6 +394,11 @@ namespace blitzdg {
        * Returns the number of elements in the 2D grid.
        */
       index_type get_NumElements() const;
+
+      /**
+       * Returns order of the basis polynomials.
+       */
+      index_type get_NOrder() const { return NOrder; };
   };
 } // namespace blitzdg
 
