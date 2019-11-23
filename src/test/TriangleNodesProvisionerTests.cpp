@@ -41,7 +41,7 @@ namespace blitzdg {
 		unique_ptr<TriangleNodesProvisioner> triangleNodesProvisioner = nullptr;
 		shared_ptr<MeshManager> meshManager =  nullptr;
 
-        Describe(Nodes1DProvisioner_Object) {
+        Describe(TriangleNodesProvisioner_Object) {
 			const real_type eps = 50*numeric_limits<double>::epsilon();
 			const float epsf = 5.8e-5;
 			const index_type NOrder = 3;
