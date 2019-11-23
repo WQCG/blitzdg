@@ -29,11 +29,11 @@ namespace blitzdg {
   class VtkOutputter : OutputterBase {
 
 	vtkSmartPointer<vtkXMLUnstructuredGridWriter> GridWriter;
-	const TriangleNodesProvisioner& NodesProvisioner;
+	const NodesProvisioner2DBase& NodesProvisioner;
 	std::string FileExtension;
 
 public:
-	VtkOutputter(TriangleNodesProvisioner & _NodesProvisioner);
+	VtkOutputter(NodesProvisioner2DBase & _NodesProvisioner);
 
 	std::string generateFileName(const std::string & fieldName, const index_type fileNumber) const;
 

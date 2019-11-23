@@ -37,7 +37,7 @@ using boost::python::numpy::ndarray;
 using boost::python::stl_input_iterator;
 
 namespace blitzdg {
-	VtkOutputter::VtkOutputter(TriangleNodesProvisioner & _NodesProvisioner)
+	VtkOutputter::VtkOutputter(NodesProvisioner2DBase& _NodesProvisioner)
 		: GridWriter { vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New() },
 			NodesProvisioner { _NodesProvisioner } 
 		{

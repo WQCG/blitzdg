@@ -8,6 +8,7 @@
  */
 
 #pragma once
+#include "NodesProvisioner2Dbase.hpp"
 #include "Nodes1DProvisioner.hpp"
 #include "DGContext2D.hpp"
 #include "MeshManager.hpp"
@@ -21,7 +22,7 @@ namespace blitzdg {
    * nodes, operators, and geometric factors on triangles.
    * @note This class is moveable but not copyable.
    */ 
-  class TriangleNodesProvisioner {
+  class TriangleNodesProvisioner : public NodesProvisioner2DBase {
       using index_mat_smart_ptr = std::unique_ptr<index_matrix_type>;
       using index_vec_smart_ptr = std::unique_ptr<index_vector_type>;
 
