@@ -376,6 +376,11 @@ namespace blitzdg {
       void computeInterpMatrix(const real_vector_type& rout, const real_vector_type& sout, real_matrix_type& IM) const;
 
       /**
+       * Splits high-order elements into smaller elements with linear basis functions.
+       */
+      void splitElements(const real_matrix_type& x, const real_matrix_type& y, const real_matrix_type& field, real_matrix_type& xnew, real_matrix_type& ynew, real_matrix_type& fieldnew) const;
+
+      /**
        * Returns the number of nodes local to a 2D triangular element.
        */
       index_type get_NumLocalPoints() const;
