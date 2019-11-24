@@ -707,6 +707,12 @@ namespace blitzdg {
         IM = sum(Vout(ii,kk)*invV(kk,jj),kk);
     }
 
+    void QuadNodesProvisioner::splitElements(const real_matrix_type& x, const real_matrix_type& y, const real_matrix_type& field,
+        real_matrix_type& xnew, real_matrix_type& ynew, real_matrix_type& fieldnew) const {
+
+        throw std::runtime_error("not implemented yet.");
+    }
+
     DGContext2D QuadNodesProvisioner::get_DGContext() const {
         return DGContext2D {
             NOrder,
