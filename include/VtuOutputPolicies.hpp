@@ -35,7 +35,7 @@ namespace blitzdg {
     struct QuadVtuOutputPolicy {
         static void insertAllCells(real_matrix_type& x, real_matrix_type& y, real_matrix_type& field, vtkSmartPointer<vtkPoints> points, vtkSmartPointer<vtkDoubleArray> array, vtkSmartPointer<vtkUnstructuredGrid> unstructuredGrid) {
             // '4' because Quadss
-            vtkIdType nodes[4];
+            vtkIdType nodes[4], permutedNodes[4];
             index_type K  = field.cols();
             index_type Np = field.rows();
             index_type nodeId = 0;
@@ -49,7 +49,12 @@ namespace blitzdg {
                     ++nodeId;
                 }
 
-                unstructuredGrid->InsertNextCell(VTK_QUAD, 4, nodes);
+                permutedNodes[0] = nodes[0];
+                permutedNodes[1] = nodes[2];
+                permutedNodes[2] = nodes[3];
+                permutedNodes[3] = nodes[1];
+
+                unstructuredGrid->InsertNextCell(VTK_QUAD, 4, permutedNodes);
             }
         }
     };
