@@ -132,11 +132,11 @@ if __name__ == '__main__':
     meshManager.readMesh('./input/coarse_box_quads_fine.msh')
 
     # Numerical parameters:
-    N = 1
+    N = 4
     CFL = 0.45
 
     filtOrder = 4
-    filtCutoff = 0.9*N
+    filtCutoff = 0.99*N
 
     nodes = dg.QuadNodesProvisioner(N, meshManager)
     nodes.buildFilter(filtCutoff, filtOrder)
@@ -154,7 +154,7 @@ if __name__ == '__main__':
 
     Filt = ctx.filter
 
-    eta = np.exp(-10*(x*x) -10*(y*y), dtype=np.dtype('Float64') , order='C')
+    eta = 1.0*np.exp(-10*(x*x) -10*(y*y), dtype=np.dtype('Float64') , order='C')
     #eta = -1*(x/1500.0)
     u   = np.zeros([Np, K], dtype=np.dtype('Float64'), order='C')
     v   = np.zeros([Np, K], dtype=np.dtype('Float64'), order='C')
@@ -172,7 +172,7 @@ if __name__ == '__main__':
     outputter.writeFieldsToFiles(fields, 0)
 
     c = np.sqrt(g*h)
-    dt =0.000724295
+    dt =0.45*0.000724295
     #dt = CFL*dx/np.max(abs(c))
 
     step = 0
@@ -180,6 +180,9 @@ if __name__ == '__main__':
 
         
         (RHS1,RHS2,RHS3) = sw2dComputeRHS(h, hu, hv, g, H, ctx)
+        RHS1 = np.dot(Filt, RHS1)
+        RHS2 = np.dot(Filt, RHS2)
+        RHS3 = np.dot(Filt, RHS3)
         
         # predictor
         h1  = h + 0.5*dt*RHS1
@@ -187,6 +190,9 @@ if __name__ == '__main__':
         hv1 = hv + 0.5*dt*RHS3
 
         (RHS1,RHS2,RHS3) = sw2dComputeRHS(h1, hu1, hv1, g, H, ctx)
+        RHS1 = np.dot(Filt, RHS1)
+        RHS2 = np.dot(Filt, RHS2)
+        RHS3 = np.dot(Filt, RHS3)
 
         # corrector - Update solution
         h += dt*RHS1
@@ -203,7 +209,8 @@ if __name__ == '__main__':
         print('t=' + str(t))
 
         eta = h-H
-        fields["eta"] = eta
-        fields["u"] = hu/h
-        fields["v"] = hv/h
-        outputter.writeFieldsToFiles(fields, step)
+        if (step % 20) == 0:
+            fields["eta"] = eta
+            fields["u"] = hu/h
+            fields["v"] = hv/h
+            outputter.writeFieldsToFiles(fields, step)
