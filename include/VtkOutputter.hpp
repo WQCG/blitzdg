@@ -54,7 +54,7 @@ public:
 			real_matrix_type xnew, ynew, fieldnew;
 			NodesProvisioner.splitElements(x, y, field, xnew, ynew, fieldnew);
 
-			Np = NodesProvisioner.get_NumLocalPoints();
+			Np = fieldnew.rows();
 			K = fieldnew.cols();
 
 			x.resize(Np, K);
