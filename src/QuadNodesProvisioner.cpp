@@ -413,24 +413,23 @@ namespace blitzdg {
 
         for(index_type k=0; k < NumElements; ++k) {
             for (index_type i=0; i < NumFacePoints; i++) {
-                // face 1
-                n_x(fid1(i), k) = -fyr(fid1(i), k);
+                // face 1 - bottom
+                n_x(fid1(i), k) = fyr(fid1(i), k);
                 n_y(fid1(i), k) = -fxr(fid1(i), k);
 
-                // face 2
-                n_x(fid2(i), k) =  fys(fid2(i), k);
+                // face 2 - right
+                n_x(fid2(i), k) = fys(fid2(i), k);
                 n_y(fid2(i), k) = -fxs(fid2(i), k);
 
-                // face 3
+                // face 3 - top
                 n_x(fid3(i), k) = -fyr(fid3(i), k);
-                n_y(fid3(i), k) =  fxr(fid3(i), k);
+                n_y(fid3(i), k) = fxr(fid3(i), k);
 
-                // face 4
+                // face 4 - left
                 n_x(fid4(i), k) = -fys(fid4(i), k);
-                n_y(fid4(i), k) = -fxs(fid4(i), k);
+                n_y(fid4(i), k) = fxs(fid4(i), k);
             }
         }
-
         // normalise
         norm = sqrt(n_x*n_x + n_y*n_y);
 
