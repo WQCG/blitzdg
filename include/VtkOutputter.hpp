@@ -13,6 +13,8 @@
 #include <vtk-7.1/vtkSmartPointer.h>
 #include <vtk-7.1/vtkPointData.h>
 #include <vtk-7.1/vtkCellArray.h>
+#include <vtk-7.1/vtkDoubleArray.h>
+#include <vtk-7.1/vtkUnstructuredGrid.h>
 #include <boost/python/numpy.hpp>
 #include <boost/python.hpp>
 
@@ -20,7 +22,6 @@
 #include "Types.hpp"
 #include "TriangleNodesProvisioner.hpp"
 #include "OutputterBase.hpp"
-#include "VtuOutputPolicies.hpp"
 
 namespace blitzdg {
   /**
@@ -77,17 +78,8 @@ public:
 		array->SetName(fieldNameChar);
 		array->SetNumberOfValues(Np*K);
 
-		unstructuredGrid->Allocate(K);
-
-		index_type NpLinear = field.rows();
-		
-		// TODO: replace this identification 'if' with using an enum class instead of NpLinear,
-		// which is non-unique when we go to 3D.
-		if (NpLinear == 3) {
-			TriangleVtuOutputPolicy::insertAllCells(x, y, field, points, array, unstructuredGrid);
-		} else if (NpLinear == 4) {
-			QuadVtuOutputPolicy::insertAllCells(x, y, field, points, array, unstructuredGrid);
-		}
+		unstructuredGrid->Allocate(K);		
+		insertAllCells(x, y, field, points, array, unstructuredGrid);
 
 		unstructuredGrid->SetPoints(points);
 		unstructuredGrid->GetPointData()->SetScalars(array);
@@ -114,6 +106,38 @@ public:
 
 private:
 	void splitTriangles(const real_matrix_type& x, const real_matrix_type& y, const real_matrix_type& field, real_matrix_type& xnew, real_matrix_type& ynew, real_matrix_type& fieldnew) const;
+
+	void insertAllCells(real_matrix_type& x, real_matrix_type& y, real_matrix_type& field, vtkSmartPointer<vtkPoints> points, vtkSmartPointer<vtkDoubleArray> array, vtkSmartPointer<vtkUnstructuredGrid> unstructuredGrid) const {
+            // '3' because Triangles
+            // vtkIdType nodes[3];
+            index_type K  = field.cols();
+            index_type Np = field.rows();
+            std::vector<vtkIdType> nodes(Np), permutedNodes(Np);
+            std::map<index_type, VTKCellType> cellTypes = 
+                {
+                    {3, VTK_TRIANGLE},
+                    {4, VTK_QUAD}
+                };
+
+            index_type nodeId = 0;
+            for (index_type k=0; k < K; ++k) {
+                for (index_type n=0; n < Np; ++n) {
+                    points->InsertPoint(nodeId, x(n, k), y(n, k), field(n,k) );
+                    
+                    array->SetValue(nodeId, field(n,k));
+
+                    nodes[n] = nodeId;
+                    ++nodeId;
+                }
+
+                if (cellTypes[Np] == VTK_QUAD) {
+					std::swap(nodes[1], nodes[3]);
+					std::swap(nodes[1], nodes[2]);
+                }
+
+				unstructuredGrid->InsertNextCell(cellTypes[Np], Np, nodes.data());
+            }
+        }
 
   };
 }
