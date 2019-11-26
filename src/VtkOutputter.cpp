@@ -40,20 +40,20 @@ namespace blitzdg {
 	VtkOutputter::VtkOutputter(NodesProvisioner2DBase& _NodesProvisioner)
 		: GridWriter { vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New() },
 			NodesProvisioner { _NodesProvisioner } 
-		{
-			FileExtension = GridWriter->GetDefaultFileExtension();
-		}
+	{
+		FileExtension = GridWriter->GetDefaultFileExtension();
+	}
 
-		/**
-		 * Generates a file name for storing a blitzdg object in vtk format.
-		 * @param[in] fieldName Name of field from the PDE (system), e.g., "u".
-		 * @param[in] fileNumber An integral intex indicating a logical ordering on the output files. It is usually related to time-level.
-		 */
-		string VtkOutputter::generateFileName(const string & fieldName, const index_type fileNumber) const {
-			stringstream fileNameStrm;
-        	fileNameStrm << fieldName << setfill('0') << setw(7) << fileNumber << "." << FileExtension;
-        	return fileNameStrm.str();
-		}
+	/**
+	 * Generates a file name for storing a blitzdg object in vtk format.
+	 * @param[in] fieldName Name of field from the PDE (system), e.g., "u".
+	 * @param[in] fileNumber An integral intex indicating a logical ordering on the output files. It is usually related to time-level.
+	 */
+	string VtkOutputter::generateFileName(const string & fieldName, const index_type fileNumber) const {
+		stringstream fileNameStrm;
+		fileNameStrm << fieldName << setfill('0') << setw(7) << fileNumber << "." << FileExtension;
+		return fileNameStrm.str();
+	}
 
 	void VtkOutputter::writeFieldsToFiles(std::map<std::string, real_matrix_type>& fields, index_type tstep) {
 		for (const auto& kv : fields) {
