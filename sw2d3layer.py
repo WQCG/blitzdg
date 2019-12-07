@@ -95,13 +95,22 @@ def sw3lrComputeRHS(h1, h1u1, h1v1, h2, h2u2, h2v2, h3, h3u3, h3v3, g, Bx, By, c
 
     RHS8 = -(rx*np.dot(Dr, F8) + sx*np.dot(Ds, F8))
     RHS8+= -(ry*np.dot(Dr, G8) + sy*np.dot(Ds, G8))
-    RHS8+= -g*h3*Bx - g*0.5*(1+r)*h3*(rx*np.dot(Dr, h2) + sx*np.dot(Ds, h2)) # to check
+    RHS8+= -g*h3*Bx - g*0.5*(1+r)*h3*(rx*np.dot(Dr, h2) + sx*np.dot(Ds, h2))
     RHS8+= -g*r*h3*(rx*np.dot(Dr, h1) + sx*np.dot(Ds, h1))
 
     RHS9 = -(rx*np.dot(Dr, F9) + sx*np.dot(Ds, F9))
     RHS9+= -(ry*np.dot(Dr, G9) + sy*np.dot(Ds, G9))
-    RHS9+= -g*h3*By - g*0.5*(1+r)*h3*(ry*np.dot(Dr, h2) + sy*np.dot(Ds, h2)) # to check
+    RHS9+= -g*h3*By - g*0.5*(1+r)*h3*(ry*np.dot(Dr, h2) + sy*np.dot(Ds, h2))
     RHS9+= -g*r*h3*(ry*np.dot(Dr, h1) + sy*np.dot(Ds, h1))
+
+    # Bottom drag terms
+    CD = 0
+    u3 = h3u3 / h3
+    v3 = h3v3 / h3
+    spd3 = np.sqrt(u3**2 + v3**2)
+
+    RHS8 += -CD*h3u3*spd3
+    RHS9 += -CD*h3v3*spd3
 
     # apply filter.
     Filt = ctx.filter
@@ -191,8 +200,8 @@ if __name__ == '__main__':
     N = 4
     CFL = 0.45
 
-    filtOrder = 2
-    filtCutoff = 0.35*N
+    filtOrder = 8
+    filtCutoff = 0.0*N
 
     nodes = dg.TriangleNodesProvisioner(N, meshManager)
     nodes.buildFilter(filtCutoff, filtOrder)
@@ -244,7 +253,7 @@ if __name__ == '__main__':
 
     c = np.sqrt(g*(h1 + h2 + h3))
     #dt =0.125*0.000724295
-    dt = 0.000724295
+    dt = 0.0000724295
     #dt = CFL*dx/np.max(abs(c))
 
     step = 0
@@ -266,11 +275,6 @@ if __name__ == '__main__':
         h3u3hat = h3u3 + 0.5*dt*RHS8
         h3v3hat = h3v3 + 0.5*dt*RHS9
 
-        # layer numerical adjustments
-        eta1 = (h1+h2+h3) - (H1+H2+H3-B)
-        htrue = H1+H2+H3 -B + eta1
-        h1 = htrue - h2 - h3
-
         (RHS1,RHS2,RHS3,RHS4,RHS5,
             RHS6,RHS7,RHS8,RHS9) = sw3lrComputeRHS(h1hat, h1u1hat, h1v1hat, h2hat, h2u2hat, h2v2hat, h3hat, h3u3hat, h3v3hat, g, Bx, By, ctx, r)
     
@@ -286,6 +290,85 @@ if __name__ == '__main__':
         h3 += dt*RHS7
         h3u3 += dt*RHS8
         h3v3 += dt*RHS9
+
+        # layer numerical adjustments
+        eta1 = (h1+h2+h3) - (H1+H2+H3-B)
+        eta2 = H1 + eta1 - h1
+        eta3 = H2 + eta2 - h2
+
+        u1 = h1u1/h1
+        u2 = h2u2/h2
+        u3 = h3u3/h3
+
+        v1 = h1v1/h1
+        v2 = h2v2/h2
+        v3 = h3v3/h3
+
+        Filt = ctx.filter
+        eta1 = np.dot(ctx.filter, eta1)
+        eta2 = np.dot(ctx.filter, eta2)
+        eta3 = np.dot(ctx.filter, eta3)
+
+        h3 = H3 - B    + eta3
+        h2 = H2 - eta3 + eta2
+        h1 = H1 - eta2 + eta1
+
+        h1u1 = h1*u1
+        h2u2 = h2*u2
+        h3u3 = h2*u3
+
+        h1v1 = h1*v1
+        h2v2 = h2*v2
+        h3v3 = h3*v3
+
+        h1 = h1.flatten("F")
+        h2 = h2.flatten("F")
+        h3 = h3.flatten("F")
+
+        h1u1 = h1u1.flatten("F")
+        h1v1 = h1v1.flatten("F")
+
+        h2u2 = h2u2.flatten("F")
+        h2v2 = h2v2.flatten("F")
+
+        h3u3 = h3u3.flatten("F")
+        h3v3 = h3v3.flatten("F")
+
+
+        vmapM = ctx.vmapM
+        vmapP = ctx.vmapP
+
+        h1[vmapM] = 0.5*(h1[vmapM] + h1[vmapP])
+        h1[vmapP] = h1[vmapM]
+        h2[vmapM] = 0.5*(h2[vmapM] + h2[vmapP])
+        h2[vmapP] = h2[vmapM]
+        h3[vmapM] = 0.5*(h3[vmapM] + h3[vmapP])
+        h3[vmapP] = h3[vmapM]
+        h1u1[vmapM] = 0.5*(h1u1[vmapM] + h1u1[vmapP])
+        h1u1[vmapP] = h1u1[vmapM]
+        h1v1[vmapM] = 0.5*(h1v1[vmapM] + h1v1[vmapP])
+        h1v1[vmapP] = h1v1[vmapM]
+        h2u2[vmapM] = 0.5*(h2u2[vmapM] + h2u2[vmapP])
+        h2u2[vmapP] = h2u2[vmapM]
+        h2v2[vmapM] = 0.5*(h2v2[vmapM] + h2v2[vmapP])
+        h2v2[vmapP] = h2v2[vmapM]
+        h3u3[vmapM] = 0.5*(h3u3[vmapM] + h3u3[vmapP])
+        h3u3[vmapP] = h3u3[vmapM]
+        h3v3[vmapM] = 0.5*(h3v3[vmapM] + h3v3[vmapP])
+        h3v3[vmapP] = h3v3[vmapM]
+
+        h1 = np.reshape(h1, (ctx.numLocalPoints, K), order='F')
+        h2 = np.reshape(h2, (ctx.numLocalPoints, K), order='F')
+        h3 = np.reshape(h3, (ctx.numLocalPoints, K), order='F')
+
+        h1u1 = np.reshape(h1u1, (ctx.numLocalPoints, K), order='F')
+        h1v1 = np.reshape(h1v1, (ctx.numLocalPoints, K), order='F')
+
+        h2u2 = np.reshape(h2u2, (ctx.numLocalPoints, K), order='F')
+        h2v2 = np.reshape(h2v2, (ctx.numLocalPoints, K), order='F')
+
+        h3u3 = np.reshape(h3u3, (ctx.numLocalPoints, K), order='F')
+        h3v3 = np.reshape(h3v3, (ctx.numLocalPoints, K), order='F')
 
         h_max = np.max(np.abs(h1))
         if h_max > 1e8  or np.isnan(h_max):
