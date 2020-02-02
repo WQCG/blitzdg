@@ -7,7 +7,9 @@ with open("README.md", "r") as fh:
 
 pyblitzdg = Extension('pyblitzdg',
                         sources=['src/pyblitzdg/pyblitzdg.cpp'],
-                        include_dirs=['/usr/local/include', 'include'],
+                        include_dirs=['/usr/local/include', 'include',
+                            "C:/ProgramData/Anaconda3/pkgs/py-boost-1.67.0-py37h8300f20_4/Library/include"
+                        ],
                         library_dirs=['/usr/local/lib/boost', '/usr/local/lib', 'lib'],
                         runtime_library_dirs=['/usr/local/lib/boost'],
                         libraries=['boost_python3', 'blitzdg', 'blitz'])
@@ -24,9 +26,18 @@ setuptools.setup(
      url="https://github.com/WQCG/blitzdg",
      platforms=['manylinux2010', 'win64', 'macosx'],
      ext_modules=[Extension('pyblitzdg', ['src/pyblitzdg/pyblitzdg.cpp'], 
-        include_dirs=[ "include", "include/igloo", "/usr/include/python3.7m/", "/usr/local/include/", "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/include/python3.7m/"],
-        library_dirs=[ "/usr/local/lib", "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/" ],
-        libraries=['blitzdg', 'vtkIOXML-7.1', 'vtkCommonCore-7.1', 'vtkCommonExecutionModel-7.1', 'vtkCommonDataModel-7.1', 'vtkCommonMisc-7.1', 'vtkCommonSystem-7.1', 'vtkCommonTransforms-7.1', 'vtkexpat-7.1', 'vtkIOCore-7.1', 'vtkIOGeometry-7.1', 'vtkIOXML-7.1', 'vtkIOXMLParser-7.1', 'vtksys-7.1', 'vtkzlib-7.1'],
+        include_dirs=[ "include", "include/igloo", "/usr/include/python3.7m/", "/usr/local/include/", "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/include/python3.7m/",
+            "C:\\ProgramData\\Anaconda3\\pkgs\\python-3.7.3-h8c8aaf0_0\\include\\",
+            "C:\\ProgramData\\Anaconda3\\pkgs\\py-boost-1.67.0-py37h8300f20_4\\Library\\include\\",
+            "C:/ProgramData/Anaconda3/Library/include\\",
+            "C:/dev/blitzdg/include/"
+        ],
+        library_dirs=[ "/usr/local/lib", "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/",
+            "C:/ProgramData/Anaconda3/pkgs/py-boost-1.67.0-py37h8300f20_4/Library/lib/",
+            "C:\\dev\\blitzdg\\Win64\\",
+            "C:\\dev\\blitzdg\\lib\\"
+        ],
+        libraries=['blitzdg', 'vtkIOXML-7.1', 'vtkCommonCore-7.1', 'vtkCommonExecutionModel-7.1', 'vtkCommonDataModel-7.1', 'vtkCommonMisc-7.1', 'vtkCommonSystem-7.1', 'vtkCommonTransforms-7.1', 'vtkexpat-7.1', 'vtkIOCore-7.1', 'vtkIOGeometry-7.1', 'vtkIOXML-7.1', 'vtkIOXMLParser-7.1', 'vtksys-7.1', 'vtkzlib-7.1', 'libcholmod', 'libcxsparse'],
         define_macros=[("VTKCOMMONCORE_STATIC_DEFINE", None),
             ("VTKCOMMONEXECUTIONMODEL_STATIC_DEFINE", None),
             ("VTKIOGEOMETRY_STATIC_DEFINE", None),
@@ -37,8 +48,7 @@ setuptools.setup(
             ("PY_MINOR_VERSION", "7")
             ],
         language = 'c++11',
-        extra_compile_args = ["-std=c++11"],
-	    extra_link_args = ["-Wl,-rpath,/usr/local/lib"]
+        extra_link_args = ["/DEF:C:/dev/blitzdg/pyblitzdg.dir/Win64/exports.def"]
         )],
      classifiers=[
          "Programming Language :: Python :: 3",
