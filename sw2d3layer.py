@@ -104,7 +104,7 @@ def sw3lrComputeRHS(h1, h1u1, h1v1, h2, h2u2, h2v2, h3, h3u3, h3v3, g, Bx, By, c
     RHS9+= -g*r*h3*(ry*np.dot(Dr, h1) + sy*np.dot(Ds, h1))
 
     # Bottom drag terms
-    CD = 0
+    CD = 2.5e-3
     u3 = h3u3 / h3
     v3 = h3v3 / h3
     spd3 = np.sqrt(u3**2 + v3**2)
@@ -200,7 +200,7 @@ if __name__ == '__main__':
     N = 4
     CFL = 0.45
 
-    filtOrder = 8
+    filtOrder = 4
     filtCutoff = 0.0*N
 
     nodes = dg.TriangleNodesProvisioner(N, meshManager)
@@ -215,7 +215,9 @@ if __name__ == '__main__':
 
     Np = ctx.numLocalPoints
     K = ctx.numElements
-    eta1 = 0.5*np.exp(-10*(x*x) -10*(y*y), dtype=np.float64 , order='C')
+    eta2 = 0.5*np.exp(-10*(x*x) -10*(y*y), dtype=np.float64 , order='C')
+    eta1 = 0*eta2
+    eta3 = eta2
 
     #eta = -1*(x/1500.0)
     u1   = np.zeros([Np, K], dtype=np.float64, order='C')
@@ -224,24 +226,22 @@ if __name__ == '__main__':
     H2 = 2*np.ones([Np, K], dtype=np.float64, order='C')
     H3 = 10.0*np.ones([Np, K], dtype=np.float64, order='C')
 
-    h1 = H1 + eta1
+    h1 = H1 - eta2 + eta1
     h1u1 = h1*u1
     h1v1 = h1*v1
 
-    h2 = H2 + 0.0*eta1
+    h2 = H2 + eta2 - eta3
+    eta1 = 0*eta2
     h2u2 = 0*eta1
     h2v2 = 0*eta1
 
-    h3 = H3 + 0.0*eta1
+    B = 0.0*eta1
+    h3 = H3 + eta3 - B
     h3u3 = 0.0*eta1
     h3v3 = 0.0*eta1
 
-    B = 0.0*eta1
     Bx = 0.0*eta1
     By = 0.0*eta1
-
-    eta2 = h1 - H1 - eta1
-    eta3 = h2 - H2 - eta2 
 
     # setup fields dictionary for outputting.
     fields = dict()
@@ -253,7 +253,7 @@ if __name__ == '__main__':
 
     c = np.sqrt(g*(h1 + h2 + h3))
     #dt =0.125*0.000724295
-    dt = 0.0000724295
+    dt = 0.5*0.000724295
     #dt = CFL*dx/np.max(abs(c))
 
     step = 0
@@ -291,85 +291,6 @@ if __name__ == '__main__':
         h3u3 += dt*RHS8
         h3v3 += dt*RHS9
 
-        # layer numerical adjustments
-        eta1 = (h1+h2+h3) - (H1+H2+H3-B)
-        eta2 = H1 + eta1 - h1
-        eta3 = H2 + eta2 - h2
-
-        u1 = h1u1/h1
-        u2 = h2u2/h2
-        u3 = h3u3/h3
-
-        v1 = h1v1/h1
-        v2 = h2v2/h2
-        v3 = h3v3/h3
-
-        Filt = ctx.filter
-        eta1 = np.dot(ctx.filter, eta1)
-        eta2 = np.dot(ctx.filter, eta2)
-        eta3 = np.dot(ctx.filter, eta3)
-
-        h3 = H3 - B    + eta3
-        h2 = H2 - eta3 + eta2
-        h1 = H1 - eta2 + eta1
-
-        h1u1 = h1*u1
-        h2u2 = h2*u2
-        h3u3 = h2*u3
-
-        h1v1 = h1*v1
-        h2v2 = h2*v2
-        h3v3 = h3*v3
-
-        h1 = h1.flatten("F")
-        h2 = h2.flatten("F")
-        h3 = h3.flatten("F")
-
-        h1u1 = h1u1.flatten("F")
-        h1v1 = h1v1.flatten("F")
-
-        h2u2 = h2u2.flatten("F")
-        h2v2 = h2v2.flatten("F")
-
-        h3u3 = h3u3.flatten("F")
-        h3v3 = h3v3.flatten("F")
-
-
-        vmapM = ctx.vmapM
-        vmapP = ctx.vmapP
-
-        h1[vmapM] = 0.5*(h1[vmapM] + h1[vmapP])
-        h1[vmapP] = h1[vmapM]
-        h2[vmapM] = 0.5*(h2[vmapM] + h2[vmapP])
-        h2[vmapP] = h2[vmapM]
-        h3[vmapM] = 0.5*(h3[vmapM] + h3[vmapP])
-        h3[vmapP] = h3[vmapM]
-        h1u1[vmapM] = 0.5*(h1u1[vmapM] + h1u1[vmapP])
-        h1u1[vmapP] = h1u1[vmapM]
-        h1v1[vmapM] = 0.5*(h1v1[vmapM] + h1v1[vmapP])
-        h1v1[vmapP] = h1v1[vmapM]
-        h2u2[vmapM] = 0.5*(h2u2[vmapM] + h2u2[vmapP])
-        h2u2[vmapP] = h2u2[vmapM]
-        h2v2[vmapM] = 0.5*(h2v2[vmapM] + h2v2[vmapP])
-        h2v2[vmapP] = h2v2[vmapM]
-        h3u3[vmapM] = 0.5*(h3u3[vmapM] + h3u3[vmapP])
-        h3u3[vmapP] = h3u3[vmapM]
-        h3v3[vmapM] = 0.5*(h3v3[vmapM] + h3v3[vmapP])
-        h3v3[vmapP] = h3v3[vmapM]
-
-        h1 = np.reshape(h1, (ctx.numLocalPoints, K), order='F')
-        h2 = np.reshape(h2, (ctx.numLocalPoints, K), order='F')
-        h3 = np.reshape(h3, (ctx.numLocalPoints, K), order='F')
-
-        h1u1 = np.reshape(h1u1, (ctx.numLocalPoints, K), order='F')
-        h1v1 = np.reshape(h1v1, (ctx.numLocalPoints, K), order='F')
-
-        h2u2 = np.reshape(h2u2, (ctx.numLocalPoints, K), order='F')
-        h2v2 = np.reshape(h2v2, (ctx.numLocalPoints, K), order='F')
-
-        h3u3 = np.reshape(h3u3, (ctx.numLocalPoints, K), order='F')
-        h3v3 = np.reshape(h3v3, (ctx.numLocalPoints, K), order='F')
-
         h_max = np.max(np.abs(h1))
         if h_max > 1e8  or np.isnan(h_max):
             raise Exception("A numerical instability has occurred.")
@@ -381,8 +302,8 @@ if __name__ == '__main__':
         if step % 5 == 0:
             print('t=' + str(t))
             eta1 = h1+h2+h3-(H1+H2+H3-B)
-            eta2 = h1 - H1 - eta1
-            eta3 = h2 - H2 - eta2 
+            eta2 = H1 + eta1 - h1
+            eta3 = H2 + eta2 - h2 
             fields["etatop"] = eta1
             fields["etamid"] = -H1 + eta2
             fields["etabot"] = -H1 - H2 + eta3

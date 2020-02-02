@@ -5,9 +5,7 @@ See COPYING and LICENSE files at project root for more details.
 '''
 
 import numpy as np
-from lib import pyblitzdg as dg
-import matplotlib.pyplot as plt
-from pprint import pprint
+from pyblitzdg import pyblitzdg as dg
 
 def sw2dComputeFluxes(h, hu, hv, g, H):
     #h equation
@@ -96,6 +94,7 @@ def sw2dComputeRHS(h, hu, hv, g, H, ctx):
     dFlux2 = 0.5*((F2M - F2P)*nxC + (G2M-G2P)*nyC - spdMax*dhu)
     dFlux3 = 0.5*((F3M - F3P)*nxC + (G3M-G3P)*nyC - spdMax*dhv)
 
+    K = ctx.numElements
     dFlux1Mat = np.reshape(dFlux1, (Nfp*ctx.numFaces, K), order='F')
     dFlux2Mat = np.reshape(dFlux2, (Nfp*ctx.numFaces, K), order='F')
     dFlux3Mat = np.reshape(dFlux3, (Nfp*ctx.numFaces, K), order='F')
@@ -124,86 +123,87 @@ def sw2dComputeRHS(h, hu, hv, g, H, ctx):
     return (RHS1, RHS2, RHS3)
 
 # Main solver:
-g = 9.81
-finalTime = 40.0
-t = 0.0
+if __name__ == '__main__':
+    g = 9.81
+    finalTime = 40.0
+    t = 0.0
 
-meshManager = dg.MeshManager()
-meshManager.readMesh('./input/box.msh')
+    meshManager = dg.MeshManager()
+    meshManager.readMesh('./input/box.msh')
 
-# Numerical parameters:
-N = 1
-CFL = 0.45
+    # Numerical parameters:
+    N = 1
+    CFL = 0.45
 
-filtOrder = 4
-filtCutoff = 0.9*N
+    filtOrder = 4
+    filtCutoff = 0.9*N
 
-nodes = dg.TriangleNodesProvisioner(N, meshManager)
-nodes.buildFilter(filtCutoff, filtOrder)
+    nodes = dg.TriangleNodesProvisioner(N, meshManager)
+    nodes.buildFilter(filtCutoff, filtOrder)
 
-outputter = dg.VtkOutputter(nodes)
+    outputter = dg.VtkOutputter(nodes)
 
-ctx = nodes.dgContext()
+    ctx = nodes.dgContext()
 
-x = ctx.x
-y = ctx.y
+    x = ctx.x
+    y = ctx.y
+
+    Np = ctx.numLocalPoints
+    K = ctx.numElements
+
+    Filt = ctx.filter
 
 
-Np = ctx.numLocalPoints
-K = ctx.numElements
+    eta = np.exp(-10*(x*x) -10*(y*y), dtype=np.dtype('Float64') , order='C')
+    #eta = -1*(x/1500.0)
+    u   = np.zeros([Np, K], dtype=np.dtype('Float64'), order='C')
+    v   = np.zeros([Np, K], dtype=np.dtype('Float64'), order='C')
+    H   = 10*np.ones([Np, K], dtype=np.dtype('Float64'), order='C')
 
-Filt = ctx.filter
+    h = H + eta
+    hu = h*u
+    hv = h*v
 
-eta = np.exp(-10*(x*x) -10*(y*y), dtype=np.dtype('Float64') , order='C')
-#eta = -1*(x/1500.0)
-u   = np.zeros([Np, K], dtype=np.dtype('Float64'), order='C')
-v   = np.zeros([Np, K], dtype=np.dtype('Float64'), order='C')
-H   = 10*np.ones([Np, K], dtype=np.dtype('Float64'), order='C')
-
-h = H + eta
-hu = h*u
-hv = h*v
-
-# setup fields dictionary for outputting.
-fields = dict()
-fields["eta"] = eta
-fields["u"] = u
-fields["v"] = v
-outputter.writeFieldsToFiles(fields, 0)
-
-c = np.sqrt(g*h)
-dt =0.000724295
-#dt = CFL*dx/np.max(abs(c))
-
-step = 0
-while t < finalTime:
-
-    
-    (RHS1,RHS2,RHS3) = sw2dComputeRHS(h, hu, hv, g, H, ctx)
-    
-    # predictor
-    h1  = h + 0.5*dt*RHS1
-    hu1 = hu + 0.5*dt*RHS2
-    hv1 = hv + 0.5*dt*RHS3
-
-    (RHS1,RHS2,RHS3) = sw2dComputeRHS(h1, hu1, hv1, g, H, ctx)
-
-    # corrector - Update solution
-    h += dt*RHS1
-    hu += dt*RHS2
-    hv += dt*RHS3
-
-    h_max = np.max(np.abs(h))
-    if h_max > 1e8  or np.isnan(h_max):
-        raise Exception("A numerical instability has occurred.")
-
-    t += dt
-    step += 1
-
-    print('t=' + str(t))
-
-    eta = h-H
+    # setup fields dictionary for outputting.
+    fields = dict()
     fields["eta"] = eta
-    fields["u"] = hu/h
-    fields["v"] = hv/h
-    outputter.writeFieldsToFiles(fields, step)
+    fields["u"] = u
+    fields["v"] = v
+    outputter.writeFieldsToFiles(fields, 0)
+
+    c = np.sqrt(g*h)
+    dt =0.000724295
+    #dt = CFL*dx/np.max(abs(c))
+
+    step = 0
+    while t < finalTime:
+
+        
+        (RHS1,RHS2,RHS3) = sw2dComputeRHS(h, hu, hv, g, H, ctx)
+        
+        # predictor
+        h1  = h + 0.5*dt*RHS1
+        hu1 = hu + 0.5*dt*RHS2
+        hv1 = hv + 0.5*dt*RHS3
+
+        (RHS1,RHS2,RHS3) = sw2dComputeRHS(h1, hu1, hv1, g, H, ctx)
+
+        # corrector - Update solution
+        h += dt*RHS1
+        hu += dt*RHS2
+        hv += dt*RHS3
+
+        h_max = np.max(np.abs(h))
+        if h_max > 1e8  or np.isnan(h_max):
+            raise Exception("A numerical instability has occurred.")
+
+        t += dt
+        step += 1
+
+        print('t=' + str(t))
+
+        eta = h-H
+        fields["eta"] = eta
+        fields["u"] = hu/h
+        fields["v"] = hv/h
+        outputter.writeFieldsToFiles(fields, step)
