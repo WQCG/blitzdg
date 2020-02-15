@@ -44,7 +44,7 @@ find_library(VTKIOXML7 NAMES "vtkIOXML-7.1" PATHS "/usr/lib" "/usr/local/lib" "/
 find_library(VTKIOXMLPARSER7 NAMES "vtkIOXMLParser-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 find_library(VTKSYS7 NAMES "vtksys-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 
-find_library(GFORTRAN NAMES "gfortran" "gfortran3" PATHS "/miniconda3/lib/" "/usr/lib/gcc/x86_64-linux-gnu/8/")
+find_library(GFORTRAN NAMES "gfortran" "gfortran3" PATHS "/miniconda3/lib/" "/usr/lib/gcc/x86_64-linux-gnu/7/" "/usr/lib/gcc/x86_64-linux-gnu/8/")
 
 if (WIN32)
     find_library(VTKZLIB7 NAMES "vtkzlib-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
