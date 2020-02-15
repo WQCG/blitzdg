@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 3.5)
 set (CMAKE_CONFIGURATION_TYPES "Win64")
 set (CMAKE_BUILD_TYPE Release) # or Debug
 set (CMAKE_CXX_FLAGS "-std=c++14 -fPIC")
-set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2")
-set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage -DBZ_DEBUG")
+set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2 -fPIC")
+set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fPIC -fprofile-arcs -ftest-coverage -DBZ_DEBUG")
 include_directories ("include"
     "include/igloo"
     "/opt/_internal/cpython-3.7.3/include/python3.7m/"
