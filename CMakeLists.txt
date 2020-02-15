@@ -5,9 +5,9 @@ set (CMAKE_BUILD_TYPE Release) # or Debug
 set (CMAKE_CXX_FLAGS "-std=c++14 -fPIC")
 set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2")
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage -DBZ_DEBUG")
-# set (CMAKE_MODULE_LINKER_FLAGS  "${CMAKE_MODULE_LINKER_FLAGS}")
 include_directories ("include"
     "include/igloo"
+    "/opt/_internal/cpython-3.7.3/include/python3.7m/"
     "/usr/include/python3.7m/"
     "/usr/local/include/"
     "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/include/python3.7m/"
@@ -21,21 +21,16 @@ include_directories ("include"
 set(CMAKE_FIND_LIBRARY_PREFIXES "" "lib")
 set(CMAKE_FIND_LIBRARY_SUFFIXES ".so" ".dylib" ".lib" ".a")
 find_library(BLITZ NAMES "blitz" "libblitz" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
-find_library(METIS NAMES "metis" "libmetis" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
-find_library(UMFPACK NAMES "umfpack" "libumfpack" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
-find_library(CXSPARSE NAMES "cxsparse" "libcxsparse" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
-find_library(AMD NAMES "amd" "libamd" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
-find_library(CHOLMOD names "cholmod" "libcholmod" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
-find_library(COLAMD names "colamd" "libcolamd" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
-find_library(SUITESPARSECONFIG NAMES "suitesparseconfig" "libsuitesparseconfig" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+find_library(METIS NAMES "metis" "libmetis" PATHS "/usr/lib64" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+find_library(UMFPACK NAMES "umfpack" "libumfpack" PATHS "/usr/lib64" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+find_library(CXSPARSE NAMES "cxsparse" "libcxsparse" PATHS "/usr/lib64/" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 
 find_library(LAPACK NAMES "liblapack" "lapack" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 find_library(BLAS NAMES "libblas" "blas" "libblas" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 
-find_library(PYTHON3 NAMES "python37" "libpython37" "python3.7" "libpython3.7" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu" "/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu" "lib" "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/")
-find_library(BOOSTPYTHON NAMES "boost_python37-vc140-mt-x64-1_67" "libboost_python3" "boost_python3" "libboost_python3,7" "boost_python3.7" "boost_python3.6" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu" "/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu" "lib")
-find_library(BOOSTNUMPY NAMES "boost_numpy37-vc140-mt-x64-1_67" "libboost_numpy3" "boost_numpy3" "libboost_numpy37" "boost_numpy37" "boost_numpy36" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
-
+find_library(PYTHON3 NAMES "python3.7m" "python37" "libpython37" "python3.7" "libpython3.7" PATHS "/miniconda3/pkgs/python-3.7.3-h0371630_0/lib/" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu" "/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu" "lib" "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/")
+find_library(BOOSTPYTHON NAMES "libboost_python37" "boost_python37-vc140-mt-x64-1_67" "libboost_python3" "boost_python3" "libboost_python3,7" "boost_python3.7" PATHS "/usr/local/lib" "/boost/lib" )
+find_library(BOOSTNUMPY NAMES "libboost_numpy37" "boost_numpy37-vc140-mt-x64-1_67" "libboost_numpy3" "boost_numpy3" "libboost_numpy37" "boost_numpy37" "boost_numpy37" PATHS "/usr/local/lib" "/boost/lib")
 find_library(VTKIOXML7 NAMES "vtkIOXML-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 find_library(VTKCOMMONCORE7 NAMES "vtkCommonCore-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 find_library(VTKCOMMONEXECUTIONMODEL7 NAMES "vtkCommonExecutionModel-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
@@ -48,6 +43,8 @@ find_library(VTKIOGEOMETRY7 NAMES "vtkIOGeometry-7.1" PATHS "/usr/lib" "/usr/loc
 find_library(VTKIOXML7 NAMES "vtkIOXML-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 find_library(VTKIOXMLPARSER7 NAMES "vtkIOXMLParser-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 find_library(VTKSYS7 NAMES "vtksys-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+
+find_library(GFORTRAN NAMES "gfortran" "gfortran3" PATHS "/miniconda3/lib/" "/usr/lib/gcc/x86_64-linux-gnu/8/")
 
 if (WIN32)
     find_library(VTKZLIB7 NAMES "vtkzlib-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
@@ -81,13 +78,15 @@ message("-- found ${VTKIOGEOMETRY7}")
 message("-- found ${VTKIOXML7}")
 message("-- found ${VTKIOXMLPARSER7}")
 message("-- found ${VTKSYS7}")
+message("-- found ${GFORTRAN}")
 
 set (CMAKE_CXX_FLAGS "-Wall -std=c++14 -fPIC")
 set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2")
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage -DBZ_DEBUG")
-include_directories ("include" 
+include_directories (
+    "include" 
     "include/igloo" 
-    "/usr/include/python3.6m/"
+    "/usr/include/python3.7m/"
     "C:/ProgramData/Anaconda3/pkgs/python-3.7.3-h8c8aaf0_0/include/"
     "C:/ProgramData/Anaconda3/pkgs/libboost-1.67.0-hfd51bdf_4/Library/include"
     "C:/ProgramData/Anaconda3/pkgs/py-boost-1.67.0-py37h8300f20_4/Library/include/boost/python"
@@ -107,13 +106,11 @@ link_libraries(
     ${CXSPARSE}
     ${LAPACK}
     ${BLAS}
-    ${CHOLMOD}
-    ${AMD}
-    ${COLAMD}
     ${SUITESPARSECONFIG}
     ${BOOSTPYTHON}
     ${BOOSTNUMPY}
     ${PYTHON3}
+    ${GFORTRAN}
     ${VTKIOXML7}
     ${VTKCOMMONCORE7}
     ${VTKCOMMONEXECUTIONMODEL7}
@@ -138,7 +135,7 @@ set_target_properties(blitzdg
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-    LINK_FLAGS "-Wl,-rpath,/usr/local/lib -L /usr/local/lib -L/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/"
+    LINK_FLAGS "-Wl,-rpath,/usr/local/lib -Wl,-soname,pyblitzdg -L /usr/local/lib -L/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/"
     )
 
 # Link to vtk using static mode (otherwise won't work on windows)
@@ -161,13 +158,11 @@ link_libraries(
     ${CXSPARSE}
     ${LAPACK}
     ${BLAS}
-    ${CHOLMOD}
-    ${AMD}
-    ${COLAMD}
     ${SUITESPARSECONFIG}
     ${BOOSTPYTHON}
     ${BOOSTNUMPY}
     ${PYTHON3}
+    ${GFORTRAN}
     ${VTKIOXML7}
     ${VTKCOMMONCORE7}
     ${VTKCOMMONEXECUTIONMODEL7}
@@ -216,9 +211,6 @@ link_libraries(
     ${CXSPARSE}
     ${LAPACK}
     ${BLAS}
-    ${CHOLMOD}
-    ${AMD}
-    ${COLAMD}
     ${SUITESPARSECONFIG}
     ${BOOSTPYTHON}
     ${BOOSTNUMPY}
