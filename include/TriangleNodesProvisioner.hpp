@@ -8,6 +8,7 @@
  */
 
 #pragma once
+#include "NodesProvisioner2Dbase.hpp"
 #include "Nodes1DProvisioner.hpp"
 #include "DGContext2D.hpp"
 #include "MeshManager.hpp"
@@ -21,7 +22,7 @@ namespace blitzdg {
    * nodes, operators, and geometric factors on triangles.
    * @note This class is moveable but not copyable.
    */ 
-  class TriangleNodesProvisioner {
+  class TriangleNodesProvisioner : public NodesProvisioner2DBase {
       using index_mat_smart_ptr = std::unique_ptr<index_matrix_type>;
       using index_vec_smart_ptr = std::unique_ptr<index_vector_type>;
 
@@ -376,6 +377,11 @@ namespace blitzdg {
       void computeInterpMatrix(const real_vector_type& rout, const real_vector_type& sout, real_matrix_type& IM) const;
 
       /**
+       * Splits high-order elements into smaller elements with linear basis functions.
+       */
+      void splitElements(const real_matrix_type& x, const real_matrix_type& y, const real_matrix_type& field, real_matrix_type& xnew, real_matrix_type& ynew, real_matrix_type& fieldnew) const;
+
+      /**
        * Returns the number of nodes local to a 2D triangular element.
        */
       index_type get_NumLocalPoints() const;
@@ -389,6 +395,11 @@ namespace blitzdg {
        * Returns the number of elements in the 2D grid.
        */
       index_type get_NumElements() const;
+
+      /**
+       * Returns order of the basis polynomials.
+       */
+      index_type get_NOrder() const { return NOrder; };
   };
 } // namespace blitzdg
 

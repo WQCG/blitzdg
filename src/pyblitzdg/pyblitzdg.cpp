@@ -12,7 +12,9 @@
 #include "Types.hpp"
 #include "LSERK4.hpp"
 #include "MeshManager.hpp"
+#include "NodesProvisioner2Dbase.hpp"
 #include "TriangleNodesProvisioner.hpp"
+#include "QuadNodesProvisioner.hpp"
 #include "Poisson2DSparseMatrix.hpp"
 
 using namespace boost::python;
@@ -88,6 +90,10 @@ BOOST_PYTHON_MODULE(pyblitzdg)
         .def("buildFilter", &TriangleNodesProvisioner::buildFilter)
         .def("dgContext", &TriangleNodesProvisioner::get_DGContext);
 
+    class_<QuadNodesProvisioner, boost::noncopyable>("QuadNodesProvisioner", init<index_type, MeshManager&>())
+        .def("buildFilter", &QuadNodesProvisioner::buildFilter)
+        .def("dgContext", &QuadNodesProvisioner::get_DGContext);
+
     class_<DGContext2D>("DGContext2D", init<>())
         .add_property("numLocalPoints", &DGContext2D::numLocalPoints)
         .add_property("numFacePoints", &DGContext2D::numFacePoints)
@@ -112,6 +118,7 @@ BOOST_PYTHON_MODULE(pyblitzdg)
         .add_property("BCmap", &DGContext2D::bcmap_numpy);
     
     class_<VtkOutputter>("VtkOutputter", init<TriangleNodesProvisioner&>())
+        .def(init<QuadNodesProvisioner&>())
         .def("writeFieldToFile", &VtkOutputter::writeFieldToFile_numpy)
         .def("writeFieldsToFiles", &VtkOutputter::writeFieldsToFiles_numpy);
 

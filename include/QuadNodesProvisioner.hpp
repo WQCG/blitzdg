@@ -13,6 +13,7 @@
 #include "MeshManager.hpp"
 #include "Types.hpp"
 #include "LinAlgHelpers.hpp"
+#include "NodesProvisioner2Dbase.hpp"
 #include <memory>
 
 namespace blitzdg {
@@ -21,7 +22,7 @@ namespace blitzdg {
    * nodes, operators, and geometric factors on Quads.
    * @note This class is moveable but not copyable.
    */ 
-  class QuadNodesProvisioner {
+  class QuadNodesProvisioner : public NodesProvisioner2DBase {
       using index_mat_smart_ptr = std::unique_ptr<index_matrix_type>;
       using index_vec_smart_ptr = std::unique_ptr<index_vector_type>;
 
@@ -146,6 +147,12 @@ namespace blitzdg {
      */
     void buildLift();
 
+    /**
+     * Split up high-order elements by node down to linear elements.
+     */
+    void splitElements(const real_matrix_type& x, const real_matrix_type& y, const real_matrix_type& field,
+        real_matrix_type& xnew, real_matrix_type& ynew, real_matrix_type& fieldnew) const;
+
     DGContext2D get_DGContext() const;
 
     const index_vector_type& get_mapB() const { return *mapB; };
@@ -190,6 +197,8 @@ namespace blitzdg {
     const real_matrix_type& get_ny() const { return *ny; };
 
     int get_NumElements() const { return NumElements; };
+
+    int get_NOrder() const { return NOrder; };
 
   };
 }
