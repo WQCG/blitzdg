@@ -17,21 +17,33 @@ RUN pip3 install cpp-coveralls
 RUN apt-get -y install g++-mingw-w64 g++-mingw-w64-x86-64 mingw-w64-tools mingw-w64 mingw-w64-i686-dev binutils-mingw-w64 gfortran-mingw-w64-x86-64
 RUN apt-get -y install zip
 RUN apt-get -y install git
+RUN apt-get -y install software-properties-common
+RUN add-apt-repository -y ppa:deadsnakes/ppa
+RUN apt-get -y install python3.7 libpython3.7-dev
+RUN apt-get -y install cmake
+RUN apt-get -y install libgfortran3
+
+RUN python3.7 -m pip install numpy
+RUN mkdir -p /boostsrc
+WORKDIR /boostsrc
+RUN curl -fsL https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.gz -o boost_1_67_0.tar.gz
+RUN tar zxf boost_1_67_0.tar.gz
+WORKDIR /boostsrc/boost_1_67_0
+RUN ./bootstrap.sh --with-python=/usr/bin/python3.7 --with-libraries=python
+RUN ./b2 --with-python toolset=gcc variant=release link=shared threading=multi runtime-link=shared install
+
 
 # Pull in blitz.
 RUN curl -fsL https://github.com/blitzpp/blitz/archive/1.0.1.tar.gz -o /blitzpp-1.0.1.tar.gz
 RUN mkdir -p /opt/blitzpp
 RUN tar xvf /blitzpp-1.0.1.tar.gz -C /opt/blitzpp
 WORKDIR /opt/blitzpp/blitz-1.0.1
-RUN ./configure && make && make install
+RUN ./configure --enable-shared && make && make install
 
 # build blitz for mingw64
 RUN mkdir -p /opt/blitzpp-mingw64
 RUN tar xvf /blitzpp-1.0.1.tar.gz -C /opt/blitzpp-mingw64
 WORKDIR /opt/blitzpp-mingw64/blitz-1.0.1
 RUN CXX=x86_64-w64-mingw32-g++-posix ./configure --host mingw64
-
-# Pull in doxygen and deps.
-RUN mkdir -p /opt/doxygen
 
 ENTRYPOINT ["/bin/bash"]

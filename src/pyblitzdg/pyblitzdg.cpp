@@ -52,20 +52,22 @@ BOOST_PYTHON_MODULE(pyblitzdg)
 
     boost::python::numpy::initialize();
 
-    class_<Nodes1DProvisioner, boost::noncopyable>("Nodes1DProvisioner", init<index_type, index_type, real_type, real_type>())
-        .def("buildNodes", &Nodes1DProvisioner::buildNodes)
-        .def("computeJacobian", &Nodes1DProvisioner::computeJacobian)
-        .add_property("numLocalPoints", &Nodes1DProvisioner::get_NumLocalPoints)
-        .add_property("xGrid", &Nodes1DProvisioner::get_xGrid_numpy)
-        .add_property("Dr", &Nodes1DProvisioner::get_Dr_numpy)
-        .add_property("rx", &Nodes1DProvisioner::get_rx_numpy)
-        .add_property("Fscale", &Nodes1DProvisioner::get_Fscale_numpy)
-        .add_property("Lift", &Nodes1DProvisioner::get_Lift_numpy)
-        .add_property("vmapM", &Nodes1DProvisioner::get_vmapM_numpy)
-        .add_property("vmapP", &Nodes1DProvisioner::get_vmapP_numpy)
-        .add_property("mapI", &Nodes1DProvisioner::get_mapI)
-        .add_property("mapO", &Nodes1DProvisioner::get_mapO)
-        .add_property("nx", &Nodes1DProvisioner::get_nx_numpy);
+    class_<Nodes1DProvisioner, boost::noncopyable>("Nodes1DProvisioner", "Class for building a one-dimensional DG mesh from line segments discretized using Legendre-Gauss-Lobatto polynomial interpolation nodes.", init<index_type, index_type, real_type, real_type>(args("self", "NOrder", "K", "xLeft", "xRight")))
+        .def("buildNodes", &Nodes1DProvisioner::buildNodes, "Builds the LGL nodes specified by the parameters passed into the constructor."
+            , args("self"))
+        .def("computeJacobian", &Nodes1DProvisioner::computeJacobian, "Computes the geometric Jacobian of the mapping to the standard element."
+            , args("self"))
+        .add_property("numLocalPoints", &Nodes1DProvisioner::get_NumLocalPoints, "Property containing the number of points per element.")
+        .add_property("xGrid", &Nodes1DProvisioner::get_xGrid_numpy, "Property containing the physical or 'x'-grid, a subset of the real line.")
+        .add_property("Dr", &Nodes1DProvisioner::get_Dr_numpy, "Property containing the differentiation matrix for the standard element, a discretization of coordinate r in [-1, 1].")
+        .add_property("rx", &Nodes1DProvisioner::get_rx_numpy, "Property containing the derivative of the coordinate r with respect to x.")
+        .add_property("Fscale", &Nodes1DProvisioner::get_Fscale_numpy, "Property containing the geometric scaling factor for boundary (i.e., end-point) integrals, i.e., F = 1/Jacobian evaluated along the faces of all elements.")
+        .add_property("Lift", &Nodes1DProvisioner::get_Lift_numpy, "Property containing the linear lifting operator to transform from face nodes to elemental nodes left-multiplied by the standard element's inverse mass matrix.")
+        .add_property("vmapM", &Nodes1DProvisioner::get_vmapM_numpy, "Property containing the volume-to-surface maps for interior (-) traces.")
+        .add_property("vmapP", &Nodes1DProvisioner::get_vmapP_numpy, "Property containing the volume-to-surface maps for exterior (+) traces.")
+        .add_property("mapI", &Nodes1DProvisioner::get_mapI, "Property containing the surface index of the Inflow boundary.")
+        .add_property("mapO", &Nodes1DProvisioner::get_mapO, "Property containing the surface index of the Outflow boundary.")
+        .add_property("nx", &Nodes1DProvisioner::get_nx_numpy, "Property containing the unit outward-pointing normal along elemental surface boundaries.");
 
     class_<lserk4wrapper>("LSERK4")
         .def_readonly("numStages", new int(5))
