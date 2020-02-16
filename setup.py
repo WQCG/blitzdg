@@ -14,7 +14,7 @@ pyblitzdg = Extension('pyblitzdg',
 
 setuptools.setup(
      name='pyblitzdg',  
-     version='0.1.5',
+     version='0.2.0',
      scripts=[] ,
      author="Waterloo Quantitative Consulting Group",
      author_email="dsteinmo@wqcg.ca",
@@ -22,7 +22,7 @@ setuptools.setup(
      long_description=long_description,
      long_description_content_type="text/markdown",
      url="https://github.com/WQCG/blitzdg",
-     platforms=['linux_x86_64', 'win64'],
+     platforms=['manylinux2010', 'win64', 'macosx'],
      ext_modules=[Extension('pyblitzdg', ['src/pyblitzdg/pyblitzdg.cpp'], 
         include_dirs=[ "include", "include/igloo", "/usr/include/python3.7m/", "/usr/local/include/", "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/include/python3.7m/"],
         library_dirs=[ "/usr/local/lib", "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/" ],
