@@ -5,16 +5,9 @@ from distutils.core import Extension
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-pyblitzdg = Extension('pyblitzdg',
-                        sources=['src/pyblitzdg/pyblitzdg.cpp'],
-                        include_dirs=['/usr/local/include', 'include'],
-                        library_dirs=['/usr/local/lib/boost', '/usr/local/lib', 'lib'],
-                        runtime_library_dirs=['/usr/local/lib/boost'],
-                        libraries=['boost_python3', 'blitzdg', 'blitz'])
-
 setuptools.setup(
      name='pyblitzdg',  
-     version='0.1.5',
+     version='0.2.0',
      scripts=[] ,
      author="Waterloo Quantitative Consulting Group",
      author_email="dsteinmo@wqcg.ca",
@@ -22,10 +15,12 @@ setuptools.setup(
      long_description=long_description,
      long_description_content_type="text/markdown",
      url="https://github.com/WQCG/blitzdg",
-     platforms=['linux_x86_64', 'win64'],
+     platforms=['manylinux2010', 'win64', 'macosx'],
      ext_modules=[Extension('pyblitzdg', ['src/pyblitzdg/pyblitzdg.cpp'], 
         include_dirs=[ "include", "include/igloo", "/usr/include/python3.7m/", "/usr/local/include/", "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/include/python3.7m/"],
-        library_dirs=[ "/usr/local/lib", "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/" ],
+        library_dirs=[ "/usr/lib64/", "/usr/local/lib", 
+            "/miniconda3/pkgs/python-3.7.3-h0371630_0/lib/",
+            "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/" ],
         libraries=['blitzdg', 'vtkIOXML-7.1', 'vtkCommonCore-7.1', 'vtkCommonExecutionModel-7.1', 'vtkCommonDataModel-7.1', 'vtkCommonMisc-7.1', 'vtkCommonSystem-7.1', 'vtkCommonTransforms-7.1', 'vtkexpat-7.1', 'vtkIOCore-7.1', 'vtkIOGeometry-7.1', 'vtkIOXML-7.1', 'vtkIOXMLParser-7.1', 'vtksys-7.1', 'vtkzlib-7.1'],
         define_macros=[("VTKCOMMONCORE_STATIC_DEFINE", None),
             ("VTKCOMMONEXECUTIONMODEL_STATIC_DEFINE", None),
