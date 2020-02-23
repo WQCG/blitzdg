@@ -72,9 +72,6 @@ namespace blitzdg {
         buildLift();
         buildPhysicalGrid();
         buildMaps();
-
-        // For curved/high-order integration.
-        buildGaussFaceNodes(2*(NOrder+1));
     }
 
     GaussFaceContext2D TriangleNodesProvisioner::buildGaussFaceNodes(index_type NGauss) {
