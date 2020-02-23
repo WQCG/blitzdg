@@ -124,6 +124,9 @@ namespace blitzdg {
             rx(NGauss*NumFaces, NumElements), ry(NGauss*NumFaces, NumElements),
             sx(NGauss*NumFaces, NumElements), sy(NGauss*NumFaces, NumElements);
 
+        index_vector_type mapM(NGauss*NumFaces*NumElements), mapP(NGauss*NumFaces*NumElements);
+        mapM = ii, mapP = ii;
+
         real_matrix_type& x = *xGrid, y = *yGrid;
         for (index_type f=0; f < NumFaces; ++f) {
                 real_matrix_type VM(NGauss, Np), dVMdr(NGauss, Np), dVMds(NGauss, Np);
@@ -177,6 +180,37 @@ namespace blitzdg {
                         sx(ids1(ig), k)  = gsx(ig);
                         sy(ids1(ig), k)  = gsy(ig);
                     }
+                
+                    const index_vector_type& E2E = Mesh2D.get_EToE(), E2F = Mesh2D.get_EToF();
+                    index_type k2 = E2E(NumFaces*k + f), f2 = E2F(NumFaces*k + f);
+
+                    index_vector_type ids2(NGauss);
+                    for (index_type ind=NGauss-1; ind >= 0; --ind) {
+                        ids2(ind) = f2*ind; 
+                    }
+                    if (k != k2) {
+                        for (index_type ig=0; ig < NGauss; ++ig) {
+                            mapP(ids1(ig) + k*NGauss) = mapM(ids2(ig + k2*NGauss));
+                        }
+                    } else {
+                        for (index_type ig=0; ig < NGauss; ++ig) {
+                            mapP(ids1(ig) + k*NGauss) = mapM(ids1(ig + k*NGauss));
+                        }
+                        // add mapM to mapB here.
+
+
+                    }
+
+                    //if ()
+
+                //k2 = EToE(k1,f1); f2 = EToF(k1,f1); ids2 = f2*NGauss:-1:(f2-1)*NGauss+1;
+                //if(k1~=k2)
+                //gauss.mapP(ids1, k1) = gauss.mapM(ids2,k2);		   
+                //else
+                //gauss.mapP(ids1, k1) = gauss.mapM(ids1,k1);	
+                //gauss.mapB = [gauss.mapB;gauss.mapM(ids1,k1)];
+                //switch(BCType(k1,f1)
+                // append to the right boundary map for each switch... 
 
             }
         }
