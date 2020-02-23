@@ -3,6 +3,7 @@
 
 #include "TriangleNodesProvisioner.hpp"
 #include "DGContext2D.hpp"
+#include "GaussFaceContext2D.hpp"
 #include "CSCMatrix.hpp"
 #include "BlitzHelpers.hpp"
 #include "DenseMatrixInverter.hpp"
@@ -71,6 +72,125 @@ namespace blitzdg {
         buildLift();
         buildPhysicalGrid();
         buildMaps();
+
+        // For curved/high-order integration.
+        buildGaussFaceNodes(2*(NOrder+1));
+    }
+
+    GaussFaceContext2D TriangleNodesProvisioner::buildGaussFaceNodes(index_type NGauss) {
+        blitz::firstIndex ii;
+        blitz::secondIndex jj;
+        blitz::thirdIndex kk;
+
+        index_type Np = NumLocalPoints;
+
+        real_vector_type z(NGauss), w(NGauss);
+        real_vector_type face1r(NGauss), face2r(NGauss), face3r(NGauss);
+        real_vector_type face1s(NGauss), face2s(NGauss), face3s(NGauss);
+
+        // alpha = beta = 0, for Legendre polynomials.
+        Jacobi.computeJacobiQuadWeights(0, 0, NGauss - 1, z, w);
+        face1r = z; face2r = -z; face3r = 0.0*z - 1.0;
+        face1s = 0.0*z - 1.0; face2s = z; face3s = -z;
+
+        real_matrix_type V1(NGauss, Np), V2(NGauss, Np), V3(NGauss, Np);
+        
+        computeVandermondeMatrix(NOrder, face1r, face1s, V1);
+        computeVandermondeMatrix(NOrder, face2r, face2s, V2);
+        computeVandermondeMatrix(NOrder, face3r, face3s, V3);
+
+        real_matrix_type gaussFaceInterp1(NGauss, Np, ColumnMajorOrder()), 
+            gaussFaceInterp2(NGauss, Np, ColumnMajorOrder()), gaussFaceInterp3(NGauss, Np, ColumnMajorOrder());
+
+        real_matrix_type & invV = *Vinv, Drref = *Dr, Dsref = *Ds;
+        gaussFaceInterp1 = blitz::sum(V1(ii, kk)*invV(kk, jj), kk);
+        gaussFaceInterp2 = blitz::sum(V2(ii, kk)*invV(kk, jj), kk);
+        gaussFaceInterp3 = blitz::sum(V3(ii, kk)*invV(kk, jj), kk);
+
+    
+        real_matrix_type gaussInterpMatrix(NumFaces*NGauss, Np);
+        gaussInterpMatrix(Range(0,          NGauss - 1), Range::all()) = gaussFaceInterp1;
+        gaussInterpMatrix(Range(1*NGauss, 2*NGauss - 1), Range::all()) = gaussFaceInterp2;
+        gaussInterpMatrix(Range(2*NGauss, 3*NGauss - 1), Range::all()) = gaussFaceInterp3;
+
+        index_vector_type gmapM(NGauss*NumFaces*NumElements), gmapP(NGauss*NumFaces*NumElements);
+        gmapM = ii; gmapP = ii;
+
+        index_hashmap gbcMap;
+
+        // zer = zeros(NGauss*Nfaces,K);
+        real_matrix_type nx(NGauss*NumFaces, NumElements), ny(NGauss*NumFaces, NumElements),
+            sJ(NGauss*NumFaces, NumElements), Jac(NGauss*NumFaces, NumElements),
+            rx(NGauss*NumFaces, NumElements), ry(NGauss*NumFaces, NumElements),
+            sx(NGauss*NumFaces, NumElements), sy(NGauss*NumFaces, NumElements);
+
+        real_matrix_type& x = *xGrid, y = *yGrid;
+        for (index_type f=0; f < NumFaces; ++f) {
+                real_matrix_type VM(NGauss, Np), dVMdr(NGauss, Np), dVMds(NGauss, Np);
+                VM(Range::all(), Range::all()) = gaussInterpMatrix(Range(f*NGauss, (f+1)*NGauss - 1), Range::all());
+
+                dVMdr = blitz::sum(VM(ii, kk)*Drref(kk, jj), kk);
+                dVMds = blitz::sum(VM(ii, kk)*Dsref(kk, jj), kk);
+
+                index_vector_type ids1(NGauss);
+                ids1 = f*NGauss + ii;
+                for (index_type k=0; k < NumElements; ++k) {
+                    real_vector_type gxr(NGauss), gyr(NGauss),
+                        gxs(NGauss), gys(NGauss), gJac(NGauss),
+                        grx(NGauss), gry(NGauss), gsx(NGauss), gsy(NGauss),
+                        gnx(NGauss), gny(NGauss), gsJ(NGauss);
+
+                    real_vector_type xk(NumLocalPoints), yk(NumLocalPoints);
+                    xk = x(Range::all(), k);
+                    yk = y(Range::all(), k);
+
+                    gxr = blitz::sum(dVMdr(ii,jj)*xk(jj), jj);
+                    gyr = blitz::sum(dVMdr(ii,jj)*yk(jj), jj);
+                    gxs = blitz::sum(dVMds(ii,jj)*xk(jj), jj);
+                    gys = blitz::sum(dVMds(ii,jj)*yk(jj), jj);
+
+                    gJac = gxr*gys - gxs*gyr;
+
+                    // Invert the 2x2 mapping matrix.
+                    grx = gys/gJac;
+                    gry =-gxs/gJac;
+                    gsx =-gyr/gJac;
+                    gsy = gxr/gJac;
+
+                    if (f == 0) { gnx = -gsx; gny = -gsy; }
+                    else if (f == 1) { gnx = grx + gsx; gny = gry + gsy;}
+                    else if (f == 2) { gnx = -grx; gny = -gry; }
+                
+                    gsJ = blitz::sqrt(gnx*gnx + gny*gny);
+                    gnx = gnx / gsJ;
+                    gny = gny / gsJ;
+                    gsJ = gsJ * gJac;
+
+                    // copy to the global arrays.
+                    for (index_type ig=0; ig < NGauss; ++ig) {
+                        nx(ids1(ig), k)  = gnx(ig);
+                        ny(ids1(ig), k)  = gny(ig);
+                        sJ(ids1(ig), k)  = gsJ(ig);
+                        Jac(ids1(ig), k) = gJac(ig);
+                        rx(ids1(ig), k)  = grx(ig);
+                        ry(ids1(ig), k)  = gry(ig);
+                        sx(ids1(ig), k)  = gsx(ig);
+                        sy(ids1(ig), k)  = gsy(ig);
+                    }
+
+            }
+        }
+        return GaussFaceContext2D (
+            NGauss,
+            nx,
+            ny,
+            sJ,
+            Jac,
+            rx,
+            ry,
+            sx,
+            sy
+        );
     }
 
 	void TriangleNodesProvisioner::evaluateSimplexPolynomial(const real_vector_type & a, const real_vector_type & b, index_type i, index_type j, real_vector_type & p) const {

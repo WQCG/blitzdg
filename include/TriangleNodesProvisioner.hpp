@@ -11,6 +11,7 @@
 #include "NodesProvisioner2Dbase.hpp"
 #include "Nodes1DProvisioner.hpp"
 #include "DGContext2D.hpp"
+#include "GaussFaceContext2D.hpp"
 #include "MeshManager.hpp"
 #include "Types.hpp"
 #include "LinAlgHelpers.hpp"
@@ -370,6 +371,11 @@ namespace blitzdg {
        * exponential power is determined by s.
        */
       void buildFilter(real_type Nc, index_type s);
+
+      /**
+       * Builds out the Gauss Face Nodes context.
+       */
+      GaussFaceContext2D buildGaussFaceNodes(index_type NGauss);
 
       /**
        * Build an interpolation operator to a new set of nodes on the reference triangle.
