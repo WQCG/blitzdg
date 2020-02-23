@@ -3,6 +3,7 @@
 
 #include "LinAlgHelpers.hpp"
 #include "TriangleNodesProvisioner.hpp"
+#include "GaussFaceContext2D.hpp"
 #include "MeshManager.hpp"
 #include "Types.hpp"
 #include "PathResolver.hpp"
@@ -434,6 +435,20 @@ namespace blitzdg {
 
 				Assert::That(normInf(resmapW), Equals(0));
 			}
+			It(Should_Build_Gauss_Face_Mesh_and_Quadrature) {
+				cout << "Should_Build_Gauss_Face_Mesh_and_Quadrature" << endl;
+				TriangleNodesProvisioner & triangleNodes = *triangleNodesProvisioner;
+
+				triangleNodes.buildNodes();
+				triangleNodes.buildPhysicalGrid();
+				triangleNodes.buildMaps();
+
+				GaussFaceContext2D gctx = triangleNodes.buildGaussFaceNodes(2*(NOrder+1));
+
+				Assert::That(gctx.NGauss(), Equals(2*(NOrder+1)));
+				// TODO: more assertions here...
+			}
+
 		};
    } // namespace TriangleNodesProvisionerTests
 } // namespace blitzdg
