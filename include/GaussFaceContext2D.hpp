@@ -66,6 +66,8 @@ namespace blitzdg {
         const real_matrix_type& sx() const { return *sx_; }
         const real_matrix_type& sy() const { return *sy_; }
         const index_hashmap& bcMap() const { return *bcMap_; }
+        const real_matrix_type& x() const { return *x_; }
+        const real_matrix_type& y() const { return *y_; }
         const real_matrix_type& W() const { return *W_; }
     };
 }

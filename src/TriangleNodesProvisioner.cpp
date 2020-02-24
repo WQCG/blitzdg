@@ -60,6 +60,8 @@ namespace blitzdg {
         Filter{ new real_matrix_type((_NOrder + 2)*(_NOrder+1)/2, (_NOrder + 2)*(_NOrder+1)/2) },
         Fmask{ new index_matrix_type( _NOrder+1, NumFaces) },
         Fscale{ new real_matrix_type((_NOrder+1)*NumFaces, _MeshManager.get_NumElements()) },
+        Fx{ new real_matrix_type((_NOrder+1)*NumFaces, _MeshManager.get_NumElements()) },
+        Fy{ new real_matrix_type((_NOrder+1)*NumFaces, _MeshManager.get_NumElements()) },
         vmapM{ new index_vector_type((_NOrder+1)*NumFaces*_MeshManager.get_NumElements()) },
         vmapP{ new index_vector_type((_NOrder+1)*NumFaces*_MeshManager.get_NumElements()) },
         mapP{ new index_vector_type((_NOrder+1)*NumFaces*_MeshManager.get_NumElements()) },
@@ -699,6 +701,8 @@ namespace blitzdg {
         real_matrix_type fxr(numLocalFaceNodes, NumElements), fxs(numLocalFaceNodes, NumElements);
         real_matrix_type fyr(numLocalFaceNodes, NumElements), fys(numLocalFaceNodes, NumElements);
 
+        real_matrix_type& fx = *Fx, fy = *Fy;
+
         for (index_type k=0; k < NumElements; ++k) {
             index_type count=0;
             for (index_type f=0; f < NumFaces; ++f) {
@@ -707,6 +711,8 @@ namespace blitzdg {
                     fxs(count, k) = xs(Fmsk(n, f), k);
                     fyr(count, k) = yr(Fmsk(n, f), k);
                     fys(count, k) = ys(Fmsk(n, f), k);
+                    fx(count,  k) = x(Fmsk(n, f), k);
+                    fy(count,  k) = y(Fmsk(n, f), k);
                     ++count;
                 }
             }
