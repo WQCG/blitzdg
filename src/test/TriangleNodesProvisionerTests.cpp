@@ -3,6 +3,7 @@
 
 #include "LinAlgHelpers.hpp"
 #include "TriangleNodesProvisioner.hpp"
+#include "GaussFaceContext2D.hpp"
 #include "MeshManager.hpp"
 #include "Types.hpp"
 #include "PathResolver.hpp"
@@ -434,6 +435,35 @@ namespace blitzdg {
 
 				Assert::That(normInf(resmapW), Equals(0));
 			}
+			It(Should_Build_Gauss_Face_Mesh_and_Quadrature) {
+				cout << "Should_Build_Gauss_Face_Mesh_and_Quadrature" << endl;
+				TriangleNodesProvisioner & triangleNodes = *triangleNodesProvisioner;
+
+				triangleNodes.buildNodes();
+				triangleNodes.buildPhysicalGrid();
+				triangleNodes.buildMaps();
+
+				GaussFaceContext2D gctx = triangleNodes.buildGaussFaceNodes(2*(NOrder+1));
+
+				index_type Ng = gctx.NGauss();
+				Assert::That(Ng, Equals(2*(NOrder+1)));
+				// TODO: more assertions here...
+
+				const real_matrix_type& xtest = triangleNodes.get_Fx(), ytest = triangleNodes.get_Fy();
+
+				real_type P = std::hypot(xtest(NOrder, 0) - xtest(0, 0), ytest(NOrder, 0)-ytest(0, 0))
+					+ std::hypot(xtest(2*NOrder+1, 0)-xtest(NOrder+1, 0), ytest(2*NOrder+1, 0)-ytest(NOrder+1, 0))
+					+ std::hypot(xtest(3*NOrder+2, 0)-xtest(2*(NOrder+1), 0), ytest(3*NOrder+2, 0)-ytest(2*(NOrder+1), 0));
+
+				
+				const real_matrix_type& W = gctx.W();
+				real_vector_type W0(3*Ng);
+				W0 = W(blitz::Range::all(), 0);
+				real_type Pquad = blitz::sum(W0);
+
+				Assert::That(std::abs(P - Pquad), IsLessThan(eps));
+			}
+
 		};
    } // namespace TriangleNodesProvisionerTests
 } // namespace blitzdg

@@ -11,6 +11,7 @@
 #include "NodesProvisioner2Dbase.hpp"
 #include "Nodes1DProvisioner.hpp"
 #include "DGContext2D.hpp"
+#include "GaussFaceContext2D.hpp"
 #include "MeshManager.hpp"
 #include "Types.hpp"
 #include "LinAlgHelpers.hpp"
@@ -54,10 +55,9 @@ namespace blitzdg {
       real_mat_smart_ptr Filter;
 
       index_mat_smart_ptr Fmask;
+      real_mat_smart_ptr Fscale;
       real_mat_smart_ptr Fx;
       real_mat_smart_ptr Fy;
-
-      real_mat_smart_ptr Fscale;
 
       index_vec_smart_ptr vmapM;
       index_vec_smart_ptr vmapP;
@@ -282,12 +282,12 @@ namespace blitzdg {
       /**
        * Returns a reference to the faces-only x-grid.
        */
-      const real_matrix_type & get_Fx() const;
+      const real_matrix_type & get_Fx() const { return *Fx; }
 
       /**
        * Returns a reference to the faces-only y-grid.
        */
-      const real_matrix_type & get_Fy() const;
+      const real_matrix_type & get_Fy() const { return *Fy; }
 
       /**
        * Returns a reference to the Face-scaling factor (inverse of Jacobian at face nodes).
@@ -370,6 +370,11 @@ namespace blitzdg {
        * exponential power is determined by s.
        */
       void buildFilter(real_type Nc, index_type s);
+
+      /**
+       * Builds out the Gauss Face Nodes context.
+       */
+      GaussFaceContext2D buildGaussFaceNodes(index_type NGauss);
 
       /**
        * Build an interpolation operator to a new set of nodes on the reference triangle.
