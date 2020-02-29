@@ -117,15 +117,16 @@ namespace blitzdg {
         index_vector_type gmapM(NGauss*NumFaces*NumElements), gmapP(NGauss*NumFaces*NumElements);
         gmapM = ii; gmapP = ii;
 
-        index_hashmap gbcMap;
-        gbcMap.insert({BCTag::Wall, std::vector<index_type>()});
-        gbcMap.insert({BCTag::Dirichlet, std::vector<index_type>()});
-        gbcMap.insert({BCTag::Neuman, std::vector<index_type>()});
-        gbcMap.insert({BCTag::In, std::vector<index_type>()});
-        gbcMap.insert({BCTag::Out, std::vector<index_type>()});
-        gbcMap.insert({BCTag::Cyl, std::vector<index_type>()});
-        gbcMap.insert({BCTag::Far, std::vector<index_type>()});
-        gbcMap.insert({BCTag::Slip, std::vector<index_type>()});
+        index_hashmap gbcMap = {
+            {BCTag::Wall, std::vector<index_type>()},
+            {BCTag::Dirichlet, std::vector<index_type>()},
+            {BCTag::Neuman, std::vector<index_type>()},
+            {BCTag::In, std::vector<index_type>()},
+            {BCTag::Out, std::vector<index_type>()},
+            {BCTag::Cyl, std::vector<index_type>()},
+            {BCTag::Far, std::vector<index_type>()},
+            {BCTag::Slip, std::vector<index_type>()}
+        };
 
         real_matrix_type nx(NGauss*NumFaces, NumElements), ny(NGauss*NumFaces, NumElements),
             sJ(NGauss*NumFaces, NumElements), Jac(NGauss*NumFaces, NumElements),
@@ -170,9 +171,13 @@ namespace blitzdg {
                 gsx =-gyr/gJac;
                 gsy = gxr/gJac;
 
-                if (f == 0) { gnx = -gsx; gny = -gsy; }
-                else if (f == 1) { gnx = grx + gsx; gny = gry + gsy;}
-                else if (f == 2) { gnx = -grx; gny = -gry; }
+                if (f == 0) { 
+                    gnx = -gsx; gny = -gsy; 
+                } else if (f == 1) { 
+                    gnx = grx + gsx; gny = gry + gsy;
+                } else if (f == 2) { 
+                    gnx = -grx; gny = -gry;
+                }
             
                 gsJ = blitz::sqrt(gnx*gnx + gny*gny);
                 gnx = gnx / gsJ;
@@ -233,21 +238,10 @@ namespace blitzdg {
         // Jacobian scaling.
         W *= sJ;
 
-        return GaussFaceContext2D (
-            NGauss,
-            nx,
-            ny,
-            sJ,
-            Jac,
-            rx,
-            ry,
-            sx,
-            sy,
-            gbcMap,
-            gx,
-            gy,
-            W
-        );
+        return GaussFaceContext2D { 
+            NGauss, nx, ny, sJ, Jac, rx, ry,
+            sx, sy, gbcMap, gx, gy, W
+        };
     }
 
 	void TriangleNodesProvisioner::evaluateSimplexPolynomial(const real_vector_type & a, const real_vector_type & b, index_type i, index_type j, real_vector_type & p) const {
@@ -656,8 +650,7 @@ namespace blitzdg {
         real_matrix_type& D_sw = *Dsw;
 
         computeVandermondeMatrix(NOrder, r, s, V2D);
-        real_matrix_type& VinvRef = *Vinv;
-        Inverter.computeInverse(*V, VinvRef);
+        Inverter.computeInverse(*V, *Vinv);
         
         computeGradVandermondeMatrix(NOrder, r, s, V2Dr, V2Ds);
         computeDifferentiationMatrices(V2Dr, V2Ds, V2D, D_r, D_s, D_rw, D_sw);
@@ -986,8 +979,7 @@ namespace blitzdg {
         V2D = 0.0*jj;
         computeVandermondeMatrix(NOrder, r, s, V2D);
         
-        real_matrix_type& VinvRef = *Vinv;
-        Inverter.computeInverse(V2D, VinvRef);
+        Inverter.computeInverse(V2D, *Vinv);
 
         MassInv = 0.0*jj;
         MassInv = sum(V2D(ii,kk)*V2D(jj,kk), kk);
