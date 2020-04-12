@@ -210,6 +210,10 @@ namespace blitzdg {
       boost::python::numpy::ndarray get_ElementPartitionMap_numpy() const;
       boost::python::numpy::ndarray get_Elements_numpy() const;
       boost::python::numpy::ndarray get_Vertices_numpy() const;
+      boost::python::numpy::ndarray get_BCType_numpy() const;
+
+      void set_BCType_numpy(boost::python::numpy::ndarray bcType);
+
 
       void buildMesh(boost::python::numpy::ndarray EToV, boost::python::numpy::ndarray Vert);
 
