@@ -71,8 +71,9 @@ namespace blitzdg{
         const real_matrix_type& nx = dg.nx(), ny  = dg.ny();
 
         real_vector_type edge1(Nfp), edge2(Nfp), edge3(Nfp);
-        for (index_type i=0; i < Nfp; ++i)
+        for (index_type i=0; i < Nfp; ++i) {
             edge1(i) = r(Fmask(i, 0));
+        }
 
         vandermonde.computeVandermondeMatrix(edge1, V1D1, V1Dinv1);
         myTemp = blitz::sum(V1Dinv1(kk,ii)*V1Dinv1(kk,jj), kk);
@@ -95,8 +96,9 @@ namespace blitzdg{
             }
         }
 
-        for (index_type i=0; i < Nfp; ++i)
+        for (index_type i=0; i < Nfp; ++i) {
             edge3(i) = s(Fmask(i, 2));
+        }
 
         vandermonde.computeVandermondeMatrix(edge3, V1D3, V1Dinv3);
         myTemp = blitz::sum(V1Dinv3(kk,ii)*V1Dinv3(kk,jj), kk);
@@ -242,8 +244,9 @@ namespace blitzdg{
         const real_matrix_type& nx = dg.nx(), ny  = dg.ny();
 
         real_vector_type edge1(Nfp), edge2(Nfp), edge3(Nfp);
-        for (index_type i=0; i < Nfp; ++i)
+        for (index_type i=0; i < Nfp; ++i) {
             edge1(i) = r(Fmask(i, 0));
+        }
 
         vandermonde.computeVandermondeMatrix(edge1, V1D1, V1Dinv1);
         myTemp = blitz::sum(V1Dinv1(kk,ii)*V1Dinv1(kk,jj), kk);
@@ -266,8 +269,9 @@ namespace blitzdg{
             }
         }
 
-        for (index_type i=0; i < Nfp; ++i)
+        for (index_type i=0; i < Nfp; ++i) {
             edge3(i) = s(Fmask(i, 2));
+        }
 
         vandermonde.computeVandermondeMatrix(edge3, V1D3, V1Dinv3);
         myTemp = blitz::sum(V1Dinv3(kk,ii)*V1Dinv3(kk,jj), kk);
