@@ -80,11 +80,14 @@ BOOST_PYTHON_MODULE(pyblitzdg)
         .def("readMesh", &MeshManager::readMesh)
         .def("partitionMesh", &MeshManager::partitionMesh)
         .def("buildMesh", &MeshManager::buildMesh)
+        .def("setBCType", &MeshManager::set_BCType_numpy)
         .add_property("vertexPartitionMap", &MeshManager::get_VertexPartitionMap_numpy)
         .add_property("elementPartitionMap", &MeshManager::get_ElementPartitionMap_numpy)
         .add_property("numElements", &MeshManager::get_NumElements)
         .add_property("vertices", &MeshManager::get_Vertices_numpy)
-        .add_property("elements", &MeshManager::get_Elements_numpy);
+        .add_property("elements", &MeshManager::get_Elements_numpy)
+        .add_property("bcType", &MeshManager::get_BCType_numpy);
+
 
     class_<TriangleNodesProvisioner, boost::noncopyable>("TriangleNodesProvisioner", init<index_type, MeshManager&>())
         .def("buildFilter", &TriangleNodesProvisioner::buildFilter)
@@ -123,6 +126,7 @@ BOOST_PYTHON_MODULE(pyblitzdg)
         .def("writeFieldsToFiles", &VtkOutputter::writeFieldsToFiles_numpy);
 
     class_<Poisson2DSparseMatrix, boost::noncopyable>("Poisson2DSparseMatrix", init<DGContext2D&, MeshManager&>())
+        .def("buildBcRhs", &Poisson2DSparseMatrix::buildBcRhs_numpy)
         .def("getOP", &Poisson2DSparseMatrix::getOP_numpy)
         .def("getMM", &Poisson2DSparseMatrix::getMM_numpy);
 }

@@ -645,4 +645,17 @@ namespace blitzdg {
         return result;
     }
 
+    ndarray MeshManager::get_BCType_numpy() const {
+        Py_intptr_t shape[2] = { NumElements, NumFaces };
+        ndarray result = zeros(2, shape, dtype::get_builtin<index_type>());
+        std::copy(BCType->begin(), BCType->end(), reinterpret_cast<index_type*>(result.get_data()));
+        return result;
+    }
+
+    void MeshManager::set_BCType_numpy(boost::python::numpy::ndarray bcType) {
+		char * raw = bcType.get_data();
+        std::copy(&raw[0], &raw[bcType.shape(0)*bcType.shape(1)*sizeof(index_type)] , reinterpret_cast<char*>(BCType->data()));
+    }
+
+
 } // namespace blitzdg
