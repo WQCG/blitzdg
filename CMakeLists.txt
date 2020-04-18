@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 
 set (CMAKE_CONFIGURATION_TYPES "Win64")
+set (CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS 1)
 set (CMAKE_BUILD_TYPE Release) # or Debug
 set (CMAKE_CXX_FLAGS "-std=c++14 -fPIC")
 set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2")
@@ -80,10 +81,11 @@ message("-- found ${VTKIOXML7}")
 message("-- found ${VTKIOXMLPARSER7}")
 message("-- found ${VTKSYS7}")
 
-set (CMAKE_CXX_FLAGS "-Wall -std=c++14 -fPIC")
+set (CMAKE_CXX_FLAGS "-Wall -std=c++11 -fPIC")
 set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2")
 if (WIN32)
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} /EHsc /fp:except")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /EHsc /fp:except")
+	message("-- enabling exception handling")
 endif()
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage -DBZ_DEBUG")
 include_directories ("include" 
@@ -135,9 +137,6 @@ file (GLOB sources src/*.cpp)
 add_library(blitzdg SHARED ${sources})
 set_target_properties(blitzdg
     PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
     LINK_FLAGS "-Wl,-rpath,/usr/local/lib -L /usr/local/lib -L/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/"
     )
 
