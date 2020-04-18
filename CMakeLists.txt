@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.5)
 
-set (CMAKE_CONFIGURATION_TYPES "Win64")
+set (CMAKE_CONFIGURATION_TYPES "Release" "Debug")
 set (CMAKE_BUILD_TYPE Release) # or Debug
 set (CMAKE_CXX_FLAGS "-std=c++14 -fPIC")
-set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2 -fPIC")
+set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2 -fPIC std=c++14")
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fPIC -fprofile-arcs -ftest-coverage -DBZ_DEBUG")
 include_directories ("include"
     "include/igloo"
@@ -29,8 +29,8 @@ find_library(LAPACK NAMES "liblapack" "lapack" PATHS "/usr/lib" "/usr/local/lib"
 find_library(BLAS NAMES "libblas" "blas" "libblas" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 
 find_library(PYTHON3 NAMES "python3.7m" "python37" "libpython37" "python3.7" "libpython3.7" PATHS "/miniconda3/pkgs/python-3.7.3-h0371630_0/lib/" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu" "lib" "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/")
-find_library(BOOSTPYTHON NAMES "libboost_python37" "boost_python37-vc140-mt-x64-1_67" "libboost_python3" "boost_python3" "libboost_python3,7" "boost_python3.7" PATHS "/usr/local/lib" "/boost/lib" )
-find_library(BOOSTNUMPY NAMES "libboost_numpy37" "boost_numpy37-vc140-mt-x64-1_67" "libboost_numpy3" "boost_numpy3" "libboost_numpy37" "boost_numpy37" "boost_numpy37" PATHS "/usr/local/lib" "/boost/lib")
+find_library(BOOSTPYTHON NAMES "libboost_python37" "boost_python37-vc140-mt-x64-1_67" "libboost_python3" "boost_python3" "libboost_python3,7" "boost_python3.7" PATHS "/usr/lib64" "/usr/local/lib" "/boost/lib" )
+find_library(BOOSTNUMPY NAMES "libboost_numpy37" "boost_numpy37-vc140-mt-x64-1_67" "libboost_numpy3" "boost_numpy3" "libboost_numpy37" "boost_numpy37" "boost_numpy37" PATHS "/usr/lib64" "/usr/local/lib" "/boost/lib")
 find_library(VTKIOXML7 NAMES "vtkIOXML-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 find_library(VTKCOMMONCORE7 NAMES "vtkCommonCore-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 find_library(VTKCOMMONEXECUTIONMODEL7 NAMES "vtkCommonExecutionModel-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
@@ -44,7 +44,7 @@ find_library(VTKIOXML7 NAMES "vtkIOXML-7.1" PATHS "/usr/lib" "/usr/local/lib" "/
 find_library(VTKIOXMLPARSER7 NAMES "vtkIOXMLParser-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 find_library(VTKSYS7 NAMES "vtksys-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 
-find_library(GFORTRAN NAMES "gfortran" "gfortran3" PATHS "/miniconda3/lib/" "/usr/lib/gcc/x86_64-linux-gnu/7/" "/usr/lib/gcc/x86_64-linux-gnu/8/")
+find_library(GFORTRAN NAMES "gfortran" "gfortran3" PATHS "/usr/lib64/" "/usr/lib/gcc/x86_64-linux-gnu/7/" "/usr/lib/gcc/x86_64-linux-gnu/8/")
 
 if (WIN32)
     find_library(VTKZLIB7 NAMES "vtkzlib-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")

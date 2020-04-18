@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
      name='pyblitzdg',  
-     version='0.2.0',
+     version='0.3.0',
      scripts=[] ,
      author="Waterloo Quantitative Consulting Group",
      author_email="dsteinmo@wqcg.ca",
@@ -18,7 +18,7 @@ setuptools.setup(
      platforms=['manylinux2010', 'win64', 'macosx'],
      ext_modules=[Extension('pyblitzdg', ['src/pyblitzdg/pyblitzdg.cpp'], 
         include_dirs=[ "include", "include/igloo", "/usr/include/python3.7m/", "/usr/local/include/", "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/include/python3.7m/"],
-        library_dirs=[ "/usr/lib64/", "/usr/local/lib", 
+        library_dirs=[ "/blitzdg/pyblitzdg", "/usr/lib64/", "/usr/local/lib", 
             "/miniconda3/pkgs/python-3.7.3-h0371630_0/lib/",
             "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/" ],
         libraries=['blitzdg', 'vtkIOXML-7.1', 'vtkCommonCore-7.1', 'vtkCommonExecutionModel-7.1', 'vtkCommonDataModel-7.1', 'vtkCommonMisc-7.1', 'vtkCommonSystem-7.1', 'vtkCommonTransforms-7.1', 'vtkexpat-7.1', 'vtkIOCore-7.1', 'vtkIOGeometry-7.1', 'vtkIOXML-7.1', 'vtkIOXMLParser-7.1', 'vtksys-7.1', 'vtkzlib-7.1'],
@@ -31,8 +31,8 @@ setuptools.setup(
             ("PY_MAJOR_VERSION", "3"),
             ("PY_MINOR_VERSION", "7")
             ],
-        language = 'c++11',
-        extra_compile_args = ["-std=c++11"],
+        language = 'c++14',
+        extra_compile_args = ["-std=c++14"],
 	    extra_link_args = ["-Wl,-rpath,/usr/local/lib"]
         )],
      classifiers=[
