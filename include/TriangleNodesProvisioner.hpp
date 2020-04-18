@@ -8,8 +8,10 @@
  */
 
 #pragma once
+#include "NodesProvisioner2Dbase.hpp"
 #include "Nodes1DProvisioner.hpp"
 #include "DGContext2D.hpp"
+#include "GaussFaceContext2D.hpp"
 #include "MeshManager.hpp"
 #include "Types.hpp"
 #include "LinAlgHelpers.hpp"
@@ -21,7 +23,7 @@ namespace blitzdg {
    * nodes, operators, and geometric factors on triangles.
    * @note This class is moveable but not copyable.
    */ 
-  class TriangleNodesProvisioner {
+  class TriangleNodesProvisioner : public NodesProvisioner2DBase {
       using index_mat_smart_ptr = std::unique_ptr<index_matrix_type>;
       using index_vec_smart_ptr = std::unique_ptr<index_vector_type>;
 
@@ -53,10 +55,9 @@ namespace blitzdg {
       real_mat_smart_ptr Filter;
 
       index_mat_smart_ptr Fmask;
+      real_mat_smart_ptr Fscale;
       real_mat_smart_ptr Fx;
       real_mat_smart_ptr Fy;
-
-      real_mat_smart_ptr Fscale;
 
       index_vec_smart_ptr vmapM;
       index_vec_smart_ptr vmapP;
@@ -281,12 +282,12 @@ namespace blitzdg {
       /**
        * Returns a reference to the faces-only x-grid.
        */
-      const real_matrix_type & get_Fx() const;
+      const real_matrix_type & get_Fx() const { return *Fx; }
 
       /**
        * Returns a reference to the faces-only y-grid.
        */
-      const real_matrix_type & get_Fy() const;
+      const real_matrix_type & get_Fy() const { return *Fy; }
 
       /**
        * Returns a reference to the Face-scaling factor (inverse of Jacobian at face nodes).
@@ -371,9 +372,19 @@ namespace blitzdg {
       void buildFilter(real_type Nc, index_type s);
 
       /**
+       * Builds out the Gauss Face Nodes context.
+       */
+      GaussFaceContext2D buildGaussFaceNodes(index_type NGauss);
+
+      /**
        * Build an interpolation operator to a new set of nodes on the reference triangle.
        */
       void computeInterpMatrix(const real_vector_type& rout, const real_vector_type& sout, real_matrix_type& IM) const;
+
+      /**
+       * Splits high-order elements into smaller elements with linear basis functions.
+       */
+      void splitElements(const real_matrix_type& x, const real_matrix_type& y, const real_matrix_type& field, real_matrix_type& xnew, real_matrix_type& ynew, real_matrix_type& fieldnew) const;
 
       /**
        * Returns the number of nodes local to a 2D triangular element.
@@ -389,6 +400,11 @@ namespace blitzdg {
        * Returns the number of elements in the 2D grid.
        */
       index_type get_NumElements() const;
+
+      /**
+       * Returns order of the basis polynomials.
+       */
+      index_type get_NOrder() const { return NOrder; };
   };
 } // namespace blitzdg
 
