@@ -12,6 +12,8 @@
 #include "CSVFileReader.hpp"
 #include <memory>
 #include <string>
+#define PY_MAJOR_VERSION 3
+#define PY_MINOR_VERSION 7
 #include <boost/python/numpy.hpp>
 
 namespace blitzdg {
