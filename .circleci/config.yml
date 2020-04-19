@@ -1,18 +1,27 @@
 version: 2
 jobs:
-  build:
+  checkout:
     branches:
       ignore:
         - gh-pages
     docker:
       - image: dsteinmoeller/blitzdg-circle:0.16
-
     steps:
       - checkout
-      - run:
-          name: Pull git submodules
-          command: |
-            git submodule update --init --recursive
+    - run:
+        name: Pull git submodules
+        command: | 
+          git submodulke update --init --recursive
+    - persist_to_workspace:
+        root: /root/project
+        paths:
+          - "*"
+  build:
+    docker:
+      - image: dsteinmoeller/blitzdgmanylinux:0.3.1
+    attach_workspace:
+      at: /root/project
+    steps:    
       - run:
           name: Generate makefiles
           command: |
@@ -31,3 +40,10 @@ jobs:
       - run:
           name: Test
           command: mv bin/tests bin/test && LD_LIBRARY_PATH=/usr/local/lib bin/test
+
+workflows:
+  version: 2
+  checkout_and_build:
+    jobs:
+      - checkout
+      - build
