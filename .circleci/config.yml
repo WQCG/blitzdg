@@ -16,9 +16,9 @@ jobs:
   build:
     docker:
       - image: dsteinmoeller/blitzdgmanylinux:0.3.1
-    attach_workspace:
-      at: /root/project
-    steps:    
+    steps:
+      - attach_workspace:
+          at: /root/project
       - run:
           name: Generate makefiles
           command: |
