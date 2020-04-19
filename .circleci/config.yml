@@ -28,6 +28,7 @@ jobs:
             for whl in dist/*.whl; do \
               auditwheel repair "$whl" --plat manylinux2010_x86_64 -w wheelhouse/ \
             done
+
       - run:
           name: Test
           command: mv bin/tests bin/test && LD_LIBRARY_PATH=/usr/local/lib bin/test
