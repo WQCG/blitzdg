@@ -2,7 +2,7 @@ version: 2
 jobs:
   checkout:
     docker:
-      - image: dsteinmoeller/blitzdg-circle:0.16
+      - image: circleci/python:stretch
     steps:
       - checkout
       - run:
