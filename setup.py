@@ -23,7 +23,7 @@ setuptools.setup(
             "C:/ProgramData/Anaconda3/Library/include\\",
             "C:/dev/blitzdg/include/"
         ],
-        library_dirs=[ "root/project/", "/usr/lib64", "/usr/local/lib64", "/usr/lib/x86_64-linux-gnu/", "/usr/local/lib", "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/",
+        library_dirs=[ "/root/project/", "/usr/lib64", "/usr/local/lib64", "/usr/lib/x86_64-linux-gnu/", "/usr/local/lib", "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/",
             "C:/ProgramData/Anaconda3/pkgs/py-boost-1.67.0-py37h8300f20_4/Library/lib/",
             "C:\\dev\\blitzdg\\Win64\\",
             "C:\\dev\\blitzdg\\lib\\",
@@ -31,7 +31,7 @@ setuptools.setup(
             "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/",
             "/usr/local/Cellar/gcc/8.2.0/lib/gcc/8/"
         ],
-        libraries=['blitzdg', 'vtkIOXML-7.1', 'vtkCommonCore-7.1', 'vtkCommonExecutionModel-7.1', 'vtkCommonDataModel-7.1', 'vtkCommonMisc-7.1', 'vtkCommonSystem-7.1', 'vtkCommonTransforms-7.1', 'vtkexpat-7.1', 'vtkIOCore-7.1', 'vtkIOGeometry-7.1', 'vtkIOXML-7.1', 'vtkIOXMLParser-7.1', 'vtksys-7.1', 'vtkzlib-7.1', 'libcholmod', 'libcxsparse'],
+        libraries=['blitzdg', 'vtkIOXML-7.1', 'vtkCommonCore-7.1', 'vtkCommonExecutionModel-7.1', 'vtkCommonDataModel-7.1', 'vtkCommonMisc-7.1', 'vtkCommonSystem-7.1', 'vtkCommonTransforms-7.1', 'vtkexpat-7.1', 'vtkIOCore-7.1', 'vtkIOGeometry-7.1', 'vtkIOXML-7.1', 'vtkIOXMLParser-7.1', 'vtksys-7.1', 'vtkzlib-7.1', 'cholmod', 'cxsparse'],
         # libraries=['blitzdg', 'vtkIOXML-7.1', 'vtkCommonCore-7.1', 'vtkCommonExecutionModel-7.1', 'vtkCommonDataModel-7.1', 'vtkCommonMisc-7.1', 'vtkCommonSystem-7.1', 'vtkCommonTransforms-7.1', 'vtkexpat-7.1', 'vtkIOCore-7.1', 'vtkIOGeometry-7.1', 'vtkIOXML-7.1', 'vtkIOXMLParser-7.1', 'vtksys-7.1', 'vtkzlib-7.1', 'gfortran.5'],
         define_macros=[("VTKCOMMONCORE_STATIC_DEFINE", None),
             ("VTKCOMMONEXECUTIONMODEL_STATIC_DEFINE", None),
