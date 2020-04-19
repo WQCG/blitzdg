@@ -22,18 +22,22 @@ jobs:
       - run:
           name: Generate makefiles
           command: |
-            DEBUG=1 CXX=clang++ INC="-I /opt/blitzpp/blitz-1.0.1" cmake .
+            CXX=clang++ INC="-I /opt/blitzpp/blitz-1.0.1" cmake .
       - run:
           name: Build (clang)
           command: |
-            DEBUG=1 CXX=clang++ INC="-I /opt/blitzpp/blitz-1.0.1" make -j4
+            CXX=clang++ INC="-I /opt/blitzpp/blitz-1.0.1" make -j4
             make clean
             rm -rf CMakeFiles/ CMakeCache.txt
       - run:
           name: Build (gcc)
           command: |
-            DEBUG=1 CXX='g++ -Og' INC="-I /opt/blitzpp/blitz-1.0.1" cmake .
-            DEBUG=1 CXX='g++ -Og' INC="-I /opt/blitzpp/blitz-1.0.1" make -j4
+            CXX='g++' cmake .
+            CXX='g++' make -j4
+            /opt/_internal/cpython-3.7.3/bin/python3.7 setup.py bdist_wheel sdist
+            for whl in dist/*.whl; do \
+              auditwheel repair "$whl" --plat manylinux2010_x86_64 -w wheelhouse/ \
+            done
       - run:
           name: Test
           command: mv bin/tests bin/test && LD_LIBRARY_PATH=/usr/local/lib bin/test

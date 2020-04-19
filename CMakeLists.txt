@@ -9,6 +9,8 @@ set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-cove
 # set (CMAKE_MODULE_LINKER_FLAGS  "${CMAKE_MODULE_LINKER_FLAGS}")
 include_directories ("include"
     "include/igloo"
+    "/opt/_internal/cpython-3.7.3/include/python3.7m/"
+    "/miniconda3/pkgs/python-3.7.3-h0371630_0/include/python3.7m/"
     "/usr/include/python3.7m/"
     "/usr/local/include/"
     "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/include/python3.7m/"
@@ -84,7 +86,7 @@ message("-- found ${VTKIOXML7}")
 message("-- found ${VTKIOXMLPARSER7}")
 message("-- found ${VTKSYS7}")
 
-set (CMAKE_CXX_FLAGS "-Wall -std=c++11 -fPIC")
+set (CMAKE_CXX_FLAGS "-Wall -std=c++14 -fPIC")
 set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2")
 if (WIN32)
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /EHsc /fp:except")
@@ -93,7 +95,9 @@ endif()
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage -DBZ_DEBUG")
 include_directories ("include" 
     "include/igloo" 
-    "/usr/include/python3.6m/"
+    "/opt/_internal/cpython-3.7.3/include/python3.7m/"
+    "/miniconda3/pkgs/python-3.7.3-h0371630_0/include/python3.7m/"    
+    "/usr/include/python3.7m/"
     "C:/ProgramData/Anaconda3/pkgs/python-3.7.3-h8c8aaf0_0/include/"
     "C:/ProgramData/Anaconda3/pkgs/py-boost-1.67.0-py37h8300f20_4/Library/include"
     "C:/ProgramData/Anaconda3/Library/include"
@@ -101,7 +105,7 @@ include_directories ("include"
     )
 
 set (pyblitzdg_VERSION_MAJOR 0)
-set (pyblitzdg_VERSION_MINOR 2)
+set (pyblitzdg_VERSION_MINOR 3)
 set (pyblitzdg_VERSION_PATCH 0)
 set (DISABLE_SOLVER_BUILDS on)
 
