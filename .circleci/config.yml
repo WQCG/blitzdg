@@ -8,7 +8,7 @@ jobs:
       - run:
           name: Pull git submodules
           command: | 
-            git submodulke update --init --recursive
+            git submodule update --init --recursive
       - persist_to_workspace:
           root: /root/project
           paths:
