@@ -1,21 +1,18 @@
 version: 2
 jobs:
   checkout:
-    branches:
-      ignore:
-        - gh-pages
     docker:
       - image: dsteinmoeller/blitzdg-circle:0.16
     steps:
       - checkout
-    - run:
-        name: Pull git submodules
-        command: | 
-          git submodulke update --init --recursive
-    - persist_to_workspace:
-        root: /root/project
-        paths:
-          - "*"
+      - run:
+          name: Pull git submodules
+          command: | 
+            git submodulke update --init --recursive
+      - persist_to_workspace:
+          root: /root/project
+          paths:
+            - "*"
   build:
     docker:
       - image: dsteinmoeller/blitzdgmanylinux:0.3.1
