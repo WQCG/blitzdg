@@ -20,16 +20,6 @@ jobs:
       - attach_workspace:
           at: /root/project
       - run:
-          name: Generate makefiles
-          command: |
-            CXX=clang++ INC="-I /opt/blitzpp/blitz-1.0.1" cmake .
-      - run:
-          name: Build (clang)
-          command: |
-            CXX=clang++ INC="-I /opt/blitzpp/blitz-1.0.1" make -j4
-            make clean
-            rm -rf CMakeFiles/ CMakeCache.txt
-      - run:
           name: Build (gcc)
           command: |
             CXX='g++' cmake .
