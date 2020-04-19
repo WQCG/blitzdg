@@ -26,8 +26,11 @@ find_library(CXSPARSE NAMES "cxsparse" "libcxsparse" PATHS "/usr/lib64/" "/usr/l
 find_library(AMD NAMES "amd" "libamd" PATHS "/usr/lib64/" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 find_library(CHOLMOD names "cholmod" "libcholmod" PATHS "/usr/lib64/" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 find_library(COLAMD names "colamd" "libcolamd" PATHS "/usr/lib64/" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
-find_library(SUITESPARSECONFIG NAMES "/usr/lib64/" "suitesparseconfig" "libsuitesparseconfig" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 
+# for static linkage on windows.
+if (WIN32)
+    find_library(SUITESPARSECONFIG NAMES "suitesparseconfig" "libsuitesparseconfig" PATHS "/usr/lib64/" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+endif()
 find_library(LAPACK NAMES "liblapack" "lapack" PATHS "/usr/lib64/" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 find_library(BLAS NAMES "libblas" "blas" "libblas" PATHS "/usr/lib64/" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 
