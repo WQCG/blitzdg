@@ -14,8 +14,6 @@ jobs:
           paths:
             - "*"
   build:
-    requires:
-      - checkout
     docker:
       - image: dsteinmoeller/blitzdgmanylinux:0.3.1
     attach_workspace:
@@ -45,4 +43,6 @@ workflows:
   checkout_and_build:
     jobs:
       - checkout
-      - build
+      - build:
+          requires:
+            - checkout
