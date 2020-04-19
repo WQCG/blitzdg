@@ -25,7 +25,7 @@ jobs:
             CXX='g++' cmake .
             CXX='g++' make -j4
             /opt/_internal/cpython-3.7.3/bin/python3.7 setup.py bdist_wheel sdist
-            cp /root/project/blitzdg.so /usr/lib64/blitzdg.so
+            cp /root/project/libblitzdg.so /usr/lib64/libblitzdg.so
             for whl in dist/*.whl; do
               auditwheel repair "$whl" --plat manylinux2010_x86_64 -w wheelhouse/
             done
