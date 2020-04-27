@@ -9,7 +9,7 @@
 #---------------------------------#
 
 # version format
-version: 0.3.1
+version: 0.3.1.${APPVEYOR_BUILD_NUMBER}
 
 # branches to build
 branches:
