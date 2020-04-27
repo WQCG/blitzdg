@@ -63,7 +63,7 @@ install:
   - echo This is batch
   # to run script as a PowerShell command prepend it with ps:
   - ps: >-
-      Push-Location c:\projects\blitzdg
+      Push-Location "c:\projects\blitzdg"
       $ErrorActionPreference = 'Stop'
       Invoke-RestMethod -Uri https://s3.amazonaws.com/dsteinmo-libs/include-deps.zip -OutFile include-deps.zip
       Invoke-RestMethod -Uri https://s3.amazonaws.com/dsteinmo-libs/deps-win-mingw64-gcc7.zip -OutFile deps-win-mingw64.zip
