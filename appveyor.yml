@@ -62,15 +62,15 @@ install:
   # by default, all script lines are interpreted as batch
   - echo This is batch
   # to run script as a PowerShell command prepend it with ps:
-  - ps: |
-        | Push-Directory c:\projects\blitzdg
-        | $ErrorActionPreference = 'Stop'
-        | Invoke-RestMethod -Uri https://s3.amazonaws.com/dsteinmo-libs/include-deps.zip -OutFile include-deps.zip
-        | Invoke-RestMethod -Uri https://s3.amazonaws.com/dsteinmo-libs/deps-win-mingw64-gcc7.zip -OutFile deps-win-mingw64.zip
-        | Expand-Archive -Path include-deps.zip -DestinationPath .\include\ -Force
-        | Expand-Archive -Path deps-win-mingw64.zip -DestinationPath .\lib\ -Force
-        | cmake -A "Win64" -G "Microsoft Visual Studio 16 2019" .
-        | Pop-Directory
+  - ps:
+        Push-Directory c:\projects\blitzdg
+        $ErrorActionPreference = 'Stop'
+        Invoke-RestMethod -Uri https://s3.amazonaws.com/dsteinmo-libs/include-deps.zip -OutFile include-deps.zip
+        Invoke-RestMethod -Uri https://s3.amazonaws.com/dsteinmo-libs/deps-win-mingw64-gcc7.zip -OutFile deps-win-mingw64.zip
+        Expand-Archive -Path include-deps.zip -DestinationPath .\include\ -Force
+        Expand-Archive -Path deps-win-mingw64.zip -DestinationPath .\lib\ -Force
+        cmake -A "Win64" -G "Microsoft Visual Studio 16 2019" .
+        Pop-Directory
 
   # batch commands start from cmd:
   #- cmd: echo This is batch again
