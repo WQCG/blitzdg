@@ -92,7 +92,7 @@ configuration: Release
 # "project" is relative to the original build directory and not influenced by directory changes in "before_build".
 build:
   parallel: true            # enable MSBuild parallel builds
-  project: pyblitzdg.sln      # path to Visual Studio solution or project
+  project: c:\projects\blitzdg\pyblitzdg.sln      # path to Visual Studio solution or project
 
   # MSBuild verbosity level
   verbosity: normal
