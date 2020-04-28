@@ -71,7 +71,7 @@ install:
       Expand-Archive -Path libfiles.zip -DestinationPath ".\lib\" -Force
       cmake -A "x64" -G "Visual Studio 16 2019" .
       Pop-Location
-      ls "c\projects\blitzdg"
+      ls "c:\projects\blitzdg"
 
   # batch commands start from cmd:
   #- cmd: echo This is batch again
