@@ -71,6 +71,7 @@ install:
       Expand-Archive -Path libfiles.zip -DestinationPath ".\lib\" -Force
       cmake -A "x64" -G "Visual Studio 16 2019" .
       Pop-Location
+      ls "c\projects\blitzdg"
 
   # batch commands start from cmd:
   #- cmd: echo This is batch again
@@ -92,7 +93,7 @@ configuration: Release
 # "project" is relative to the original build directory and not influenced by directory changes in "before_build".
 build:
   parallel: true            # enable MSBuild parallel builds
-  project: c:\projects\blitzdg\pyblitzdg.sln      # path to Visual Studio solution or project
+  project: c:\projects\blitzdg\blitzdg.sln      # path to Visual Studio solution or project
 
   # MSBuild verbosity level
   verbosity: normal
