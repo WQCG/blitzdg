@@ -144,7 +144,7 @@ set(VS_STARTUP_PROJECT "blitzdg")
 file (GLOB sources src/*.cpp)
 add_library(blitzdg SHARED ${sources})
 
-if (not WIN32)
+if (NOT WIN32)
 set_target_properties(blitzdg
     PROPERTIES
      LINK_FLAGS "-Wl,-rpath,/usr/local/lib -L /usr/local/lib -L/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/"
