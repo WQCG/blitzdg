@@ -2,7 +2,8 @@
 
 #include <memory>
 #include <suitesparse/umfpack.h>
-#include <boost/python.hpp>
+#define PY_MAJOR_VERSION 3
+#define PY_MINOR_VERSION 7
 #include <boost/python/numpy.hpp>
 #include "CSCMatrix.hpp"
 #include "SparseTriplet.hpp"

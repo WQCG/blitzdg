@@ -1,33 +1,45 @@
 version: 2
 jobs:
-  build:
-    branches:
-      ignore:
-        - gh-pages
+  checkout:
     docker:
-      - image: dsteinmoeller/blitzdg-circle:0.16
-
+      - image: circleci/python:stretch
     steps:
       - checkout
       - run:
           name: Pull git submodules
-          command: |
+          command: | 
             git submodule update --init --recursive
-      - run:
-          name: Generate makefiles
-          command: |
-            DEBUG=1 CXX=clang++ INC="-I /opt/blitzpp/blitz-1.0.1" cmake .
-      - run:
-          name: Build (clang)
-          command: |
-            DEBUG=1 CXX=clang++ INC="-I /opt/blitzpp/blitz-1.0.1" make -j4
-            make clean
-            rm -rf CMakeFiles/ CMakeCache.txt
+      - persist_to_workspace:
+          root: .
+          paths:
+            - "*"
+  build:
+    docker:
+      - image: dsteinmoeller/blitzdgmanylinux:0.3.1
+    steps:
+      - attach_workspace:
+          at: /root/project
       - run:
           name: Build (gcc)
           command: |
-            DEBUG=1 CXX='g++ -Og' INC="-I /opt/blitzpp/blitz-1.0.1" cmake .
-            DEBUG=1 CXX='g++ -Og' INC="-I /opt/blitzpp/blitz-1.0.1" make -j4
+            CXX='g++' cmake .
+            CXX='g++' make -j4
+            /opt/_internal/cpython-3.7.3/bin/python3.7 setup.py bdist_wheel sdist
+            unlink /usr/lib64/libblitzdg.so
+            cp /root/project/libblitzdg.so /usr/lib64/libblitzdg.so
+            for whl in dist/*.whl; do
+              auditwheel repair "$whl" --plat manylinux2010_x86_64 -w wheelhouse/
+            done
+
       - run:
           name: Test
           command: mv bin/tests bin/test && LD_LIBRARY_PATH=/usr/local/lib bin/test
+
+workflows:
+  version: 2
+  checkout_and_build:
+    jobs:
+      - checkout
+      - build:
+          requires:
+            - checkout
