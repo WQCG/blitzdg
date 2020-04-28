@@ -66,9 +66,9 @@ install:
       $ErrorActionPreference = 'Continue'
       Push-Location "c:\projects\blitzdg"
       Invoke-RestMethod -Uri "https://s3.amazonaws.com/dsteinmo-libs/include.zip" -OutFile "include.zip"
-      Invoke-RestMethod -Uri "https://s3.amazonaws.com/dsteinmo-libs/libfiles.zip" -OutFile "libfiles.zip"
-      Expand-Archive -Path include.zip -DestinationPath ".\include\." -Force -Verbose
-      Expand-Archive -Path libfiles.zip -DestinationPath ".\lib\." -Force -Verbose
+      Invoke-RestMethod -Uri "https://s3.amazonaws.com/dsteinmo-libs/libfiles.zip" -OutFile "lib.zip"
+      Expand-Archive -Path include.zip -DestinationPath "." -Force -Verbose
+      Expand-Archive -Path lib.zip -DestinationPath ".\lib\." -Force -Verbose
       cmake -A "x64" -G "Visual Studio 16 2019" .
       Pop-Location
       ls "c:\projects\blitzdg\include\blitz"
