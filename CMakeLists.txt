@@ -17,6 +17,7 @@ include_directories ("include"
     "C:/ProgramData/Anaconda3/pkgs/python-3.7.3-h8c8aaf0_0/include/"
     "C:/ProgramData/Anaconda3/pkgs/py-boost-1.67.0-py37h8300f20_4/Library/include"
     "c:/dev/blitzdg/include"
+    "C:/projects/blitzdg/include"
     )
 
 set(CMAKE_FIND_LIBRARY_PREFIXES "" "lib")
@@ -102,6 +103,7 @@ include_directories ("include"
     "C:/ProgramData/Anaconda3/pkgs/py-boost-1.67.0-py37h8300f20_4/Library/include"
     "C:/ProgramData/Anaconda3/Library/include"
     "C:/dev/blitzdg/include"
+    "C:/projects/blitzdg/include"
     )
 
 set (pyblitzdg_VERSION_MAJOR 0)
