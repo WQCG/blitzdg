@@ -18,6 +18,7 @@ include_directories ("include"
     "C:/ProgramData/Anaconda3/pkgs/py-boost-1.67.0-py37h8300f20_4/Library/include"
     "c:/dev/blitzdg/include"
     "C:/projects/blitzdg/include"
+    "C:/Miniconda37-x64/include"
     )
 
 set(CMAKE_FIND_LIBRARY_PREFIXES "" "lib")
