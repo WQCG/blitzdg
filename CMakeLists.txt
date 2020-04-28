@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 
-set (CMAKE_CONFIGURATION_TYPES "Win64")
+set(CMAKE_CONFIGURATION_TYPES Debug Release)
+set(CMAKE_BUILD_TYPE Release) #or Debug
 set (CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS 1)
-set (CMAKE_BUILD_TYPE Release) # or Debug
 set (CMAKE_CXX_FLAGS "-std=c++14 -fPIC")
 set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2")
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage -DBZ_DEBUG")
@@ -140,12 +140,16 @@ link_libraries(
 )
 
 project(blitzdg)
+set(VS_STARTUP_PROJECT "blitzdg")
 file (GLOB sources src/*.cpp)
 add_library(blitzdg SHARED ${sources})
+
+if (not WIN32)
 set_target_properties(blitzdg
     PROPERTIES
-    LINK_FLAGS "-Wl,-rpath,/usr/local/lib -L /usr/local/lib -L/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/"
+     LINK_FLAGS "-Wl,-rpath,/usr/local/lib -L /usr/local/lib -L/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/"
     )
+endif()
 
 # Link to vtk using static mode (otherwise won't work on windows)
 target_compile_definitions(blitzdg PUBLIC "VTKCOMMONCORE_STATIC_DEFINE"
