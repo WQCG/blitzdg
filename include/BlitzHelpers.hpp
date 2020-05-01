@@ -14,8 +14,136 @@
 #include <cstddef>
 #include <limits>
 #include <stdexcept>
+#include <algorithm>
+#include <cmath>
+#include <numeric>
+#include <utility>
+#include <vector>
+
 
 namespace blitzdg {
+    namespace details {
+        // Exact lexicographic comparison for a given ordering.
+        template <typename T>
+        class CompareExact {
+        public:
+            explicit CompareExact(const matrix_type<T>& A)
+                : ptr_{ &A }, ord_(A.cols())
+            {
+                std::iota(ord_.begin(), ord_.end(), index_type(0));
+            }
+
+            CompareExact(const matrix_type<T>& A, const std::vector<index_type>& order)
+                : ptr_{ &A }, ord_{ order }
+            {}
+
+            bool operator()(index_type lhs, index_type rhs) const;
+        private:
+            const matrix_type<T>* ptr_;
+            std::vector<index_type> ord_;
+        };
+
+        template <typename T>
+        bool CompareExact<T>::operator()(index_type lhs, index_type rhs) const {
+            for (auto j : ord_) {
+                if ((*ptr_)(lhs, j) < (*ptr_)(rhs, j)) {
+                    return true;
+                }
+                else if ((*ptr_)(lhs, j) > (*ptr_)(rhs, j)) {
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        // Equality comparison with tolerance.
+        template <typename T>
+        class CompareEQ {
+        public:
+            explicit CompareEQ(const matrix_type<T>& A, real_type tol = real_type(0));
+
+            bool operator()(index_type lhs, index_type rhs) const;
+        private:
+            const matrix_type<T>* ptr_;
+            std::vector<real_type> tols_;
+        };
+
+        template <typename T>
+        CompareEQ<T>::CompareEQ(const matrix_type<T>& A, real_type tol)
+            : ptr_{ &A }, tols_(A.cols(), real_type(0))
+        {
+            if (tol > real_type(0)) {
+                for (index_type i = 0; i < A.rows(); ++i) {
+                    for (index_type j = 0; j < A.cols(); ++j) {
+                        tols_[j] = std::max(tols_[j], std::abs(A(i, j)));
+                    }
+                }
+                for (auto& t : tols_) {
+                    t *= tol;
+                }
+            }
+        }
+
+        template <typename T>
+        bool CompareEQ<T>::operator()(index_type lhs, index_type rhs) const {
+            for (index_type j = 0; j < ptr_->cols(); ++j) {
+                if (std::abs((*ptr_)(lhs, j) - (*ptr_)(rhs, j)) > tols_[j]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // Equality comparison with tolerance over a single dimension.
+        template <typename T>
+        class CompareEQByDim {
+        public:
+            CompareEQByDim(const matrix_type<T>& A, index_type dim, real_type tol = real_type(0));
+
+            bool operator()(index_type lhs, index_type rhs) const {
+                return std::abs((*ptr_)(lhs, dim_) - (*ptr_)(rhs, dim_)) <= tol_;
+            }
+        private:
+            const matrix_type<T>* ptr_;
+            index_type dim_;
+            real_type tol_;
+        };
+
+        template <typename T>
+        CompareEQByDim<T>::CompareEQByDim(const matrix_type<T>& A, index_type dim, real_type tol)
+            : ptr_{ &A }, dim_{ dim }, tol_{ real_type(0) }
+        {
+            if (tol > real_type(0)) {
+                for (index_type i = 0; i < A.rows(); ++i) {
+                    tol_ = std::max(tol_, std::abs(A(i, dim)));
+                }
+                tol_ *= tol;
+            }
+        }
+
+        // Order the columns of A by decreasing size of their variance.
+        template <typename T>
+        std::vector<index_type> getOrdering(const matrix_type<T>& A) {
+            if (A.cols() < 2) {
+                return std::vector<index_type>{ index_type(0) };
+            }
+            std::vector<real_type> mn(A.cols(), real_type(0)), var(A.cols(), real_type(0));
+            for (index_type i = 0; i < A.rows(); ++i) {
+                for (index_type j = 0; j < A.cols(); ++j) {
+                    auto delta = A(i, j) - mn[j];
+                    mn[j] += delta / (i + 1);
+                    auto delta2 = A(i, j) - mn[j];
+                    var[j] += delta * delta2;
+                }
+            }
+            std::vector<index_type> order(A.cols());
+            std::iota(order.begin(), order.end(), index_type(0));
+            std::sort(order.begin(), order.end(),
+                [&var](index_type i, index_type j) { return var[i] > var[j]; });
+            return order;
+        }
+    } // namespace details
+
     /**
      * Used for constructing a matrix with column-major ordering.
      * 
@@ -190,4 +318,68 @@ namespace blitzdg {
 
         return C;
     }
+
+    template <typename T>
+    std::pair<std::vector<index_type>, std::vector<index_type>>
+    unique(const matrix_type<T>& A) {
+        using details::CompareExact;
+
+        std::vector<index_type> gather(A.rows()), scatter(A.rows());
+        std::iota(gather.begin(), gather.end(), index_type(0));
+        CompareExact<T> comp(A);
+        std::sort(gather.begin(), gather.end(), comp);
+        index_type i = 0;
+        for (index_type k = 0; k < A.rows(); ++k) {
+            auto curr = gather[i];
+            auto next = gather[k];
+            if (comp(curr, next) || comp(next, curr)) { // A(next,:) != A(curr,:)
+                ++i;
+                gather[i] = next;
+            }
+            scatter[next] = i;
+        }
+        gather.resize(i + 1);
+        return std::make_pair(std::move(gather), std::move(scatter));
+    }
+
+    template <typename T>
+    std::pair<std::vector<index_type>, std::vector<index_type>>
+    uniquetol(const matrix_type<T>& A, real_type tol = real_type(0)) {
+        using details::CompareEQ;
+        using details::CompareEQByDim;
+        using details::CompareExact;
+        using details::getOrdering;
+
+        if (tol <= real_type(0)) {
+            return unique(A);
+        }
+        std::vector<index_type> gather(A.rows()), scatter(A.rows());
+        std::iota(gather.begin(), gather.end(), index_type(0));
+        auto order = getOrdering(A);
+        std::sort(gather.begin(), gather.end(), CompareExact<T>(A, order));
+        CompareEQ<T> comp(A, tol);
+        CompareEQByDim<T> compByDim(A, order[0], tol);
+        index_type nunique = 0;
+        auto curr = gather.begin();
+        while (curr != gather.end()) {
+            auto seed = *curr;
+            auto first = curr;
+            auto last = ++first;
+            while (last != gather.end() && compByDim(seed, *last)) {
+                if (!comp(seed, *last)) {
+                    *first = *last;
+                    ++first;
+                }
+                else {
+                    scatter[*last] = nunique;
+                }
+                ++last;
+            }
+            scatter[seed] = nunique++;
+            gather.erase(first, last);
+            ++curr;
+        }
+        return std::make_pair(std::move(gather), std::move(scatter));
+    }
+
 } // namespace blitzdg

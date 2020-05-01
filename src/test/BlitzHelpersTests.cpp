@@ -234,6 +234,48 @@ namespace blitzdg {
 				real_type diff = normMax(C);
                 Assert::That(diff, Equals(0.0));
 			}
+
+		It(Should_Find_Unique_Rows_With_Tol) {
+			real_matrix_type A(6, 3);
+			A = 1.,1.,1,
+				1.,1.,1,
+				2., 0., 3.,
+				2.00000001, 0., 3,
+				2.,2.,2.,
+				2.,2.,2.1;
+
+			std::pair<std::vector<index_type>,std::vector<index_type>> uniqueIndices;
+			uniqueIndices = uniquetol(A, 1e-4);
+			
+			auto gather = uniqueIndices.first;
+			auto scatter = uniqueIndices.second;
+
+
+			real_matrix_type AuniqExpected(4, 3);
+			AuniqExpected = 1.,1.,1,
+							2.,2.,2.,
+							2.,2.,2.1,
+							2.,0.,3.;
+
+			real_matrix_type Auniq(gather.size(), 3);
+
+			real_matrix_type Ascatter(scatter.size(), 3);
+
+			for (index_type i=0; i < static_cast<index_type>(gather.size()); ++i) {
+				Auniq(i, blitz::Range::all()) = A(gather[i], blitz::Range::all());
+			}
+
+			AuniqExpected -= Auniq;
+			Assert::That(normFro(AuniqExpected), IsLessThan(1e-5));
+
+			for (index_type i=0; i < static_cast<index_type>(scatter.size()); ++i) {
+				Ascatter(i, blitz::Range::all()) = Auniq(scatter[i], blitz::Range::all());
+			}
+
+			Ascatter -= A;
+			Assert::That(normFro(Ascatter), IsLessThan(1e-5));
+
+		}
         };
     } // namespace DenseMatrixHelpersTests
 } // namespace blitzdg
