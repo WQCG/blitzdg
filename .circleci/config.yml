@@ -33,7 +33,7 @@ jobs:
 
       - run:
           name: Test
-          command: mv bin/tests bin/test && LD_LIBRARY_PATH=/usr/local/lib bin/test
+          command: LD_LIBRARY_PATH=/usr/local/lib bin/tests
 
 workflows:
   version: 2
