@@ -382,4 +382,52 @@ namespace blitzdg {
         return std::make_pair(std::move(gather), std::move(scatter));
     }
 
+    // Order the columns of A by decreasing size of their 2-norm.
+    template <typename T>
+    std::vector<index_type> orderColsByNorm(const matrix_type<T>& A) {
+        if (A.cols() < 2) {
+            return std::vector<index_type>{ index_type(0) };
+        }
+        std::vector<T> nrm(A.cols());
+        for (index_type j = 0; j < A.cols(); ++j) {
+            auto s = T(0);
+            for (index_type i = 0; i < A.rows(); ++i) {
+                s += A(i, j) * A(i, j);
+            }
+            nrm[j] = s;
+        }
+        std::vector<index_type> order(A.cols());
+        std::iota(order.begin(), order.end(), index_type(0));
+        std::sort(order.begin(), order.end(),
+            [&nrm](index_type i, index_type j) { return nrm[i] > nrm[j]; });
+        return order;
+    }
+    template <typename T>
+    std::pair<std::vector<index_type>, std::vector<index_type>>
+    uniquetolMatlab(const matrix_type<T>& A, real_type tol = real_type(0)) {
+        using details::CompareEQ;
+        using details::CompareExact;
+        
+        if (tol <= real_type(0)) {
+            return unique(A);
+        }
+        std::vector<index_type> gather(A.rows()), scatter(A.rows());
+        std::iota(gather.begin(), gather.end(), index_type(0));
+        std::sort(gather.begin(), gather.end(), CompareExact<T>(A, orderColsByNorm(A)));
+        CompareEQ<T> comp(A, tol);
+        index_type i = 0;
+        scatter[gather[0]] = 0;
+        for (index_type k = 1; k < A.rows(); ++k) {
+            auto curr = gather[k - 1];
+            auto next = gather[k];
+            if (!comp(curr, next)) {
+                ++i;
+                gather[i] = next;
+            }
+            scatter[next] = i;
+        }
+        gather.resize(i + 1);
+        return std::make_pair(std::move(gather), std::move(scatter));
+    }
+
 } // namespace blitzdg
