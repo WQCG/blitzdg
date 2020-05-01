@@ -13,6 +13,8 @@
 #include "DGContext2D.hpp"
 #include "GaussFaceContext2D.hpp"
 #include "TriangleCubatureRules.hpp"
+#include "CubatureContext2D.hpp"
+#include "CubatureContext2D.hpp"
 #include "MeshManager.hpp"
 #include "Types.hpp"
 #include "LinAlgHelpers.hpp"
@@ -377,7 +379,7 @@ namespace blitzdg {
        */
       GaussFaceContext2D buildGaussFaceNodes(index_type NGauss);
 
-      CubatureContext2D buildCubatureVolumeMesh(index_type NCubature);
+      // CubatureContext2D buildCubatureVolumeMesh(index_type NCubature);
 
       /**
        * Build an interpolation operator to a new set of nodes on the reference triangle.

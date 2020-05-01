@@ -77,6 +77,11 @@ namespace blitzdg {
         buildMaps();
     }
 
+    CubatureContext2D buildCubatureVolumeMesh(index_type NCubature) {
+        //...
+    }
+
+
     GaussFaceContext2D TriangleNodesProvisioner::buildGaussFaceNodes(index_type NGauss) {
         blitz::firstIndex ii;
         blitz::secondIndex jj;
