@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 
 set (CMAKE_CONFIGURATION_TYPES "Release" "Debug")
-set (CMAKE_BUILD_TYPE Debug) # or Debug
+set (CMAKE_BUILD_TYPE Release) # or Debug
 set (CMAKE_CXX_FLAGS "-std=c++14 -fPIC")
 set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2 -fPIC std=c++14")
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fPIC -fprofile-arcs -ftest-coverage -DBZ_DEBUG")
