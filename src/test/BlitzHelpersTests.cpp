@@ -275,7 +275,7 @@ namespace blitzdg {
 				Ascatter -= A;
 				Assert::That(normFro(Ascatter), IsLessThan(1e-5));
 			}
-			It(Should_Find_Unique_Rows_With_Tol) {
+			It(Should_Find_Unique_Rows_With_Tol_Matlab_Style_Impl) {
 				real_matrix_type A(6, 3);
 				A = 1.,1.,1,
 					1.,1.,1,
@@ -285,7 +285,7 @@ namespace blitzdg {
 					2.,2.,2.1;
 
 				std::pair<std::vector<index_type>,std::vector<index_type>> uniqueIndices;
-				uniqueIndices = uniquetolmatlab(A, 1e-4);
+				uniqueIndices = uniquetolMatlab(A, 1e-4);
 				
 				auto gather = uniqueIndices.first;
 				auto scatter = uniqueIndices.second;
