@@ -16,6 +16,8 @@
 #include "TriangleNodesProvisioner.hpp"
 #include "QuadNodesProvisioner.hpp"
 #include "Poisson2DSparseMatrix.hpp"
+#include "GaussFaceContext2D.hpp"
+#include "CubatureContext2D.hpp"
 
 using namespace boost::python;
 using namespace boost::python::numpy;
@@ -90,11 +92,45 @@ BOOST_PYTHON_MODULE(pyblitzdg)
 
     class_<TriangleNodesProvisioner, boost::noncopyable>("TriangleNodesProvisioner", "Class for building a two-dimensional triangular DG nodal mesh from triangular mesh discretized using the Hesthaven & Warburton explicit construction for triangular polynomial interpolation nodes.", init<index_type, MeshManager&>(args("self", "NOrder", "MeshManager")))
         .def("buildFilter", &TriangleNodesProvisioner::buildFilter, "Method to construct a polynomial spectral filter that can be retrieved from the dgContext.")
+        .def("buildGaussFaceNodes", &TriangleNodesProvisioner::buildGaussFaceNodes, "Method to construct a Gaussian quadrature mesh along faces of order NGauss", args("self", "NGauss (integer)"))
+        .def("buildCubatureVolumeMesh", &TriangleNodesProvisioner::buildCubatureVolumeMesh, "Method to construct a 2D cubature mesh on each element.", args("self", "NCubature (integer)"))
         .def("dgContext", &TriangleNodesProvisioner::get_DGContext, "Read-only property containing the 2D triangular DG Context containing all the data necessary for a spatial discretization of the domain of interest.");
 
     class_<QuadNodesProvisioner, boost::noncopyable>("QuadNodesProvisioner", init<index_type, MeshManager&>())
         .def("buildFilter", &QuadNodesProvisioner::buildFilter, "Method to construct a polynomial spectral filter that can be retrieved from the dgContext.")
         .def("dgContext", &QuadNodesProvisioner::get_DGContext, "Read-only property containing the 2D quadrilateral DG Context containing all the data necessary for a spatial discretization of the domain of interest.");
+    
+    class_<GaussFaceContext2D, boost::noncopyable>("GaussFaceContext2D", init<>())
+        .add_property("NGauss", &GaussFaceContext2D::NGauss)
+        .add_property("nx", &GaussFaceContext2D::nx_numpy)
+        .add_property("ny", &GaussFaceContext2D::ny_numpy)
+        .add_property("sJ", &GaussFaceContext2D::sJ_numpy)
+        .add_property("J",  &GaussFaceContext2D::Jac_numpy)
+        .add_property("rx", &GaussFaceContext2D::rx_numpy)
+        .add_property("ry", &GaussFaceContext2D::ry_numpy)
+        .add_property("sx", &GaussFaceContext2D::sx_numpy)
+        .add_property("sy", &GaussFaceContext2D::sy_numpy)
+        .add_property("BCmap", &GaussFaceContext2D::bcMap_numpy)
+        .add_property("x", &GaussFaceContext2D::x_numpy)
+        .add_property("y", &GaussFaceContext2D::y_numpy)
+        .add_property("W", &GaussFaceContext2D::W_numpy);
+
+    class_<CubatureContext2D, boost::noncopyable>("CubatureContext2D", init<>())
+        .add_property("NCubature", &CubatureContext2D::NCubature)
+        .add_property("NumCubaturePoints", &CubatureContext2D::NumCubaturePoints)
+        .add_property("r", &CubatureContext2D::r_numpy)
+        .add_property("s", &CubatureContext2D::s_numpy)
+        .add_property("w", &CubatureContext2D::w_numpy)
+        .add_property("V", &CubatureContext2D::V_numpy)
+        .add_property("rx", &CubatureContext2D::rx_numpy)
+        .add_property("ry", &CubatureContext2D::ry_numpy)
+        .add_property("sx", &CubatureContext2D::sx_numpy)
+        .add_property("sy", &CubatureContext2D::sy_numpy)
+        .add_property("J", &CubatureContext2D::Jac_numpy)
+        .add_property("Dr", &CubatureContext2D::Dr_numpy)
+        .add_property("Ds", &CubatureContext2D::Ds_numpy)
+        .add_property("MM", &CubatureContext2D::MM_numpy)
+        .add_property("MMChol", &CubatureContext2D::MMChol_numpy);
 
     class_<DGContext2D>("DGContext2D", init<>())
         .add_property("numLocalPoints", &DGContext2D::numLocalPoints, "The number of nodal points in an element.")
