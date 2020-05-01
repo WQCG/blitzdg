@@ -70,7 +70,7 @@ namespace blitzdg {
             if (std::abs(*itr) > dropTol)
                 ++nnz;
         }
-        if (nnz > std::numeric_limits<index_type>::max())
+        if (static_cast<index_type>(nnz) > std::numeric_limits<index_type>::max())
             throw std::runtime_error("countNonzeros: number of nonzero elements exceeds maximum allowable");
         return static_cast<index_type>(nnz);
     }

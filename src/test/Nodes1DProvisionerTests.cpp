@@ -22,7 +22,7 @@ namespace blitzdg {
         firstIndex ii;
         secondIndex jj;
 
-        Nodes1DProvisioner * nodes1DProvisioner = nullptr;
+        
 
         Describe(Nodes1DProvisioner_Object) {
 			const real_type eps = 2.*numeric_limits<double>::epsilon();
@@ -30,21 +30,13 @@ namespace blitzdg {
 			const index_type NOrder = 3;
 			const index_type NumElements = 5;
 			const int NumFaces = 2;
+            const real_type xmin = -1.0;
+            const real_type xmax = 1.0;
 
-            void SetUp() {
-                const real_type xmin = -1.0;
-                const real_type xmax = 1.0;
-
-                nodes1DProvisioner = new Nodes1DProvisioner(NOrder, NumElements, xmin, xmax);
-            }
-
-			void TearDown() {
-				delete nodes1DProvisioner;
-			}
 
 			It(Should_Build_3rd_Order_Vandermonde_Matrix) {
                 cout << "Should_Build_3rd_Order_Vandermonde_Matrix" << endl;
-                Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+                Nodes1DProvisioner nodes1D(NOrder, NumElements, xmin, xmax);
 
                 nodes1D.buildNodes();
                 const real_matrix_type & V = nodes1D.get_V();
@@ -62,7 +54,7 @@ namespace blitzdg {
 
             It(Should_Build_3rd_Order_Differentiation_Matrix) {
                 cout << "Should_Build_3rd_Order_Differentiation_Matrix" << endl;
-                Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+                Nodes1DProvisioner nodes1D(NOrder, NumElements, xmin, xmax);
                 nodes1D.buildNodes();
 
                 const real_matrix_type & Dr = nodes1D.get_Dr();
@@ -80,9 +72,7 @@ namespace blitzdg {
 
             It(Should_Build_A_1D_X_Grid) {
                 cout << "Should_Build_A_1D_X_Grid" << endl;
-
-                Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
-
+                Nodes1DProvisioner nodes1D(NOrder, NumElements, xmin, xmax);
                 nodes1D.buildNodes();
 
                 const real_matrix_type & x = nodes1D.get_xGrid();
@@ -100,7 +90,7 @@ namespace blitzdg {
 
             It(Should_Build_Element_To_Vertex_Connectivity) {
                 cout << "Should_Build_Element_To_Vertex_Connectivity" << endl;
-                Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+                Nodes1DProvisioner nodes1D(NOrder, NumElements, xmin, xmax);
 
                 nodes1D.buildNodes();
 
@@ -115,8 +105,7 @@ namespace blitzdg {
 
             It(Should_Compute_Jacobian) {
                 cout << "Should_Compute_Jacobian" << endl;
-                Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
-
+                Nodes1DProvisioner nodes1D(NOrder, NumElements, xmin, xmax);
                 nodes1D.buildNodes();
 
                 nodes1D.computeJacobian();
@@ -151,7 +140,7 @@ namespace blitzdg {
 
             It(Should_Build_1D_Lift_Operator) {
                 cout << "Should_Build_1D_Lift_Operator" << endl;
-                Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+                Nodes1DProvisioner nodes1D(NOrder, NumElements, xmin, xmax);
 
                 nodes1D.buildNodes();
                 real_matrix_type Lift = nodes1D.get_Lift();
@@ -171,7 +160,7 @@ namespace blitzdg {
 
             It(Should_Build_1D_Connectivity_Matrices) {
                 cout << "Should_Build_1D_Connectivity_Matrices" << endl;
-                Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+                Nodes1DProvisioner nodes1D(NOrder, NumElements, xmin, xmax);
 
                 nodes1D.buildNodes();
                 const index_matrix_type & EToE = nodes1D.get_EToE();
@@ -202,7 +191,7 @@ namespace blitzdg {
 
             It(Should_Build_Face_Mask) {
                 cout << "Should_Build_Face_Mask" << endl;
-                Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+                Nodes1DProvisioner nodes1D(NOrder, NumElements, xmin, xmax);
                 nodes1D.buildNodes();
 
                 const index_vector_type & Fmask = nodes1D.get_Fmask();
@@ -226,7 +215,7 @@ namespace blitzdg {
 
             It(Should_Build_Volume_Maps) {
                 cout << "Should_Build_Volume_Maps" << endl;
-                Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+                Nodes1DProvisioner nodes1D(NOrder, NumElements, xmin, xmax);
                 nodes1D.buildNodes();
 
                 index_vector_type vmapM = nodes1D.get_vmapM();
@@ -250,7 +239,7 @@ namespace blitzdg {
 
             It(Should_Build_Normals) {
                 cout << "Should_Build_Normals" << endl;
-                Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
+                Nodes1DProvisioner nodes1D(NOrder, NumElements, xmin, xmax);
                 nodes1D.buildNodes();
 
                 const real_matrix_type & nx = nodes1D.get_nx();

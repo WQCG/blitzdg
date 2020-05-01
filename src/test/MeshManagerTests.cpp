@@ -28,12 +28,10 @@ namespace blitzdg {
             using find_vector_type = vector<iterator_range<string::iterator>>;
 
             string PathDelimeter = "/";
-            MeshManager* meshManager=nullptr;
             string* ExePath = nullptr;
             unique_ptr<vector<string>> InputPathVec = nullptr;
 
             void SetUp() {
-                meshManager = new MeshManager();
                 if (ExePath == nullptr) {
                     // Deal with paths to the test input files.
                     index_type cap = 1024;
@@ -52,7 +50,6 @@ namespace blitzdg {
             }
             void TearDown() {
                 delete ExePath;
-                delete meshManager;
             }
 
             void resolveInputPath() {
@@ -60,10 +57,12 @@ namespace blitzdg {
                 find_vector_type FindVec;
 
                 replace_last(path, ".exe", "");
+                replace_last(path, "/bin/tests", "");
                 replace_last(path, "/bin/test", "");
                 find_all( FindVec, path, "\\" );
                 if (FindVec.size() > 0) {
                     PathDelimeter = "\\";
+                    replace_last(path, "\\bin\\tests", "");
                     replace_last(path, "\\bin\\test", "");
                 }
 
@@ -101,7 +100,7 @@ namespace blitzdg {
                 cout << *ExePath << endl;
 
                 cout << "MeshManager Reads Vertex File: " << vertexFile << endl;
-                MeshManager & mgr = *meshManager;
+                MeshManager mgr;
 
                 mgr.readVertices(vertexFile);
 
@@ -134,7 +133,7 @@ namespace blitzdg {
                 get_EToVFilePath(eToVFile);
 
                 cout << "MeshManager Reads Elements Files: " << eToVFile << endl;
-                MeshManager & mgr = *meshManager;
+                MeshManager mgr;
 
                 mgr.readElements(eToVFile);
 
@@ -159,7 +158,7 @@ namespace blitzdg {
                 cout << "Can_Print_Vertices_And_DoesNotThrow" << endl;
                 cout << "MeshManager Reads Vertex File: " << vertexFile << endl;
 
-                MeshManager & mgr = *meshManager;   
+                MeshManager mgr;   
                 mgr.readVertices(vertexFile);
                 cout << "Vertices:" << endl;
                 mgr.printVertices();
@@ -171,7 +170,7 @@ namespace blitzdg {
                 cout << "Can_Print_Elements_And_DoesNotThrow" << endl;
                 cout << "MeshManager Reads Element File: " << eToVFile << endl;
 
-                MeshManager & mgr = *meshManager;
+                MeshManager mgr;
                 mgr.readElements(eToVFile);
                 cout << endl << "Elements" << endl;
                 mgr.printElements();
@@ -181,7 +180,7 @@ namespace blitzdg {
                 cout << "Can_Read_Gmsh_Mesh" << endl;
                 string mshFile = "";
                 get_MshFile(mshFile);
-                MeshManager& mgr = *meshManager;
+                MeshManager mgr;
                 mgr.readMesh(mshFile);
 
                 const index_vector_type& elements = mgr.get_Elements();
@@ -234,7 +233,7 @@ namespace blitzdg {
                 get_EToVFilePath(eToVFile);
                 get_VertexFilePath(vertexFile);
 
-                MeshManager & mgr = *meshManager;
+                MeshManager mgr;
                 mgr.readVertices(vertexFile);
                 mgr.readElements(eToVFile);
 
