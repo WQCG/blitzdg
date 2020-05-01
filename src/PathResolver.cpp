@@ -44,6 +44,7 @@ namespace blitzdg{
         string path(ExePath);
         vector<string> pathVec;
         replace_last(path, ".exe", "");
+        replace_last(path, PathDelimiter + "bin" + PathDelimiter + "tests", "");
         replace_last(path, PathDelimiter + "bin" + PathDelimiter + "test", "");
 
         return path;

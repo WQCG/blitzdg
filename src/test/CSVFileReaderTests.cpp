@@ -50,10 +50,12 @@ namespace blitzdg {
                 string PathDelimeter = "/";
                 string path(ExePath);
                 replace_last(path, ".exe", "");
+                replace_last(path, "/bin/tests", "");
                 replace_last(path, "/bin/test", "");
                 find_all(FindVec, path, "\\");
                 if (FindVec.size() > 0) {
                     PathDelimeter = "\\";
+                    replace_last(path, "\\bin\\tests", "");
                     replace_last(path, "\\bin\\test", "");
                 }
 
