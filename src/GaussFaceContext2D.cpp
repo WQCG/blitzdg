@@ -108,4 +108,11 @@ namespace blitzdg {
 
         return bcDict;
     }
+
+    ndarray GaussFaceContext2D::W_numpy() const {
+        Py_intptr_t shape[2] = { W_->rows(), W_->cols() };
+        ndarray result = zeros(2, shape, dtype::get_builtin<real_type>());
+        std::copy(W_->begin(), W_->end(), reinterpret_cast<real_type*>(result.get_data()));
+        return result;
+    }
 }

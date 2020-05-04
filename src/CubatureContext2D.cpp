@@ -126,4 +126,11 @@ namespace blitzdg {
         std::copy(MMChol_->begin(), MMChol_->end(), reinterpret_cast<real_type*>(result.get_data()));
         return result;
     }
+
+    ndarray CubatureContext2D::V_numpy() const {
+        Py_intptr_t shape[2] = { V_->rows(), V_->cols() };
+        ndarray result = zeros(2, shape, dtype::get_builtin<real_type>());
+        std::copy(V_->begin(), V_->end(), reinterpret_cast<real_type*>(result.get_data()));
+        return result;
+    }
 }
