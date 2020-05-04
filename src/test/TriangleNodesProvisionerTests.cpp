@@ -4,6 +4,7 @@
 #include "LinAlgHelpers.hpp"
 #include "TriangleNodesProvisioner.hpp"
 #include "GaussFaceContext2D.hpp"
+#include "CubatureContext2D.hpp"
 #include "MeshManager.hpp"
 #include "Types.hpp"
 #include "PathResolver.hpp"
@@ -462,6 +463,58 @@ namespace blitzdg {
 				real_type Pquad = blitz::sum(W0);
 
 				Assert::That(std::abs(P - Pquad), IsLessThan(eps));
+			}
+			It(Should_Build_Cubature_Volume_Mesh) {
+				cout << "Should_Build_Cubature_Volume_Mesh" << endl;
+				TriangleNodesProvisioner & triangleNodes = *triangleNodesProvisioner;
+
+				triangleNodes.buildNodes();
+				triangleNodes.buildPhysicalGrid();
+				triangleNodes.buildMaps();
+
+				CubatureContext2D cubctx = triangleNodes.buildCubatureVolumeMesh(3*(NOrder+1));
+				index_type Ncub = cubctx.NumCubaturePoints();
+
+				Assert::That(Ncub, Equals(40));
+
+				// const real_matrix_type& r = *triangleNodes.get_rGrid(), ytest = *triangleNodes.get_sGrid();
+
+				const int Np = (NOrder+1)*(NOrder+2)/2;
+				real_vector_type field(Np), fieldcub(Ncub);
+				field = 1.0;
+
+				fieldcub = blitz::sum(cubctx.V()(ii,jj)*field(jj), jj);
+
+				Assert::That(blitz::sum(fieldcub), Equals(40.0));
+
+				// check an integral/area:
+				Assert::That(std::abs(blitz::sum(fieldcub*cubctx.w()) - 2.0), IsLessThan(eps));
+
+				const real_tensor3_type& MMs = cubctx.MM();
+				const real_tensor3_type& MMchols = cubctx.MMChol();
+
+				std::cout << "MassMatrix: " << "\n";
+				std::cout << MMs(blitz::Range::all(), blitz::Range::all(), 0) << "\n";
+
+				std::cout << "MassMatrix CHOL: " << "\n";
+				std::cout << MMchols(blitz::Range::all(), blitz::Range::all(), 0) << "\n";
+
+				// check cholesky vs. result from MATLAB.
+				real_matrix_type cholExpected(Np, Np);
+				cholExpected = 2.402082429892863e-01,5.828276259705386e-03,-4.009021455783061e-02,2.485343519317225e-02,5.828276259705386e-03,4.412837739491220e-03,5.078926454886122e-02,-4.009021455783061e-02,5.078926454886122e-02,2.485343519317225e-02,
+					0.000000000000000e+00,4.549351945011955e-01,2.601174186738547e-02,-2.148625299703605e-02,1.502764174374311e-01,1.206199947285476e-01,-6.989130374861441e-02,-6.872702646918195e-02,-5.516393140859115e-02,2.649860344814415e-02,
+					0.000000000000000e+00,0.000000000000000e+00,4.524557038890455e-01,6.531632578941622e-03,-7.774306795347631e-02,1.147943876017478e-01,1.596933057619292e-01,-5.441309595579978e-02,-6.194846766631715e-02,2.764271642317755e-02,
+					0.000000000000000e+00,0.000000000000000e+00,0.000000000000000e+00,2.378612735757964e-01,6.639085613337543e-02,1.173878682539431e-02,-1.011954527938700e-02,5.076530298388707e-02,-4.907452598913978e-02,2.413638127546737e-02,
+					0.000000000000000e+00,0.000000000000000e+00,0.000000000000000e+00,0.000000000000000e+00,4.170507153393579e-01,1.076441262439807e-01,-3.611326574216586e-03,3.491449525365355e-02,-6.009854220538501e-02,-3.167569993106339e-02,
+					0.000000000000000e+00,0.000000000000000e+00,0.000000000000000e+00,0.000000000000000e+00,0.000000000000000e+00,6.265209775250528e-01,7.227499089443469e-02,1.041606301245910e-01,1.204850562267574e-01,-3.659563147898786e-03,
+					0.000000000000000e+00,0.000000000000000e+00,0.000000000000000e+00,0.000000000000000e+00,0.000000000000000e+00,0.000000000000000e+00,4.107244613809286e-01,-7.904632915636338e-02,1.372215182425997e-02,-3.179812976061824e-02,
+					0.000000000000000e+00,0.000000000000000e+00,0.000000000000000e+00,0.000000000000000e+00,0.000000000000000e+00,0.000000000000000e+00,0.000000000000000e+00,4.204933870241067e-01,1.341247524069373e-01,8.252169942809579e-03,
+					0.000000000000000e+00,0.000000000000000e+00,0.000000000000000e+00,0.000000000000000e+00,0.000000000000000e+00,0.000000000000000e+00,0.000000000000000e+00,0.000000000000000e+00,3.985288437776906e-01,5.929715442301729e-03,
+					0.000000000000000e+00,0.000000000000000e+00,0.000000000000000e+00,0.000000000000000e+00,0.000000000000000e+00,0.000000000000000e+00,0.000000000000000e+00,0.000000000000000e+00,0.000000000000000e+00,2.300050496038051e-01;
+
+				cholExpected -= MMchols(blitz::Range::all(), blitz::Range::all(), 0);
+
+				Assert::That(normMax(cholExpected), IsLessThan(1.25e-4));
 			}
 
 		};

@@ -28,6 +28,20 @@ namespace blitzdg {
         return result;
     }
 
+    ndarray DGContext2D::r_numpy() const {
+        Py_intptr_t shape[1] = { Np_ };
+        ndarray result = zeros(1, shape, dtype::get_builtin<real_type>());
+        std::copy(r_->begin(), r_->end(), reinterpret_cast<real_type*>(result.get_data()));
+        return result;
+    }
+
+    ndarray DGContext2D::s_numpy() const {
+        Py_intptr_t shape[1] = { Np_ };
+        ndarray result = zeros(1, shape, dtype::get_builtin<real_type>());
+        std::copy(s_->begin(), s_->end(), reinterpret_cast<real_type*>(result.get_data()));
+        return result;
+    }
+
     ndarray DGContext2D::x_numpy() const {
         Py_intptr_t shape[2] = { Np_, K_ };
         ndarray result = zeros(2, shape, dtype::get_builtin<real_type>());

@@ -10,8 +10,12 @@
 #pragma once
 #include "NodesProvisioner2Dbase.hpp"
 #include "Nodes1DProvisioner.hpp"
+#include "DenseCholeskyFactorizer.hpp"
 #include "DGContext2D.hpp"
 #include "GaussFaceContext2D.hpp"
+#include "TriangleCubatureRules.hpp"
+#include "CubatureContext2D.hpp"
+#include "CubatureContext2D.hpp"
 #include "MeshManager.hpp"
 #include "Types.hpp"
 #include "LinAlgHelpers.hpp"
@@ -69,10 +73,11 @@ namespace blitzdg {
       const MeshManager& Mesh2D;
 
       std::unique_ptr<Nodes1DProvisioner> Nodes1D;
-	  JacobiBuilders Jacobi;
+	    JacobiBuilders Jacobi;
       VandermondeBuilders Vandermonde;
       DirectSolver LinSolver;
       DenseMatrixInverter Inverter;
+      DenseCholeskyFactorizer CholeskyFactorizer;
 
   public:
       static const index_type NumFaces;
@@ -375,6 +380,12 @@ namespace blitzdg {
        * Builds out the Gauss Face Nodes context.
        */
       GaussFaceContext2D buildGaussFaceNodes(index_type NGauss);
+
+
+      /**
+       * Builds out the Cubature Volume Mesh context.
+       */
+      CubatureContext2D buildCubatureVolumeMesh(index_type NCubature);
 
       /**
        * Build an interpolation operator to a new set of nodes on the reference triangle.

@@ -6,6 +6,7 @@
 #include <boost/python/numpy.hpp>
 
 namespace blitzdg {
+    
     class GaussFaceContext2D {
     private:
         index_type NGauss_;
@@ -69,5 +70,21 @@ namespace blitzdg {
         const real_matrix_type& x() const { return *x_; }
         const real_matrix_type& y() const { return *y_; }
         const real_matrix_type& W() const { return *W_; }
+
+        using numpyarray = boost::python::numpy::ndarray;
+
+        // for py bindings
+        numpyarray sJ_numpy() const;
+        numpyarray Jac_numpy() const;
+        numpyarray rx_numpy() const;
+        numpyarray ry_numpy() const;
+        numpyarray sx_numpy() const;
+        numpyarray sy_numpy() const;
+        numpyarray nx_numpy() const;
+        numpyarray ny_numpy() const;
+        boost::python::dict bcMap_numpy() const;
+        numpyarray x_numpy() const;
+        numpyarray y_numpy() const;
+        numpyarray W_numpy() const;
     };
 }
