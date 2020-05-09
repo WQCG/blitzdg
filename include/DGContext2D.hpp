@@ -191,6 +191,7 @@ namespace blitzdg {
         boost::python::numpy::ndarray x_numpy() const;
         boost::python::numpy::ndarray y_numpy() const;
         boost::python::numpy::ndarray fscale_numpy() const;
+        boost::python::numpy::ndarray fmask_numpy() const;
         boost::python::numpy::ndarray jacobian_numpy() const;
         boost::python::numpy::ndarray rx_numpy() const;
         boost::python::numpy::ndarray ry_numpy() const;

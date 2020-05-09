@@ -24,6 +24,7 @@ using boost::python::stl_input_iterator;
 using boost::token_compress_on;
 using boost::python::numpy::ndarray;
 using boost::python::numpy::dtype;
+using pystr = boost::python::str;
 using std::cout;
 using std::endl;
 using std::getline;
@@ -117,6 +118,12 @@ namespace blitzdg {
         
         // this is still a hack, but okay.
         buildBCTable(BCTag::Wall);
+    }
+
+    void MeshManager::readMesh_python(const pystr& gmshInputFileStr) {
+          char const* gmshInputFile = boost::python::extract<char const*>(gmshInputFileStr);
+
+          readMesh(std::string(gmshInputFile));
     }
 
     void MeshManager::readMesh(const string& gmshInputFile) {

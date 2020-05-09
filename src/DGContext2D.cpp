@@ -63,6 +63,13 @@ namespace blitzdg {
         return result;
     }
 
+    ndarray DGContext2D::fmask_numpy() const {
+        Py_intptr_t shape[2] = { Nfp_, NumFaces_ };
+        ndarray result = zeros(2, shape, dtype::get_builtin<index_type>());
+        std::copy(Fmask_->begin(), Fmask_->end(), reinterpret_cast<index_type*>(result.get_data()));
+        return result;
+    }
+
     ndarray DGContext2D::jacobian_numpy() const {
         Py_intptr_t shape[2] = { Np_, K_ };
         ndarray result = zeros(2, shape, dtype::get_builtin<real_type>());
