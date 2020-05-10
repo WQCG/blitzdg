@@ -68,6 +68,7 @@ install:
       Invoke-RestMethod -Uri "https://s3.amazonaws.com/dsteinmo-libs/libfiles.zip" -OutFile "lib.zip"
       Expand-Archive -Path include.zip -DestinationPath ".\include\." -Force
       Expand-Archive -Path lib.zip -DestinationPath ".\lib\." -Force
+      cp ".\lib\boost_python37-vc140-mt-x64-1_67.lib" ".\lib\boost_pythonPY_MAJOR_VERSIONPY_MINOR_VERSION-vc141-mt-x64-1_67.lib"
       cmake -A "x64" -G "Visual Studio 16 2019" .
       Pop-Location
       ls "C:\Miniconda37-x64"
