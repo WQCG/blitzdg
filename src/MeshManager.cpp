@@ -12,6 +12,7 @@
 #include <metis.h>
 #include <cmath>
 #include <fstream>
+#include <memory>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
