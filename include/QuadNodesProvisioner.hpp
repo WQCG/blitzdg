@@ -69,10 +69,13 @@ namespace blitzdg {
       const MeshManager& Mesh2D;
 
       std::unique_ptr<Nodes1DProvisioner> Nodes1D;
-	  JacobiBuilders Jacobi;
+	    JacobiBuilders Jacobi;
       VandermondeBuilders Vandermonde;
       DirectSolver LinSolver;
       DenseMatrixInverter Inverter;
+
+      std::unique_ptr<std::vector<index_type>> gather;
+      std::unique_ptr<std::vector<index_type>> scatter;
 
   public:
       static const index_type NumFaces;
