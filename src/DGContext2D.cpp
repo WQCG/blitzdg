@@ -70,6 +70,20 @@ namespace blitzdg {
         return result;
     }
 
+    ndarray DGContext2D::gather_numpy() const {
+        Py_intptr_t shape[1] = { static_cast<index_type>(Gather_->size()) };
+        ndarray result = zeros(1, shape, dtype::get_builtin<index_type>());
+        std::copy(Gather_->begin(), Gather_->end(), reinterpret_cast<index_type*>(result.get_data()));
+        return result;
+    }
+
+    ndarray DGContext2D::scatter_numpy() const {
+        Py_intptr_t shape[1] = { static_cast<index_type>(Scatter_->size()) };
+        ndarray result = zeros(1, shape, dtype::get_builtin<index_type>());
+        std::copy(Scatter_->begin(), Scatter_->end(), reinterpret_cast<index_type*>(result.get_data()));
+        return result;
+    }
+
     ndarray DGContext2D::jacobian_numpy() const {
         Py_intptr_t shape[2] = { Np_, K_ };
         ndarray result = zeros(2, shape, dtype::get_builtin<real_type>());

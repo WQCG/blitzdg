@@ -22,6 +22,8 @@ namespace blitzdg {
         real_matrix_type* yGrid_;
         real_matrix_type* Fscale_;
         index_matrix_type* Fmask_;
+        std::vector<index_type>* Gather_;
+        std::vector<index_type>* Scatter_;
         real_matrix_type* V_;
         real_matrix_type* Vinv_;
         real_matrix_type* J_;
@@ -53,6 +55,8 @@ namespace blitzdg {
             real_matrix_type* ygrid,
             real_matrix_type* fscale,
             index_matrix_type* fmask,
+            std::vector<index_type>* gather,
+            std::vector<index_type>* scatter,
             real_matrix_type* vandermonde2d,
             real_matrix_type* vandermonde2dinv,
             real_matrix_type* jacobian,
@@ -71,7 +75,7 @@ namespace blitzdg {
             : N_{ order }, Np_{ numLocalPoints }, Nfp_{ numFacePoints },
             K_{ numElems }, NumFaces_{ numFaces },
             Filt_{ filter }, r_{ rgrid }, s_{ sgrid },  xGrid_{ xgrid }, yGrid_{ ygrid },
-            Fscale_{ fscale }, Fmask_ { fmask }, V_ { vandermonde2d }, Vinv_ {vandermonde2dinv}, J_{ jacobian }, rx_{ rx },
+            Fscale_{ fscale }, Fmask_ { fmask }, Gather_{ gather }, Scatter_{ scatter }, V_ { vandermonde2d }, Vinv_ {vandermonde2dinv}, J_{ jacobian }, rx_{ rx },
             ry_{ ry }, sx_{ sx }, sy_{ sy }, nx_{ nx }, ny_{ ny },
             Dr_{ Dr }, Ds_{ Ds }, Lift_{ lift }, vmapM_{ vmapM },
             vmapP_{ vmapP }, bcHash_{ bcmap }
@@ -123,6 +127,14 @@ namespace blitzdg {
 
         const index_matrix_type& fmask() const {
             return *Fmask_;
+        }
+
+        const std::vector<index_type>& gather() const {
+            return *Gather_;
+        }
+
+        const std::vector<index_type>& scatter() const {
+            return *Scatter_;
         }
 
         const real_matrix_type& V() const {
@@ -192,6 +204,8 @@ namespace blitzdg {
         boost::python::numpy::ndarray y_numpy() const;
         boost::python::numpy::ndarray fscale_numpy() const;
         boost::python::numpy::ndarray fmask_numpy() const;
+        boost::python::numpy::ndarray gather_numpy() const;
+        boost::python::numpy::ndarray scatter_numpy() const;
         boost::python::numpy::ndarray jacobian_numpy() const;
         boost::python::numpy::ndarray rx_numpy() const;
         boost::python::numpy::ndarray ry_numpy() const;
