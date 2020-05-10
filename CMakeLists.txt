@@ -3,7 +3,8 @@ cmake_minimum_required(VERSION 3.5)
 set(CMAKE_CONFIGURATION_TYPES Debug Release)
 set(CMAKE_BUILD_TYPE Release) #or Debug
 set (CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS 1)
-set (CMAKE_CXX_FLAGS "-std=c++14 -fPIC")
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2")
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage -DBZ_DEBUG")
 # set (CMAKE_MODULE_LINKER_FLAGS  "${CMAKE_MODULE_LINKER_FLAGS}")
@@ -88,12 +89,14 @@ message("-- found ${VTKIOXML7}")
 message("-- found ${VTKIOXMLPARSER7}")
 message("-- found ${VTKSYS7}")
 
-set (CMAKE_CXX_FLAGS "-Wall -std=c++14 -fPIC")
 set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2")
 if (WIN32)
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /EHsc /fp:except /W0")
 	message("-- enabling exception handling")
-endif()
+else()
+    set (CMAKE_CXX_FLAGS "-Wall -std=c++14 -fPIC")
+endif()    
+
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage -DBZ_DEBUG")
 include_directories ("include" 
     "include/igloo" 
