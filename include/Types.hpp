@@ -9,6 +9,7 @@
 #include <blitz/array.h>
 #include <unordered_map>
 #include <vector>
+#include <memory>
 
 namespace blitzdg {
     template <typename T>
