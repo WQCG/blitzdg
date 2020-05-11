@@ -34,6 +34,7 @@ find_library(COLAMD names "colamd" "libcolamd" PATHS "/usr/lib64/" "/usr/lib" "/
 
 # for static linkage on windows.
 if (WIN32)
+    set(CMAKE_GENERATOR_TOOLSET "v140")
     find_library(SUITESPARSECONFIG NAMES "suitesparseconfig" "libsuitesparseconfig" PATHS "/usr/lib64/" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 endif()
 find_library(LAPACK NAMES "liblapack" "lapack" PATHS "/usr/lib64/" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
