@@ -191,7 +191,7 @@ namespace blitzdg{
             }
         }
 
-        BcRhs_ = make_unique<real_matrix_type>(bcRhs);
+        BcRhs_ = std::make_unique<real_matrix_type>(bcRhs);
     }
 
     void Poisson2DSparseMatrix::buildPoissonOperator(DGContext2D& dg, MeshManager& mshManager, const index_vector_type& bcType) {
@@ -416,8 +416,8 @@ namespace blitzdg{
             entriesMM += Np*Np;
         }
 
-        OP_ = make_unique<CSCMat>(OP);
-        MM_ = make_unique<CSCMat>(MM);
+        OP_ = std::make_unique<CSCMat>(OP);
+        MM_ = std::make_unique<CSCMat>(MM);
     }
 
     const ndarray Poisson2DSparseMatrix::buildBcRhs_numpy(DGContext2D& dg, const MeshManager& mshManager, const ndarray& ubc, const ndarray& qbc) {
