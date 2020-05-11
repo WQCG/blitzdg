@@ -58,8 +58,10 @@ find_library(VTKSYS7 NAMES "vtksys-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/
 if (WIN32)
     find_library(VTKZLIB7 NAMES "vtkzlib-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
     find_library(VTKEXPAT7 NAMES "vtkexpat-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+    find_library(BOOST_PY_BADVERSIONSTAMP names "boost_pythonPY_MAJOR_VERSIONPY_MINOR_VERSION-vc140-mt-x64-1_67" PATHS "lib")
     message("-- found ${VTKZLIB7}")
     message("-- found ${VTKEXPAT7}")
+    message("-- found ${BOOST_PY_BADVERSIONSTAMP}")
 endif()
 
 message("-- found ${BLITZ}")
@@ -128,6 +130,7 @@ link_libraries(
     ${COLAMD}
     ${SUITESPARSECONFIG}
     ${BOOSTPYTHON}
+    ${BOOST_PY_BADVERSIONSTAMP}
     ${BOOSTNUMPY}
     ${PYTHON3}
     ${VTKIOXML7}
@@ -183,6 +186,7 @@ link_libraries(
     ${COLAMD}
     ${SUITESPARSECONFIG}
     ${BOOSTPYTHON}
+    ${BOOST_PY_BADVERSIONSTAMP}
     ${BOOSTNUMPY}
     ${PYTHON3}
     ${VTKIOXML7}
@@ -238,6 +242,7 @@ link_libraries(
     ${COLAMD}
     ${SUITESPARSECONFIG}
     ${BOOSTPYTHON}
+    ${BOOST_PY_BADVERSIONSTAMP}
     ${BOOSTNUMPY}
     ${PYTHON3}
     ${VTKIOXML7}
