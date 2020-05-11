@@ -63,7 +63,6 @@ install:
   - ps: |
       $ErrorActionPreference = 'Continue'
       Push-Location "c:\projects\blitzdg"
-      git submodule update --init --recursive
       Invoke-RestMethod -Uri "https://s3.amazonaws.com/dsteinmo-libs/include_bundle.zip" -OutFile "include.zip"
       Invoke-RestMethod -Uri "https://s3.amazonaws.com/dsteinmo-libs/libfiles.zip" -OutFile "lib.zip"
       Expand-Archive -Path include.zip -DestinationPath ".\include\." -Force
@@ -71,7 +70,6 @@ install:
       cp ".\lib\boost_python37-vc140-mt-x64-1_67.lib" ".\lib\boost_pythonPY_MAJOR_VERSIONPY_MINOR_VERSION-vc141-mt-x64-1_67.lib"
       cmake -A "x64" -G "Visual Studio 16 2019" .
       Pop-Location
-      ls "C:\Miniconda37-x64"
 
   # batch commands start from cmd:
   #- cmd: echo This is batch again
