@@ -77,11 +77,11 @@ namespace blitzdg {
         NumFaces = EToVnp.shape(1);
         NumElements = EToVnp.shape(0);
 
-        EToV = std::make_unique<index_vector_type>(NumElements*NumFaces);
-        Vert = std::make_unique<real_vector_type>(Dim*NumVerts);
-        BCType = std::make_unique<index_vector_type>(NumElements*NumFaces);
-        EToE = std::make_unique<index_vector_type>(NumElements*NumFaces);
-        EToF = std::make_unique<index_vector_type>(NumElements*NumFaces);
+        EToV = make_unique<index_vector_type>(NumElements*NumFaces);
+        Vert = make_unique<real_vector_type>(Dim*NumVerts);
+        BCType = make_unique<index_vector_type>(NumElements*NumFaces);
+        EToE = make_unique<index_vector_type>(NumElements*NumFaces);
+        EToF = make_unique<index_vector_type>(NumElements*NumFaces);
 
         auto vertRawData = std::vector<real_type>(reinterpret_cast<real_type*>(Vertnp.get_data()), reinterpret_cast<real_type*>(Vertnp.get_data() + 8*Dim*NumVerts));
         auto eToVRawData = std::vector<real_type>(reinterpret_cast<real_type*>(EToVnp.get_data()), reinterpret_cast<real_type*>(EToVnp.get_data() + 8*NumElements*NumFaces));
