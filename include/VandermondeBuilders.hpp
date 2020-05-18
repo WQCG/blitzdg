@@ -11,9 +11,14 @@
 #include "JacobiBuilders.hpp"
 #include "DenseMatrixInverter.hpp"
 #include "Types.hpp"
+#include "boost/python.hpp"
+#include "boost/python/numpy.hpp"
 #include <memory>
 
 namespace blitzdg {
+    using pyarray = boost::python::numpy::ndarray;
+    using boost::python::numpy::dtype;
+    using boost::python::numpy::zeros;
     /**
      * Provides facilities for the construction of one-dimensional
      * nodes, operators, and geometric factors.
@@ -62,6 +67,29 @@ public:
                 Jacobi.computeGradJacobi(r, 0.0, 0.0, i, dp);
                 DVr(blitz::Range::all(), i) = dp;
             }    
+        }
+
+        boost::python::tuple buildVandermondeMatrix_numpy(const pyarray& r) {
+            const index_type N = r.shape(0);
+            real_matrix_type V(N, N), Vinv(N,N);
+            real_vector_type rblitz(N);
+
+            char * raw = r.get_data();
+            std::copy(&raw[0], &raw[N*sizeof(real_type)], reinterpret_cast<char*>(rblitz.data()));
+
+            computeVandermondeMatrix(rblitz, V, Vinv);
+
+            Py_intptr_t shape[1] = { N };
+            pyarray Vpy = zeros(1, shape, dtype::get_builtin<real_type>());
+            pyarray Vinvpy = zeros(1, shape, dtype::get_builtin<real_type>());
+
+            raw = reinterpret_cast<char*>(V.data());
+            std::copy(&raw[0], &raw[N*N*sizeof(real_type)], Vpy.get_data());
+        
+            raw = reinterpret_cast<char*>(Vinv.data());
+            std::copy(&raw[0], &raw[N*N*sizeof(real_type)], Vinvpy.get_data());
+
+            return boost::python::make_tuple<pyarray, pyarray>(Vpy, Vinvpy);
         }
     };
 }

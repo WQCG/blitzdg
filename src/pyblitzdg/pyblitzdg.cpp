@@ -18,6 +18,7 @@
 #include "Poisson2DSparseMatrix.hpp"
 #include "GaussFaceContext2D.hpp"
 #include "CubatureContext2D.hpp"
+#include "VandermondeBuilders.hpp"
 
 using namespace boost::python;
 using namespace boost::python::numpy;
@@ -72,6 +73,10 @@ BOOST_PYTHON_MODULE(pyblitzdg)
         .add_property("mapI", &Nodes1DProvisioner::get_mapI, "Property containing the surface index of the Inflow boundary.")
         .add_property("mapO", &Nodes1DProvisioner::get_mapO, "Property containing the surface index of the Outflow boundary.")
         .add_property("nx", &Nodes1DProvisioner::get_nx_numpy, "Property containing the unit outward-pointing normal along elemental surface boundaries.");
+
+    class_<VandermondeBuilders>("VandermondeBuilder")
+        .def("buildVandermondeMatrix", &VandermondeBuilders::buildVandermondeMatrix_numpy, "Build Generalized Vandermonde matrix for a numpy 1D array of input points, r.", args("self", "r"));
+        //.def("buildGradVandermonde", &VandermondeBuilders::buildGradVandermonde_numpy, "Build Gradient of Generalized Vandermonde matrix for a numpy 1D array of input points, r.", args("self", "r"))
 
     class_<lserk4wrapper>("LSERK4")
         .def_readonly("numStages", new int(5), "The number of stages in the LSERK4 time-stepper (5).")
