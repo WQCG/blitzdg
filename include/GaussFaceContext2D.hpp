@@ -10,18 +10,21 @@ namespace blitzdg {
     class GaussFaceContext2D {
     private:
         index_type NGauss_;
-        real_mat_smart_ptr nx_;
-        real_mat_smart_ptr ny_;
-        real_mat_smart_ptr sJ_;
-        real_mat_smart_ptr Jac_;
-        real_mat_smart_ptr rx_;
-        real_mat_smart_ptr ry_;
-        real_mat_smart_ptr sx_;
-        real_mat_smart_ptr sy_;
-        std::unique_ptr<index_hashmap> bcMap_;
-        real_mat_smart_ptr x_;
-        real_mat_smart_ptr y_;
-        real_mat_smart_ptr W_;
+        std::shared_ptr<real_matrix_type> nx_;
+        std::shared_ptr<real_matrix_type> ny_;
+        std::shared_ptr<real_matrix_type> sJ_;
+        std::shared_ptr<real_matrix_type> Jac_;
+        std::shared_ptr<real_matrix_type> rx_;
+        std::shared_ptr<real_matrix_type> ry_;
+        std::shared_ptr<real_matrix_type> sx_;
+        std::shared_ptr<real_matrix_type> sy_;
+        std::shared_ptr<index_hashmap> bcMap_;
+        std::shared_ptr<real_matrix_type> x_;
+        std::shared_ptr<real_matrix_type> y_;
+        std::shared_ptr<real_matrix_type> W_;
+        std::shared_ptr<real_matrix_type> Interp_;
+        std::shared_ptr<index_vector_type> mapM_;
+        std::shared_ptr<index_vector_type> mapP_;
 
     public:
         GaussFaceContext2D() = default;
@@ -39,22 +42,27 @@ namespace blitzdg {
             const index_hashmap& bcMap,
             const real_matrix_type& x,
             const real_matrix_type& y,
-            const real_matrix_type& W
+            const real_matrix_type& W,
+            const real_matrix_type& Interp,
+            const index_vector_type& mapM,
+            const index_vector_type& mapP
         ) : 
             NGauss_{ NGauss },
-            nx_{ std::make_unique<real_matrix_type>(nx) },
-            ny_{ std::make_unique<real_matrix_type>(ny) },
-            sJ_{ std::make_unique<real_matrix_type>(sJ) },
-            Jac_{ std::make_unique<real_matrix_type>(Jac) },
-            rx_{ std::make_unique<real_matrix_type>(rx) },
-            ry_{ std::make_unique<real_matrix_type>(ry) },
-            sx_{ std::make_unique<real_matrix_type>(sx) },
-            sy_{ std::make_unique<real_matrix_type>(sy) },
-            bcMap_{ std::make_unique<index_hashmap>(bcMap) },
-            x_{ std::make_unique<real_matrix_type>(x) },
-            y_{ std::make_unique<real_matrix_type>(y) },
-            W_{ std::make_unique<real_matrix_type>(W) }
-
+            nx_{ std::make_shared<real_matrix_type>(nx) },
+            ny_{ std::make_shared<real_matrix_type>(ny) },
+            sJ_{ std::make_shared<real_matrix_type>(sJ) },
+            Jac_{ std::make_shared<real_matrix_type>(Jac) },
+            rx_{ std::make_shared<real_matrix_type>(rx) },
+            ry_{ std::make_shared<real_matrix_type>(ry) },
+            sx_{ std::make_shared<real_matrix_type>(sx) },
+            sy_{ std::make_shared<real_matrix_type>(sy) },
+            bcMap_{ std::make_shared<index_hashmap>(bcMap) },
+            x_{ std::make_shared<real_matrix_type>(x) },
+            y_{ std::make_shared<real_matrix_type>(y) },
+            W_{ std::make_shared<real_matrix_type>(W) },
+            Interp_{ std::make_shared<real_matrix_type>(Interp) },
+            mapM_{ std::make_shared<index_vector_type>(mapM) },
+            mapP_{ std::make_shared<index_vector_type>(mapP) }
         {}
         
         const index_type NGauss() const { return NGauss_; }
@@ -70,6 +78,10 @@ namespace blitzdg {
         const real_matrix_type& x() const { return *x_; }
         const real_matrix_type& y() const { return *y_; }
         const real_matrix_type& W() const { return *W_; }
+        const real_matrix_type& Interp() const { return *Interp_; }
+
+        const index_vector_type& mapM() const { return *mapM_; };
+        const index_vector_type& mapP() const { return *mapP_; }; 
 
         using numpyarray = boost::python::numpy::ndarray;
 
@@ -86,5 +98,9 @@ namespace blitzdg {
         numpyarray x_numpy() const;
         numpyarray y_numpy() const;
         numpyarray W_numpy() const;
+        numpyarray Interp_numpy() const;
+
+        numpyarray mapM_numpy() const;
+        numpyarray mapP_numpy() const;
     };
 }

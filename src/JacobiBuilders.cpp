@@ -20,6 +20,7 @@ namespace blitzdg {
         index_type Np = (x.length())(0);
 
         real_matrix_type pStorage(N+1, Np);
+        pStorage = 0.0;
 
         real_type gamma0 = pow(2,(alpha+beta+1))/(alpha+beta+1)*tgamma(alpha+1)*tgamma(beta+1)/tgamma(alpha+beta+1);
 

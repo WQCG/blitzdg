@@ -98,7 +98,7 @@ namespace blitzdg {
         real_matrix_type V2Dr(Ncub, NumLocalPoints), V2Ds(Ncub, NumLocalPoints);
 
         computeGradVandermondeMatrix(NOrder, rcub, scub, V2Dr, V2Ds);
-        computeDifferentiationMatrices(V2Dr, V2Ds, *V, Drcub, Dscub, Drwcub, Dswcub);
+        computeDifferentiationMatrices(V2Dr, V2Ds, *V, Vcub, Drcub, Dscub, Drwcub, Dswcub);
 
         real_matrix_type sJcub(Ncub, NumElements), Jcub(Ncub, NumElements),
             xrcub(Ncub, NumElements), yrcub(Ncub, NumElements),
@@ -137,12 +137,14 @@ namespace blitzdg {
 
 
         real_matrix_type Jcubdiag(Ncub, Ncub), tmp(Ncub, NumLocalPoints), MMtmp(NumLocalPoints, NumLocalPoints), upperFactor(NumLocalPoints, NumLocalPoints);
+        Jcubdiag = 0.0;
 
         // build custom mass matrix and its pre-factorization on each Element.
         for (index_type k=0; k< NumElements; ++k) {
             for (index_type i=0; i < Ncub; ++i) {
                 Jcubdiag(i,i) = Jcub(i, k);
             }
+
             tmp = sum(Jcubdiag(ii,kk)*Vcub(kk, jj), kk);
             MMtmp = sum(Vcub(kk, ii)*tmp(kk,jj), kk);
             MM(Range::all(), Range::all(), k) = MMtmp;
@@ -155,22 +157,22 @@ namespace blitzdg {
         return CubatureContext2D {
             NCubature,
             Ncub,
-            rcub,
-            scub,
-            wcub,
-            Vcub,
-            rxcub,
-            sxcub,
-            rycub,
-            sycub,
-            Jcub,
-            Drcub,
-            Dscub,
-            MM,
-            MMchol,
-            xcub,
-            ycub,
-            W    
+            std::make_shared<real_vector_type>(rcub),
+            std::make_shared<real_vector_type>(scub),
+            std::make_shared<real_vector_type>(wcub),
+            std::make_shared<real_matrix_type>(Vcub),
+            std::make_shared<real_matrix_type>(rxcub),
+            std::make_shared<real_matrix_type>(sxcub),
+            std::make_shared<real_matrix_type>(rycub),
+            std::make_shared<real_matrix_type>(sycub),
+            std::make_shared<real_matrix_type>(Jcub),
+            std::make_shared<real_matrix_type>(Drcub),
+            std::make_shared<real_matrix_type>(Dscub),
+            std::make_shared<real_tensor3_type>(MM),
+            std::make_shared<real_tensor3_type>(MMchol),
+            std::make_shared<real_matrix_type>(xcub),
+            std::make_shared<real_matrix_type>(ycub),
+            std::make_shared<real_matrix_type>(W)    
         };
     }
 
@@ -338,7 +340,8 @@ namespace blitzdg {
 
         return GaussFaceContext2D { 
             NGauss, nx, ny, sJ, Jac, rx, ry,
-            sx, sy, gbcMap, gx, gy, W
+            sx, sy, gbcMap, gx, gy, W, gaussInterpMatrix,
+            mapM, mapP
         };
     }
 
@@ -415,28 +418,21 @@ namespace blitzdg {
         }
     }
 
-    void TriangleNodesProvisioner::computeDifferentiationMatrices(const real_matrix_type & V2Dr, const real_matrix_type & V2Ds, const real_matrix_type & V, real_matrix_type & Dr, real_matrix_type & Ds, real_matrix_type& Drw, real_matrix_type& Dsw) const {
+    void TriangleNodesProvisioner::computeDifferentiationMatrices(const real_matrix_type & V2Dr, const real_matrix_type & V2Ds, const real_matrix_type & V, const real_matrix_type & Vc, real_matrix_type & Dr, real_matrix_type & Ds, real_matrix_type& Drw, real_matrix_type& Dsw) const {
         firstIndex ii;
         secondIndex jj;
         thirdIndex kk;
  
-        const index_type numRowsV = V.rows();
-        const index_type numColsV = V.cols();
-
-        const index_type numRowsV2Dr = V2Dr.rows();
-        const index_type numColsV2Dr = V2Dr.cols();
-
-        const index_type numRowsDrw = Drw.rows();
-        const index_type numColsDrw = Drw.cols();
-
+        const index_type Np = V.rows(); // = V.cols()
+        const index_type Nc = V2Dr.rows(); // num cubature points
 
 		// Note: this is not a column major ordering trick. We need these transposes.
-        real_matrix_type Vtrans(numColsV, numRowsV);
-        real_matrix_type V2Drtrans(numColsV2Dr, numRowsV2Dr);
-        real_matrix_type V2Dstrans(numColsV2Dr, numRowsV2Dr);
+        real_matrix_type Vtrans(Np, Np);
+        real_matrix_type V2Drtrans(Np, Nc);
+        real_matrix_type V2Dstrans(Np, Nc);
 
-        real_matrix_type Drtrans(numColsV2Dr, numRowsV2Dr);
-        real_matrix_type Dstrans(numColsV2Dr, numRowsV2Dr);
+        real_matrix_type Drtrans(Np, Nc);
+        real_matrix_type Dstrans(Np, Nc);
 
         Drtrans = 0.*jj;
         Dstrans = 0.*jj;
@@ -446,6 +442,7 @@ namespace blitzdg {
         V2Dstrans = V2Ds(jj,ii);
 
         // Dr = V2Dr * V^{-1}
+        // Drtrans = Vtrans^{-1}* V2Drtrans
         LinSolver.solve(Vtrans, V2Drtrans, Drtrans);
 
         // LAPACK can mangle our input.
@@ -459,15 +456,17 @@ namespace blitzdg {
         Ds = Dstrans(jj, ii);
 
         // Now construct the weak derivatives.
-        real_matrix_type VVt(numRowsV,numRowsV), VVrt(numRowsV, numColsV2Dr), VVst(numRowsV, numColsV2Dr); 
-        real_matrix_type VVttrans(numRowsV,numRowsV), VVrttrans(numRowsV, numRowsV), VVsttrans(numRowsV, numRowsV); 
-        real_matrix_type Drwtrans(numColsDrw,numRowsDrw), Dswtrans(numColsDrw,numRowsDrw);
+        real_matrix_type VVt(Nc, Nc), VVrt(Nc, Np), VVst(Nc, Np); 
+        real_matrix_type VVttrans(Nc, Nc), VVrttrans(Np, Nc), VVsttrans(Np, Nc);
+        real_matrix_type Drwtrans(Np, Nc), Dswtrans(Np, Nc), Vctrans(Np, Nc);
 
-        VVt = blitz::sum(V(ii,kk)*Vtrans(kk,jj), kk);
-        VVrt = blitz::sum(V(ii,kk)*V2Drtrans(kk,jj), kk);
-        VVst = blitz::sum(V(ii,kk)*V2Dstrans(kk,jj), kk);
+        Vctrans = Vc(jj, ii);
 
-        VVttrans = VVt(jj,ii);
+        VVt = blitz::sum(Vc(ii,kk)*Vctrans(kk,jj), kk);
+        VVrt = blitz::sum(Vc(ii,kk)*V2Drtrans(kk,jj), kk);
+        VVst = blitz::sum(Vc(ii,kk)*V2Dstrans(kk,jj), kk);
+
+        VVttrans = VVt(jj,ii);   // Vvttrans must be Nc x Np for this to shake out.
         VVrttrans = VVrt(jj,ii);
         VVsttrans = VVst(jj,ii);
 
@@ -756,7 +755,7 @@ namespace blitzdg {
         Inverter.computeInverse(*V, *Vinv);
         
         computeGradVandermondeMatrix(NOrder, r, s, V2Dr, V2Ds);
-        computeDifferentiationMatrices(V2Dr, V2Ds, V2D, D_r, D_s, D_rw, D_sw);
+        computeDifferentiationMatrices(V2Dr, V2Ds, V2D, V2D, D_r, D_s, D_rw, D_sw);
 
         real_matrix_type& x = *xGrid;
         real_matrix_type& y = *yGrid;
@@ -1228,6 +1227,14 @@ namespace blitzdg {
 				fieldnew(2,i) = fieldVec(vci);
 		}
 	}
+
+    void TriangleNodesProvisioner::setCoordinates_numpy(const pyarray& x, const pyarray& y) {
+		char * xRaw = x.get_data();
+        char * yRaw = y.get_data();
+
+        std::copy(&xRaw[0], &xRaw[x.shape(0)*x.shape(1)*sizeof(real_type)] , reinterpret_cast<char*>(xGrid->data()));
+        std::copy(&yRaw[0], &yRaw[y.shape(0)*y.shape(1)*sizeof(real_type)] , reinterpret_cast<char*>(yGrid->data()));
+    }
 
     const real_matrix_type & TriangleNodesProvisioner::get_Lift() const {
         return *Lift;

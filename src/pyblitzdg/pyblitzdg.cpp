@@ -75,7 +75,7 @@ BOOST_PYTHON_MODULE(pyblitzdg)
         .add_property("nx", &Nodes1DProvisioner::get_nx_numpy, "Property containing the unit outward-pointing normal along elemental surface boundaries.");
 
     class_<VandermondeBuilders>("VandermondeBuilder")
-        .def("buildVandermondeMatrix", &VandermondeBuilders::buildVandermondeMatrix_numpy, "Build Generalized Vandermonde matrix for a numpy 1D array of input points, r.", args("self", "r"));
+        .def("buildVandermondeMatrix", &VandermondeBuilders::buildVandermondeMatrix_numpy, "Build Generalized Vandermonde matrix for a numpy 1D array of input points, r.", args("self", "r", "includeInverse", "order"));
         //.def("buildGradVandermonde", &VandermondeBuilders::buildGradVandermonde_numpy, "Build Gradient of Generalized Vandermonde matrix for a numpy 1D array of input points, r.", args("self", "r"))
 
     class_<lserk4wrapper>("LSERK4")
@@ -96,6 +96,7 @@ BOOST_PYTHON_MODULE(pyblitzdg)
         .add_property("bcType", &MeshManager::get_BCType_numpy, "Property containing the NumElements x NumFaces array of boundary condition types. Values of 0 corresponds to interior (non-boundary) faces.");
 
     class_<TriangleNodesProvisioner, boost::noncopyable>("TriangleNodesProvisioner", "Class for building a two-dimensional triangular DG nodal mesh from triangular mesh discretized using the Hesthaven & Warburton explicit construction for triangular polynomial interpolation nodes.", init<index_type, MeshManager&>(args("self", "NOrder", "MeshManager")))
+        .def("setCoordinates", &TriangleNodesProvisioner::setCoordinates_numpy, "Update phyiscal (x,y)-grid to a new set of nodal coordinates")
         .def("buildFilter", &TriangleNodesProvisioner::buildFilter, "Method to construct a polynomial spectral filter that can be retrieved from the dgContext.")
         .def("buildGaussFaceNodes", &TriangleNodesProvisioner::buildGaussFaceNodes, "Method to construct a Gaussian quadrature mesh along faces of order NGauss", args("self", "NGauss (integer)"))
         .def("buildCubatureVolumeMesh", &TriangleNodesProvisioner::buildCubatureVolumeMesh, "Method to construct a 2D cubature mesh on each element.", args("self", "NCubature (integer)"))
@@ -105,7 +106,7 @@ BOOST_PYTHON_MODULE(pyblitzdg)
         .def("buildFilter", &QuadNodesProvisioner::buildFilter, "Method to construct a polynomial spectral filter that can be retrieved from the dgContext.")
         .def("dgContext", &QuadNodesProvisioner::get_DGContext, "Read-only property containing the 2D quadrilateral DG Context containing all the data necessary for a spatial discretization of the domain of interest.");
     
-    class_<GaussFaceContext2D, boost::noncopyable>("GaussFaceContext2D", init<>())
+    class_<GaussFaceContext2D>("GaussFaceContext2D", init<>())
         .add_property("NGauss", &GaussFaceContext2D::NGauss)
         .add_property("nx", &GaussFaceContext2D::nx_numpy)
         .add_property("ny", &GaussFaceContext2D::ny_numpy)
@@ -118,9 +119,12 @@ BOOST_PYTHON_MODULE(pyblitzdg)
         .add_property("BCmap", &GaussFaceContext2D::bcMap_numpy)
         .add_property("x", &GaussFaceContext2D::x_numpy)
         .add_property("y", &GaussFaceContext2D::y_numpy)
-        .add_property("W", &GaussFaceContext2D::W_numpy);
+        .add_property("W", &GaussFaceContext2D::W_numpy)
+        .add_property("Interp", &GaussFaceContext2D::Interp_numpy)
+        .add_property("mapM", &GaussFaceContext2D::mapM_numpy)
+        .add_property("mapP", &GaussFaceContext2D::mapP_numpy);
 
-    class_<CubatureContext2D, boost::noncopyable>("CubatureContext2D", init<>())
+    class_<CubatureContext2D>("CubatureContext2D", init<>())
         .add_property("NCubature", &CubatureContext2D::NCubature)
         .add_property("NumCubaturePoints", &CubatureContext2D::NumCubaturePoints)
         .add_property("r", &CubatureContext2D::r_numpy)
@@ -135,6 +139,7 @@ BOOST_PYTHON_MODULE(pyblitzdg)
         .add_property("Dr", &CubatureContext2D::Dr_numpy)
         .add_property("Ds", &CubatureContext2D::Ds_numpy)
         .add_property("MM", &CubatureContext2D::MM_numpy)
+        .add_property("W", &CubatureContext2D::W_numpy)
         .add_property("MMChol", &CubatureContext2D::MMChol_numpy);
 
     class_<DGContext2D>("DGContext2D", init<>())
@@ -163,7 +168,8 @@ BOOST_PYTHON_MODULE(pyblitzdg)
         .add_property("Lift", &DGContext2D::lift_numpy, "Matrix operator transforming surface integral contributions to volume contributions. Lift = MassMatrix^{-1} * E, where E contains the edge-mass matrices of the standard element.")
         .add_property("vmapM", &DGContext2D::vmapM_numpy, "Volume-to-Surface index map. Interior (-) traces.")
         .add_property("vmapP", &DGContext2D::vmapP_numpy, "Volume-to-surface index map. Exterior (+) traces.")
-        .add_property("BCmap", &DGContext2D::bcmap_numpy, "Dictionary containing a list of boundary condition nodes for each boundary type (key).");
+        .add_property("BCmap", &DGContext2D::bcmap_numpy, "Dictionary containing a list of boundary condition nodes for each boundary type (key).")
+        .add_property("V", &DGContext2D::V_numpy, "Two-dimensional Generalized Vandermonde Matrix");
     
     class_<VtkOutputter>("VtkOutputter", "Class for writting output to unstructured visualization toolkit (vtk) files.", init<TriangleNodesProvisioner&>(args("TriangleNodesProvisioner")))
         .def(init<QuadNodesProvisioner&>(args("QuadNodesProvisioner")))

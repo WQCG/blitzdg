@@ -86,7 +86,7 @@ namespace blitzdg {
     }
 
     ndarray CubatureContext2D::sx_numpy() const {
-        Py_intptr_t shape[2] = { sx_->rows(), sx_->rows() };
+        Py_intptr_t shape[2] = { sx_->rows(), sx_->cols() };
         ndarray result = zeros(2, shape, dtype::get_builtin<real_type>());
         std::copy(sx_->begin(), sx_->end(), reinterpret_cast<real_type*>(result.get_data()));
         return result;

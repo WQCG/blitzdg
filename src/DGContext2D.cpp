@@ -168,6 +168,13 @@ namespace blitzdg {
         return result;
     }
 
+    ndarray DGContext2D::V_numpy() const {
+        Py_intptr_t shape[2] = {  Np_, Np_ };
+        ndarray result = zeros(2, shape, dtype::get_builtin<real_type>());
+        std::copy(V_->begin(), V_->end(), reinterpret_cast<real_type*>(result.get_data()));
+        return result;
+    }
+
     dict DGContext2D::bcmap_numpy() const {
         boost::python::dict bcDict;
 
