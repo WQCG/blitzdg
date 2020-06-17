@@ -30,8 +30,6 @@ namespace blitzdg {
         std::shared_ptr<real_matrix_type> y_;
         std::shared_ptr<real_matrix_type> W_;
 
-
-
     public:
         CubatureContext2D() = default;
         CubatureContext2D(
