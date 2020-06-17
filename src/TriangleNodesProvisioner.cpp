@@ -216,9 +216,6 @@ namespace blitzdg {
         gaussInterpMatrix(Range(1*NGauss, 2*NGauss - 1), Range::all()) = gaussFaceInterp2;
         gaussInterpMatrix(Range(2*NGauss, 3*NGauss - 1), Range::all()) = gaussFaceInterp3;
 
-        index_vector_type gmapM(NGauss*NumFaces*NumElements), gmapP(NGauss*NumFaces*NumElements);
-        gmapM = ii; gmapP = ii;
-
         index_hashmap gbcMap = {
             {BCTag::Wall, std::vector<index_type>()},
             {BCTag::Dirichlet, std::vector<index_type>()},
