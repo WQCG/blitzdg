@@ -233,11 +233,21 @@ namespace blitzdg {
             sx(NGauss*NumFaces, NumElements), sy(NGauss*NumFaces, NumElements);
 
         index_vector_type mapM(NGauss*NumFaces*NumElements), mapP(NGauss*NumFaces*NumElements);
-        mapM = ii, mapP = ii;
+        mapM = 0, mapP = 0;
 
         real_matrix_type& x = *xGrid, y = *yGrid;
         std::vector<index_type> mapB;
         const index_vector_type& bcVec = Mesh2D.get_BCType();
+
+        // global face node id's.
+        index_type Nfp = NGauss*NumFaces;
+        index_matrix_type nodeIds(Nfp, NumElements, ColumnMajorOrder());
+        index_vector_type nodeIdsVec(Nfp*NumElements);
+        nodeIds = ii + Nfp*jj;
+        fullToVector(nodeIds, nodeIdsVec, false);
+
+        mapM = nodeIdsVec;
+
         for (index_type f=0; f < NumFaces; ++f) {
             real_matrix_type VM(NGauss, Np), dVMdr(NGauss, Np), dVMds(NGauss, Np);
             VM(Range::all(), Range::all()) = gaussInterpMatrix(Range(f*NGauss, (f+1)*NGauss - 1), Range::all());
@@ -245,6 +255,7 @@ namespace blitzdg {
             dVMdr = blitz::sum(VM(ii, kk)*Drref(kk, jj), kk);
             dVMds = blitz::sum(VM(ii, kk)*Dsref(kk, jj), kk);
 
+            // get global numbers for local guys.
             index_vector_type ids1(NGauss);
             ids1 = f*NGauss + ii;
             for (index_type k=0; k < NumElements; ++k) {
@@ -300,16 +311,16 @@ namespace blitzdg {
 
                 index_vector_type ids2(NGauss);
                 for (index_type ind=NGauss-1; ind >= 0; --ind) {
-                    ids2(ind) = f2*ind; 
+                    ids2(ind) = NGauss*(f2+1) - ind - 1;
                 }
                 if (k != k2) {
                     for (index_type ig=0; ig < NGauss; ++ig) {
-                        mapP(ids1(ig) + k*NGauss) = mapM(ids2(ig) + k2*NGauss);
+                        mapP(ids1(ig) + k*Nfp) = mapM(ids2(ig) + k2*Nfp);
                     }
                 } else {
                     for (index_type ig=0; ig < NGauss; ++ig) {
-                        index_type bcFaceNode = mapM(ids1(ig) + k*NGauss);
-                        mapP(ids1(ig) + k*NGauss) = bcFaceNode;
+                        index_type bcFaceNode = mapM(ids1(ig) + k*Nfp);
+                        mapP(ids1(ig) + k*Nfp) = bcFaceNode;
                         mapB.push_back(bcFaceNode);
 
                         gbcMap[bcVec(NumFaces*k + f)].push_back(bcFaceNode);
