@@ -44,22 +44,22 @@ namespace blitzdg {
     }
 
     ndarray CubatureContext2D::r_numpy() const {
-        Py_intptr_t shape[2] = { r_->rows(), r_->cols() };
-        ndarray result = zeros(2, shape, dtype::get_builtin<real_type>());
+        Py_intptr_t shape[1] = { r_->length(0) };
+        ndarray result = zeros(1, shape, dtype::get_builtin<real_type>());
         std::copy(r_->begin(), r_->end(), reinterpret_cast<real_type*>(result.get_data()));
         return result;
     }
 
     ndarray CubatureContext2D::s_numpy() const {
-        Py_intptr_t shape[2] = { s_->rows(), s_->cols() };
-        ndarray result = zeros(2, shape, dtype::get_builtin<real_type>());
+        Py_intptr_t shape[1] = { s_->length(0) };
+        ndarray result = zeros(1, shape, dtype::get_builtin<real_type>());
         std::copy(s_->begin(), s_->end(), reinterpret_cast<real_type*>(result.get_data()));
         return result;
     }
 
     ndarray CubatureContext2D::w_numpy() const {
-        Py_intptr_t shape[2] = { w_->rows(), w_->cols() };
-        ndarray result = zeros(2, shape, dtype::get_builtin<real_type>());
+        Py_intptr_t shape[1] = { w_->length(0) };
+        ndarray result = zeros(1, shape, dtype::get_builtin<real_type>());
         std::copy(w_->begin(), w_->end(), reinterpret_cast<real_type*>(result.get_data()));
         return result;
     }
