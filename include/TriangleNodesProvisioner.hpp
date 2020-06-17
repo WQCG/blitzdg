@@ -200,13 +200,13 @@ namespace blitzdg {
        * Returns a reference to a vector that contains the 
        * r-component of the local grid points on the standard element.
        */
-      const real_vector_type & get_rGrid() const;
+      const real_vector_type & get_rGrid() const { return *rGrid; }
 
       /**
        * Returns a reference to a vector that contains the 
        * s-component of the local grid points on the standard element.
        */
-      const real_vector_type & get_sGrid() const;
+      const real_vector_type & get_sGrid() const { return *sGrid; }
 
       /**
        * Returns a reference to the differentiation matrix with respect
