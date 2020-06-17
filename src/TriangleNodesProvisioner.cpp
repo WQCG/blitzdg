@@ -125,6 +125,8 @@ namespace blitzdg {
         real_matrix_type W(Ncub, NumElements), xcub(Ncub, NumElements), ycub(Ncub, NumElements);
         real_vector_type ones(NumElements);
 
+        ones = 0*ii + 1;
+
         W = wcub(ii)*ones(jj);
         W *= Jcub;
 
