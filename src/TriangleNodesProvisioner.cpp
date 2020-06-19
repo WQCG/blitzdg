@@ -120,6 +120,30 @@ namespace blitzdg {
         rycub =-xscub/Jcub;
         sycub = xrcub/Jcub;
 
+        // repair Jacobian components on nodal points as well
+        real_matrix_type& Jac = *J, D_r = *Dr, D_s = *Ds;
+
+        real_matrix_type& r_x = *rx;
+        real_matrix_type& r_y = *ry;
+        real_matrix_type& s_x = *sx;
+        real_matrix_type& s_y = *sy;
+
+        index_type Np = NumLocalPoints, K = NumElements;
+        real_matrix_type xr(Np, K), yr(Np, K), xs(Np, K), ys(Np, K);
+
+        xr = sum(D_r(ii,kk)*x(kk,jj), kk);
+        yr = sum(D_r(ii,kk)*y(kk,jj), kk);
+        xs = sum(D_s(ii,kk)*x(kk,jj), kk);
+        ys = sum(D_s(ii,kk)*y(kk,jj), kk);
+
+        Jac = xr*ys - xs*yr;
+
+        // Invert the 2x2 mapping matrix.
+        r_x = ys/Jac;
+        r_y =-xs/Jac;
+        s_x =-yr/Jac;
+        s_y = xr/Jac;
+        
 
         // compute cholesky factors.
         real_matrix_type W(Ncub, NumElements), xcub(Ncub, NumElements), ycub(Ncub, NumElements);
@@ -138,18 +162,19 @@ namespace blitzdg {
         MMchol = 0.;
 
 
-        real_matrix_type Jcubdiag(Ncub, Ncub), tmp(Ncub, NumLocalPoints), MMtmp(NumLocalPoints, NumLocalPoints), upperFactor(NumLocalPoints, NumLocalPoints);
+        real_matrix_type Jcubdiag(Ncub, Ncub), tmp(Ncub, NumLocalPoints), MMinvtmp(NumLocalPoints, NumLocalPoints), upperFactor(NumLocalPoints, NumLocalPoints),
+            MMtmp(NumLocalPoints,  NumLocalPoints);
         Jcubdiag = 0.0;
 
         // build custom mass matrix and its pre-factorization on each Element.
         for (index_type k=0; k< NumElements; ++k) {
             for (index_type i=0; i < Ncub; ++i) {
-                Jcubdiag(i,i) = Jcub(i, k);
+                Jcubdiag(i,i) = Jcub(i, k)*wcub(i);
             }
 
-            tmp = sum(Jcubdiag(ii,kk)*Vcub(kk, jj), kk);
+            tmp = sum(Jcubdiag(ii, kk)*Vcub(kk, jj), kk);
             MMtmp = sum(Vcub(kk, ii)*tmp(kk,jj), kk);
-            MM(Range::all(), Range::all(), k) = MMtmp;
+            MM(Range::all(), Range::all(), k) = MMtmp; 
             
             upperFactor = 0.0;
             CholeskyFactorizer.computeCholesky(MMtmp, upperFactor);
