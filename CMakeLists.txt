@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-set(CMAKE_CONFIGURATION_TYPES Debug Release)
-set(CMAKE_BUILD_TYPE Release) #or Debug
+set (CMAKE_CONFIGURATION_TYPES Release Debug)
 set (CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS 1)
 set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2")
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage -DBZ_DEBUG")
@@ -39,8 +38,8 @@ find_library(LAPACK NAMES "liblapack" "lapack" PATHS "/usr/lib64/" "/usr/lib" "/
 find_library(BLAS NAMES "libblas" "blas" "libblas" PATHS "/usr/lib64/" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 
 find_library(PYTHON3 NAMES "python37" "libpython37" "python3.7" "python3.7m" "libpython3.7" PATHS "/miniconda3/pkgs/python-3.7.3-h0371630_0/lib/" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu" "/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu" "lib" "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/")
-find_library(BOOSTPYTHON NAMES "boost_python37-vc140-mt-x64-1_67" "libboost_python3" "boost_python37" "boost_python3.7" "boost_python3.6" PATHS "/usr/lib64" "C:/ProgramData/Anaconda3/pkgs/py-boost-1.67.0-py37h8300f20_4/Library/lib" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu" "/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu" "lib")
-find_library(BOOSTNUMPY NAMES "boost_numpy37-vc140-mt-x64-1_67" "libboost_numpy37" "boost_numpy37" "boost_numpy36" "boost_numpy37" PATHS "/usr/lib64" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+find_library(BOOSTPYTHON NAMES "boost_python37-vc140-mt-x64-1_67" "libboost_python37" "boost_python37" "boost_python3.7" "boost_python3.6" PATHS "/boost_1_72/lib/" "/usr/lib64" "C:/ProgramData/Anaconda3/pkgs/py-boost-1.67.0-py37h8300f20_4/Library/lib" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu" "/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu" "lib")
+find_library(BOOSTNUMPY NAMES "boost_numpy37-vc140-mt-x64-1_67" "libboost_numpy37" "boost_numpy37" "boost_numpy36" "boost_numpy37" PATHS "/boost_1_72/lib/" "/usr/lib64" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 
 find_library(VTKIOXML7 NAMES "vtkIOXML-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 find_library(VTKCOMMONCORE7 NAMES "vtkCommonCore-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
@@ -155,9 +154,12 @@ file (GLOB sources src/*.cpp)
 add_library(blitzdg SHARED ${sources})
 
 if (NOT WIN32)
-set_target_properties(blitzdg
-    PROPERTIES
-     LINK_FLAGS "-Wl,-rpath,/usr/local/lib -L /usr/local/lib -L/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/"
+    set_target_properties(blitzdg
+        PROPERTIES
+        LINK_FLAGS "-Wl,-rpath,/usr/local/lib -L /usr/local/lib -L/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/"
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
     )
 endif()
 

@@ -23,7 +23,7 @@ setuptools.setup(
             "C:/ProgramData/Anaconda3/Library/include\\",
             "C:/dev/blitzdg/include/"
         ],
-        library_dirs=[ "/root/project/", "/usr/lib64", "/usr/local/lib64", "/usr/lib/x86_64-linux-gnu/", "/usr/local/lib", "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/",
+        library_dirs=[ "/root/project/", "/root/project/pyblitzdg", "/usr/lib64", "/usr/local/lib64", "/usr/lib/x86_64-linux-gnu/", "/usr/local/lib", "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/",
             "C:/ProgramData/Anaconda3/pkgs/py-boost-1.67.0-py37h8300f20_4/Library/lib/",
             "C:\\dev\\blitzdg\\Win64\\",
             "C:\\dev\\blitzdg\\lib\\",

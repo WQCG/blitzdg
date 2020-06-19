@@ -74,6 +74,8 @@ namespace blitzdg {
        * @param[in] gmshInputFile Full path to .msh file.
        */
       void readMesh(const std::string& gmshInputFile);
+
+      void readMesh_python(const boost::python::str& gmshInputFileStr);
       
       /**
        * Reads a list of vertices from a file. 

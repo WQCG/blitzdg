@@ -70,6 +70,9 @@ namespace blitzdg {
       index_vec_smart_ptr mapB;
       std::unique_ptr<index_hashmap> BCmap;
 
+      std::unique_ptr<std::vector<index_type>> gather;
+      std::unique_ptr<std::vector<index_type>> scatter;
+
       const MeshManager& Mesh2D;
 
       std::unique_ptr<Nodes1DProvisioner> Nodes1D;

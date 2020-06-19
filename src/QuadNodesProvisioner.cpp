@@ -560,6 +560,18 @@ namespace blitzdg {
         }
 
         buildBCHash();
+
+        real_matrix_type allNodes(NumLocalPoints*NumElements, 2);
+        real_vector_type xFlat(NumLocalPoints*NumElements), yFlat(NumLocalPoints*NumElements);
+        fullToVector(*xGrid, xFlat, false);
+        fullToVector(*yGrid, yFlat, false);
+
+        allNodes(Range::all(), 0) = xFlat;
+        allNodes(Range::all(), 1) = yFlat;
+
+        auto foo = uniquetol(allNodes, 1.e-9);
+        gather = std::make_unique<std::vector<index_type>>(foo.first);
+        scatter = std::make_unique<std::vector<index_type>>(foo.second);    
     }
 
     void QuadNodesProvisioner::buildBCHash() {
@@ -839,6 +851,8 @@ namespace blitzdg {
             yGrid.get(),
             Fscale.get(),
             Fmask.get(),
+            gather.get(),
+            scatter.get(),
             V.get(),
             Vinv.get(),
             J.get(),
