@@ -1,4 +1,4 @@
-// Copyright (C) 2017-2019  Waterloo Quantitative Consulting Group, Inc.
+// Copyright (C) 2017-2020  Waterloo Quantitative Consulting Group, Inc.
 // See COPYING and LICENSE files at project root for more details.
 
 #include "Nodes1DProvisioner.hpp"
@@ -165,6 +165,13 @@ namespace blitzdg {
         Py_intptr_t shape[1] = {  NumFaces_*Nfp_*K_ };
         ndarray result = zeros(1, shape, dtype::get_builtin<index_type>());
         std::copy(vmapP_->begin(), vmapP_->end(), reinterpret_cast<index_type*>(result.get_data()));
+        return result;
+    }
+
+    ndarray DGContext2D::V_numpy() const {
+        Py_intptr_t shape[2] = {  Np_, Np_ };
+        ndarray result = zeros(2, shape, dtype::get_builtin<real_type>());
+        std::copy(V_->begin(), V_->end(), reinterpret_cast<real_type*>(result.get_data()));
         return result;
     }
 

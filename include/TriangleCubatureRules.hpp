@@ -1805,24 +1805,24 @@ namespace blitzdg {
 		}
 
 		index_type NCubature() const { return NCubature_; }
-		index_type NumCubaturePoints() const { return CubatureRules_[NCubature_].rows(); }
+		index_type NumCubaturePoints() const { return CubatureRules_[NCubature_ - 1].rows(); }
 
 		real_vector_type rCoord() const {
-			const real_matrix_type& rule = CubatureRules_[NCubature_];
+			const real_matrix_type& rule = CubatureRules_[NCubature_ - 1];
 			real_vector_type ret(rule.rows());
 			ret = rule(blitz::Range::all(), 0);
 			return ret;
 		}
 
 		real_vector_type sCoord() const {
-			const real_matrix_type& rule = CubatureRules_[NCubature_];
+			const real_matrix_type& rule = CubatureRules_[NCubature_ - 1];
 			real_vector_type ret(rule.rows());
 			ret = rule(blitz::Range::all(), 1);
 			return ret;
 		}
 
 		real_vector_type weights() const {
-			const real_matrix_type& rule = CubatureRules_[NCubature_];
+			const real_matrix_type& rule = CubatureRules_[NCubature_ - 1];
 			real_vector_type ret(rule.rows());
 			ret = rule(blitz::Range::all(), 2);
 			return ret;

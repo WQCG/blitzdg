@@ -13,65 +13,63 @@ namespace blitzdg {
 	private:
 		index_type NCubature_;
         index_type NumCubaturePoints_;
-        real_vec_smart_ptr r_;
-        real_vec_smart_ptr s_;
-        real_vec_smart_ptr w_;
-        real_mat_smart_ptr V_;
-        real_mat_smart_ptr rx_;
-        real_mat_smart_ptr sx_;
-        real_mat_smart_ptr ry_;
-        real_mat_smart_ptr sy_;
-        real_mat_smart_ptr J_;
-        real_mat_smart_ptr Dr_;
-        real_mat_smart_ptr Ds_;
-        std::unique_ptr<real_tensor3_type> MM_;
-        std::unique_ptr<real_tensor3_type> MMChol_;
-        real_mat_smart_ptr x_;
-        real_mat_smart_ptr y_;
-        real_mat_smart_ptr W_;
-
-
+        std::shared_ptr<real_vector_type> r_;
+        std::shared_ptr<real_vector_type> s_;
+        std::shared_ptr<real_vector_type> w_;
+        std::shared_ptr<real_matrix_type> V_;
+        std::shared_ptr<real_matrix_type> rx_;
+        std::shared_ptr<real_matrix_type> sx_;
+        std::shared_ptr<real_matrix_type> ry_;
+        std::shared_ptr<real_matrix_type> sy_;
+        std::shared_ptr<real_matrix_type> J_;
+        std::shared_ptr<real_matrix_type> Dr_;
+        std::shared_ptr<real_matrix_type> Ds_;
+        std::shared_ptr<real_tensor3_type> MM_;
+        std::shared_ptr<real_tensor3_type> MMChol_;
+        std::shared_ptr<real_matrix_type> x_;
+        std::shared_ptr<real_matrix_type> y_;
+        std::shared_ptr<real_matrix_type> W_;
 
     public:
         CubatureContext2D() = default;
         CubatureContext2D(
             index_type NCubature,
             index_type NumCubaturePoints,
-            const real_vector_type& r,
-            const real_vector_type& s,
-            const real_vector_type& w,
-            const real_matrix_type& V,
-            const real_matrix_type& rx,
-            const real_matrix_type& sx,
-            const real_matrix_type& ry,
-            const real_matrix_type& sy,
-            const real_matrix_type& J,
-            const real_matrix_type& Dr,
-            const real_matrix_type& Ds,
-            const real_tensor3_type& MM,
-            const real_tensor3_type& MMChol,
-            const real_matrix_type& x,
-            const real_matrix_type& y,
-            const real_matrix_type& W    
+            std::shared_ptr<real_vector_type> r,
+            std::shared_ptr<real_vector_type> s,
+            std::shared_ptr<real_vector_type> w,
+            std::shared_ptr<real_matrix_type> V,
+            std::shared_ptr<real_matrix_type> rx,
+            std::shared_ptr<real_matrix_type> sx,
+            std::shared_ptr<real_matrix_type> ry,
+            std::shared_ptr<real_matrix_type> sy,
+            std::shared_ptr<real_matrix_type> J,
+            std::shared_ptr<real_matrix_type> Dr,
+            std::shared_ptr<real_matrix_type> Ds,
+            std::shared_ptr<real_tensor3_type> MM,
+            std::shared_ptr<real_tensor3_type> MMChol,
+            std::shared_ptr<real_matrix_type> x,
+            std::shared_ptr<real_matrix_type> y,
+            std::shared_ptr<real_matrix_type> W    
         ) : 
             NCubature_{ NCubature },
             NumCubaturePoints_{ NumCubaturePoints },
-            r_{ std::make_unique<real_vector_type>(r) },
-            s_{ std::make_unique<real_vector_type>(s) },
-            w_{ std::make_unique<real_vector_type>(w) },
-            V_{ std::make_unique<real_matrix_type>(V) },
-            rx_{ std::make_unique<real_matrix_type>(rx) },
-            sx_{ std::make_unique<real_matrix_type>(sx) },
-            ry_{ std::make_unique<real_matrix_type>(ry) },
-            sy_{ std::make_unique<real_matrix_type>(sy) },
-            J_{ std::make_unique<real_matrix_type>(J) },
-            Dr_{ std::make_unique<real_matrix_type>(Dr) },
-            Ds_{ std::make_unique<real_matrix_type>(Ds) },
-            MM_{ std::make_unique<real_tensor3_type>(MM) },
-            MMChol_{ std::make_unique<real_tensor3_type>(MMChol) },
-            x_{ std::make_unique<real_matrix_type>(x) },
-            y_{ std::make_unique<real_matrix_type>(y) },
-            W_{ std::make_unique<real_matrix_type>(W) }
+            r_{ r },
+            s_{ s },
+            w_{ w },
+            V_{ V },
+            rx_{ rx },
+            sx_{ sx },
+            ry_{ ry },
+            sy_{ sy },
+            J_{ J },
+            Dr_{ Dr },
+            Ds_{ Ds },
+            MM_{ MM },
+            MMChol_{ MMChol },
+            x_{ x },
+            y_{ y },
+            W_{ W }
         {}
 
         const index_type NCubature() const { return NCubature_; }

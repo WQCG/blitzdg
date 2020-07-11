@@ -115,4 +115,25 @@ namespace blitzdg {
         std::copy(W_->begin(), W_->end(), reinterpret_cast<real_type*>(result.get_data()));
         return result;
     }
+
+    ndarray GaussFaceContext2D::Interp_numpy() const {
+        Py_intptr_t shape[2] = { Interp_->rows(), Interp_->cols() };
+        ndarray result = zeros(2, shape, dtype::get_builtin<real_type>());
+        std::copy(Interp_->begin(), Interp_->end(), reinterpret_cast<real_type*>(result.get_data()));
+        return result;
+    }
+
+    ndarray GaussFaceContext2D::mapM_numpy() const {
+        Py_intptr_t shape[1] = { mapM_->length(0) };
+        ndarray result = zeros(1, shape, dtype::get_builtin<index_type>());
+        std::copy(mapM_->begin(), mapM_->end(), reinterpret_cast<index_type*>(result.get_data()));
+        return result;
+    }
+
+    ndarray GaussFaceContext2D::mapP_numpy() const {
+        Py_intptr_t shape[1] = { mapP_->length(0) };
+        ndarray result = zeros(1, shape, dtype::get_builtin<index_type>());
+        std::copy(mapP_->begin(), mapP_->end(), reinterpret_cast<index_type*>(result.get_data()));
+        return result;
+    }
 }

@@ -1,4 +1,4 @@
-// Copyright (C) 2017-2019  Waterloo Quantitative Consulting Group, Inc. 
+// Copyright (C) 2017-2020  Waterloo Quantitative Consulting Group, Inc. 
 // See COPYING and LICENSE files at project root for more details. 
 
 #pragma once
@@ -219,5 +219,6 @@ namespace blitzdg {
         boost::python::numpy::ndarray vmapM_numpy() const;
         boost::python::numpy::ndarray vmapP_numpy() const;
         boost::python::dict bcmap_numpy() const;
+        boost::python::numpy::ndarray V_numpy() const;
     };
 }

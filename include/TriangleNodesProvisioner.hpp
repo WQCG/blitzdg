@@ -1,4 +1,4 @@
-// Copyright (C) 2017-2019  Waterloo Quantitative Consulting Group, Inc. 
+// Copyright (C) 2017-2020  Waterloo Quantitative Consulting Group, Inc. 
 // See COPYING and LICENSE files at project root for more details. 
 
 /**
@@ -19,6 +19,8 @@
 #include "MeshManager.hpp"
 #include "Types.hpp"
 #include "LinAlgHelpers.hpp"
+
+#include <boost/python/numpy.hpp>
 #include <memory>
 
 namespace blitzdg {
@@ -30,6 +32,7 @@ namespace blitzdg {
   class TriangleNodesProvisioner : public NodesProvisioner2DBase {
       using index_mat_smart_ptr = std::unique_ptr<index_matrix_type>;
       using index_vec_smart_ptr = std::unique_ptr<index_vector_type>;
+      using pyarray = boost::python::numpy::ndarray;
 
       index_type NumElements;
       index_type NOrder;
@@ -179,7 +182,7 @@ namespace blitzdg {
       * @param[out] Dr Differentiation matrix with respect to r coordinate.
       * @param[out] Ds Differentiation matrix with respect to s coordinate.
       */
-      void computeDifferentiationMatrices(const real_matrix_type & V2Dr, const real_matrix_type & V2Ds, const real_matrix_type & V, real_matrix_type & Dr, real_matrix_type & Ds, real_matrix_type& Drw, real_matrix_type& Dsw) const;
+      void computeDifferentiationMatrices(const real_matrix_type & V2Dr, const real_matrix_type & V2Ds, const real_matrix_type & V, const real_matrix_type & Vc, real_matrix_type & Dr, real_matrix_type & Ds, real_matrix_type& Drw, real_matrix_type& Dsw) const;
 
      /**
       * Returns a reference to a matrix whose jth column contains the
@@ -197,13 +200,13 @@ namespace blitzdg {
        * Returns a reference to a vector that contains the 
        * r-component of the local grid points on the standard element.
        */
-      const real_vector_type & get_rGrid() const;
+      const real_vector_type & get_rGrid() const { return *rGrid; }
 
       /**
        * Returns a reference to a vector that contains the 
        * s-component of the local grid points on the standard element.
        */
-      const real_vector_type & get_sGrid() const;
+      const real_vector_type & get_sGrid() const { return *sGrid; }
 
       /**
        * Returns a reference to the differentiation matrix with respect
@@ -419,6 +422,8 @@ namespace blitzdg {
        * Returns order of the basis polynomials.
        */
       index_type get_NOrder() const { return NOrder; };
+
+      void setCoordinates_numpy(const pyarray& x, const pyarray& y);
   };
 } // namespace blitzdg
 
