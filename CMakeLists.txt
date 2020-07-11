@@ -1,9 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 
-set (CMAKE_CONFIGURATION_TYPES "Release Debug")
+set (CMAKE_CONFIGURATION_TYPES Release Debug)
 set (CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS 1)
-set (CMAKE_BUILD_TYPE Release) # or Debug
-set (CMAKE_CXX_FLAGS "-std=c++14 -fPIC")
 set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2")
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage -DBZ_DEBUG")
 # set (CMAKE_MODULE_LINKER_FLAGS  "${CMAKE_MODULE_LINKER_FLAGS}")
@@ -17,6 +15,8 @@ include_directories ("include"
     "C:/ProgramData/Anaconda3/pkgs/python-3.7.3-h8c8aaf0_0/include/"
     "C:/ProgramData/Anaconda3/pkgs/py-boost-1.67.0-py37h8300f20_4/Library/include"
     "c:/dev/blitzdg/include"
+    "C:/projects/blitzdg/include"
+    "C:/Miniconda37-x64/include"
     )
 
 set(CMAKE_FIND_LIBRARY_PREFIXES "" "lib")
@@ -31,6 +31,7 @@ find_library(COLAMD names "colamd" "libcolamd" PATHS "/usr/lib64/" "/usr/lib" "/
 
 # for static linkage on windows.
 if (WIN32)
+    set(CMAKE_GENERATOR_TOOLSET "v140")
     find_library(SUITESPARSECONFIG NAMES "suitesparseconfig" "libsuitesparseconfig" PATHS "/usr/lib64/" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 endif()
 find_library(LAPACK NAMES "liblapack" "lapack" PATHS "/usr/lib64/" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
@@ -56,8 +57,10 @@ find_library(VTKSYS7 NAMES "vtksys-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/
 if (WIN32)
     find_library(VTKZLIB7 NAMES "vtkzlib-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
     find_library(VTKEXPAT7 NAMES "vtkexpat-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+    find_library(BOOST_PY_BADVERSIONSTAMP names "boost_pythonPY_MAJOR_VERSIONPY_MINOR_VERSION-vc140-mt-x64-1_67" PATHS "lib")
     message("-- found ${VTKZLIB7}")
     message("-- found ${VTKEXPAT7}")
+    message("-- found ${BOOST_PY_BADVERSIONSTAMP}")
 endif()
 
 message("-- found ${BLITZ}")
@@ -86,12 +89,16 @@ message("-- found ${VTKIOXML7}")
 message("-- found ${VTKIOXMLPARSER7}")
 message("-- found ${VTKSYS7}")
 
-set (CMAKE_CXX_FLAGS "-Wall -std=c++14 -fPIC")
 set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2")
 if (WIN32)
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /EHsc /fp:except")
+    set(CMAKE_CXX_STANDARD 11)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /EHsc /fp:except /W0")
 	message("-- enabling exception handling")
-endif()
+else()
+    set (CMAKE_CXX_FLAGS "-Wall -std=c++14 -fPIC")
+endif()    
+
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage -DBZ_DEBUG")
 include_directories ("include" 
     "include/igloo" 
@@ -102,6 +109,7 @@ include_directories ("include"
     "C:/ProgramData/Anaconda3/pkgs/py-boost-1.67.0-py37h8300f20_4/Library/include"
     "C:/ProgramData/Anaconda3/Library/include"
     "C:/dev/blitzdg/include"
+    "C:/projects/blitzdg/include"
     )
 
 set (pyblitzdg_VERSION_MAJOR 0)
@@ -121,6 +129,7 @@ link_libraries(
     ${COLAMD}
     ${SUITESPARSECONFIG}
     ${BOOSTPYTHON}
+    ${BOOST_PY_BADVERSIONSTAMP}
     ${BOOSTNUMPY}
     ${PYTHON3}
     ${VTKIOXML7}
@@ -140,15 +149,19 @@ link_libraries(
 )
 
 project(blitzdg)
+set(VS_STARTUP_PROJECT "blitzdg")
 file (GLOB sources src/*.cpp)
 add_library(blitzdg SHARED ${sources})
-set_target_properties(blitzdg
-    PROPERTIES
-    LINK_FLAGS "-Wl,-rpath,/usr/local/lib -L /usr/local/lib -L/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/"
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-)
+
+if (NOT WIN32)
+    set_target_properties(blitzdg
+        PROPERTIES
+        LINK_FLAGS "-Wl,-rpath,/usr/local/lib -L /usr/local/lib -L/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/"
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pyblitzdg"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    )
+endif()
 
 # Link to vtk using static mode (otherwise won't work on windows)
 target_compile_definitions(blitzdg PUBLIC "VTKCOMMONCORE_STATIC_DEFINE"
@@ -175,6 +188,7 @@ link_libraries(
     ${COLAMD}
     ${SUITESPARSECONFIG}
     ${BOOSTPYTHON}
+    ${BOOST_PY_BADVERSIONSTAMP}
     ${BOOSTNUMPY}
     ${PYTHON3}
     ${VTKIOXML7}
@@ -230,6 +244,7 @@ link_libraries(
     ${COLAMD}
     ${SUITESPARSECONFIG}
     ${BOOSTPYTHON}
+    ${BOOST_PY_BADVERSIONSTAMP}
     ${BOOSTNUMPY}
     ${PYTHON3}
     ${VTKIOXML7}

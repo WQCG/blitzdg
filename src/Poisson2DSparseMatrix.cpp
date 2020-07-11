@@ -9,6 +9,8 @@
 #include "BlitzHelpers.hpp"
 #include "Types.hpp"
 
+#include <memory>
+
 using blitz::Range;
 using boost::python::numpy::ndarray;
 using boost::python::numpy::zeros;
