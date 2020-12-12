@@ -1,5 +1,7 @@
 
 #include "Poisson2DSparseMatrix.hpp"
+#include "GaussFaceContext2D.hpp"
+#include "CubatureContext2D.hpp"
 #include "SparseTriplet.hpp"
 #include "CSCMatrix.hpp"
 #include "Nodes1DProvisioner.hpp"
