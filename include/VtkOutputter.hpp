@@ -15,8 +15,6 @@
 #include <vtk-7.1/vtkCellArray.h>
 #include <vtk-7.1/vtkDoubleArray.h>
 #include <vtk-7.1/vtkUnstructuredGrid.h>
-#define PY_MAJOR_VERSION 3
-#define PY_MINOR_VERSION 7
 #include <boost/python/numpy.hpp>
 #include <boost/python.hpp>
 

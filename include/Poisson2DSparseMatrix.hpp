@@ -2,10 +2,10 @@
 
 #include <memory>
 #include <suitesparse/umfpack.h>
-#define PY_MAJOR_VERSION 3
-#define PY_MINOR_VERSION 7
 #include <boost/python/numpy.hpp>
 #include "CSCMatrix.hpp"
+#include "CubatureContext2D.hpp"
+#include "GaussFaceContext2D.hpp"
 #include "SparseTriplet.hpp"
 #include "DGContext2D.hpp"
 #include "MeshManager.hpp"
@@ -20,12 +20,17 @@ namespace blitzdg {
     std::unique_ptr<real_matrix_type> BcRhs_;
 
     void buildPoissonOperator(DGContext2D& dg, MeshManager& mshManager, const index_vector_type& bcType);
+    void buildPoissonOperator(DGContext2D& dg, MeshManager& mshManager, const index_vector_type& bcType, GaussFaceContext2D& gCtx, CubatureContext2D& cubCtx);
 
     public:
         Poisson2DSparseMatrix(DGContext2D& dg, MeshManager& mshManager);
+        Poisson2DSparseMatrix(DGContext2D& dg, MeshManager& mshManager, GaussFaceContext2D& gctx, CubatureContext2D& cubCtx);
+        
 
         void buildBcRhs(DGContext2D& dg, const MeshManager& mshManager, const real_matrix_type& ubc, const real_matrix_type& qbc, const index_vector_type& bcType);
+        void buildBcRhs(DGContext2D& dg, const MeshManager& mshManager, const GaussFaceContext2D& gctx, const CubatureContext2D& cubCtx, const real_matrix_type& ubc, const real_matrix_type& qbc, const index_vector_type& bcType);
         const python_array buildBcRhs_numpy(DGContext2D& dg, const MeshManager& mshManager, const python_array& ubc, const python_array& qbc);
+        const python_array buildBcRhs_numpy(DGContext2D& dg, const MeshManager& mshManager, const GaussFaceContext2D& gctx, const CubatureContext2D& cubCtx);
 
         const CSCMat& getMM() const { return *OP_; };
         const CSCMat& getOP() const { return *MM_; };
