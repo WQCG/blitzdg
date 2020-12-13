@@ -401,8 +401,11 @@ namespace blitzdg{
                 }
             }
         }
-
         BcRhs_ = std::make_unique<real_matrix_type>(bcRhs);
+    }
+
+    void Poisson2DSparseMatrix::buildBcRhs(DGContext2D& dg, const MeshManager& mshManager, const GaussFaceContext2D& gctx, const CubatureContext2D& cubCtx, const real_matrix_type& ubc, const real_matrix_type& qbc, const index_vector_type& bcType) {
+        throw std::runtime_error("Not yet implemented");
     }
 
     void Poisson2DSparseMatrix::buildPoissonOperator(DGContext2D& dg, MeshManager& mshManager, const index_vector_type& bcType) {
@@ -632,7 +635,6 @@ namespace blitzdg{
     }
 
     const ndarray Poisson2DSparseMatrix::buildBcRhs_numpy(DGContext2D& dg, const MeshManager& mshManager, const ndarray& ubc, const ndarray& qbc) {
-        // do all the things.
 
         real_matrix_type blitzUbc(ubc.shape(0), ubc.shape(1));
 		blitzUbc = 0.0;
@@ -646,6 +648,24 @@ namespace blitzdg{
 
         const index_vector_type & bcType = mshManager.get_BCType();
 		buildBcRhs(dg, mshManager, blitzUbc, blitzQbc, bcType);
+
+		return getBcRhs_numpy();
+    }
+
+    const ndarray Poisson2DSparseMatrix::buildCubatureBcRhs_numpy(DGContext2D& dg, const MeshManager& mshManager, const GaussFaceContext2D& gctx, const CubatureContext2D& cubCtx, const ndarray& ubc, const ndarray& qbc) {
+        
+        real_matrix_type blitzUbc(ubc.shape(0), ubc.shape(1));
+		blitzUbc = 0.0;
+		char * raw = ubc.get_data();
+        std::copy(&raw[0], &raw[ubc.shape(0)*ubc.shape(1)*sizeof(real_type)] , reinterpret_cast<char*>(blitzUbc.data()));
+
+        real_matrix_type blitzQbc(qbc.shape(0), qbc.shape(1));
+		blitzQbc = 0.0;
+		raw = qbc.get_data();
+        std::copy(&raw[0], &raw[qbc.shape(0)*qbc.shape(1)*sizeof(real_type)] , reinterpret_cast<char*>(blitzQbc.data()));
+
+        const index_vector_type & bcType = mshManager.get_BCType();
+		buildBcRhs(dg, mshManager, gctx, cubCtx, blitzUbc, blitzQbc, bcType);
 
 		return getBcRhs_numpy();
     }

@@ -30,7 +30,7 @@ namespace blitzdg {
         void buildBcRhs(DGContext2D& dg, const MeshManager& mshManager, const real_matrix_type& ubc, const real_matrix_type& qbc, const index_vector_type& bcType);
         void buildBcRhs(DGContext2D& dg, const MeshManager& mshManager, const GaussFaceContext2D& gctx, const CubatureContext2D& cubCtx, const real_matrix_type& ubc, const real_matrix_type& qbc, const index_vector_type& bcType);
         const python_array buildBcRhs_numpy(DGContext2D& dg, const MeshManager& mshManager, const python_array& ubc, const python_array& qbc);
-        const python_array buildBcRhs_numpy(DGContext2D& dg, const MeshManager& mshManager, const GaussFaceContext2D& gctx, const CubatureContext2D& cubCtx);
+        const python_array buildCubatureBcRhs_numpy(DGContext2D& dg, const MeshManager& mshManager, const GaussFaceContext2D& gctx, const CubatureContext2D& cubCtx, const python_array& ubc, const python_array& qbc);
 
         const CSCMat& getMM() const { return *OP_; };
         const CSCMat& getOP() const { return *MM_; };
