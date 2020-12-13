@@ -1,4 +1,3 @@
-
 #include "Poisson2DSparseMatrix.hpp"
 #include "GaussFaceContext2D.hpp"
 #include "CubatureContext2D.hpp"
@@ -43,10 +42,6 @@ namespace blitzdg{
         index_type Np = dg.numLocalPoints();
         index_type Nfp = dg.numFacePoints();
         index_type N = dg.order();
-        const index_vector_type& vmapM = dg.vmapM();
-        const index_vector_type& vmapP = dg.vmapP();
-        const real_matrix_type& nx = dg.nx();
-        const real_matrix_type& ny = dg.ny();
         const real_matrix_type& Fscale = dg.fscale();
         const real_matrix_type& gInterp = gCtx.Interp();
 
@@ -66,7 +61,8 @@ namespace blitzdg{
 
             // Extract local mass matrix and cubature weights
             const index_type k1 = k;
-            real_matrix_type localMM(Np, Np), localW(NGauss);
+            real_matrix_type localMM(Np, Np);
+            real_vector_type localW(NGauss);
             localMM = cubCtx.MM()(Range::all(), Range::all(), k1);
             localW = cubCtx.W()(Range::all(), k1);
 
