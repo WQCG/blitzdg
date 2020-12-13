@@ -123,10 +123,6 @@ namespace blitzdg {
         return result;
     }
 
-    const real_matrix_type& GaussFaceContext2D::Interp() const {
-        return *Interp_;
-    }
-
     ndarray GaussFaceContext2D::mapM_numpy() const {
         Py_intptr_t shape[1] = { mapM_->length(0) };
         ndarray result = zeros(1, shape, dtype::get_builtin<index_type>());
