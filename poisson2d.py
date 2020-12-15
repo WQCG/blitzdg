@@ -28,7 +28,7 @@ OP = poisson2d.getOP()
 
 # create scipy sparse mats
 dof = ctx.numLocalPoints*ctx.numElements
-MMsp = csc_matrix((MM[:, 2], (MM[:, 0], MM[:, 1])), shape=(dof, dof), dtype=np.dtype('Float64'))
+MMsp = csc_matrix((MM[:, 2], (MM[:, 0], MM[:, 1])), shape=(dof, dof), dtype=np.float)
 
 rows = OP[:, 0]
 cols = OP[:, 1]
@@ -55,7 +55,7 @@ OPsp = csc_matrix((vals, (rows, cols)), shape=(dof + 1, dof + 1))
 linSolver = lu(-OPsp)
 
 # Define right-hand side; compute load vector (mass matrix times forcing).
-rhs1 = np.sin(0.5*np.pi*x, dtype=np.dtype('Float64') , order='C') * np.sin(0.5*np.pi*y, dtype=np.dtype('Float64') , order='C')
+rhs1 = np.sin(0.5*np.pi*x, dtype=np.float , order='C') * np.sin(0.5*np.pi*y, dtype=np.float , order='C')
 rhs = rhs1.flatten('F')
 rhs = MMsp.dot(rhs)
 rhs = np.append(rhs, [0.0])
@@ -72,7 +72,7 @@ print(f"mean: {np.sum(soln)/dof}")
 fields = dict()
 # Need to ensure fields send to the outputter are Row-Major ('C'-ordering),
 # since blitzdg internally assumes they are.
-fields["u"] = np.array(soln, dtype=np.dtype('Float64'), order='C')
-fields["f"] = np.array(rhs1, dtype=np.dtype('Float64'), order='C') 
+fields["u"] = np.array(soln, dtype=np.float, order='C')
+fields["f"] = np.array(rhs1, dtype=np.float, order='C')
 outputter = dg.VtkOutputter(nodes)
 outputter.writeFieldsToFiles(fields, 0)
