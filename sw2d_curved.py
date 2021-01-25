@@ -15,6 +15,8 @@ from swhelpers.maps import makeMapsPeriodic, correctBCTable
 from swhelpers.rhs import sw2dComputeRHS_curved
 from swhelpers.limiters import surfaceReconstruction, positivityPreservingLimiter2D
 
+from meshhelpers.curved import adjustStraightEdges, deformAndBlendElements
+
 # Main solver:
 # Set scaled density jump.
 drho = 1.00100 - 1.000
@@ -100,134 +102,8 @@ yTopSmooth = splev(ss, sply, ext=2)
 bcInds = np.where(bcType.flatten('F') > 0)
 bcFaces = np.transpose(np.unravel_index(bcInds, (ctx.numElements, ctx.numFaces), order='F'))
 
-modifiedVerts = np.zeros(Verts.shape[0])
-
-curvedFaces = []
-for bcFace in bcFaces:
-
-    el = bcFace[0][0]
-    face = bcFace[0][1]
-    # Get vertices along face
-    v1ind = EToV[el, face]
-    v2ind = EToV[el, (face+1) % ctx.numFaces]
-
-    v1 = Verts[v1ind, :]
-    v2 = Verts[v2ind, :]
-
-    hyps1 = np.hypot(xTopSmooth - v1[0], yTopSmooth-v1[1])
-    hyps2 = np.hypot(xTopSmooth - v2[0], yTopSmooth-v2[1])
-
-    minInd1 = np.argmin(hyps1)
-    minInd2 = np.argmin(hyps2)
-
-    mytol = 200
-
-    if hyps1[minInd1] > mytol or hyps2[minInd2] > mytol:
-        # nothing to do here
-        continue
-
-    curvedFaces.append([el, face])
-
-    # set new vertex coordinates to closest spline point coordinates
-    newx1 = xTopSmooth[minInd1] 
-    newy1 = yTopSmooth[minInd1]
-
-    newx2 = xTopSmooth[minInd2]
-    newy2 = yTopSmooth[minInd2]
-
-    # update mesh vertex locations
-    Verts[v1ind, 0] = newx1
-    Verts[v1ind, 1] = newy1
-
-    Verts[v2ind, 0] = newx2
-    Verts[v2ind, 1] = newy2
-
-    modifiedVerts[v1ind] = 1  
-    modifiedVerts[v2ind] = 1
-
-
-curvedEls = []
-for face in curvedFaces:
-    k = face[0]
-    f = face[1]
-
-    curvedEls.append(k)
-
-    if f==0:
-       v1 = EToV[k, 0]
-       v2 = EToV[k, 1]
-       vr = ctx.r
-    elif f==1:
-        v1 = EToV[k, 1]
-        v2 = EToV[k, 2]
-        vr = ctx.s
-    elif f==2:
-        v1 = EToV[k, 0]
-        v2 = EToV[k, 2]
-        vr = ctx.s
-
-    fmsk = ctx.Fmask[:, f]
-
-    fr = vr[ctx.Fmask[:, f]]
-    x1 = Verts[v1, 0]
-    y1 = Verts[v1, 1]
-    x2 = Verts[v2, 0]
-    y2 = Verts[v2, 1]
-
-    v1_dists2 = (x1-xTopSmooth)**2 + (y1-yTopSmooth)**2
-    v2_dists2 = (x2-xTopSmooth)**2 + (y2-yTopSmooth)**2
-
-    v1s_inds = np.where(np.sqrt(v1_dists2) < 1.0e-8)
-    v2s_inds = np.where(np.sqrt(v2_dists2) < 1.0e-8)
-
-    if len(v1s_inds) == 0 or len(v2s_inds) == 0:
-        continue
-
-    if len(v1s_inds) > 1 and len(v2s_inds) > 1:
-        raise Exception('bad parameterization.')
-
-    # found degenerate interval.
-    if v1s_inds[0] == v2s_inds[0]:
-        continue
-    
-    if len(v1s_inds) == 1 and len(v2s_inds) == 1:
-        t1 = ss[v1s_inds[0]] # set end-points of parameter-space interval.
-        t2 = ss[v2s_inds[0]]
-    else:
-        raise Exception("Error tabulating spline interval end-points.")
-
-    tLGL = 0.5*t1*(1-fr) + 0.5*t2*(1+fr)
-
-    # Basically xnew - xold
-    # where xnew is evaluated using the parameterization
-    splxev = splev(tLGL, splx, ext=3)
-    splyev = splev(tLGL, sply, ext=3) 
-    x1 = x[fmsk, k]
-    y1 = y[fmsk, k]
-    fdx = splxev - x1
-    fdy = splyev - y1
-
-    # build 1D Vandermonde matrix for face nodes and volume nodes
-    vand = dg.VandermondeBuilder()
-    Vface, Vfinv = vand.buildVandermondeMatrix(fr, True, NOrder)
-    Vvol,  = vand.buildVandermondeMatrix(vr, False, NOrder)
-
-    # compute unblended volume deformations
-    vdx = np.dot(Vvol, np.dot(Vfinv, fdx))
-    vdy = np.dot(Vvol, np.dot(Vfinv, fdy))
-
-    # compute blending functions for Gordon-Hall blending.
-    r = ctx.r
-    s = ctx.s
-    ids = np.where(np.abs(1-vr) > 1.e-7)[0]
-    blend = np.zeros(ids.shape)
-    if f==0: blend = -(r[ids]+s[ids])/(1-vr[ids])
-    if f==1: blend = (r[ids]+1)/(1-vr[ids])
-    if f==2: blend = -(r[ids]+s[ids])/(1-vr[ids])
-    
-    # blend deformation to volume interior
-    x[ids, k] += blend*vdx[ids]
-    y[ids, k] += blend*vdy[ids]
+Verts, modifiedVerts, curvedFaces = adjustStraightEdges(Verts, EToV, bcFaces, xTopSmooth, yTopSmooth, ctx)
+x, y, curvedEls = deformAndBlendElements(Verts, EToV, curvedFaces, xTopSmooth, yTopSmooth, ss, splx, sply, ctx, NOrder)
 
 print("Updating physical coordinates")
 nodes.setCoordinates(x, y)
@@ -241,15 +117,12 @@ J = xr*ys - xs*yr
 gauss_ctx = nodes.buildGaussFaceNodes(2*(NOrder+1))
 
 BCmap = ctx.BCmap
-mapW = ctx.BCmap[3]
-mapO = ctx.BCmap[2]
 
-vmapO = ctx.vmapM[mapO]
+mapW = ctx.BCmap[3]; mapO = ctx.BCmap[2]
 
-vmapW = ctx.vmapM[mapW]
+vmapO = ctx.vmapM[mapO]; vmapW = ctx.vmapM[mapW]
 
-xFlat = x.flatten('F')
-yFlat = y.flatten('F')
+xFlat = x.flatten('F'); yFlat = y.flatten('F')
 
 gxFlat = np.dot(gauss_ctx.Interp, x).flatten('F')
 gyFlat = np.dot(gauss_ctx.Interp, y).flatten('F')
@@ -300,7 +173,7 @@ CD_max = 2.5e-3
 CDflat = np.zeros((Np, K)).flatten('F')
 length_tol = 2.5e2
 
-for i, _ in enumerate(xFlat):
+for i, _  in enumerate(xFlat):
     xi = xFlat[i]
     yi = yFlat[i]
 
