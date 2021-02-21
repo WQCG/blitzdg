@@ -7,6 +7,7 @@ set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-cove
 # set (CMAKE_MODULE_LINKER_FLAGS  "${CMAKE_MODULE_LINKER_FLAGS}")
 include_directories ("include"
     "include/igloo"
+    "/opt/python/cp38-cp38/include/python3.8/"
     "/opt/_internal/cpython-3.7.3/include/python3.7m/"
     "/miniconda3/pkgs/python-3.7.3-h0371630_0/include/python3.7m/"
     "/usr/include/python3.7m/"
@@ -95,7 +96,7 @@ if (WIN32)
 	message("-- enabling exception handling")
 else()
     set (CMAKE_CXX_FLAGS "-Wall -std=c++14 -fPIC")
-endif()    
+endif()
 
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage -DBZ_DEBUG")
 include_directories ("include" 
