@@ -40,7 +40,7 @@ find_library(BLAS NAMES "libblas" "blas" "libblas" PATHS "/usr/lib64/" "/usr/lib
 
 find_library(PYTHON3 NAMES "python3.7" "python3.8" "libpython37" "python37" "python3.7m" "libpython3.7" PATHS "/miniconda3/pkgs/python-3.7.3-h0371630_0/lib/" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu" "/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu" "lib" "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/" PREFIX "lib" SUFFIX ".so")
 find_library(BOOSTPYTHON NAMES "boost_python37" "boost_python38"  "boost_python37-vc140-mt-x64-1_67" "libboost_python37" "boost_python37" "boost_python3.7" "boost_python3.6" PATHS "/boost_1_72/lib/" "/usr/lib64" "C:/ProgramData/Anaconda3/pkgs/py-boost-1.67.0-py37h8300f20_4/Library/lib" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu" "/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu" "lib" PREFIX "lib" SUFFIX ".so")
-find_library(BOOSTNUMPY NAMES "boost_numpy37" "boost_numpy38"  PATHS "/usr/lib/x86_64-linux-gnu" PREFIX "lib" SUFFIX ".so")
+find_library(BOOSTNUMPY NAMES "boost_numpy37" "boost_numpy38"  PATHS "/boost_1_72/lib" "/usr/lib/x86_64-linux-gnu" PREFIX "lib" SUFFIX ".so")
 
 find_library(VTKIOXML7 NAMES "vtkIOXML-7.1" PATHS "/usr/local/lib" "/usr/lib/x86_64-linux-gnu"  PREFIX "lib" SUFFIX ".so")
 find_library(VTKCOMMONCORE7 NAMES "vtkCommonCore-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
