@@ -40,6 +40,7 @@ find_library(LAPACK NAMES "liblapack" "lapack" PATHS "/usr/lib64/" "/usr/lib" "/
 find_library(BLAS NAMES "libblas" "blas" "libblas" PATHS "/usr/lib64/" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 
 find_library(BOOSTPYTHON NAMES "boost_python37" "boost_python38"  "boost_python37-vc140-mt-x64-1_67" "libboost_python37" "boost_python37" "boost_python3.7" "boost_python3.6" PATHS "/boost_1_72/lib/" "/usr/lib64" "C:/ProgramData/Anaconda3/pkgs/py-boost-1.67.0-py37h8300f20_4/Library/lib" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu" "/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu" "lib" PREFIX "lib" SUFFIX ".so")
+find_library(BOOSTNUMPY NAMES "boost_numpy37-vc140-mt-x64-1_67" "boost_numpy38" "libboost_numpy37" "boost_numpy37" "boost_numpy36" "boost_numpy37" PATHS "/boost_1_72/lib/" "/usr/lib64" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib"
 
 find_library(VTKIOXML7 NAMES "vtkIOXML-7.1" PATHS "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "/usr/lib" PREFIX "lib" SUFFIX ".so")
 find_library(VTKCOMMONCORE7 NAMES "vtkCommonCore-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "/usr/lib" "lib")
