@@ -32,7 +32,7 @@ jobs:
 
       - run:
           name: Test
-          command: mv bin/tests bin/test && LD_LIBRARY_PATH=/usr/local/lib bin/test
+          command: mv bin/tests bin/test && LD_LIBRARY_PATH=/usr/local/lib valgrind bin/test
 
 workflows:
   version: 2
