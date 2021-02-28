@@ -136,13 +136,13 @@ namespace blitzdg {
                             0.20000,0.20000,0.20000,0.20000,0.20000,
                             0.20000,0.20000,0.20000,0.20000,0.20000;
 
-                expectedrx =5,5,5,5,5,
-                            5,5,5,5,5,
-                            5,5,5,5,5,
-                            5,5,5,5,5;
+                expectedrx =5.,5.,5.,5.,5.,
+                            5.,5.,5.,5.,5.,
+                            5.,5.,5.,5.,5.,
+                            5.,5.,5.,5.,5.;
                 
-                expectedFscale = 5,5,5,5,5,
-                                 5,5,5,5,5;
+                expectedFscale = 5.,5.,5.,5.,5.,
+                                 5.,5.,5.,5.,5.;
 
                 real_matrix_type resJ(NOrder+1, NumElements), resrx(NOrder+1, NumElements), resFscale(2, NumElements);
                 resJ = J - expectedJ;
