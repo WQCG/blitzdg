@@ -70,14 +70,14 @@ namespace blitzdg {
         real_type width = L / NumElements;
 
         real_matrix_type & x = *xGrid;
-        for (index_type k=0; k < NumElements; k++) {
+        for (index_type k=0; k < NumElements; ++k) {
             x(Range::all(), k) = Min_x + width*(k + 0.5*(r+1.));
         }
 
         index_matrix_type & E2V = *EToV;
 
         // Create Element-to-Vertex connectivity table.
-        for (index_type k=0; k < NumElements; k++) {
+        for (index_type k=0; k < NumElements; ++k) {
             E2V(k, 0) = k;
             E2V(k, 1) = k+1;
         }
@@ -135,8 +135,8 @@ namespace blitzdg {
         }
 
         count = 0;
-        for (index_type k1=0; k1 < NumElements; k1++) {
-            for (index_type f1=0; f1 < NumFaces; f1++) {
+        for (index_type k1=0; k1 < NumElements; ++k1) {
+            for (index_type f1=0; f1 < NumFaces; ++f1) {
                 index_type k2 = E2E(k1, f1);
                 index_type f2 = E2F(k1, f1);
 
@@ -161,8 +161,8 @@ namespace blitzdg {
 
         Fmaskref = 0, (NumLocalPoints - 1);
 
-        for (index_type k = 0;  k < NumElements; k++) {
-            for (index_type f = 0; f < NumFacePoints*NumFaces; f++) {
+        for (index_type k = 0;  k < NumElements; ++k) {
+            for (index_type f = 0; f < NumFacePoints*NumFaces; ++f) {
                 Fxref(f, k) = x(Fmaskref(f), k);
             }
         }
