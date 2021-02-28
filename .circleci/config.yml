@@ -32,7 +32,7 @@ jobs:
 
       - run:
           name: Test
-          command: mv bin/tests bin/test && LD_LIBRARY_PATH=/usr/local/lib valgrind bin/test
+          command: mv bin/tests bin/test && LDq_LIBRARY_PATH=/usr/local/lib valgrind --leak-check=full --track-origins=yes bin/test 2>&1
 
 workflows:
   version: 2
