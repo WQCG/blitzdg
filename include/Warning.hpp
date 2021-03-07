@@ -13,7 +13,7 @@ namespace blitzdg {
      */
     void printDisclaimer() {
         std::cout << "blitzdg, version 0.1.0a" << std::endl;
-        std::cout << "Copyright (C) 2017-2019 Waterloo Quantitative Consulting Group, Inc." << std::endl;
+        std::cout << "Copyright (C) 2017-2020 Waterloo Quantitative Consulting Group, Inc." << std::endl;
         std::cout << "This is free software; see the source code for copying conditions." << std::endl;
         std::cout << "There is ABSOLUTELY NO WARRANTY; not even for MERCHANTABILITY or" << std::endl;
         std::cout << "FITNESS FOR A PARTICULAR PURPOSE." << std::endl << std::endl;

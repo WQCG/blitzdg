@@ -1,5 +1,6 @@
-
 #include "Poisson2DSparseMatrix.hpp"
+#include "GaussFaceContext2D.hpp"
+#include "CubatureContext2D.hpp"
 #include "SparseTriplet.hpp"
 #include "CSCMatrix.hpp"
 #include "Nodes1DProvisioner.hpp"
@@ -21,6 +22,216 @@ namespace blitzdg{
     Poisson2DSparseMatrix::Poisson2DSparseMatrix(DGContext2D& dg, MeshManager& mshManager) {
         const index_vector_type& bcType = mshManager.get_BCType();
         buildPoissonOperator(dg, mshManager, bcType);
+    }
+
+    Poisson2DSparseMatrix::Poisson2DSparseMatrix(DGContext2D& dg, MeshManager& mshManager, GaussFaceContext2D& gCtx, CubatureContext2D& cubCtx) {
+        const index_vector_type& bcType = mshManager.get_BCType();
+        buildPoissonOperator(dg, mshManager, bcType, gCtx, cubCtx);
+    }
+
+    void Poisson2DSparseMatrix::buildPoissonOperator(DGContext2D& dg, MeshManager& mshManager, const index_vector_type& bcType, GaussFaceContext2D& gCtx, CubatureContext2D& cubCtx) {
+        using blitz::Range;
+        blitz::firstIndex ii;
+        blitz::secondIndex jj;
+        blitz::thirdIndex kk;
+
+        index_type NGauss = gCtx.NGauss();
+        index_type NCub = cubCtx.NumCubaturePoints();
+        index_type K = dg.numElements();
+        index_type Nfaces = dg.numFaces();
+        index_type Np = dg.numLocalPoints();
+        index_type Nfp = dg.numFacePoints();
+        index_type N = dg.order();
+        const real_matrix_type& Fscale = dg.fscale();
+        const real_matrix_type& gInterp = gCtx.Interp();
+
+        // allocate storage for sparse matrix entries.
+        SparseTriplet MM(Np*K, Np*K, Np*Np*K),
+            OP(Np*K, Np*K, (1+Nfaces)*Np*Np*K);
+
+        for (index_type k=0; k < K; ++k) {
+            index_vector_type entries(Np*Np), entriesMM(Np*Np);
+
+            entries = ii;
+            entriesMM = ii;
+
+            index_matrix_type rows1(Np, Np), cols1(Np, Np);
+            rows1 = ((ii+Np*k) * (0*jj + 1));
+            cols1 = rows1(jj, ii);
+
+            // Extract local mass matrix and cubature weights
+            const index_type k1 = k;
+            real_matrix_type localMM(Np, Np);
+            real_vector_type localW(NGauss);
+            localMM = cubCtx.MM()(Range::all(), Range::all(), k1);
+            localW = cubCtx.W()(Range::all(), k1);
+
+            // Evaluate derivatives of Lagrange basis functions at cubature nodes
+            const real_matrix_type& Dr = dg.Dr();
+            const real_matrix_type& Ds = dg.Ds();
+
+            real_matrix_type cDx(NCub, Np), cDy(NCub, Np), iDr(NCub, Np), iDs(NCub, Np);
+
+            const real_matrix_type& Vc = cubCtx.V();
+
+            iDr = blitz::sum(Vc(ii, kk)*Dr(kk, jj), kk);
+            iDs = blitz::sum(Vc(ii, kk)*Ds(kk, jj), kk);
+
+            real_vector_type xLocal(Np), yLocal(Np);
+            xLocal = dg.x()(blitz::Range::all(), k1);
+            yLocal = dg.y()(blitz::Range::all(), k1);
+
+            real_vector_type xr(NCub), xs(NCub), yr(NCub), ys(NCub),
+                J(NCub), rx(NCub), sx(NCub), ry(NCub), sy(NCub);
+
+            // Compute geometric factors on this element.
+            xr = blitz::sum(iDr(ii, jj)*xLocal(jj), jj);
+            xs = blitz::sum(iDs(ii, jj)*xLocal(jj), jj);
+
+            yr = blitz::sum(iDr(ii, jj)*yLocal(jj), jj);
+            ys = blitz::sum(iDs(ii, jj)*yLocal(jj), jj);
+
+            J = -xs*yr + xr*ys;
+
+            rx = ys/J;
+            sx =-yr/J;
+            ry =-xs/J;
+            sy = xr/J;
+
+            // build physical differential matrices.
+            cDx = 0.0;
+            cDy = 0.0;
+
+            for (index_type i=0; i < NCub; ++i) {
+                for (index_type j=0; j < Np; ++j) {
+                    cDx(i, j) = rx(i) * iDr(i, j) + sx(i) * iDs(i, j);
+                    cDy(i, j) = ry(i) * iDr(i, j) + sy(i) * iDs(i, j);
+                }
+            }
+
+            real_matrix_type OP11(Np, Np), tmp(Np, Np);
+
+            // 'Volume' contribution.
+            tmp   = blitz::sum(cDx(kk, ii)*localMM(kk, jj), kk);
+            OP11  = blitz::sum(tmp(ii, kk)*cDx(kk, jj), kk);
+            tmp   = blitz::sum(cDy(kk, ii)*localMM(kk, jj), kk);
+            OP11 += blitz::sum(tmp(ii, kk)*cDy(kk, jj), kk);
+            OP11 *= J(0, k);  // is this OK to assume J is constant on element k?
+
+            for (index_type f1=0; f1 < Nfaces; ++f1) {
+                index_type k2 = mshManager.get_EToE()(Nfaces*k1 + f1);
+                index_type f2 = mshManager.get_EToF()(Nfaces*k1 + f1);
+
+                real_vector_type xLocal2(Np), yLocal2(Np);
+                xLocal2 = dg.x()(blitz::Range::all(), k2);
+                yLocal2 = dg.y()(blitz::Range::all(), k2);
+
+                index_vector_type idsM(NGauss);
+                idsM = ii + f1*NGauss;
+
+                // Extract Lagrange basis function, i.e., Gauss node interpolation matrix
+                real_matrix_type gVM(NGauss, Np), gVP(NGauss, Np);
+                gVM = 0.0; gVP=0.0;
+
+                gVM = gInterp(Range(f1*NGauss, (f1+1)*NGauss - 1), Range::all());
+                gVP = gInterp(Range(f2*NGauss, (f2+1)*NGauss - 1), Range::all());
+                gVP = gVP(Range(NGauss-1, 0, -1), Range::all()); // reverse quadrature nodes' ordering
+                                                                 // for '+' traces.
+
+                real_matrix_type gDxM(NGauss, Np), gDyM(NGauss, Np),
+                    gDxP(NGauss, Np), gDyP(NGauss, Np);
+
+                // Evaluate spatial derivatives of  Lagrange basis function at Gauss nodes
+                dg.computeDifferentiationMatrices(xLocal, yLocal, gVM, gDxM, gDyM);
+                dg.computeDifferentiationMatrices(xLocal2, yLocal2, gVP, gDxP, gDyP);
+
+                // to be used like diagonal matrices
+                real_vector_type gnx(NGauss), gny(NGauss), gw(NGauss);
+                gnx = 0.; gny = 0.; gw = 0.;
+
+                real_matrix_type gFullNx(NGauss, K), gFullNy(NGauss, K), gFullW(NGauss, K);
+                gFullNx = gCtx.nx(); gFullNy = gCtx.ny(); gFullW = gCtx.W();
+
+                for (index_type i=0; i < NGauss; ++i) {
+                    index_type idM = idsM(i);
+                    gnx(i) = gFullNx(idM, k1);
+                    gny(i) = gFullNy(idM, k1);
+                    gw(i)  = gFullW(idM, k1);
+                }
+
+                // Compute normal derivatives of Lagrange basis functions at Gauss nodes
+                real_matrix_type gDnM(NGauss, Np), gDnP(NGauss, Np);
+                gDnM = 0.; gDnP = 0;
+                for (index_type i=0; i < NGauss; ++i) {
+                    gDnM(i, Range::all()) = gnx(i)*gDxM(i, Range::all()) +
+                        gny(i) * gDyM(i, Range::all());
+
+                    gDnP(i, Range::all()) = gnx(i)*gDxP(i, Range::all()) +
+                        gny(i) * gDyP(i, Range::all());
+                }
+
+                index_matrix_type rows2(Np, Np), cols2(Np, Np);
+                rows2 = ((ii+ Np*k2) ) * (0*jj + 1);
+                cols2 = rows2(jj, ii);
+
+
+                index_vector_type vidM(Nfp), vidP(Nfp),
+                    Fm1(Nfp), Fm2(Nfp);
+
+                real_type hinv = std::max(Fscale(f1*Nfp, k1), Fscale(f2*Nfp, k2));
+                real_type gtau = 100*100*2*(N+1)*(N+1)*hinv; // set penalty scaling
+
+                real_matrix_type weighted_gVM(NGauss, Np), weighted_gVP(NGauss, Np);
+                weighted_gVM = 0.0; weighted_gVP = 0.0;
+                for (index_type i=0; i < NGauss; ++i) {
+                    weighted_gVM(i, Range::all()) = gw(i)*gVM(i, Range::all());
+                }
+                switch(bcType(Nfaces*k1 +f1)) {
+                case BCTag::Dirichlet:
+                    //% Dirichlet boundary face variational terms
+	                //OP11 = OP11 + ( gVM'*gw*gtau*gVM - gVM'*gw*gDnM - gDnM'*gw*gVM);
+                    OP11 -= blitz::sum(gDnM(kk, ii)*weighted_gVM(kk, jj), kk);
+                    OP11 -= blitz::sum(gVM(kk, ii)*weighted_gVM(kk, jj), kk);
+                    OP11 += gtau*blitz::sum(gVM(kk, ii)*weighted_gVM(kk, jj), kk);
+                    break;
+                case BCTag::Neuman:
+                case BCTag::Wall:
+                    break;
+                default:
+                    // interior face variational terms
+                    OP11 -= 0.5*blitz::sum(weighted_gVM(kk,ii)*gDnM(kk,jj), kk);
+                    OP11 -= 0.5*blitz::sum(gDnM(kk, ii)*weighted_gVM(kk,jj), kk);
+                    OP11 += 0.5*gtau*blitz::sum(weighted_gVM(kk,ii)*gVM(kk,jj), kk);
+
+                    // neighbor-to-interior contribution
+	                real_matrix_type OP12(Np, Np);
+                    OP12 = -0.5*gtau*blitz::sum(weighted_gVM(kk,ii)*gVP(kk,jj));
+                    OP12-=  0.5*blitz::sum(weighted_gVM(kk,ii)*gDnP(kk,jj), kk);
+                    OP12+=  0.5*blitz::sum( gDnM(kk, ii)*weighted_gVP(kk,jj), kk );
+
+
+                    // insert OP12 into sparse matrix.
+                    for (index_type i=0; i < Np; ++i) {
+                        for (index_type j=0; j < Np; ++j) {
+                            OP.insert(rows1(i, j), cols2(i, j), OP12(i, j));
+                        }
+                    }
+                    entries += Np*Np;
+                }
+            }
+
+            for (index_type i=0; i < Np; ++i ) {
+                for (index_type j=0; j < Np; ++j) {
+                    OP.insert(rows1(i, j), cols1(i, j), OP11(i,j));
+                    MM.insert(rows1(i, j), cols1(i, j), localMM(i,j));
+                }
+            }
+            entries += Np*Np;
+            entriesMM += Np*Np;
+        }
+
+        OP_ = std::make_unique<CSCMat>(OP);
+        MM_ = std::make_unique<CSCMat>(MM);
     }
 
     void Poisson2DSparseMatrix::buildBcRhs(DGContext2D& dg, const MeshManager& mshManager, const real_matrix_type& ubc, const real_matrix_type& qbc, const index_vector_type& bcType) {
@@ -190,8 +401,11 @@ namespace blitzdg{
                 }
             }
         }
-
         BcRhs_ = std::make_unique<real_matrix_type>(bcRhs);
+    }
+
+    void Poisson2DSparseMatrix::buildBcRhs(DGContext2D& dg, const MeshManager& mshManager, const GaussFaceContext2D& gctx, const CubatureContext2D& cubCtx, const real_matrix_type& ubc, const real_matrix_type& qbc, const index_vector_type& bcType) {
+        throw std::runtime_error("Not yet implemented");
     }
 
     void Poisson2DSparseMatrix::buildPoissonOperator(DGContext2D& dg, MeshManager& mshManager, const index_vector_type& bcType) {
@@ -421,7 +635,6 @@ namespace blitzdg{
     }
 
     const ndarray Poisson2DSparseMatrix::buildBcRhs_numpy(DGContext2D& dg, const MeshManager& mshManager, const ndarray& ubc, const ndarray& qbc) {
-        // do all the things.
 
         real_matrix_type blitzUbc(ubc.shape(0), ubc.shape(1));
 		blitzUbc = 0.0;
@@ -435,6 +648,24 @@ namespace blitzdg{
 
         const index_vector_type & bcType = mshManager.get_BCType();
 		buildBcRhs(dg, mshManager, blitzUbc, blitzQbc, bcType);
+
+		return getBcRhs_numpy();
+    }
+
+    const ndarray Poisson2DSparseMatrix::buildCubatureBcRhs_numpy(DGContext2D& dg, const MeshManager& mshManager, const GaussFaceContext2D& gctx, const CubatureContext2D& cubCtx, const ndarray& ubc, const ndarray& qbc) {
+        
+        real_matrix_type blitzUbc(ubc.shape(0), ubc.shape(1));
+		blitzUbc = 0.0;
+		char * raw = ubc.get_data();
+        std::copy(&raw[0], &raw[ubc.shape(0)*ubc.shape(1)*sizeof(real_type)] , reinterpret_cast<char*>(blitzUbc.data()));
+
+        real_matrix_type blitzQbc(qbc.shape(0), qbc.shape(1));
+		blitzQbc = 0.0;
+		raw = qbc.get_data();
+        std::copy(&raw[0], &raw[qbc.shape(0)*qbc.shape(1)*sizeof(real_type)] , reinterpret_cast<char*>(blitzQbc.data()));
+
+        const index_vector_type & bcType = mshManager.get_BCType();
+		buildBcRhs(dg, mshManager, gctx, cubCtx, blitzUbc, blitzQbc, bcType);
 
 		return getBcRhs_numpy();
     }

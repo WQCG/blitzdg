@@ -7,9 +7,11 @@ set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-cove
 # set (CMAKE_MODULE_LINKER_FLAGS  "${CMAKE_MODULE_LINKER_FLAGS}")
 include_directories ("include"
     "include/igloo"
+    "/opt/python/cp38-cp38/include/python3.8/"
     "/opt/_internal/cpython-3.7.3/include/python3.7m/"
     "/miniconda3/pkgs/python-3.7.3-h0371630_0/include/python3.7m/"
     "/usr/include/python3.7m/"
+    "/usr/include/python3.8/"
     "/usr/local/include/"
     "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/include/python3.7m/"
     "C:/ProgramData/Anaconda3/pkgs/python-3.7.3-h8c8aaf0_0/include/"
@@ -37,22 +39,22 @@ endif()
 find_library(LAPACK NAMES "liblapack" "lapack" PATHS "/usr/lib64/" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 find_library(BLAS NAMES "libblas" "blas" "libblas" PATHS "/usr/lib64/" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 
-find_library(PYTHON3 NAMES "python37" "libpython37" "python3.7" "python3.7m" "libpython3.7" PATHS "/miniconda3/pkgs/python-3.7.3-h0371630_0/lib/" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu" "/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu" "lib" "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/")
-find_library(BOOSTPYTHON NAMES "boost_python37-vc140-mt-x64-1_67" "libboost_python37" "boost_python37" "boost_python3.7" "boost_python3.6" PATHS "/boost_1_72/lib/" "/usr/lib64" "C:/ProgramData/Anaconda3/pkgs/py-boost-1.67.0-py37h8300f20_4/Library/lib" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu" "/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu" "lib")
-find_library(BOOSTNUMPY NAMES "boost_numpy37-vc140-mt-x64-1_67" "libboost_numpy37" "boost_numpy37" "boost_numpy36" "boost_numpy37" PATHS "/boost_1_72/lib/" "/usr/lib64" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+find_library(BOOSTPYTHON NAMES "boost_python37" "boost_python38"  "boost_python37-vc140-mt-x64-1_67" "libboost_python37" "boost_python37" "boost_python3.7" "boost_python3.6" PATHS "/boost_1_72/lib/" "/usr/lib64" "C:/ProgramData/Anaconda3/pkgs/py-boost-1.67.0-py37h8300f20_4/Library/lib" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu" "/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu" "lib" PREFIX "lib" SUFFIX ".so")
+find_library(BOOSTNUMPY NAMES "boost_numpy37-vc140-mt-x64-1_67" "boost_numpy38" "libboost_numpy37" "boost_numpy37" "boost_numpy36" "boost_numpy37" PATHS "/boost_1_72/lib/" "/usr/lib64" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
 
-find_library(VTKIOXML7 NAMES "vtkIOXML-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
-find_library(VTKCOMMONCORE7 NAMES "vtkCommonCore-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
-find_library(VTKCOMMONEXECUTIONMODEL7 NAMES "vtkCommonExecutionModel-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
-find_library(VTKCOMMONDATAMODEL7 NAMES "vtkCommonDataModel-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
-find_library(VTKCOMMONMISC7 NAMES "vtkCommonMisc-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
-find_library(VTKCOMMONSYSTEM7 NAMES "vtkCommonSystem-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
-find_library(VTKCOMMONTRANSFORMS7 NAMES "vtkCommonTransforms-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
-find_library(VTKIOCORE7 NAMES "vtkIOCore-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
-find_library(VTKIOGEOMETRY7 NAMES "vtkIOGeometry-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
-find_library(VTKIOXML7 NAMES "vtkIOXML-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
-find_library(VTKIOXMLPARSER7 NAMES "vtkIOXMLParser-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
-find_library(VTKSYS7 NAMES "vtksys-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
+find_library(PYTHON3 NAMES "python3.7" "python3.8" "libpython37" "python37" "python38" "python3.7m" "python3.8m" "libpython3.7" PATHS "/miniconda3/pkgs/python-3.7.3-h0371630_0/lib/" "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu" "/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu" "lib" "/usr/local/Cellar/python/3.7.4_1/Frameworks/Python.framework/Versions/3.7/lib/" PREFIX "lib" SUFFIX ".so")
+
+find_library(VTKIOXML7 NAMES "vtkIOXML-7.1" PATHS "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "/usr/lib" PREFIX "lib" SUFFIX ".so")
+find_library(VTKCOMMONCORE7 NAMES "vtkCommonCore-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "/usr/lib" "lib")
+find_library(VTKCOMMONEXECUTIONMODEL7 NAMES "vtkCommonExecutionModel-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib" "/usr/lib")
+find_library(VTKCOMMONDATAMODEL7 NAMES "vtkCommonDataModel-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib" "/usr/lib")
+find_library(VTKCOMMONMISC7 NAMES "vtkCommonMisc-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib" "/usr/lib")
+find_library(VTKCOMMONSYSTEM7 NAMES "vtkCommonSystem-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib" "/usr/lib")
+find_library(VTKCOMMONTRANSFORMS7 NAMES "vtkCommonTransforms-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib" "/usr/lib")
+find_library(VTKIOCORE7 NAMES "vtkIOCore-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib" "/usr/lib")
+find_library(VTKIOGEOMETRY7 NAMES "vtkIOGeometry-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib" "/usr/lib")
+find_library(VTKIOXMLPARSER7 NAMES "vtkIOXMLParser-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib" "/usr/lib")
+find_library(VTKSYS7 NAMES "vtksys-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib" "/usr/lib")
 
 if (WIN32)
     find_library(VTKZLIB7 NAMES "vtkzlib-7.1" PATHS "/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu" "lib")
@@ -97,7 +99,7 @@ if (WIN32)
 	message("-- enabling exception handling")
 else()
     set (CMAKE_CXX_FLAGS "-Wall -std=c++14 -fPIC")
-endif()    
+endif()
 
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage -DBZ_DEBUG")
 include_directories ("include" 
@@ -368,8 +370,8 @@ INSTALL(FILES
 SET(CPACK_GENERATOR DEB)
 SET(CPACK_PACKAGE_NAME "pyblitzdg")
 SET(CPACK_SOURCE_STRIP_FILES "")
-SET(CPACK_DEBIAN_PACKAGE_BUILDS_DEPENDS "build-essential,cmake,libvtk7.1,libvtk7-dev,libsuitesparse-dev,libmetis-dev,libboost-dev,libboost-python1.65.1-dev,libboost-numpy1.65.1-dev")
-SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libvtk7.1,python3-pip,python3-numpy,libsuitesparse-dev,libmetis-dev,libboost-dev,libboost-python1.65.1,libboost-numpy1.65.1")
+SET(CPACK_DEBIAN_PACKAGE_BUILDS_DEPENDS "build-essential,cmake,libvtk7.1,libvtk7-dev,libsuitesparse-dev,libmetis-dev,libboost-dev,libboost-python1.65.1-dev")
+SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libvtk7.1,python3-pip,libsuitesparse-dev,libmetis-dev,libboost-dev,libboost-python1.65.1")
 SET(CPACK_DEBIAN_FILE_NAME "DEB-DEFAULT")
 SET(CPACK_PACKAGE_CONTACT "Derek Steinmoeller <dsteinmo@wqcg.ca>")
 SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Derek Steinmoeller <dsteinmo@wqcg.ca>")
@@ -386,4 +388,4 @@ INCLUDE(InstallRequiredSystemLibraries)
 
 SET(CPACK_GENERATOR RPM)
 set(CPACK_RPM_PACKAGE_VERSION "0.1.5")
-SET(CPACK_RPM_PACKAGE_DEPENDS "python3,python3-pip,libgfortran.x86_64,suitesparse-devel.x86_64,metis-devel.x86_64,boost-devel.x86_64,vtk-devel.x86_64 vtk.x86_64,boost-python3-devel.x86_64,boost-numpy3.x86_64")
+SET(CPACK_RPM_PACKAGE_DEPENDS "python3,python3-pip,libgfortran.x86_64,suitesparse-devel.x86_64,metis-devel.x86_64,boost-devel.x86_64,vtk-devel.x86_64 vtk.x86_64,boost-python3-devel.x86_64")

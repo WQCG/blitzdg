@@ -3,8 +3,6 @@
 
 #pragma once
 #include "Types.hpp"
-#define PY_MAJOR_VERSION 3
-#define PY_MINOR_VERSION 7
 #include <boost/python/numpy.hpp>
 
 namespace blitzdg {
@@ -220,5 +218,42 @@ namespace blitzdg {
         boost::python::numpy::ndarray vmapP_numpy() const;
         boost::python::dict bcmap_numpy() const;
         boost::python::numpy::ndarray V_numpy() const;
+
+        void computeDifferentiationMatrices(const real_vector_type& x, const real_vector_type& y, const real_matrix_type& V, real_matrix_type& Dx, real_matrix_type& Dy) {
+            const real_matrix_type& Dr = *Dr_;
+            const real_matrix_type& Ds = *Ds_;
+
+            index_type Nout = V.rows();
+
+            blitz::firstIndex ii;
+            blitz::secondIndex jj;
+            blitz::thirdIndex kk;
+
+            real_vector_type xr(Np_), xs(Np_), yr(Np_), ys(Np_), J(Np_),
+                rx(Np_), sx(Np_), ry(Np_), sy(Np_);
+
+            xr = blitz::sum(Dr(ii, kk)*x(kk, jj), kk);
+            xs = blitz::sum(Ds(ii, kk)*x(kk, jj), kk);
+
+            yr = blitz::sum(Dr(ii, kk)*y(kk, jj), kk);
+            ys = blitz::sum(Ds(ii, kk)*y(kk, jj), kk);
+
+            J = -xs*yr + xr*ys;
+
+            rx = ys/J;
+            sx =-yr/J;
+            ry =-xs/J;
+            sy = xr/J;
+
+            Dx = 0.0; Dy = 0.0;
+
+
+            for (index_type i=0; i < Nout; ++i) {
+                for (index_type j=0; j < Np_; ++j) {
+                    Dx(i, j) = rx(i) * Dr(i, j) + sx(i) * Ds(i, j);
+                    Dy(i, j) = ry(i) * Dr(i, j) + sy(i) * Ds(i, j);
+                }
+            }
+        }
     };
 }

@@ -15,17 +15,16 @@ jobs:
             - "*"
   build:
     docker:
-      - image: dsteinmoeller/blitzdgmanylinux:0.3.1
+      - image: dsteinmoeller/blitzdgmanylinux:0.4.0
     steps:
       - attach_workspace:
           at: /root/project
       - run:
           name: Build (gcc)
           command: |
-            CXX='g++' cmake .
+            CXX='g++' cmake . -D"CMAKE_BUILD_TYPE=DEBUG"
             CXX='g++' make -j4
-            /opt/_internal/cpython-3.7.3/bin/python3.7 setup.py bdist_wheel sdist
-            unlink /usr/lib64/libblitzdg.so
+            /opt/_internal/cpython-3.8.7/bin/python3.8 setup.py bdist_wheel sdist
             cp /root/project/pyblitzdg/libblitzdg.so /usr/lib64/libblitzdg.so
             for whl in dist/*.whl; do
               auditwheel repair "$whl" --plat manylinux2010_x86_64 -w wheelhouse/
