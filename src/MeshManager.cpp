@@ -251,10 +251,8 @@ namespace blitzdg {
         }
 
         NumFaces = 3;
-        NumElements = tris.size();
         if (!quads.empty()) {
             NumFaces = 4;
-            NumElements = quads.size();
         }
 
         lines.shrink_to_fit();
@@ -264,7 +262,7 @@ namespace blitzdg {
         // Allocate storage EToV and BC Table.
         // Note: we are doing this here as opposed to in the initializer list,
         // since prior to this point we did not know how many elements there are.
-        index_type K = static_cast<index_type>(NumElements);   // ... but we don't handle both, yet.
+        index_type K = static_cast<index_type>(tris.size() + quads.size());   // ... but we don't handle both, yet.
         EToV = index_vec_smart_ptr(new index_vector_type(K*NumFaces));
         BCType = index_vec_smart_ptr(new index_vector_type(K*NumFaces));
         EToE = index_vec_smart_ptr(new index_vector_type(K*NumFaces));
@@ -272,6 +270,7 @@ namespace blitzdg {
 
         index_vector_type& E2V = *EToV;
 
+        NumElements = K;
         if (NumFaces == 3) {
             for (index_type k=0; k < K; ++k) {
                 // Subtract one to go from 1-based (Gmsh) to 0-based (us).
