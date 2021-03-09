@@ -6,8 +6,6 @@ See COPYING and LICENSE files at project root for more details.
 
 import numpy as np
 from pyblitzdg import pyblitzdg as dg
-import matplotlib.pyplot as plt
-from pprint import pprint
 
 def sw2dComputeFluxes(h, hu, hv, hN, g, H):
     #h equation
@@ -111,6 +109,7 @@ def sw2dComputeRHS(h, hu, hv, hN, g, H, f, ctx):
     dFlux3 = 0.5*((F3M - F3P)*nxC + (G3M-G3P)*nyC - spdMax*dhv)
     dFlux4 = 0.5*((F4M - F4P)*nxC + (G4M-G4P)*nyC - spdMax*dhN)
 
+    K = ctx.numElements
     dFlux1Mat = np.reshape(dFlux1, (Nfp*ctx.numFaces, K), order='F')
     dFlux2Mat = np.reshape(dFlux2, (Nfp*ctx.numFaces, K), order='F')
     dFlux3Mat = np.reshape(dFlux3, (Nfp*ctx.numFaces, K), order='F')
@@ -180,9 +179,6 @@ y = ctx.y
 
 Np = ctx.numLocalPoints
 K = ctx.numElements
-
-Filt = ctx.filter
-
 
 eta = -2.5*(x/8000.0)
 u   = np.zeros([Np, K], dtype=np.float, order='C')
