@@ -248,6 +248,7 @@ namespace blitzdg{
                 weighted_gVM = 0.0; weighted_gVP = 0.0;
                 for (index_type i=0; i < NGauss; ++i) {
                     weighted_gVM(i, Range::all()) = gw(i)*gVM(i, Range::all());
+                    weighted_gVP(i, Range::all()) = gw(i)*gVP(i, Range::all());
                 }
                 switch(bcType(Nfaces*k1 +f1)) {
                 case BCTag::Dirichlet:
