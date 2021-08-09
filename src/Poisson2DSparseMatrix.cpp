@@ -8,6 +8,7 @@
 #include "VandermondeBuilders.hpp"
 #include "BCtypes.hpp"
 #include "BlitzHelpers.hpp"
+#include "LinAlgHelpers.hpp"
 #include "Types.hpp"
 
 #include <memory>
@@ -166,6 +167,10 @@ namespace blitzdg{
 
                 J1 = -xs1*yr1 + xr1*ys1;
 
+                if (normFro(J1) < 10.0*std::numeric_limits<double>::epsilon()) {
+                    throw std::runtime_error("Fatally small elemental Jacobian. Terminating...");
+                }
+
                 rx1 = ys1/J1;
                 sx1 =-yr1/J1;
                 ry1 =-xs1/J1;
@@ -181,6 +186,10 @@ namespace blitzdg{
                     }
                 }
 
+                if (normMax(gDx1) < 10.0*std::numeric_limits<double>::epsilon() || normMax(gDy1) < 10.0*std::numeric_limits<double>::epsilon()) {
+                    throw std::runtime_error("Local cartesian derivatives are arbitrarily small -- Check mesh and geometric factors. Terminating...");
+                }
+
                 real_vector_type xr2(NGauss), xs2(NGauss), yr2(NGauss), ys2(NGauss),
                     J2(NGauss), rx2(NGauss), sx2(NGauss), ry2(NGauss), sy2(NGauss);
 
@@ -192,6 +201,9 @@ namespace blitzdg{
                 ys2 = blitz::sum(gDs(ii, jj)*yLocal2(jj), jj);
 
                 J2 = -xs1*yr1 + xr1*ys1;
+                if (normFro(J1) < 10.0*std::numeric_limits<double>::epsilon()) {
+                    throw std::runtime_error("Fatally small elemental Jacobian. Terminating...");
+                }
 
                 rx2 = ys2/J2;
                 sx2 =-yr2/J2;
@@ -206,6 +218,10 @@ namespace blitzdg{
                         gDx2(i, j) = rx2(i) * gDr(i, j) + sx2(i) * gDs(i, j);
                         gDy2(i, j) = ry2(i) * gDr(i, j) + sy2(i) * gDs(i, j);
                     }
+                }
+
+                if (normMax(gDx2) < 10.0*std::numeric_limits<double>::epsilon() || normMax(gDy2) < 10.0*std::numeric_limits<double>::epsilon()) {
+                    throw std::runtime_error("Local cartesian derivatives are arbitrarily small -- Check mesh and geometric factors. Terminating...");
                 }
 
                 // Evaluate spatial derivatives of  Lagrange basis function at Gauss nodes
@@ -225,7 +241,7 @@ namespace blitzdg{
 
                 // Compute normal derivatives of Lagrange basis functions at Gauss nodes
                 real_matrix_type gDnM(NGauss, Np), gDnP(NGauss, Np);
-                gDnM = 0.; gDnP = 0.0;
+                gDnM = 0.; gDnP = 0.;
                 for (index_type i=0; i < NGauss; ++i) {
                     gDnM(i, Range::all()) = gnx(i)*gDx1(i, Range::all()) +
                         gny(i) * gDy1(i, Range::all());
