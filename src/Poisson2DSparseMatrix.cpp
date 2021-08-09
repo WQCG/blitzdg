@@ -225,7 +225,7 @@ namespace blitzdg{
 
                 // Compute normal derivatives of Lagrange basis functions at Gauss nodes
                 real_matrix_type gDnM(NGauss, Np), gDnP(NGauss, Np);
-                gDnM = 0.; gDnP = 0;
+                gDnM = 0.; gDnP = 0.0;
                 for (index_type i=0; i < NGauss; ++i) {
                     gDnM(i, Range::all()) = gnx(i)*gDx1(i, Range::all()) +
                         gny(i) * gDy1(i, Range::all());
