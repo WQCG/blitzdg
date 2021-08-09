@@ -62,9 +62,15 @@ namespace blitzdg{
             // Extract local mass matrix and cubature weights
             const index_type k1 = k;
             real_matrix_type localMM(Np, Np);
-            real_vector_type localW(NGauss);
             localMM = cubCtx.MM()(Range::all(), Range::all(), k1);
+            real_vector_type localW(NCub);
             localW = cubCtx.W()(Range::all(), k1);
+
+            real_matrix_type cW(NCub, NCub);
+            cW = 0.0;
+            for (index_type i =0; i < NCub; ++i) {
+                cW(i,i) = localW(i);
+            }
 
             // Evaluate derivatives of Lagrange basis functions at cubature nodes
             const real_matrix_type& Dr = dg.Dr();
@@ -109,14 +115,14 @@ namespace blitzdg{
                 }
             }
 
-            real_matrix_type OP11(Np, Np), tmp(Np, Np);
+            real_matrix_type OP11(Np, Np), tmp(Np, NCub);
 
             // 'Volume' contribution.
-            tmp   = blitz::sum(cDx(kk, ii)*localMM(kk, jj), kk);
+            //  (Nc x Np)^T * Nc x Nc
+            tmp   = blitz::sum(cDx(kk, ii)*cW(kk, jj), kk);
             OP11  = blitz::sum(tmp(ii, kk)*cDx(kk, jj), kk);
-            tmp   = blitz::sum(cDy(kk, ii)*localMM(kk, jj), kk);
+            tmp   = blitz::sum(cDy(kk, ii)*cW(kk, jj), kk);
             OP11 += blitz::sum(tmp(ii, kk)*cDy(kk, jj), kk);
-            OP11 *= J(0, k);  // is this OK to assume J is constant on element k?
 
             for (index_type f1=0; f1 < Nfaces; ++f1) {
                 index_type k2 = mshManager.get_EToE()(Nfaces*k1 + f1);
@@ -139,17 +145,75 @@ namespace blitzdg{
                                                                  // for '+' traces.
 
                 real_matrix_type gDxM(NGauss, Np), gDyM(NGauss, Np),
-                    gDxP(NGauss, Np), gDyP(NGauss, Np);
+                    gDxP(NGauss, Np), gDyP(NGauss, Np), gDr(NGauss, Np), gDs(NGauss, Np);
+
+                // Compute x and y differentiation matrices that evaluate
+                // derivatives at Gauss nodes.
+                const real_matrix_type& gInterp = gCtx.Interp();
+
+                gDr = blitz::sum(gInterp(ii, kk)*Dr(kk, jj), kk);
+                gDs = blitz::sum(gInterp(ii, kk)*Ds(kk, jj), kk);
+
+                real_vector_type xr1(NGauss), xs1(NGauss), yr1(NGauss), ys1(NGauss),
+                    J1(NGauss), rx1(NGauss), sx1(NGauss), ry1(NGauss), sy1(NGauss);
+
+                // Compute geometric factors on this element.
+                xr1 = blitz::sum(gDr(ii, jj)*xLocal(jj), jj);
+                xs1 = blitz::sum(gDs(ii, jj)*xLocal(jj), jj);
+
+                yr1 = blitz::sum(gDr(ii, jj)*yLocal(jj), jj);
+                ys1 = blitz::sum(gDs(ii, jj)*yLocal(jj), jj);
+
+                J1 = -xs1*yr1 + xr1*ys1;
+
+                rx1 = ys1/J1;
+                sx1 =-yr1/J1;
+                ry1 =-xs1/J1;
+                sy1 = xr1/J1;
+
+                real_matrix_type gDx1(NGauss, Np), gDy1(NGauss, Np);
+                gDx1 = 0.; gDy1 = 0.;
+
+                for (index_type i=0; i < NGauss; ++i) {
+                    for (index_type j=0; j < Np; ++j) {
+                        gDx1(i, j) = rx1(i) * gDr(i, j) + sx1(i) * gDs(i, j);
+                        gDy1(i, j) = ry1(i) * gDr(i, j) + sy1(i) * gDs(i, j);
+                    }
+                }
+
+                real_vector_type xr2(NGauss), xs2(NGauss), yr2(NGauss), ys2(NGauss),
+                    J2(NGauss), rx2(NGauss), sx2(NGauss), ry2(NGauss), sy2(NGauss);
+
+                // Compute geometric factors on the neighboring element.
+                xr2 = blitz::sum(gDr(ii, jj)*xLocal2(jj), jj);
+                xs2 = blitz::sum(gDs(ii, jj)*xLocal2(jj), jj);
+
+                yr2 = blitz::sum(gDr(ii, jj)*yLocal2(jj), jj);
+                ys2 = blitz::sum(gDs(ii, jj)*yLocal2(jj), jj);
+
+                J2 = -xs1*yr1 + xr1*ys1;
+
+                rx2 = ys2/J2;
+                sx2 =-yr2/J2;
+                ry2 =-xs2/J2;
+                sy2 = xr2/J2;
+
+                real_matrix_type gDx2(NGauss, Np), gDy2(NGauss, Np);
+                gDx2 = 0.; gDy2 = 0.;
+
+                for (index_type i=0; i < NGauss; ++i) {
+                    for (index_type j=0; j < Np; ++j) {
+                        gDx2(i, j) = rx2(i) * gDr(i, j) + sx2(i) * gDs(i, j);
+                        gDy2(i, j) = ry2(i) * gDr(i, j) + sy2(i) * gDs(i, j);
+                    }
+                }
 
                 // Evaluate spatial derivatives of  Lagrange basis function at Gauss nodes
-                dg.computeDifferentiationMatrices(xLocal, yLocal, gVM, gDxM, gDyM);
-                dg.computeDifferentiationMatrices(xLocal2, yLocal2, gVP, gDxP, gDyP);
-
-                // to be used like diagonal matrices
+                // on both faces, '-' and '+'.
                 real_vector_type gnx(NGauss), gny(NGauss), gw(NGauss);
                 gnx = 0.; gny = 0.; gw = 0.;
 
-                real_matrix_type gFullNx(NGauss, K), gFullNy(NGauss, K), gFullW(NGauss, K);
+                real_matrix_type gFullNx(Nfaces*NGauss, K), gFullNy(Nfaces*NGauss, K), gFullW(Nfaces*NGauss, K);
                 gFullNx = gCtx.nx(); gFullNy = gCtx.ny(); gFullW = gCtx.W();
 
                 for (index_type i=0; i < NGauss; ++i) {
@@ -163,17 +227,16 @@ namespace blitzdg{
                 real_matrix_type gDnM(NGauss, Np), gDnP(NGauss, Np);
                 gDnM = 0.; gDnP = 0;
                 for (index_type i=0; i < NGauss; ++i) {
-                    gDnM(i, Range::all()) = gnx(i)*gDxM(i, Range::all()) +
-                        gny(i) * gDyM(i, Range::all());
+                    gDnM(i, Range::all()) = gnx(i)*gDx1(i, Range::all()) +
+                        gny(i) * gDy1(i, Range::all());
 
-                    gDnP(i, Range::all()) = gnx(i)*gDxP(i, Range::all()) +
-                        gny(i) * gDyP(i, Range::all());
+                    gDnP(i, Range::all()) = gnx(i)*gDx2(i, Range::all()) +
+                        gny(i) * gDy2(i, Range::all());
                 }
 
                 index_matrix_type rows2(Np, Np), cols2(Np, Np);
                 rows2 = ((ii+ Np*k2) ) * (0*jj + 1);
                 cols2 = rows2(jj, ii);
-
 
                 index_vector_type vidM(Nfp), vidP(Nfp),
                     Fm1(Nfp), Fm2(Nfp);
@@ -188,8 +251,8 @@ namespace blitzdg{
                 }
                 switch(bcType(Nfaces*k1 +f1)) {
                 case BCTag::Dirichlet:
-                    //% Dirichlet boundary face variational terms
-	                //OP11 = OP11 + ( gVM'*gw*gtau*gVM - gVM'*gw*gDnM - gDnM'*gw*gVM);
+                    // Dirichlet boundary face variational terms
+                    // translated from: OP11 = OP11 + ( gVM'*gw*gtau*gVM - gVM'*gw*gDnM - gDnM'*gw*gVM);
                     OP11 -= blitz::sum(gDnM(kk, ii)*weighted_gVM(kk, jj), kk);
                     OP11 -= blitz::sum(gVM(kk, ii)*weighted_gVM(kk, jj), kk);
                     OP11 += gtau*blitz::sum(gVM(kk, ii)*weighted_gVM(kk, jj), kk);
@@ -208,7 +271,6 @@ namespace blitzdg{
                     OP12 = -0.5*gtau*blitz::sum(weighted_gVM(kk,ii)*gVP(kk,jj));
                     OP12-=  0.5*blitz::sum(weighted_gVM(kk,ii)*gDnP(kk,jj), kk);
                     OP12+=  0.5*blitz::sum( gDnM(kk, ii)*weighted_gVP(kk,jj), kk );
-
 
                     // insert OP12 into sparse matrix.
                     for (index_type i=0; i < Np; ++i) {
