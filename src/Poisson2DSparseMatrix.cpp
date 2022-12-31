@@ -181,7 +181,7 @@ namespace blitzdg{
                 sy1 = xr1/J1;
 
                 real_matrix_type gDx1(NGauss, Np), gDy1(NGauss, Np);
-                gDx1 = 0.; gDy1 = 0.;
+                gDx1 = 0.0; gDy1 = 0.0;
 
                 for (index_type i=0; i < NGauss; ++i) {
                     for (index_type j=0; j < Np; ++j) {
@@ -215,7 +215,7 @@ namespace blitzdg{
                 sy2 = xr2/J2;
 
                 real_matrix_type gDx2(NGauss, Np), gDy2(NGauss, Np);
-                gDx2 = 0.; gDy2 = 0.;
+                gDx2 = 0.0; gDy2 = 0.0;
 
                 for (index_type i=0; i < NGauss; ++i) {
                     for (index_type j=0; j < Np; ++j) {
@@ -231,7 +231,7 @@ namespace blitzdg{
                 // Evaluate spatial derivatives of  Lagrange basis function at Gauss nodes
                 // on both faces, '-' and '+'.
                 real_vector_type gnx(NGauss), gny(NGauss), gw(NGauss);
-                gnx = 0.; gny = 0.; gw = 0.;
+                gnx = 0.0; gny = 0.0; gw = 0.0;
 
                 real_matrix_type gFullNx(Nfaces*NGauss, K), gFullNy(Nfaces*NGauss, K), gFullW(Nfaces*NGauss, K);
                 gFullNx = gCtx.nx(); gFullNy = gCtx.ny(); gFullW = gCtx.W();
@@ -245,7 +245,7 @@ namespace blitzdg{
 
                 // Compute normal derivatives of Lagrange basis functions at Gauss nodes
                 real_matrix_type gDnM(NGauss, Np), gDnP(NGauss, Np);
-                gDnM = 0.; gDnP = 0.;
+                gDnM = 0.0; gDnP = 0.0;
                 for (index_type i=0; i < NGauss; ++i) {
                     gDnM(i, Range::all()) = gnx(i)*gDx1(i, Range::all()) +
                         gny(i) * gDy1(i, Range::all());
