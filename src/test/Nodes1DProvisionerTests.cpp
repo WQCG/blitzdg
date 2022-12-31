@@ -118,13 +118,7 @@ namespace blitzdg {
                 Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
 
                 nodes1D.buildNodes();
-
-                cout << "Nodes built.\n";
-
                 nodes1D.computeJacobian();
-
-                cout << "Jacobian computed.\n";
-
 
                 const real_matrix_type & J = nodes1D.get_J();
                 const real_matrix_type & rx = nodes1D.get_rx();
