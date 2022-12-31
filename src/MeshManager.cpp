@@ -282,18 +282,18 @@ namespace blitzdg {
         } else if (NumFaces == 4) {
             for (index_type k=0; k < K; ++k) {
                 // Subtract one to go from 1-based (Gmsh) to 0-based (us).
-                E2V(NumFaces*k)   = quads[k][5] - 1;
-                E2V(NumFaces*k+1) = quads[k][6] - 1;
-                E2V(NumFaces*k+2) = quads[k][7] - 1;
-                E2V(NumFaces*k+3) = quads[k][8] - 1;
+                E2V(NumFaces*k)   = quads[k][6] - 1;
+                E2V(NumFaces*k+1) = quads[k][7] - 1;
+                E2V(NumFaces*k+2) = quads[k][8] - 1;
+                E2V(NumFaces*k+3) = quads[k][9] - 1;
             }
         }
 
         for (index_type k=0; k < K; ++k) {
             // Enforce counter-clockwise ordering of vertices in EToV table.
-            real_type ax = Vref(E2V(NumFaces*k)*Dim),   ay = Vref(E2V(NumFaces*k)*Dim+1);
-            real_type bx = Vref(E2V(NumFaces*k+1)*Dim), by = Vref(E2V(NumFaces*k+1)*Dim+1);
-            real_type cx = Vref(E2V(NumFaces*k+2)*Dim), cy = Vref(E2V(NumFaces*k+2)*Dim+1);
+            real_type ax = Vref((E2V(NumFaces*k))*Dim),   ay = Vref((E2V(NumFaces*k))*Dim+1);
+            real_type bx = Vref((E2V(NumFaces*k+1))*Dim), by = Vref((E2V(NumFaces*k+1))*Dim+1);
+            real_type cx = Vref((E2V(NumFaces*k+2))*Dim), cy = Vref((E2V(NumFaces*k+2))*Dim+1);
 
             real_type det = (ax-cx)*(by-cy) - (bx-cx)*(ay-cy);
 
