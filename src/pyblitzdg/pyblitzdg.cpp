@@ -48,6 +48,12 @@ namespace blitzdg {
             return a;
         }
     };
+
+    struct BCType {
+        int Dirichlet = 6;
+        int Neuman = 7;
+        int Wall = 3;
+    };
 }
 
 BOOST_PYTHON_MODULE(pyblitzdg)
@@ -73,6 +79,15 @@ BOOST_PYTHON_MODULE(pyblitzdg)
         .add_property("mapI", &Nodes1DProvisioner::get_mapI, "Property containing the surface index of the Inflow boundary.")
         .add_property("mapO", &Nodes1DProvisioner::get_mapO, "Property containing the surface index of the Outflow boundary.")
         .add_property("nx", &Nodes1DProvisioner::get_nx_numpy, "Property containing the unit outward-pointing normal along elemental surface boundaries.");
+
+    object class_bcType = class_<BCType>("BCType")
+        .def_readonly("Neuman", &BCType::Neuman)
+        .def_readonly("Dirichlet", &BCType::Dirichlet)
+        .def_readonly("Wall", &BCType::Wall);
+    object bcType = class_bcType();
+
+    scope().attr("BCType") = bcType; // injects x into current scope
+
 
     class_<VandermondeBuilders>("VandermondeBuilder")
         .def("buildVandermondeMatrix", &VandermondeBuilders::buildVandermondeMatrix_numpy, "Build Generalized Vandermonde matrix for a numpy 1D array of input points, r.", args("self", "r", "includeInverse", "order"));
