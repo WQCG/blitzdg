@@ -170,7 +170,6 @@ namespace blitzdg{
                 ys1 = blitz::sum(gDs(ii, jj)*yLocal(jj), jj);
 
                 J1 = -xs1*yr1 + xr1*ys1;
-
                 if (normFro(J1) < 10.0*std::numeric_limits<double>::epsilon()) {
                     throw std::runtime_error("Fatally small elemental Jacobian. Terminating...");
                 }
