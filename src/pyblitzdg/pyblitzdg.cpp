@@ -191,7 +191,7 @@ BOOST_PYTHON_MODULE(pyblitzdg)
         .def("writeFieldToFile", &VtkOutputter::writeFieldToFile_numpy, "Write a field to a .vtu file for a given time-index number.")
         .def("writeFieldsToFiles", &VtkOutputter::writeFieldsToFiles_numpy, "Write a dictionary of fields to a set of .vtu files for a given time-index number.");
 
-    class_<Poisson2DSparseMatrix, boost::noncopyable>("Poisson2DSparseMatrix", init<DGContext2D&, MeshManager&>(args("DGContext2D", "MeshManager")))
+    class_<Poisson2DSparseMatrix, boost::noncopyable>("Poisson2DSparseMatrix", init<DGContext2D&, MeshManager&, index_type, index_type>(args("DGContext2D", "MeshManager", "bordered", "skipDG")))
         .def(init<DGContext2D&, MeshManager&, GaussFaceContext2D&, CubatureContext2D&>(args("DGContext2D", "MeshManager", "GaussFaceContext2D", "CubatureContext2D")))
         .def("buildBcRhs", &Poisson2DSparseMatrix::buildBcRhs_numpy, "Build boundary conditions contribution to right-hand side of the linear system for the Poisson problem.")
         //.def("buildCubatureBcRhs", buildBcRhsCurved_ptr, "Build boundary conditions contribution to right-hand side of the linear system for the Poisson problem from cubature context and Gauss face context")
@@ -199,5 +199,3 @@ BOOST_PYTHON_MODULE(pyblitzdg)
         .def("getMM", &Poisson2DSparseMatrix::getMM_numpy, "Read-only property containing the DG-discretize sparse 2D Mass Matrix.");
 
 }
-
-
