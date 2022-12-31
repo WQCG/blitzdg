@@ -1,5 +1,5 @@
 
-// Copyright (C) 2017-2020  Waterloo Quantitative Consulting Group, Inc.
+// Copyright (C) 2017-2022  Waterloo Quantitative Consulting Group, Inc.
 // See COPYING and LICENSE files at project root for more details.
 
 #include "Nodes1DProvisioner.hpp"
