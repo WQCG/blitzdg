@@ -19,11 +19,12 @@ namespace blitzdg {
     std::unique_ptr<CSCMat> OP_, MM_;
     std::unique_ptr<real_matrix_type> BcRhs_;
 
-    void buildPoissonOperator(DGContext2D& dg, MeshManager& mshManager, const index_vector_type& bcType);
+    void buildPoissonOperator(DGContext2D& dg, MeshManager& mshManager, const index_vector_type& bcType, index_type bordered, index_type skipDG);
+    void buildSEMPoissonOperator(DGContext2D& dg, MeshManager& mshManager, index_type bordered);
     void buildPoissonOperator(DGContext2D& dg, MeshManager& mshManager, const index_vector_type& bcType, GaussFaceContext2D& gCtx, CubatureContext2D& cubCtx);
 
     public:
-        Poisson2DSparseMatrix(DGContext2D& dg, MeshManager& mshManager);
+        Poisson2DSparseMatrix(DGContext2D& dg, MeshManager& mshManager, index_type bordered, index_type skipDG);
         Poisson2DSparseMatrix(DGContext2D& dg, MeshManager& mshManager, GaussFaceContext2D& gCtx, CubatureContext2D& cubCtx);
 
         void buildBcRhs(DGContext2D& dg, const MeshManager& mshManager, const real_matrix_type& ubc, const real_matrix_type& qbc, const index_vector_type& bcType);

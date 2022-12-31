@@ -1,4 +1,4 @@
-// Copyright (C) 2017-2020  Waterloo Quantitative Consulting Group, Inc.
+// Copyright (C) 2017-2022  Waterloo Quantitative Consulting Group, Inc.
 // See COPYING and LICENSE files at project root for more details.
 
 #include "MeshManager.hpp"
@@ -103,9 +103,9 @@ namespace blitzdg {
         for (index_type k=0; k < NumElements; ++k) {
             std::cout << k << ", " << E2V(NumFaces*k) << "\n";
             // Enforce counter-clockwise ordering of vertices in EToV table.
-            real_type ax = Vref(E2V(NumFaces*k)*NumFaces),   ay = Vref(E2V(NumFaces*k)*NumFaces+1);
-            real_type bx = Vref(E2V(NumFaces*k+1)*NumFaces), by = Vref(E2V(NumFaces*k+1)*NumFaces+1);
-            real_type cx = Vref(E2V(NumFaces*k+2)*NumFaces), cy = Vref(E2V(NumFaces*k+2)*NumFaces+1);
+            real_type ax = Vref(E2V(NumFaces*k)*Dim),   ay = Vref(E2V(NumFaces*k)*Dim+1);
+            real_type bx = Vref(E2V(NumFaces*k+1)*Dim), by = Vref(E2V(NumFaces*k+1)*Dim+1);
+            real_type cx = Vref(E2V(NumFaces*k+2)*Dim), cy = Vref(E2V(NumFaces*k+2)*Dim+1);
 
             real_type det = (ax-cx)*(by-cy) - (bx-cx)*(ay-cy);
 

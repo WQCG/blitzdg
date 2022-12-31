@@ -20,9 +20,13 @@ using boost::python::numpy::dtype;
 using boost::python::dict;
 
 namespace blitzdg{
-    Poisson2DSparseMatrix::Poisson2DSparseMatrix(DGContext2D& dg, MeshManager& mshManager) {
+    Poisson2DSparseMatrix::Poisson2DSparseMatrix(DGContext2D& dg, MeshManager& mshManager, index_type bordered, index_type CG) {
         const index_vector_type& bcType = mshManager.get_BCType();
-        buildPoissonOperator(dg, mshManager, bcType);
+        if (CG == 0) {
+            buildPoissonOperator(dg, mshManager, bcType, bordered, 0);
+            return;
+        } 
+        buildSEMPoissonOperator(dg, mshManager, bordered);
     }
 
     Poisson2DSparseMatrix::Poisson2DSparseMatrix(DGContext2D& dg, MeshManager& mshManager, GaussFaceContext2D& gCtx, CubatureContext2D& cubCtx) {
@@ -487,7 +491,104 @@ namespace blitzdg{
         throw std::runtime_error("Not yet implemented");
     }
 
-    void Poisson2DSparseMatrix::buildPoissonOperator(DGContext2D& dg, MeshManager& mshManager, const index_vector_type& bcType) {
+    void Poisson2DSparseMatrix::buildSEMPoissonOperator(DGContext2D& dg, MeshManager& mshManager, index_type bordered) {
+        const index_type Np = dg.numLocalPoints();
+        const index_type K = dg.numElements();
+        const std::vector<index_type>& gather = dg.gather();
+        const std::vector<index_type>& scatter = dg.scatter();
+
+        const index_type sem_dof = gather.size();
+
+        index_matrix_type DG2SEM_map(Np, K); // = reshape(j, Np, K);
+        DG2SEM_map = 0;
+        index_type ind = 0;
+        for (index_type k=0; k < K; ++k) {
+            for (index_type n=0; n < Np; ++n) {
+                DG2SEM_map(n, k) = scatter.at(ind);
+                ++ind;
+            }
+        }
+
+        const real_matrix_type& Dr = dg.Dr();
+        const real_matrix_type& Ds = dg.Ds();
+
+        const real_matrix_type& rx = dg.rx();
+        const real_matrix_type& ry = dg.ry();
+        const real_matrix_type& sx = dg.sx();
+        const real_matrix_type& sy = dg.sy();
+        const real_matrix_type& J = dg.jacobian();
+
+        const real_matrix_type& Vinv = dg.Vinv();
+
+        blitz::firstIndex ii;
+        blitz::secondIndex jj;
+        blitz::thirdIndex kk;
+
+        real_matrix_type MassMatrix(Np, Np);
+        MassMatrix = blitz::sum(Vinv(kk,ii)*Vinv(kk,jj),kk);
+
+        // allocate storage for sparse matrix entries.
+        index_type dof_inc = 0;
+        std::cout << "bordered: " << bordered << "\n";
+        if (bordered != 0) {
+            dof_inc = 1;
+        }
+        SparseTriplet MM(sem_dof, sem_dof, Np*Np*K),
+            OP(Np*K + dof_inc, Np*K + dof_inc, 10*Np*Np*K + dof_inc*2*sem_dof);
+
+        index_vector_type entries(Np*Np), entriesMM(Np*Np);
+
+        entries = ii;
+        entriesMM = ii;
+        
+
+        for (index_type k=0; k < K; ++k) {
+            index_matrix_type rows1(Np, Np), cols1(Np, Np);
+            index_vector_type slice(Np);
+            slice = DG2SEM_map(blitz::Range::all(), k);
+
+            rows1 = slice(ii)*(0*jj + 1);
+            cols1 = rows1(jj, ii);
+
+            real_matrix_type Dx(Np, Np), Dy(Np, Np);
+
+            Dx = rx(0, k)*Dr + sx(0, k)*Ds;
+            Dy = ry(0, k)*Dr + sy(0, k)*Ds;
+
+            real_matrix_type OP11(Np, Np), tmp(Np, Np);
+
+            // 'Volume' contribution.
+            tmp   = blitz::sum(Dx(kk, ii)*MassMatrix(kk, jj), kk);
+            OP11  = blitz::sum(tmp(ii, kk)*Dx(kk, jj), kk);
+            tmp   = blitz::sum(Dy(kk, ii)*MassMatrix(kk, jj), kk);
+            OP11 += blitz::sum(tmp(ii, kk)*Dy(kk, jj), kk);
+            OP11 *= J(0, k);
+
+            tmp = J(0, k)*MassMatrix;                    
+            for (index_type i=0; i < Np; ++i ) {
+                for (index_type j=0; j < Np; ++j) {
+                    OP.insert(rows1(i, j), cols1(i, j), OP11(i,j));
+                    MM.insert(rows1(i, j), cols1(i, j), tmp(i,j));
+                }
+            }
+            entries += Np*Np;
+            entriesMM += Np*Np;
+        }
+
+        if (bordered != 0) {
+            std::cout << "Bordering on\n";
+            for (index_type k = 0; k < sem_dof; ++k) {
+                OP.insert(sem_dof, k, 1.0);
+                OP.insert(k, sem_dof, 1.0);
+            }
+        }
+
+
+        OP_ = std::make_unique<CSCMat>(OP);
+        MM_ = std::make_unique<CSCMat>(MM);
+    }
+
+    void Poisson2DSparseMatrix::buildPoissonOperator(DGContext2D& dg, MeshManager& mshManager, const index_vector_type& bcType, index_type bordered, index_type skipDG) {
         const real_matrix_type& Dr = dg.Dr();
         const real_matrix_type& Ds = dg.Ds();
 
@@ -538,7 +639,24 @@ namespace blitzdg{
         const real_vector_type& r = dg.r(), s = dg.s();
         const real_matrix_type& nx = dg.nx(), ny  = dg.ny();
 
-        real_vector_type edge1(Nfp), edge2(Nfp), edge3(Nfp);
+        // could us ptr here.
+        std::vector<real_vector_type> standardFaces;
+        if (Nfaces == 3) {
+            standardFaces.push_back(r);
+            standardFaces.push_back(r);
+            standardFaces.push_back(s);
+        } else if (Nfaces == 4) {
+            standardFaces.push_back(r);
+            standardFaces.push_back(s);
+            standardFaces.push_back(r);
+            standardFaces.push_back(s);
+        } else {
+            throw std::runtime_error(std::string("Unsupported element with Nfaces = ") + std::to_string(Nfaces));
+        }
+
+        // loop over edgies. 
+
+        real_vector_type edge1(Nfp), edge2(Nfp), edge3(Nfp), edge4(Nfp); // or matrix_type (Nfaces, Nfp)...
         for (index_type i=0; i < Nfp; ++i) {
             edge1(i) = r(Fmask(i, 0));
         }
@@ -576,9 +694,14 @@ namespace blitzdg{
             }
         }
         
-        // allocate storage for sparse matrix entries. 
-        SparseTriplet MM(Np*K, Np*K, Np*Np*K),
-            OP(Np*K, Np*K, (1+Nfaces)*Np*Np*K);
+        // allocate storage for sparse matrix entries.
+        index_type dof = Np*K, dof_inc = 0;
+        std::cout << "bordered: " << bordered << "\n";
+        if (bordered != 0) {
+            dof_inc = 1;
+        }
+        SparseTriplet MM(dof, dof, Np*Np*K),
+            OP(Np*K + dof_inc, Np*K + dof_inc, (1+Nfaces)*Np*Np*K + dof_inc*2*dof);
 
         index_vector_type entries(Np*Np), entriesMM(Np*Np);
 
@@ -642,59 +765,62 @@ namespace blitzdg{
 
                 real_type gtau = 100*100*2*(N+1)*(N+1)*hinv; // set penalty scaling
 
-                switch(bcType(Nfaces*k1 +f1)) {
-                case BCTag::Dirichlet:
-                    OP11 += ( gtau*mmE - blitz::sum(mmE(ii,kk)*Dn1(kk,jj), kk) - blitz::sum(Dn1(kk,ii)*mmE(kk,jj), kk) ); // ok
-                    break;
-                case BCTag::Neuman:
-                case BCTag::Wall:
-                    break;
-                default:
-                    // interior face variational terms
-                    OP11 += 0.5*( gtau*mmE(ii,jj) - blitz::sum(mmE(ii,kk)*Dn1(kk,jj), kk) - blitz::sum(Dn1(kk,ii)*mmE(kk,jj), kk) );
+                // If we are using DG, then do the DG terms.
+                if (skipDG == 0) {
+                    switch(bcType(Nfaces*k1 +f1)) {
+                    case BCTag::Dirichlet:
+                        OP11 += ( gtau*mmE - blitz::sum(mmE(ii,kk)*Dn1(kk,jj), kk) - blitz::sum(Dn1(kk,ii)*mmE(kk,jj), kk) ); // ok
+                        break;
+                    case BCTag::Neuman:
+                    case BCTag::Wall:
+                        break;
+                    default:
+                        // interior face variational terms
+                        OP11 += 0.5*( gtau*mmE(ii,jj) - blitz::sum(mmE(ii,kk)*Dn1(kk,jj), kk) - blitz::sum(Dn1(kk,ii)*mmE(kk,jj), kk) );
 
-                    real_matrix_type OP12(Np, Np);
-                    OP12 = 0.0;
+                        real_matrix_type OP12(Np, Np);
+                        OP12 = 0.0;
 
-                    for (index_type i=0; i < Np; ++i) {
-                        for (index_type j=0; j < Nfp; ++j) {
-                            OP12(i, Fm2(j)) +=             - 0.5*( gtau*mmE(i, Fm1(j)) );  
+                        for (index_type i=0; i < Np; ++i) {
+                            for (index_type j=0; j < Nfp; ++j) {
+                                OP12(i, Fm2(j)) +=             - 0.5*( gtau*mmE(i, Fm1(j)) );  
+                            }
                         }
+
+                        // sliced temporaries.
+                        real_matrix_type mmE_Fm1Fm1(Nfp, Nfp), Dn2_Fm2(Nfp, Np),
+                            mmE_Fm1(Np, Nfp), prod1(Nfp, Np), prod2(Np, Nfp);
+
+                        mmE_Fm1Fm1 = 0.0; Dn2_Fm2 = 0.0;
+                        mmE_Fm1 = 0.0;
+                        for (index_type i=0; i < Nfp; ++i) {
+                            for(index_type j=0; j < Nfp; ++j) {
+                                mmE_Fm1Fm1(i, j) = mmE(Fm1(i), Fm1(j));
+                            }
+                            for(index_type j=0; j < Np; ++j) {
+                                Dn2_Fm2(i, j) = Dn2(Fm2(i), j);
+                                mmE_Fm1(j, i) = mmE(j, Fm1(i));
+                            }
+                        }
+
+                        // products needed in the face-to-neighbour variational terms assembly.
+                        prod1 = blitz::sum(mmE_Fm1Fm1(ii, kk)*Dn2_Fm2(kk, jj), kk);
+                        prod2 = blitz::sum(-Dn1(kk, ii)*mmE_Fm1(kk, jj), kk);
+
+                        for (index_type i=0; i < Np; ++i) {
+                            for (index_type j=0; j < Nfp; ++j) {
+                                OP12(Fm1(j), i) += -0.5*prod1(j, i);
+                                OP12(i, Fm2(j)) += -0.5*prod2(i, j);
+                            }
+                        }
+
+                        for (index_type i=0; i < Np; ++i) {
+                            for (index_type j=0; j < Np; ++j) { 
+                                OP.insert(rows1(i, j), cols2(i, j), OP12(i, j));
+                            }
+                        }
+                        entries += Np*Np;
                     }
-
-                    // sliced temporaries.
-                    real_matrix_type mmE_Fm1Fm1(Nfp, Nfp), Dn2_Fm2(Nfp, Np),
-                        mmE_Fm1(Np, Nfp), prod1(Nfp, Np), prod2(Np, Nfp);
-
-                    mmE_Fm1Fm1 = 0.0; Dn2_Fm2 = 0.0;
-                    mmE_Fm1 = 0.0;
-                    for (index_type i=0; i < Nfp; ++i) {
-                        for(index_type j=0; j < Nfp; ++j) {
-                            mmE_Fm1Fm1(i, j) = mmE(Fm1(i), Fm1(j));
-                        }
-                        for(index_type j=0; j < Np; ++j) {
-                            Dn2_Fm2(i, j) = Dn2(Fm2(i), j);
-                            mmE_Fm1(j, i) = mmE(j, Fm1(i));
-                        }
-                    }
-
-                    // products needed in the face-to-neighbour variational terms assembly.
-                    prod1 = blitz::sum(mmE_Fm1Fm1(ii, kk)*Dn2_Fm2(kk, jj), kk);
-                    prod2 = blitz::sum(-Dn1(kk, ii)*mmE_Fm1(kk, jj), kk);
-
-                    for (index_type i=0; i < Np; ++i) {
-                        for (index_type j=0; j < Nfp; ++j) {
-                            OP12(Fm1(j), i) += -0.5*prod1(j, i);
-                            OP12(i, Fm2(j)) += -0.5*prod2(i, j);
-                        }
-                    }
-
-                    for (index_type i=0; i < Np; ++i) {
-                        for (index_type j=0; j < Np; ++j) { 
-                            OP.insert(rows1(i, j), cols2(i, j), OP12(i, j));
-                        }
-                    }
-                    entries += Np*Np;
                 }
             }
 
@@ -708,6 +834,15 @@ namespace blitzdg{
             entries += Np*Np;
             entriesMM += Np*Np;
         }
+
+        if (bordered != 0) {
+            std::cout << "Bordering on\n";
+            for (index_type k = 0; k < dof; ++k) {
+                OP.insert(dof, k, 1.0);
+                OP.insert(k, dof, 1.0);
+            }
+        }
+
 
         OP_ = std::make_unique<CSCMat>(OP);
         MM_ = std::make_unique<CSCMat>(MM);
