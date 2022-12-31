@@ -200,6 +200,8 @@ namespace blitzdg {
     const real_matrix_type& get_ny() const { return *ny; };
 
     int get_NumElements() const { return NumElements; };
+    
+    int get_NumFacePoints() const { return NumFacePoints; };
 
     int get_NOrder() const { return NOrder; };
 
