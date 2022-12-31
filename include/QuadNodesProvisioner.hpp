@@ -1,4 +1,4 @@
-// Copyright (C) 2017-2020  Waterloo Quantitative Consulting Group, Inc. 
+// Copyright (C) 2017-2022  Waterloo Quantitative Consulting Group, Inc. 
 // See COPYING and LICENSE files at project root for more details. 
 
 /**
@@ -200,6 +200,8 @@ namespace blitzdg {
     const real_matrix_type& get_ny() const { return *ny; };
 
     int get_NumElements() const { return NumElements; };
+    
+    int get_NumFacePoints() const { return NumFacePoints; };
 
     int get_NOrder() const { return NOrder; };
 

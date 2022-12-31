@@ -1,4 +1,4 @@
-// Copyright (C) 2017-2020  Waterloo Quantitative Consulting Group, Inc.
+// Copyright (C) 2017-2022  Waterloo Quantitative Consulting Group, Inc.
 // See COPYING and LICENSE files at project root for more details.
 
 #include "LinAlgHelpers.hpp"
@@ -118,13 +118,7 @@ namespace blitzdg {
                 Nodes1DProvisioner & nodes1D = *nodes1DProvisioner;
 
                 nodes1D.buildNodes();
-
-                cout << "Nodes built.\n";
-
                 nodes1D.computeJacobian();
-
-                cout << "Jacobian computed.\n";
-
 
                 const real_matrix_type & J = nodes1D.get_J();
                 const real_matrix_type & rx = nodes1D.get_rx();

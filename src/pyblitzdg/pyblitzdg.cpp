@@ -1,4 +1,4 @@
-// Copyright (C) 2017-2020  Waterloo Quantitative Consulting Group, Inc.
+// Copyright (C) 2017-2022  Waterloo Quantitative Consulting Group, Inc.
 // See COPYING and LICENSE files at project root for more details.
 
 /**
@@ -48,6 +48,12 @@ namespace blitzdg {
             return a;
         }
     };
+
+    struct BCType {
+        int Dirichlet = 6;
+        int Neuman = 7;
+        int Wall = 3;
+    };
 }
 
 BOOST_PYTHON_MODULE(pyblitzdg)
@@ -73,6 +79,15 @@ BOOST_PYTHON_MODULE(pyblitzdg)
         .add_property("mapI", &Nodes1DProvisioner::get_mapI, "Property containing the surface index of the Inflow boundary.")
         .add_property("mapO", &Nodes1DProvisioner::get_mapO, "Property containing the surface index of the Outflow boundary.")
         .add_property("nx", &Nodes1DProvisioner::get_nx_numpy, "Property containing the unit outward-pointing normal along elemental surface boundaries.");
+
+    object class_bcType = class_<BCType>("BCType")
+        .def_readonly("Neuman", &BCType::Neuman)
+        .def_readonly("Dirichlet", &BCType::Dirichlet)
+        .def_readonly("Wall", &BCType::Wall);
+    object bcType = class_bcType();
+
+    scope().attr("BCType") = bcType; // injects x into current scope
+
 
     class_<VandermondeBuilders>("VandermondeBuilder")
         .def("buildVandermondeMatrix", &VandermondeBuilders::buildVandermondeMatrix_numpy, "Build Generalized Vandermonde matrix for a numpy 1D array of input points, r.", args("self", "r", "includeInverse", "order"));
@@ -176,7 +191,7 @@ BOOST_PYTHON_MODULE(pyblitzdg)
         .def("writeFieldToFile", &VtkOutputter::writeFieldToFile_numpy, "Write a field to a .vtu file for a given time-index number.")
         .def("writeFieldsToFiles", &VtkOutputter::writeFieldsToFiles_numpy, "Write a dictionary of fields to a set of .vtu files for a given time-index number.");
 
-    class_<Poisson2DSparseMatrix, boost::noncopyable>("Poisson2DSparseMatrix", init<DGContext2D&, MeshManager&>(args("DGContext2D", "MeshManager")))
+    class_<Poisson2DSparseMatrix, boost::noncopyable>("Poisson2DSparseMatrix", init<DGContext2D&, MeshManager&, index_type, index_type>(args("DGContext2D", "MeshManager", "bordered", "skipDG")))
         .def(init<DGContext2D&, MeshManager&, GaussFaceContext2D&, CubatureContext2D&>(args("DGContext2D", "MeshManager", "GaussFaceContext2D", "CubatureContext2D")))
         .def("buildBcRhs", &Poisson2DSparseMatrix::buildBcRhs_numpy, "Build boundary conditions contribution to right-hand side of the linear system for the Poisson problem.")
         //.def("buildCubatureBcRhs", buildBcRhsCurved_ptr, "Build boundary conditions contribution to right-hand side of the linear system for the Poisson problem from cubature context and Gauss face context")
@@ -184,5 +199,3 @@ BOOST_PYTHON_MODULE(pyblitzdg)
         .def("getMM", &Poisson2DSparseMatrix::getMM_numpy, "Read-only property containing the DG-discretize sparse 2D Mass Matrix.");
 
 }
-
-
