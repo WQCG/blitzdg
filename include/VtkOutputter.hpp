@@ -123,7 +123,7 @@ private:
             index_type nodeId = 0;
             for (index_type k=0; k < K; ++k) {
                 for (index_type n=0; n < Np; ++n) {
-                    points->InsertPoint(nodeId, x(n, k), y(n, k), field(n,k) );
+                    points->InsertPoint(nodeId, x(n, k), y(n, k), 0.0 );
                     
                     array->SetValue(nodeId, field(n,k));
 
