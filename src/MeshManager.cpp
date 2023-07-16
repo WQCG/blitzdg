@@ -101,7 +101,6 @@ namespace blitzdg {
 
     
         for (index_type k=0; k < NumElements; ++k) {
-            std::cout << k << ", " << E2V(NumFaces*k) << "\n";
             // Enforce counter-clockwise ordering of vertices in EToV table.
             real_type ax = Vref(E2V(NumFaces*k)*Dim),   ay = Vref(E2V(NumFaces*k)*Dim+1);
             real_type bx = Vref(E2V(NumFaces*k+1)*Dim), by = Vref(E2V(NumFaces*k+1)*Dim+1);
@@ -110,8 +109,16 @@ namespace blitzdg {
             real_type det = (ax-cx)*(by-cy) - (bx-cx)*(ay-cy);
 
             if (det < 0) {
-                using std::swap;
-                swap(E2V(NumFaces*k+1), E2V(NumFaces*k+2));
+                // Flip the ordering.
+                index_type tmp = E2V(NumFaces*k+1);
+                if (NumFaces == 3) {
+                    E2V(NumFaces*k+1) = E2V(NumFaces*k+2);
+                    E2V(NumFaces*k+2) = tmp;
+                } else if (NumFaces == 4) {
+                    E2V(NumFaces*k+1) = E2V(NumFaces*k+2);
+                    E2V(NumFaces*k+2) = E2V(NumFaces*k+3);
+                    E2V(NumFaces*k+3) = tmp;
+                }
             }
         }
 
@@ -300,11 +307,15 @@ namespace blitzdg {
             if (det < 0) {
                 // Flip the ordering.
                 index_type tmp = E2V(NumFaces*k+1);
-                E2V(NumFaces*k+1) = E2V(NumFaces*k+2);
-                E2V(NumFaces*k+2) = tmp;
+                if (NumFaces == 3) {
+                    E2V(NumFaces*k+1) = E2V(NumFaces*k+2);
+                    E2V(NumFaces*k+2) = tmp;
+                } else if (NumFaces == 4) {
+                    E2V(NumFaces*k+1) = E2V(NumFaces*k+3);
+                    E2V(NumFaces*k+3) = tmp;
+                }
             }
         }
-
 
         buildConnectivity();
 

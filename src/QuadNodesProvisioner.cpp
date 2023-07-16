@@ -730,7 +730,7 @@ namespace blitzdg {
 
 		index_type count = 0;
 
-		index_matrix_type counter(N+1,N+1);
+		index_matrix_type counter(N+1, N+1);
 		counter = -1; // -1 == 'No Value'
 
 		for (index_type n=0; n < N+1; ++n) {
@@ -754,7 +754,7 @@ namespace blitzdg {
 		for (index_type n=0; n < N; ++n) {
 			for (index_type m=0; m < N; ++m) {
 				index_type v1 = counter(n,m), v2 = counter(n,m+1),
-					v3 = counter(n+1, m), v4 = counter(n+1,m+1);
+					v3 = counter(n+1, m+1), v4 = counter(n+1,m);
 
 				index_vector_type quad1234(4);
 				quad1234 = v1,v2,v3,v4;

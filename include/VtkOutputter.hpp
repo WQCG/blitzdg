@@ -131,10 +131,11 @@ private:
                     ++nodeId;
                 }
 
-                if (cellTypes[Np] == VTK_QUAD) {
-					std::swap(nodes[1], nodes[3]);
-					std::swap(nodes[1], nodes[2]);
-                }
+				// This seems to make a mess of things in paraview (for N==1?). Probably don't want it.
+                //if (cellTypes[Np] == VTK_QUAD) {
+				//	std::swap(nodes[1], nodes[3]);
+				//	std::swap(nodes[1], nodes[2]);
+                //}
 
 				unstructuredGrid->InsertNextCell(cellTypes[Np], Np, nodes.data());
             }
