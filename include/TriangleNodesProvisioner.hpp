@@ -163,6 +163,9 @@ namespace blitzdg {
       */
       void computeVandermondeMatrix(index_type N, const real_vector_type & r, const real_vector_type & s, real_matrix_type & V) const;
 
+      pyarray computeVandermondeMatrix_numpy(index_type N, const pyarray & r, const pyarray & s) const;
+
+
      /**
       * Computes the Gradient of the 2D Vandermonde matrix.
       * @param[in] N Order of the approximating polynomials;.

@@ -115,11 +115,14 @@ BOOST_PYTHON_MODULE(pyblitzdg)
         .def("buildFilter", &TriangleNodesProvisioner::buildFilter, "Method to construct a polynomial spectral filter that can be retrieved from the dgContext.")
         .def("buildGaussFaceNodes", &TriangleNodesProvisioner::buildGaussFaceNodes, "Method to construct a Gaussian quadrature mesh along faces of order NGauss", args("self", "NGauss (integer)"))
         .def("buildCubatureVolumeMesh", &TriangleNodesProvisioner::buildCubatureVolumeMesh, "Method to construct a 2D cubature mesh on each element.", args("self", "NCubature (integer)"))
-        .def("dgContext", &TriangleNodesProvisioner::get_DGContext, "Read-only property containing the 2D triangular DG Context containing all the data necessary for a spatial discretization of the domain of interest.");
+        .def("dgContext", &TriangleNodesProvisioner::get_DGContext, "Read-only property containing the 2D triangular DG Context containing all the data necessary for a spatial discretization of the domain of interest.")
+        .def("computeVandermondeMatrix", &TriangleNodesProvisioner::computeVandermondeMatrix_numpy, "Builds 2D generalized Vandermonde matrix");
 
     class_<QuadNodesProvisioner, boost::noncopyable>("QuadNodesProvisioner", init<index_type, MeshManager&>())
         .def("buildFilter", &QuadNodesProvisioner::buildFilter, "Method to construct a polynomial spectral filter that can be retrieved from the dgContext.")
         .def("dgContext", &QuadNodesProvisioner::get_DGContext, "Read-only property containing the 2D quadrilateral DG Context containing all the data necessary for a spatial discretization of the domain of interest.");
+        //.def("computeVandermondeMatrix", &QuadNodesProvisioner::compuyteVandermondeMatrix_numpy, "Builds 2D generalized Vandermonde matrix");
+
     
     class_<GaussFaceContext2D>("GaussFaceContext2D", init<>())
         .add_property("NGauss", &GaussFaceContext2D::NGauss)

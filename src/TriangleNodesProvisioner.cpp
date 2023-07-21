@@ -433,6 +433,35 @@ namespace blitzdg {
         }
     }
 
+    pyarray TriangleNodesProvisioner::computeVandermondeMatrix_numpy(index_type N, const pyarray & r, const pyarray & s) const {
+        const index_type Nr = r.shape(0);  // Ns assumed same. // 6 
+        const index_type Np = NumLocalPoints;  // 15
+
+        char * rRaw = r.get_data();
+        char * sRaw = s.get_data();
+
+        // Target grid.
+        real_vector_type rout(Nr), sout(Nr);
+        rout = 0.0;
+        sout = 0.0;
+
+        std::copy(&rRaw[0], &rRaw[r.shape(0)*sizeof(real_type)], reinterpret_cast<char*>(rout.data()));
+        std::copy(&sRaw[0], &sRaw[s.shape(0)*sizeof(real_type)], reinterpret_cast<char*>(sout.data()));
+
+        real_matrix_type V2D(Nr, Np);
+        V2D = 0.0;
+
+        computeVandermondeMatrix(N, rout, sout, V2D);
+
+        Py_intptr_t shape[2] = { Nr, Np };
+        pyarray Vpy = zeros(2, shape, dtype::get_builtin<real_type>());
+
+        char * raw = reinterpret_cast<char*>(V2D.data());
+        std::copy(&raw[0], &raw[Nr*Np*sizeof(real_type)], Vpy.get_data());
+
+        return Vpy;
+    }
+
     void TriangleNodesProvisioner::computeGradVandermondeMatrix(index_type N,  const real_vector_type & r, const real_vector_type & s, real_matrix_type & V2Dr, real_matrix_type & V2Ds) const {
         const index_type Nr = r.length(0);
         real_vector_type a(Nr), b(Nr);
